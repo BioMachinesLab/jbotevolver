@@ -1,23 +1,26 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.LinkedList;
-
+import java.util.Vector;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
-
+import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
+import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 import simulation.Simulator;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class NeuralNetworkController extends Controller implements FixedLenghtGenomeEvolvableController {
 	protected NeuralNetwork neuralNetwork;
 
-	// Robot robot;
+	public NeuralNetworkController(Simulator simulator, Robot robot, Arguments args) {
+		super(simulator, robot, args);
+		
+		Vector<NNInput> inputs = simulator.getControllerFactory().getNNInputs(robot, args);
+		Vector<NNOutput> outputs = simulator.getControllerFactory().getNNOutputs(robot, args);
 
-	public NeuralNetworkController(Simulator simulator, Robot robot,
-			NeuralNetwork neuralNetwork) {
-		super(simulator, robot);
-		this.neuralNetwork = neuralNetwork;
-		// this.robot = robot;
+		neuralNetwork = new MulitlayerPerceptron(inputs, outputs, args);
+		simulator.getControllerFactory().setChromosomeLenght(getRequiredNumberOfWeights());
 	}
 
 	public boolean isAlive() {

@@ -92,7 +92,6 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 					drawPreys(graphics, (Prey)m);
 					break;
 				case ROBOT:
-					System.out.println("robot");
 					drawRobot(graphics, (Robot) m);
 					break;
 				case LIGHTPOLE:
@@ -215,45 +214,13 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 		}
 		graphics.fillOval(x, y, circleDiameter, circleDiameter);
 		graphics.setColor(Color.BLACK);
-
-//		double orientation  = prey.getOrientation();
-//		Vector2d p0 = new Vector2d();
-//		Vector2d p1 = new Vector2d();
-//		Vector2d p2 = new Vector2d();
-//		p0.set( 0, -prey.getRadius() / 3);
-//		p1.set( 0, prey.getRadius() / 3);
-//		p2.set( 6 * prey.getRadius() / 7, 0);
-//
-//		p0.rotate(orientation);
-//		p1.rotate(orientation);
-//		p2.rotate(orientation);
-//
-//		int[] xp = new int[3];
-//		int[] yp = new int[3];
-//
-//		xp[0] = transformX(p0.getX() + prey.getPosition().getX());
-//		yp[0] = transformY(p0.getY() + prey.getPosition().getY());
-//
-//		xp[1] = transformX(p1.getX() + prey.getPosition().getX());
-//		yp[1] = transformY(p1.getY() + prey.getPosition().getY());
-//
-//		xp[2] = transformX(p2.getX() + prey.getPosition().getX());
-//		yp[2] = transformY(p2.getY() + prey.getPosition().getY());
-//
-//		graphics.fillPolygon(xp, yp, 3);
-		
-		
-		//graphics.drawString(prey.getId()+"", x, y);
-
 	}
-
 
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
 			createImage();
 		
 		int circleDiameter = (int) Math.round(0.5 + robot.getDiameter() * scale);
-		System.out.println(robot.getDiameter());
 		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
 
@@ -264,7 +231,7 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 //		}
 		graphics.setColor(robot.getBodyColor());
 		graphics.fillOval(x, y, circleDiameter, circleDiameter);
-		if (robot.getBodyColor() != Color.BLACK) {
+		if (!robot.getBodyColor().equals(Color.BLACK)) {
 			graphics.setColor(Color.BLACK);
 		} else {
 			graphics.setColor(Color.WHITE);
@@ -296,7 +263,6 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 
 		graphics.fillPolygon(xp, yp, 3);
 		graphics.setColor(Color.BLACK);
-//		graphics.drawString(robot.getId()+"", x, y);
 	}
 	
 

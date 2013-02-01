@@ -1,14 +1,8 @@
 package simulation;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
-
-import mathutils.Vector2d;
-
-import evolutionaryrobotics.neuralnetworks.BehaviorController;
-import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import factories.ControllerFactory;
 import factories.EnvironmentFactory;
 import factories.RobotFactory;
@@ -27,10 +21,6 @@ public class JBotSim {
 	
 	protected SimRandom simRandom  = new SimRandom();
 	protected long      randomSeed = 0;
-	
-	protected ControllerFactory      controllerFactory; 
-	protected RobotFactory           robotFactory;
-	protected EnvironmentFactory     environmentFactory;
 	
 	protected String[]  commandlineArguments = null;
 	protected Simulator simulator;
@@ -67,11 +57,7 @@ public class JBotSim {
 		SimRandom simRandom = new SimRandom();
 		simulator = new Simulator(simRandom);
 
-		environmentFactory = new EnvironmentFactory(simulator);
-		controllerFactory  = new ControllerFactory(simulator);
-		robotFactory       = new RobotFactory(simulator);
-
-		Environment environment = environmentFactory.getEnvironment(environmentArguments);
+		Environment environment = simulator.getEnvironmentFactory().getEnvironment(environmentArguments);
 		simulator.setEnvironment(environment);
 		environment.setup();
 		
@@ -91,8 +77,8 @@ public class JBotSim {
 	}
 	
 	protected Robot createOneRobot(Arguments robotArguments, Arguments controllerArguments) {
-		Robot robot = robotFactory.getRobot(robotArguments);
-		robot.setController(controllerFactory.getController(robot, controllerArguments));
+		Robot robot = simulator.getRobotFactory().getRobot(robotArguments);
+		robot.setController(simulator.getControllerFactory().getController(robot, controllerArguments));
 		robot.setPosition((simRandom.nextDouble() - 0.5) * simulator.getEnvironment().getWidth(), (simRandom.nextDouble() - 0.5) * simulator.getEnvironment().getHeight());
 		return robot;
 	}

@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import comm.FileProvider;
+import factories.ControllerFactory;
+import factories.EnvironmentFactory;
+import factories.RobotFactory;
 import simulation.environment.Environment;
 import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.PhysicalObject;
@@ -23,11 +26,18 @@ public class Simulator implements Serializable {
 	private int numberRobots = 0;
 	private int numberPhysicalObjects = 0;
 	private ArrayList<Runnable> callbacks = new ArrayList<Runnable>(); 
+	
+	protected ControllerFactory      controllerFactory; 
+	protected RobotFactory           robotFactory;
+	protected EnvironmentFactory     environmentFactory;
 
 	private GeometricCalculator calculator;
 	
 	public Simulator(SimRandom random) {
 		this.random = random;
+		environmentFactory = new EnvironmentFactory(this);
+		controllerFactory  = new ControllerFactory(this);
+		robotFactory       = new RobotFactory(this);
 		calculator = new GeometricCalculator();
 	}
 	
@@ -129,15 +139,23 @@ public class Simulator implements Serializable {
 		return timeDelta;
 	}
 
-	public void addNumberOfRobots() {
-		
-	}
-
 	public int getAndIncrementNumberPhysicalObjects(PhysicalObjectType type) {
 		return type == PhysicalObjectType.ROBOT ? this.numberRobots++ : MAXNUMBEROFROBOTS + numberPhysicalObjects++;
 	}
 
 	public void addNumbetrOfPhysicalObjects() {
 		this.numberPhysicalObjects++;
+	}
+	
+	public EnvironmentFactory getEnvironmentFactory() {
+		return environmentFactory;
+	}
+	
+	public ControllerFactory getControllerFactory() {
+		return controllerFactory;
+	}
+	
+	public RobotFactory getRobotFactory() {
+		return robotFactory;
 	}
 }

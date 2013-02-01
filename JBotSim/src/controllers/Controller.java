@@ -5,6 +5,7 @@ import java.io.Serializable;
 import simulation.Simulator;
 import simulation.SimulatorObject;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 /**
  * Superclass for all the robot control logic. Subclasses should override at least the method {@link #controlStep(int)}
@@ -28,9 +29,9 @@ public abstract class Controller extends SimulatorObject implements Serializable
 	/**
 	 *  Initialize a new controller for a {@link Robot}
 	 */
-	public Controller(Simulator simulator,Robot robot) {
+	public Controller(Simulator simulator,Robot robot,Arguments args) {
 		super();
-			this.robot = robot;
+		this.robot = robot;
 	}
 			
 	/**

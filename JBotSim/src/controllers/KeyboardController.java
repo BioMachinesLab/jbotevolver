@@ -4,6 +4,7 @@ import java.awt.event.KeyEvent;
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class KeyboardController extends Controller {
 
@@ -12,8 +13,8 @@ public class KeyboardController extends Controller {
 	double leftSpeed = 0;
 	double rightSpeed = 0;
 
-	public KeyboardController(Simulator simulator, Robot robot) {
-		super(simulator, robot);
+	public KeyboardController(Simulator simulator, Robot robot, Arguments args) {
+		super(simulator, robot, args);
 	}
 
 	public void controlStep(double time) {

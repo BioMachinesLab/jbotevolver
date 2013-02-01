@@ -27,8 +27,8 @@ public class OldProgrammedForager extends Controller {
 	private static final double MIN_NEST_SIGNAL = 0.8;
 	private static final int NUM_FULL_FORWARD_STEPS = 50;
 	private static final double MIN_COLIDE_DISTANCE = 0.9;
+	private double lastLightFrontMeasure = 0;
 	private double moveForwardSpeed = MAXSPEED;
-
 	private ConeTypeSensor nestSensors;
 	private ConeTypeSensor foodSensors;
 	private PreyCarriedSensor tray;
@@ -37,8 +37,6 @@ public class OldProgrammedForager extends Controller {
 	private RobotColorActuator topLight;
 	private ConeTypeSensor robotRedSensor;
 	private ConeTypeSensor robotBlueSensor;
-
-	private double lastLightFrontMeasure = 0;
 
 	private enum Action {
 		NA, TURN_LEFT, TURN_RIGHT, FORWORD, GRAB, RELEASE, TURN_RIGHT_AVOID, BACKWARD, LOST, FULL_FORWORD, MOVE_RIGHT, MOVE_LEFT
@@ -60,9 +58,8 @@ public class OldProgrammedForager extends Controller {
 	private double maxNextReading;
 	private InNestSensor inNestSensor;
 
-	public OldProgrammedForager(Simulator simulator, Robot robot,
-			Arguments arguments) {
-		super(simulator, robot);
+	public OldProgrammedForager(Simulator simulator, Robot robot, Arguments arguments) {
+		super(simulator, robot, arguments);
 
 		moveForwardSpeed = arguments
 				.getArgumentIsDefined("speedofpreprogrammedrobots") ? arguments
