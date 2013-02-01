@@ -5,6 +5,7 @@ import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.TwoRoomsEnvironment;
 import simulation.physicalobjects.Wall;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
@@ -38,7 +39,8 @@ public class OpenDoorActuator extends Actuator {
 					break;
 				}
 			}
-			rob.setWheelSpeed(0, 0);
+			
+			((DifferentialDriveRobot) robot).setWheelSpeed(0, 0);
 		}
 		open = false;
 	}

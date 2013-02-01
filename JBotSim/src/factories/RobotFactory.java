@@ -5,7 +5,6 @@ import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.MultiPreyPickerActuator;
 import simulation.robot.actuators.OpenDoorActuator;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.actuators.RobotColorActuator;
@@ -235,9 +234,7 @@ public class RobotFactory extends Factory implements Serializable {
 		} else if (name.equalsIgnoreCase("preypicker")
 				|| name.equalsIgnoreCase("preypickeractuator")) {
 			return new PreyPickerActuator(simulator, id, arguments);
-		} else if (name.equalsIgnoreCase("multipreypicker")
-				|| name.equalsIgnoreCase("multipreypickeractuator")) {
-			return new MultiPreyPickerActuator(simulator, id, arguments);
+		
 		} else if (name.equalsIgnoreCase("opendoor")
 				|| name.equalsIgnoreCase("opendooractuator")) {
 			return new OpenDoorActuator(simulator, id,arguments);
