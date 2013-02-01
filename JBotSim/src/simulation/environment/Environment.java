@@ -7,7 +7,6 @@ import java.awt.event.KeyListener;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricCalculator;
@@ -129,7 +128,6 @@ public abstract class Environment implements KeyListener, Serializable {
 				.getDistanceBetween(fromPoint, toObject, time);
 	}
 
-	// public void addMovableObject(MovableObject o) {
 	protected void addMovableObject(MovableObject o) {
 		movableObjects.add(o);
 		addObject(o);

@@ -15,7 +15,6 @@ import simulation.robot.actuators.RobotColorActuator;
 import simulation.robot.actuators.RobotRGBColorActuator;
 import simulation.robot.actuators.TwoWheelActuator;
 import simulation.robot.behaviors.OpenDoorBehavior;
-import simulation.robot.sensors.BehaviorSensor;
 import simulation.robot.sensors.EpuckLightSensor;
 import simulation.robot.sensors.WallButtonSensor;
 import simulation.robot.sensors.XRayPreySensor;
@@ -37,15 +36,6 @@ import simulation.robot.sensors.Sensor;
 import simulation.robot.sensors.SimpleLightTypeSensor;
 import simulation.robot.sensors.SimpleRobotColorSensor;
 import simulation.util.Arguments;
-import controllers.KeyboardController;
-import controllers.ProgrammedForager;
-import controllers.ProgrammedMazeSolver;
-import controllers.RobotFollower;
-import evolutionaryrobotics.neuralnetworks.BehaviorController;
-import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
-import evolutionaryrobotics.neuralnetworks.MulitlayerPerceptron;
-import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
-import evolutionaryrobotics.neuralnetworks.inputs.BehaviorNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.CompassNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.DoubleParameterNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.EpuckIRNNInput;
@@ -250,8 +240,6 @@ public class ControllerFactory extends Factory implements Serializable {
 				nnInputs.add(createInput(robot, "DoubleParameter", new Arguments("id=" + sensor.getId() + ",name=doubleparametersensor")));
 			}else if(sensor.getClass().equals(GroundRGBColorSensor.class)){
 				nnInputs.add(createInput(robot,"GroundRGBColorSensor", new Arguments("id=" +sensor.getId() + ",name=groundrgbcolorsensor")));
-			} else if(sensor.getClass().equals(BehaviorSensor.class)){
-				nnInputs.add(createInput(robot,"BehaviorSensor", new Arguments("id=" +sensor.getId() + ",name=behaviorsensor")));
 			} else if(sensor.getClass().equals(EpuckIRSensor.class)){
 				nnInputs.add(createInput(robot,"EPuckIRSensor", new Arguments("id=" +sensor.getId() + ",name=epuckirsensor")));
 			} else if(sensor.getClass().equals(WallButtonSensor.class)){
@@ -316,8 +304,6 @@ public class ControllerFactory extends Factory implements Serializable {
 			return new SysoutNNInput(createInput(robot, new_name, actuators));
 		} else if (name.equalsIgnoreCase("groundrgbcolor") || name.equalsIgnoreCase("groundrgbcolorsensor")) {
 			return new GroundRGBColorNNInput(robot.getSensorWithId(id));
-		} else if (name.equalsIgnoreCase("behavior") || name.equalsIgnoreCase("behaviorsensor")) {
-			return new BehaviorNNInput(robot.getSensorWithId(id), robot);
 		} else if (name.equalsIgnoreCase("epuckir") || name.equalsIgnoreCase("epuckirsensor")) {
 			return new EpuckIRNNInput(robot.getSensorWithId(id));
 		} else
