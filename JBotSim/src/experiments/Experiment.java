@@ -1,6 +1,7 @@
 package experiments;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import mathutils.Vector2d;
@@ -18,11 +19,11 @@ import factories.RobotFactory;
 public class Experiment implements Serializable {
 	protected Simulator simulator;
 	protected Environment   environment;
-	protected LinkedList<Robot> robots = new LinkedList<Robot>();
-	private boolean hasEnded                   = false;
-	public int numberOfRobots      = 0;
-	int robotNumber                = 1;
-	int numberOfStepsPerRun        = 100000;
+	protected ArrayList<Robot> robots = new ArrayList<Robot>();
+	private boolean hasEnded = false;
+	public int numberOfRobots = 0;
+	int robotNumber = 1;
+	int numberOfStepsPerRun = 100000;
 
 	ControllerFactory      controllerFactory; 
 	protected RobotFactory robotFactory;
@@ -211,7 +212,7 @@ public class Experiment implements Serializable {
 
 	}
 
-	public LinkedList<Robot> createRobots() {
+	public ArrayList<Robot> createRobots() {
 		robots.clear();
 
 		for (int i = 0; i < numberOfRobots; i++)
@@ -242,7 +243,7 @@ public class Experiment implements Serializable {
 		robot.setController(controllerFactory.getController(robot, argumentsControler));
 	}
 
-	public LinkedList<Robot> getRobots() {
+	public ArrayList<Robot> getRobots() {
 		return robots;
 	}
 
