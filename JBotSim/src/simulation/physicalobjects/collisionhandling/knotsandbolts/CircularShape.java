@@ -16,7 +16,6 @@ public class CircularShape extends Shape {
 		computeNewPositionAndOrientationFromParent();
 	}
 
-
 	public void computeNewPositionAndOrientationFromParent()
 	{
 		setPosition(parent.getPosition().getX() + relativePosition.getX(),
@@ -33,11 +32,12 @@ public class CircularShape extends Shape {
 		return COLLISION_OBJECT_TYPE_CIRCLE;
 	}
 
-
 	public double getRadius()
 	{
 		return radius;
 	}
 
-
+	public double getDiameter() {
+		return diameter;
+	}
 }

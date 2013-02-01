@@ -92,6 +92,7 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 					drawPreys(graphics, (Prey)m);
 					break;
 				case ROBOT:
+					System.out.println("robot");
 					drawRobot(graphics, (Robot) m);
 					break;
 				case LIGHTPOLE:
@@ -130,7 +131,6 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 	}
 
     public void drawWall(Wall m) {
-    	//System.out.println("draw wall");
     	
 		graphics.setColor(Color.blue);
 		
@@ -253,6 +253,7 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 			createImage();
 		
 		int circleDiameter = (int) Math.round(0.5 + robot.getDiameter() * scale);
+		System.out.println(robot.getDiameter());
 		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
 

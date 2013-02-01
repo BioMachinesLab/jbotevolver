@@ -1,6 +1,9 @@
 package factories;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+
+import controllers.Controller;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -65,66 +68,24 @@ public class RobotFactory extends Factory implements Serializable {
 	}
 
 	private Robot createRobot(Arguments arguments) {
-		if (arguments == null) {
-			arguments = new Arguments("name=differentialdrive");
-		}
-
 		if (!arguments.getArgumentIsDefined("name")) {
-			throw new RuntimeException("Robot 'name' not defined: "
-					+ arguments.toString());
+			throw new RuntimeException("Controller 'name' not defined: "+ arguments.toString());
 		}
 
 		String robotName = arguments.getArgumentAsString("name");
-		System.out.println("Robot name = " + robotName);
-		Robot robot = null;
-		if (robotName.equalsIgnoreCase("differentialdrive") 
-				|| (robotName.equalsIgnoreCase("simulation.robot.Robot"))
-				|| (robotName.equalsIgnoreCase("bee"))
-				|| (robotName.equalsIgnoreCase("MultiPreyForagerRobot"))
-				|| (robotName.equalsIgnoreCase("ardrone"))) {
-			Vector2d position = arguments.getArgumentIsDefined("position") ? arguments
-					.getArgumentAsVector2d("position") : new Vector2d(0, 0);
-			double orientation = arguments.getArgumentIsDefined("orientation") ? arguments
-					.getArgumentAsDouble("orientation") : simulator.getRandom()
-					.nextGaussian() * Math.PI;
-			double mass = arguments.getArgumentIsDefined("mass") ? arguments
-					.getArgumentAsDouble("mass") : 1.0;
-			double radius = arguments.getArgumentIsDefined("radius") ? arguments
-					.getArgumentAsDouble("radius") : 0.1;
-			double extraRadius = arguments.getArgumentIsDefined("extraradius") ? arguments
-							.getArgumentAsDouble("extraradius") : 0;
-			double distanceWheels = arguments.getArgumentIsDefined("distancewheels") ? arguments
-					.getArgumentAsDouble("distancewheels") : radius*2;
-			String color = arguments.getArgumentIsDefined("color") ? arguments
-					.getArgumentAsString("color") : "black";
 
-			if (robotName.equalsIgnoreCase("differentialdrive") || robotName.equalsIgnoreCase("simulation.robot.Robot"))
-				robot = new Robot(simulator, robotName + numberOfRobots++,
-						position.x, position.y, orientation, mass, radius,color);
-						
-			if (robotName.equalsIgnoreCase("MultiPreyForagerRobot")) {
-				int limit = arguments.getArgumentIsDefined("preyslimit") ? arguments
-						.getArgumentAsInt("preyslimit") : 10;
-				double preysCarriedSpeedReductionFactor = arguments
-						.getArgumentIsDefined("preysCarriedSpeedReductionFactor") ? arguments
-						.getArgumentAsDouble("preysCarriedSpeedReductionFactor")
-						: 0.8;
-				int penalizationDueToColision = arguments
-						.getArgumentIsDefined("penalizationDueToColision") ? arguments
-						.getArgumentAsInt("penalizationDueToColision") : 10;
-
-				int amountOfSafeTime = arguments
-						.getArgumentIsDefined("amountOfSafeTime") ? arguments
-						.getArgumentAsInt("amountOfSafeTime") : 10;
-
+		try {
+			Constructor<?>[] constructors = Class.forName(robotName).getDeclaredConstructors();
+			for (Constructor<?> constructor : constructors) {
+				Class<?>[] params = constructor.getParameterTypes();
+				return (Robot) constructor.newInstance(simulator,arguments);
 			}
-			
-//			robot.setExtraRadius(extraRadius);
 
-		} else {
-			throw new RuntimeException("Unknown robot type: " + robotName);
-		}
-		return robot;
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+
+		throw new RuntimeException("Unknown robot: " + robotName);
 	}
 
 	public void addSensors(Robot robot, 

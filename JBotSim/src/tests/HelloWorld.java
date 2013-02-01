@@ -15,7 +15,7 @@ public class HelloWorld {
 	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		LinkedList<String> arguments = new LinkedList<String>();
 		arguments.add("--robots");
-		arguments.add("robotconfigid=1,name=Robot,radius=.05,color=red,sensors=(),actuators=()");
+		arguments.add("robotconfigid=1,name=DifferentialDriveRobot,radius=.05,color=red,sensors=(),actuators=()");
 		arguments.add("--controllers");
 		arguments.add("name=KeyboardController");
 		arguments.add("--environment");

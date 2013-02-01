@@ -5,16 +5,15 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import controllers.Controller;
 import simulation.Simulator;
 import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
-import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.Sensor;
-import simulation.util.MathUtils;
+import simulation.util.Arguments;
+import controllers.Controller;
 
 /**
  * Representation of a circular, differential drive robot, including its physical characteristics such as size 
@@ -51,7 +50,6 @@ public class Robot extends MovableObject {
 	public static final int GREENINDEX = 1;
 	public static final int BLUEINDEX  = 2;
 	
-	
 	/**
 	 * Initialize a new robot.
 	 * 
@@ -63,8 +61,15 @@ public class Robot extends MovableObject {
 	 * @param radius the radius of the robot
 	 * @param color 
 	 */
-	public Robot(Simulator simulator, String name, double x, double y, double orientation, double mass, double radius, String color) {
-		super(simulator, name, x, y, orientation, mass, PhysicalObjectType.ROBOT, null);	
+	public Robot(Simulator simulator, Arguments args) {
+		super(simulator, args);
+		double x = args.getArgumentAsDoubleOrSetDefault("relativex",0);
+		double y = args.getArgumentAsDoubleOrSetDefault("relaivey",0);
+		double diameter = args.getArgumentAsDoubleOrSetDefault("diameter",0.1);
+		this.shape = new CircularShape(simulator, name + "CollisionObject", this, x, y, diameter, diameter/2);
+	}
+	 public Robot(Simulator simulator, String name, double x, double y, double orientation, double mass, double radius, String color) {
+		super(simulator, name, x, y, orientation, mass, PhysicalObjectType.ROBOT);
 		this.shape = new CircularShape(simulator, name + "CollisionObject", this, x, y, 2.0 * radius, radius);
 	}
 	
@@ -76,15 +81,6 @@ public class Robot extends MovableObject {
 	public Controller getController() {
 		return controller;
 	}
-	
-	/**
-	 * Get the evolving controller of a robot. The distinction of evolving/non-evolving controller
-	 * is needed because some controllers have sub-controllers in an hierarchical fashion.
-	 * @return the reference to the evolving controller for the robot (or null)
-	 */
-//	public Controller getEvolvingController() {
-//		return controller.getEvolvingController();
-//	}
 	
 	/**
 	 * Get a list of the robot's sensors.
@@ -353,4 +349,3 @@ public class Robot extends MovableObject {
 		return null;
 	}
 }
-

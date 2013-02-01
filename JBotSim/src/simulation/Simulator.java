@@ -7,6 +7,7 @@ import comm.FileProvider;
 import simulation.environment.Environment;
 import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.PhysicalObject;
+import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.Robot;
 import simulation.util.SimRandom;
 
@@ -128,16 +129,12 @@ public class Simulator implements Serializable {
 		return timeDelta;
 	}
 
-	public int getAndIncrementNumberRobots() {
-		return numberRobots++;
-	}
-
 	public void addNumberOfRobots() {
-		this.numberRobots++;
+		
 	}
 
-	public int getAndIncrementNumberPhysicalObjects() {
-		return MAXNUMBEROFROBOTS + numberPhysicalObjects++;
+	public int getAndIncrementNumberPhysicalObjects(PhysicalObjectType type) {
+		return type == PhysicalObjectType.ROBOT ? this.numberRobots++ : MAXNUMBEROFROBOTS + numberPhysicalObjects++;
 	}
 
 	public void addNumbetrOfPhysicalObjects() {

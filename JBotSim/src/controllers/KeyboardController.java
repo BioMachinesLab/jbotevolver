@@ -1,12 +1,11 @@
 package controllers;
 
 import java.awt.event.KeyEvent;
-
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 
-public class KeyboardController extends controllers.Controller {
+public class KeyboardController extends Controller {
 
 	public static final double SPEEDCHANGE = 0.01;
 

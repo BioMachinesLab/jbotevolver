@@ -82,7 +82,9 @@ public class JBotSim {
 		LinkedList<Robot> result = new LinkedList<Robot>();
 		
 		for (int i = 0; i < numberOfRobots; i++) {
-			result.add(createOneRobot(robotArguments, controllerArguments));
+			Robot r = createOneRobot(robotArguments, controllerArguments);
+			result.add(r);
+			simulator.getEnvironment().addRobot(r);
 		}
 		
 		return result;

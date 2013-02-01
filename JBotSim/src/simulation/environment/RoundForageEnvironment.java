@@ -75,10 +75,12 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 		
 		for(Robot robot: robots){
 			PreyCarriedSensor sensor = (PreyCarriedSensor)robot.getSensorByType(PreyCarriedSensor.class.getName());
-			if (sensor.preyCarried() && robot.isInvolvedInCollison()){
+			if (sensor != null && sensor.preyCarried() && robot.isInvolvedInCollison()){
 				PreyPickerActuator actuator = (PreyPickerActuator)robot.getActuatorByType(PreyPickerActuator.class.getName());
-				Prey preyToDrop = actuator.dropPrey();
-				preyToDrop.teleportTo(newRandomPosition());
+				if(actuator != null) {
+					Prey preyToDrop = actuator.dropPrey();
+					preyToDrop.teleportTo(newRandomPosition());
+				}
 			}
 		}
 	}

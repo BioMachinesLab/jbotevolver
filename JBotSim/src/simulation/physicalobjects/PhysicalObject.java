@@ -5,36 +5,48 @@ import simulation.Simulator;
 import simulation.SimulatorObject;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.Shape;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
+import simulation.util.Arguments;
 
 public class PhysicalObject extends SimulatorObject implements
 		Comparable<PhysicalObject> {
 
-	protected String name;
 	protected Vector2d position = new Vector2d();
 	protected double mass;
 	protected double orientation;
-	private   int id;
-	private   boolean involvedInCollison = false;
-	private   PhysicalObjectType type;
-	public    Shape shape = null;
+	private int id;
+	private boolean involvedInCollison = false;
+	private PhysicalObjectType type;
+	public Shape shape = null;
 
 	private boolean enabled = true;
 
-	public PhysicalObject(Simulator simulator, String name, double x, double y,
-			double orientation, double mass, PhysicalObjectType type) {
+	public PhysicalObject(Simulator simulator, Arguments args) {
+		super(args.getArgumentAsStringOrSetDefault("name", "defaultName"));
+		double x = args.getArgumentAsDouble("x");
+		double y = args.getArgumentAsDouble("y");
+		this.position.set(x,y);
+		
+		orientation = args.getArgumentAsDouble("orientation");
+		orientation = args.getArgumentAsDouble("mass");
+		type = PhysicalObjectType.valueOf(args.getArgumentAsStringOrSetDefault("type","ROBOT").toUpperCase());
+		
+		this.id = simulator.getAndIncrementNumberPhysicalObjects(type);
+	}
+	
+	public PhysicalObject(Simulator simulator, String name, double x, double y, double orientation, double mass, PhysicalObjectType type) {
 		super(name);
 		position.set(x, y);
 
-		this.name = name;
 		this.orientation = orientation;
 		this.mass = mass;
 		this.type = type;
 
-		if (type == PhysicalObjectType.ROBOT) {
-			this.id = simulator.getAndIncrementNumberRobots();
-		} else {
-			this.id = simulator.getAndIncrementNumberPhysicalObjects();
-		}
+		this.id = simulator.getAndIncrementNumberPhysicalObjects(type);
+	}
+	
+	public PhysicalObject(Simulator simulator, String name, double x, double y, double orientation, double mass, PhysicalObjectType type, Shape shape) {
+		this(simulator, name, x, y, orientation, mass, type);
+		this.shape = shape;
 	}
 
 	public Vector2d getPosition() {
@@ -114,5 +126,4 @@ public class PhysicalObject extends SimulatorObject implements
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
 	}
-	
 }

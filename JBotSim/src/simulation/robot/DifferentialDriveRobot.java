@@ -1,7 +1,9 @@
 package simulation.robot;
 
 import simulation.Simulator;
+import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 import simulation.robot.actuators.Actuator;
+import simulation.util.Arguments;
 import simulation.util.MathUtils;
 
 public class DifferentialDriveRobot extends Robot {
@@ -23,16 +25,11 @@ public class DifferentialDriveRobot extends Robot {
 	 * Distance between the wheels of the robot.
 	 */
 	protected double distanceBetweenWheels = 0.05;
-		
-
-	public DifferentialDriveRobot(Simulator simulator, String name, double x,
-			double y, double orientation, double mass, double radius,
-			double distanceWheels, String color) {
-		super(simulator, name, x, y, orientation, mass, radius, color);
-
-		this.distanceBetweenWheels = radius * 2.0;
+	
+	public DifferentialDriveRobot(Simulator simulator, Arguments args) {
+		super(simulator, args);
+		this.distanceBetweenWheels = ((CircularShape)shape).getDiameter();
 	}
-
 	
 	public void updateActuators(Double time, double timeDelta) {	
 		position.set(

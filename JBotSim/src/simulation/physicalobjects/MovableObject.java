@@ -4,6 +4,7 @@ import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.Shape;
+import simulation.util.Arguments;
 
 public class MovableObject extends PhysicalObject {
 	private static final double NUMBER_OF_CYCLES_PER_SECOND = 10;
@@ -11,10 +12,18 @@ public class MovableObject extends PhysicalObject {
 	public static final double  TWICEMAXIMUMSPEEDPERTIMESTEP = 2.0 * MAXIMUMSPEED / NUMBER_OF_CYCLES_PER_SECOND;
 	protected Environment env;
 	
-	public MovableObject(Simulator simulator, String name, double x, double y, 
-			double orientation, double mass, PhysicalObjectType type, Shape shape) {
+	public MovableObject(Simulator simulator, Arguments args) {
+		super(simulator, args);
+		this.env = simulator.getEnvironment();
+	}
+	
+	public MovableObject(Simulator simulator, String name, double x, double y, double orientation, double mass, PhysicalObjectType type) {
 		super(simulator, name, x, y, orientation, mass, type);
-		this.shape = shape;
+		this.env = simulator.getEnvironment();
+	}
+	
+	public MovableObject(Simulator simulator, String name, double x, double y, double orientation, double mass, PhysicalObjectType type, Shape shape) {
+		super(simulator, name, x, y, orientation, mass, type, shape);
 		this.env = simulator.getEnvironment();
 	}
 
