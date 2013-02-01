@@ -95,6 +95,7 @@ public class ControllerFactory extends Factory implements Serializable {
 		Sensor sensor = robot.getSensorWithId(id);
 		
 		try {
+			name = ClassSearchUtils.getClassFullName(name);
 		
 			if(name.endsWith("SysoutNNInput")) {
 				Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
@@ -170,10 +171,9 @@ public class ControllerFactory extends Factory implements Serializable {
 		int id = 0;
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
-
-		Actuator actuator = robot.getActuatorWithId(id);
 		
 		try {
+			name = ClassSearchUtils.getClassFullName(name);
 		
 			if(name.endsWith("SysoutNNOutput") || name.endsWith("FixedNNOutput")) {
 				Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
@@ -193,6 +193,7 @@ public class ControllerFactory extends Factory implements Serializable {
 					}
 				}
 			} else {
+				Actuator actuator = robot.getActuatorWithId(id);
 				Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
 				for (Constructor<?> constructor : constructors) {
 					Class<?>[] params = constructor.getParameterTypes();
