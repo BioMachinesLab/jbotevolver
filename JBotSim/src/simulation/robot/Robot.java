@@ -243,42 +243,13 @@ public class Robot extends MovableObject {
 	 * @param time the number of the current simulation step.
 	 * @param timeDelta      the time (in virtual seconds) between calls to this method. 
 	 */
-	public void updateActuators(Double time, double timeDelta) {	
-		position.set(
-				position.getX() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.cos(orientation),
-				position.getY() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.sin(orientation));
-		
-		orientation += timeDelta * 0.5/(distanceBetweenWheels/2.0) * (rightWheelSpeed - leftWheelSpeed); 
-
-		orientation = MathUtils.modPI2(orientation);
-		
+	public void updateActuators(Double time, double timeDelta) {			
 		for(Actuator actuator: actuators){
 			actuator.apply(this);
 		}
 	}
 	
-	/**
-	 * Set the rotational speed of the wheels (in radians)
-	 * 
-	 * @param left the rotational speed of the left wheel (in radians)
-	 * @param right the rotational speed of the right wheel (in radians)
-	 */	
-	public void setRotationalWheelSpeed(double left, double right) {
-		leftWheelSpeed  = left * wheelDiameter * Math.PI;
-		rightWheelSpeed = right * wheelDiameter * Math.PI;	
-	}
-	
-	/**
-	 * Set the speed of the left and the right wheel in terms of how far each wheel drives a robot forward or backwards (in meters/second).
-	 * 
-	 * @param left the speed of the left wheel (in meters/second)
-	 * @param right the speed of the right wheel (in meters/second)
-	 */
-	public void setWheelSpeed(double left, double right) {
-		leftWheelSpeed  = left;
-		rightWheelSpeed = right;	
-	}
-	
+		
 	/**
 	 * TODO: Sancho
 	 * @param simulationStep
@@ -291,40 +262,13 @@ public class Robot extends MovableObject {
 	}
 
 	/**
-	 * Determine if the robot is currently carrying a prey.
-	 *
-	 * @return true if a prey is currently carried, false otherwise.
-	 */	
-	public boolean isCarryingPrey() {
-		return preyCarried != null;
-	}
-
-	/**
-	 * Pickup a prey (no checks are made).
+	 * Stops the robot in case it is moving
 	 */
-	public void pickUpPrey(Prey prey) {
-		preyCarried = prey;
-		prey.setCarrier(this);
-	}
-
-	/**
-	 * Drop a prey (no checks are made).
-	 */
-	public Prey dropPrey() {
-		numDrops++;
-		Prey prey = preyCarried;
-		prey.setCarrier(null);
-		preyCarried = null;
-		return prey;
+	public void stop() {
+		
 	}
 	
 	
-	
-
-	public int getNumDrops() {
-		return numDrops;
-	}
-
 	/**
 	 * Set the controller for the robot
 	 * 
@@ -432,20 +376,15 @@ public class Robot extends MovableObject {
 		
 		return null;
 	}
-
 	
-	public int getNumberOfPreysCarried() {
-		return preyCarried != null ? 1 : 0; 
-			
-	}
-
-	public boolean getCanCarryMorePreys() {
-		return preyCarried == null;
-	}
-
-	
-	public double getDistanceBetweenWheels() {
-		return distanceBetweenWheels;
+	public Actuator getActuatorByType(String actuatorClass){
+		
+		for(Actuator a : actuators){
+			if(a.getClass().getSimpleName().equals(actuatorClass))
+				return a;
+		}
+		
+		return null;
 	}
 }
 

@@ -22,6 +22,8 @@ public class PreyPickerActuator extends Actuator {
 	private Vector2d temp = new Vector2d();
 	private boolean stopRobot;
 	private SimRandom random;
+	private Prey preyCarried;
+	private int numDrops;
 
 	public PreyPickerActuator(Simulator simulator, int id, Arguments arguments) {
 		super(simulator, id);
@@ -47,7 +49,7 @@ public class PreyPickerActuator extends Actuator {
 	public void apply(Robot robot) {
 		if (status != PickerStatus.OFF) {
 			if (status == PickerStatus.PICK) {
-				if ((random.nextFloat() > NOISESTDEV) && !robot.isCarryingPrey()) {
+				if ((random.nextFloat() > NOISESTDEV) && !isCarryingPrey()) {
 					double bestLength = maxPickDistance;
 					Prey bestPrey = null;
 					ClosePhysicalObjects closePreys = robot.shape
@@ -66,18 +68,18 @@ public class PreyPickerActuator extends Actuator {
 						}
 					}
 					if (bestPrey != null) {
-						robot.pickUpPrey(bestPrey);
+						pickUpPrey(robot, bestPrey);
 					} else {
 						status = PickerStatus.OFF;
 					}
 
 					// Stop robot
 					if (stopRobot)
-						robot.setWheelSpeed(0, 0);
+						robot.stop();
 				}
 			} else { // DROP
-				if (robot.isCarryingPrey()) {
-					Prey prey = robot.dropPrey();
+				if (isCarryingPrey()) {
+					Prey prey = dropPrey();
 					double offset = robot.getRadius() + prey.getRadius();
 					Vector2d newPosition = new Vector2d(
 							robot.getPosition().getX() + offset
@@ -89,12 +91,56 @@ public class PreyPickerActuator extends Actuator {
 
 					// Stop robot
 					if (stopRobot)
-						robot.setWheelSpeed(0, 0);
+						robot.stop();
 				}
 			}
 		}
 	}
 
+	
+	/**
+	 * Determine if the robot is currently carrying a prey.
+	 *
+	 * @return true if a prey is currently carried, false otherwise.
+	 */	
+	public boolean isCarryingPrey() {
+		return preyCarried != null;
+	}
+
+	/**
+	 * Pickup a prey (no checks are made).
+	 */
+	public void pickUpPrey(Robot robot, Prey prey) {
+		preyCarried = prey;
+		prey.setCarrier(robot);
+	}
+
+	/**
+	 * Drop a prey (no checks are made).
+	 */
+	public Prey dropPrey() {
+		numDrops++;
+		Prey prey = preyCarried;
+		prey.setCarrier(null);
+		preyCarried = null;
+		return prey;
+	}
+	
+	public int getNumDrops() {
+		return numDrops;
+	}
+
+	
+	public int getNumberOfPreysCarried() {
+		return preyCarried != null ? 1 : 0; 
+			
+	}
+
+	public boolean getCanCarryMorePreys() {
+		return preyCarried == null;
+	}
+
+	
 	@Override
 	public String toString() {
 		return "PreyPickerActuator [maxPickDistance=" + maxPickDistance

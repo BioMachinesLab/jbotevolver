@@ -1,6 +1,7 @@
 package simulation.robot.actuators;
 
 import simulation.Simulator;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.SimRandom;
 import simulation.util.Arguments;
@@ -48,7 +49,7 @@ public class TwoWheelActuator extends Actuator {
 			rightSpeed = -Robot.MAXIMUMSPEED;
 		else if (rightSpeed > Robot.MAXIMUMSPEED)
 			rightSpeed = Robot.MAXIMUMSPEED;
-		robot.setWheelSpeed(leftSpeed, rightSpeed);
+		((DifferentialDriveRobot) robot).setWheelSpeed(leftSpeed, rightSpeed);
 	}
 
 	@Override

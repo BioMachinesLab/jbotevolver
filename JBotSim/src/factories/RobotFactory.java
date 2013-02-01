@@ -45,7 +45,7 @@ import simulation.robot.sensors.Sensor;
 import simulation.robot.sensors.SimpleLightTypeSensor;
 import simulation.robot.sensors.SimpleRobotColorSensor;
 import simulation.util.Arguments;
-import experiments.Experiment;
+
 
 public class RobotFactory extends Factory implements Serializable {
 

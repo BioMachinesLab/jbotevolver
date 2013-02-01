@@ -1,6 +1,5 @@
 package gui;
 
-import experiments.Experiment;
 import gui.renderer.Renderer;
 import java.awt.BorderLayout;
 import java.awt.Component;
