@@ -240,10 +240,10 @@ public class Robot extends MovableObject {
 	 * Update all actuators including moving the robot (using differential drive kinematics) according to the speeds 
 	 * of its left and right wheels.
 	 * 
-	 * @param simulationStep the number of the current simulation step.
+	 * @param time the number of the current simulation step.
 	 * @param timeDelta      the time (in virtual seconds) between calls to this method. 
 	 */
-	public void updateActuators(double simulationStep, double timeDelta) {	
+	public void updateActuators(Double time, double timeDelta) {	
 		position.set(
 				position.getX() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.cos(orientation),
 				position.getY() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.sin(orientation));
