@@ -3,7 +3,7 @@ package evolutionaryrobotics.neuralnetworks.outputs;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.TwoWheelActuator;
 
-public class TwoWheelNNOutput implements NNOutput {
+public class TwoWheelNNOutput extends NNOutput {
 	private TwoWheelActuator twoWheelActuator;
 	private double leftSpeed = 0;
 	private double rightSpeed = 0;

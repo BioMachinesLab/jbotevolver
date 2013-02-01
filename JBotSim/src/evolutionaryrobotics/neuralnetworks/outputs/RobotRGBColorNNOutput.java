@@ -4,7 +4,7 @@ import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.RobotRGBColorActuator;
 import simulation.util.Arguments;
 
-public class RobotRGBColorNNOutput implements NNOutput {
+public class RobotRGBColorNNOutput extends NNOutput {
 	boolean controlRed   = true;
 	boolean controlGreen = true;
 	boolean controlBlue  = true;
@@ -89,7 +89,5 @@ public class RobotRGBColorNNOutput implements NNOutput {
 		} else {
 			blue = value;
 		}
-		
 	}
-
 }

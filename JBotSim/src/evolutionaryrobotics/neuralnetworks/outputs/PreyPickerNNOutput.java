@@ -4,19 +4,19 @@ import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.util.Arguments;
 
-public class PreyPickerNNOutput implements NNOutput {
+public class PreyPickerNNOutput extends NNOutput {
 	private PreyPickerActuator preyPicker;
 	
 	public PreyPickerNNOutput(Actuator preyPicker, Arguments args) {
 		this.preyPicker = (PreyPickerActuator)preyPicker;
 	}
 
-//	@Override
+	@Override
 	public int getNumberOfOutputValues() {
 		return 1;
 	}
 
-//	@Override
+	@Override
 	public void setValue(int index, double value) {
 		if (value > 0.5) {
 			preyPicker.pick();
@@ -26,6 +26,5 @@ public class PreyPickerNNOutput implements NNOutput {
 	}
 
 	@Override
-	public void apply() {		
-	}
+	public void apply() {		}
 }

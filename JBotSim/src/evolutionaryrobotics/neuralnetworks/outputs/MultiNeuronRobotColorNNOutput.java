@@ -4,7 +4,7 @@ import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.RobotColorActuator;
 import simulation.util.Arguments;
 
-public class MultiNeuronRobotColorNNOutput implements NNOutput {
+public class MultiNeuronRobotColorNNOutput extends NNOutput {
 	protected int 	   numberOfColors;
 	protected double[] activations;
 	protected RobotColorActuator robotColorActuator;

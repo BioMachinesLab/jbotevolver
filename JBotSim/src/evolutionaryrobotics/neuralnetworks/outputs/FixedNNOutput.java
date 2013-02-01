@@ -1,22 +1,30 @@
 package evolutionaryrobotics.neuralnetworks.outputs;
 
-public class FixedNNOutput implements NNOutput {
+import simulation.Simulator;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 
-	NNOutput nnOutput;
-	double   value;
+public class FixedNNOutput extends NNOutput {
 
-	public FixedNNOutput(NNOutput nnOutput, double value) {
-		super();
-		this.value    = value;
-		this.nnOutput = nnOutput;
+	private NNOutput nnOutput;
+	private double value;
+
+	public FixedNNOutput(Simulator simulator, Robot robot, Arguments args) {
+		
+		value = args.getArgumentAsDouble("value");
+		
+		String newName = args.getArgumentAt(0);
+		Arguments newArguments = new Arguments(args.getArgumentAsString(newName));
+		
+		nnOutput = simulator.getControllerFactory().createOutput(robot, newName, newArguments);
 	}
 
-//	@Override
+	@Override
 	public int getNumberOfOutputValues() {
 		return nnOutput.getNumberOfOutputValues();
 	}
 
-//	@Override
+	@Override
 	public void setValue(int index, double value) {
 		nnOutput.setValue(index, this.value);
 	}

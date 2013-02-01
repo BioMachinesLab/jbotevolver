@@ -4,7 +4,7 @@ import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.RobotColorActuator;
 import simulation.util.Arguments;
 
-public class RobotColorNNOutput implements NNOutput {
+public class RobotColorNNOutput extends NNOutput {
 
 	private RobotColorActuator robotColor;
 	
@@ -12,12 +12,12 @@ public class RobotColorNNOutput implements NNOutput {
 		this.robotColor = (RobotColorActuator)robotColor;
 	}
 
-//	@Override
+	@Override
 	public int getNumberOfOutputValues() {
 		return 1;
 	}
 
-//	@Override
+	@Override
 	public void setValue(int index, double value) {
 		if (value < 0.33) {
 			robotColor.turnBlack();
@@ -29,6 +29,5 @@ public class RobotColorNNOutput implements NNOutput {
 	}
 
 	@Override
-	public void apply() {		
-	}
+	public void apply() {}
 }

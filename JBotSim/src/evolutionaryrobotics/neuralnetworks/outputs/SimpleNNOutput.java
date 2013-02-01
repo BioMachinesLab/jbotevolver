@@ -1,11 +1,13 @@
 package evolutionaryrobotics.neuralnetworks.outputs;
 
-public class SimpleNNOutput implements NNOutput{
+import simulation.util.Arguments;
+
+public class SimpleNNOutput extends NNOutput {
 	
 	private double[] values;
 	
-	public SimpleNNOutput(int numberOfOuputs) {
-		values = new double[numberOfOuputs];
+	public SimpleNNOutput(Arguments args) {
+		values = new double[args.getArgumentAsInt("numberofoutputs")];
 	}
 
 	@Override
@@ -20,5 +22,4 @@ public class SimpleNNOutput implements NNOutput{
 
 	@Override
 	public void apply() {}
-
 }

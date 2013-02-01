@@ -1,6 +1,6 @@
 package evolutionaryrobotics.neuralnetworks.outputs;
 
-public class SysoutNNOutput implements NNOutput {
+public class SysoutNNOutput extends NNOutput {
 
 	private NNOutput nnOutput;
 
@@ -8,12 +8,12 @@ public class SysoutNNOutput implements NNOutput {
 		this.nnOutput = nnOutput;
 	}
 
-//	@Override
+	@Override
 	public int getNumberOfOutputValues() {
 		return nnOutput.getNumberOfOutputValues();
 	}
 
-//	@Override
+	@Override
 	public void setValue(int index, double value) {
 		if (index == nnOutput.getNumberOfOutputValues()-1) {
 			System.out.println(nnOutput + "["+index+"]: "+value);
@@ -22,9 +22,5 @@ public class SysoutNNOutput implements NNOutput {
 	}
 
 	@Override
-	public void apply() {
-		// TODO Auto-generated method stub
-		
-	}
-
+	public void apply() {}
 }

@@ -1,9 +1,19 @@
 package evolutionaryrobotics.neuralnetworks.inputs;
 
+import simulation.Simulator;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class SysoutNNInput extends NNInput {
 
-	NNInput nnInput;
+	private NNInput nnInput;
+	
+	public SysoutNNInput(Simulator simulator, Robot robot, Arguments args) {
+		String newName = args.getArgumentAt(0);
+		Arguments actuators = new Arguments(args.getArgumentAsString(newName));
+		this.nnInput = simulator.getControllerFactory().createInput(robot, newName, args);
+	}
+	
 	public SysoutNNInput(NNInput nnInput) {
 		this.nnInput = nnInput;
 	}
