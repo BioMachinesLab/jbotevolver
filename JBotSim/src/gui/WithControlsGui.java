@@ -273,7 +273,7 @@ public class WithControlsGui implements Gui {
 
 			long startTime = System.currentTimeMillis(); 
 			if (simulationState == RUN) {
-				simulator.performOneSimulationStep(currentStep);
+				simulator.performOneSimulationStep(new Double(0));
 				long controlStepTime = System.currentTimeMillis() - startTime; 
 				controlStepTimeTextField.setText("" + controlStepTime + " ms");
 

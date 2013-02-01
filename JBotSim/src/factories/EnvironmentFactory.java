@@ -15,8 +15,6 @@ public class EnvironmentFactory extends Factory implements Serializable {
 	}
 
 	public Environment getEnvironment(Arguments arguments) {
-		if (arguments == null)
-			return new Environment(simulator, 10, 10);
 
 		if (!arguments.getArgumentIsDefined("name")) {
 			throw new RuntimeException("Environment 'name' not defined: "

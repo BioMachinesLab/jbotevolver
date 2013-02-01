@@ -89,9 +89,6 @@ public class ControllerFactory extends Factory implements Serializable {
 	}
 
 	public Controller getController(Robot robot, Arguments arguments) {
-		if (arguments == null)
-			return null;
-
 		Controller controller = null;
 
 		if (!arguments.getArgumentIsDefined("name")) {
@@ -137,7 +134,7 @@ public class ControllerFactory extends Factory implements Serializable {
 
 			controller = new ProgrammedMazeSolver(simulator, robot, arguments);
 
-		} else if (controllerName.equalsIgnoreCase("Keyboard")) {
+		} else if (controllerName.equalsIgnoreCase("controllers.KeyboardController")) {
 			controller = new KeyboardController(simulator, robot);
 		} else if (controllerName.equalsIgnoreCase("Behavior")) {
 			controller = new BehaviorController(simulator, robot,arguments);
