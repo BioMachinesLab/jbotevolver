@@ -19,7 +19,7 @@ public class SimpleCollisionManager extends CollisionManager {
 	}
 
 	@Override
-	public void handleCollisions(Environment environment, int time) {
+	public void handleCollisions(Environment environment, double time) {
 
 		for (MovableObject mo : environment.getMovableObjects()) {
 			mo.setInvolvedInCollison(false);
