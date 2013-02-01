@@ -4,17 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import comm.FileProvider;
-import mathutils.Vector2d;
 import simulation.environment.Environment;
 import simulation.physicalobjects.GeometricCalculator;
-import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.robot.Robot;
 import simulation.util.SimRandom;
 
 public class Simulator implements Serializable {
 
-	public static final int MAXNUMBEROFROBOTS = 100000;
+	public final int MAXNUMBEROFROBOTS = 100000;
 
 	protected Double time = Double.valueOf(0);
 	protected double timeDelta = 0.1;
