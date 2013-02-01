@@ -18,7 +18,7 @@ public abstract class CollisionManager implements Serializable {
 		this.simulator = simulator;
 	}
 
-	public abstract void handleCollisions(Environment environment, int time);
+	public abstract void handleCollisions(Environment environment, double time);
 	
 	static public boolean checkCollisionBetweenTwoObjects(
 				Shape collisionObject1,

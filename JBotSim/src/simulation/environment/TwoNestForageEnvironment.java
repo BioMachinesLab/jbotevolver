@@ -105,7 +105,8 @@ public class TwoNestForageEnvironment extends Environment implements
 
 		if (numberOfFoodSuccessfullyForagedNestB
 				+ numberOfFoodSuccessfullyForagedNestA >= amountOfFood) {
-			simulator.getExperiment().endExperiment();
+			//TODO:
+//			simulator.getExperiment().endExperiment();
 		}
 	}
 

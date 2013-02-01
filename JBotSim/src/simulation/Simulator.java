@@ -3,11 +3,7 @@ package simulation;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-
 import comm.FileProvider;
-
-import experiments.Experiment;
-
 import mathutils.Vector2d;
 import simulation.environment.Environment;
 import simulation.physicalobjects.GeometricCalculator;
@@ -24,7 +20,6 @@ public class Simulator implements Serializable {
 	protected double timeDelta = 0.1;
 	protected Environment environment;
 	protected SimRandom random;
-	protected Experiment experiment;
 	protected FileProvider fileProvider = FileProvider.getDefaultFileProvider();
 	private int numberRobots = 0;
 	private int numberPhysicalObjects = 0;
@@ -53,14 +48,6 @@ public class Simulator implements Serializable {
 		return environment;
 	}
 
-	public void setExperiment(Experiment experiment) {
-		this.experiment = experiment;
-	}
-
-	public Experiment getExperiment() {
-		return experiment;
-	}
-
 	public SimRandom getRandom() {
 		return random;
 	}
@@ -73,21 +60,12 @@ public class Simulator implements Serializable {
 		this.fileProvider = fileProvider;
 	}
 
-	public void start() {
-
-	}
-	
 	public void addCallback(Runnable r) {
 		callbacks.add(r);
 	}
 	
 	public void removeCallback(Runnable r) {
 		callbacks.remove(r);
-	}
-
-	public void stop() {
-		if(experiment != null)
-			experiment.endExperiment();
 	}
 
 	public void performOneSimulationStep(Double time) {
@@ -116,7 +94,7 @@ public class Simulator implements Serializable {
 		environment.update(time);
 	}
 
-	protected void updateAllRobotSensors(Double time) {
+	protected void updateAllRobotSensors(double time) {
 		ArrayList<PhysicalObject> teleported = environment.getTeleported();
 		for (Robot r : environment.getRobots()) {
 			r.updateSensors(time, teleported);
@@ -124,16 +102,15 @@ public class Simulator implements Serializable {
 		environment.clearTeleported();
 	}
 
-	protected void updateAllRobotActuators(Double time) {
-		ArrayList<Robot> robots = (ArrayList<Robot>) environment.getRobots()
-				.clone();
+	protected void updateAllRobotActuators(double time) {
+		ArrayList<Robot> robots = (ArrayList<Robot>) environment.getRobots().clone();
 		Collections.shuffle(robots,random);
 		for (Robot r : robots) {
 			r.updateActuators(time, timeDelta);
 		}
 	}
 
-	protected void updatePositions(Double time) {
+	protected void updatePositions(double time) {
 		environment.updateCollisions(time);
 
 		// checkAgentAgentCollisions();
@@ -153,14 +130,6 @@ public class Simulator implements Serializable {
 		return timeDelta;
 	}
 
-	// public Environment getEnvironment() {
-	// return this.environment;
-	// }
-
-	/*public double getDistanceBetween(Vector2d fromPoint, PhysicalObject toObject) {
-		return environment.getDistanceBetween(fromPoint, toObject, time);
-	}*/
-
 	public int getAndIncrementNumberRobots() {
 		return numberRobots++;
 	}
@@ -175,11 +144,5 @@ public class Simulator implements Serializable {
 
 	public void addNumbetrOfPhysicalObjects() {
 		this.numberPhysicalObjects++;
-	}
-
-	public void pause() {
-		if(experiment != null)
-			for(Robot r : experiment.getRobots())
-				r.getController().pause();
 	}
 }

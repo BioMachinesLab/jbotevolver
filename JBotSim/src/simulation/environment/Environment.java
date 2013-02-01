@@ -147,7 +147,7 @@ public abstract class Environment implements KeyListener, Serializable {
 		teleported.add(physicalObject);
 	}
 
-	public void updateCollisions(int time) {
+	public void updateCollisions(double time) {
 		// updateRobotCloseObjects(time);
 		collisionManager.handleCollisions(this, time);
 	}
