@@ -7,12 +7,10 @@ import simulation.Controller;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.BehaviorActuator;
 import simulation.robot.actuators.MultiPreyPickerActuator;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.actuators.RobotColorActuator;
 import simulation.robot.actuators.RobotRGBColorActuator;
-import simulation.robot.actuators.SimplePreyPickerActuator;
 import simulation.robot.actuators.TwoWheelActuator;
 import simulation.robot.behaviors.OpenDoorBehavior;
 import simulation.robot.sensors.BehaviorSensor;
@@ -30,7 +28,6 @@ import simulation.robot.sensors.MultyPreyCarriedSensor;
 import simulation.robot.sensors.NearRobotSensor;
 import simulation.robot.sensors.PerimeterSimpleLightTypeSensor;
 import simulation.robot.sensors.PerimeterSimpleRobotColorSensor;
-import simulation.robot.sensors.PheromoneSensor;
 import simulation.robot.sensors.PositionSensor;
 import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.robot.sensors.PreySensor;
@@ -245,9 +242,7 @@ public class ControllerFactory extends Factory implements Serializable {
 				nnInputs.add(createInput(robot, "Position", new Arguments("id=" + sensor.getId() + ",name=positionsensor")));
 			}else if(sensor.getClass().equals(DoubleParameterSensor.class)) {
 				nnInputs.add(createInput(robot, "DoubleParameter", new Arguments("id=" + sensor.getId() + ",name=doubleparametersensor")));
-			}else if(sensor.getClass().equals(PheromoneSensor.class)){
-				nnInputs.add(createInput(robot,"PheromoneSensor", new Arguments("id=" +sensor.getId() + ",name=pheromonesensor")));
-			} else if(sensor.getClass().equals(GroundRGBColorSensor.class)){
+			}else if(sensor.getClass().equals(GroundRGBColorSensor.class)){
 				nnInputs.add(createInput(robot,"GroundRGBColorSensor", new Arguments("id=" +sensor.getId() + ",name=groundrgbcolorsensor")));
 			} else if(sensor.getClass().equals(BehaviorSensor.class)){
 				nnInputs.add(createInput(robot,"BehaviorSensor", new Arguments("id=" +sensor.getId() + ",name=behaviorsensor")));
@@ -368,16 +363,10 @@ public class ControllerFactory extends Factory implements Serializable {
 			} else if (actuator.getClass().equals(PreyPickerActuator.class)) {
 				nnOutputs.add(createOutput(robot, "PreyPicker", new Arguments(
 						"id=" + actuator.getId() + ",name=preypicker")));
-			} else if (actuator.getClass().equals(SimplePreyPickerActuator.class)) {
-				nnOutputs.add(createOutput(robot, "simplepreypicker", new Arguments(
-						"id=" + actuator.getId() + ",name=simplepreypicker")));
-			} else if (actuator.getClass().equals(MultiPreyPickerActuator.class)) {
+			}else if (actuator.getClass().equals(MultiPreyPickerActuator.class)) {
 				nnOutputs.add(createOutput(robot, "MultiPreyPicker", new Arguments(
 						"id=" + actuator.getId() + ",name=multipreypicker")));
-			} else if (actuator.getClass().equals(BehaviorActuator.class)) {
-				nnOutputs.add(createOutput(robot, "Behavior", new Arguments(
-						"id=" + actuator.getId() + ",name=behavior")));
-			}  else {
+			} else {
 				throw new RuntimeException(
 						"Trying to automatically create output for actuator: "
 								+ actuator + ", but actuator unknown here");
