@@ -2,7 +2,6 @@ package factories;
 
 import java.io.Serializable;
 
-import experiments.Experiment;
 import gui.Gui;
 import gui.RendererOnlyGui;
 import gui.WithControlsGui;
@@ -22,7 +21,7 @@ public class GuiFactory extends Factory implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Gui getGui(Arguments arguments, Experiment experiment) throws Exception {
+	public Gui getGui(Arguments arguments) throws Exception {
 		if (arguments == null) {
 			return new WithControlsGui(simulator, new TwoDRenderer(simulator)); 
 		}
