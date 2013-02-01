@@ -18,9 +18,22 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 		
 		Vector<NNInput> inputs = simulator.getControllerFactory().getNNInputs(robot, args);
 		Vector<NNOutput> outputs = simulator.getControllerFactory().getNNOutputs(robot, args);
+		
+		String name = args.getArgumentAsString("name");
 
-		neuralNetwork = new MulitlayerPerceptron(inputs, outputs, args);
-		simulator.getControllerFactory().setChromosomeLenght(getRequiredNumberOfWeights());
+		if (name.equalsIgnoreCase("MultilayerPerceptron")) {
+			neuralNetwork = new MulitlayerPerceptron(inputs, outputs, args);
+		} else if (name.equalsIgnoreCase("CTRNNMultilayer")) {
+			neuralNetwork = new CTRNNMultilayer(inputs, outputs, args);
+		}
+		
+		if(args.getArgumentIsDefined("weights")) {
+			String[] rawArray = args.getArgumentAsString("weights").split(",");
+			double[] weights = new double[rawArray.length];
+			for(int i = 0 ; i < weights.length ; i++)
+				weights[i] = Double.parseDouble(rawArray[i]);
+			setNNWeights(weights);
+		}
 	}
 
 	public boolean isAlive() {

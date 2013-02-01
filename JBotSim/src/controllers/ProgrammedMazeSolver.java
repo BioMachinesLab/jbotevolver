@@ -18,7 +18,7 @@ public class ProgrammedMazeSolver extends Controller {
 	};
 
 	public ProgrammedMazeSolver(Simulator simulator, Robot robot, Arguments arguments) {
-		super(simulator, robot);
+		super(simulator, robot, arguments);
 		rgbSensor = (GroundRGBColorSensor) (robot.getSensorWithId(1));
 //		behaviorSensor = (BehaviorSensor) (robot.getSensorWithId(2));
 	}

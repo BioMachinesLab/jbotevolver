@@ -59,8 +59,4 @@ public abstract class Controller extends SimulatorObject implements Serializable
 	 */
 	public void reset() {};
 	
-	/**
-	 *  The controller that is affected by evolution
-	 */
-	public Controller getEvolvingController() { return this; };
 }

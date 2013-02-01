@@ -58,9 +58,8 @@ public class ProgrammedForager extends Controller {
 	private double right_sensor_measure;
 	private double maxNextReading;
 
-	public ProgrammedForager(Simulator simulator, Robot robot,
-			Arguments arguments) {
-		super(simulator, robot);
+	public ProgrammedForager(Simulator simulator, Robot robot, Arguments arguments) {
+		super(simulator, robot, arguments);
 		double speed = 0;
 		moveForwardSpeed = arguments
 				.getArgumentIsDefined("speedofpreprogrammedrobots") ? arguments

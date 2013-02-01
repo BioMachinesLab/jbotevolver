@@ -21,7 +21,7 @@ public class CTRNNMultilayer extends NeuralNetwork {
 	private boolean printWeights = false;
 	
 	public CTRNNMultilayer(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments) {
-		numberOfHiddenNodes = arguments.getArgumentIsDefined("hiddennodes") ? arguments.getArgumentAsInt("hiddennodes") : 5;
+		numberOfHiddenNodes = arguments.getArgumentAsIntOrSetDefault("hiddennodes",5);
 		create(inputs, outputs, numberOfHiddenNodes);
 		printWeights = arguments.getArgumentIsDefined("printweights") && arguments.getArgumentAsInt("printweights") == 1;
 	}

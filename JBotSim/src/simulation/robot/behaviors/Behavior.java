@@ -12,7 +12,7 @@ public abstract class Behavior extends Controller{
 	protected boolean isLocked = false;
 	
 	public Behavior(Simulator simulator, Robot r, Arguments args) {
-		super(simulator, r);
+		super(simulator, r, args);
 		
 		lock = args.getArgumentAsIntOrSetDefault("lock", 0) == 1;
 		this.robot = r;

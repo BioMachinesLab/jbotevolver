@@ -58,7 +58,7 @@ public class ProgrammedAntiForager extends Controller {
 
 	public ProgrammedAntiForager(Simulator simulator, Robot robot,
 			Arguments arguments) {
-		super(simulator, robot);
+		super(simulator, robot, arguments);
 		// Arguments inputs= new
 		// Arguments(arguments.getArgumentAsString("inputs"));
 

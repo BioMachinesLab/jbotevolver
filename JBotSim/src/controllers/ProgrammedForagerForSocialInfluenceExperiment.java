@@ -63,7 +63,7 @@ public class ProgrammedForagerForSocialInfluenceExperiment extends Controller {
 
 	public ProgrammedForagerForSocialInfluenceExperiment(Simulator simulator,
 			Robot robot, Arguments arguments) {
-		super(simulator, robot);
+		super(simulator, robot, arguments);
 		double speed = 0;
 		moveForwardSpeed = arguments
 				.getArgumentIsDefined("speedofpreprogrammedrobots") ? arguments

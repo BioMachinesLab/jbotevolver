@@ -24,7 +24,7 @@ public class RobotFollower extends Controller{
 	private int activeBehavior = 0;
 
 	public RobotFollower(Simulator simulator, Robot robot, Arguments args) {
-		super(simulator, robot);
+		super(simulator, robot, args);
 		
 //		forward = new MoveForwardBehavior(simulator, robot, false);
 //		left = new TurnLeftBehavior(simulator, robot, true);

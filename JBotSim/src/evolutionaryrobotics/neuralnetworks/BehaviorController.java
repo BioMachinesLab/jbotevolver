@@ -3,23 +3,24 @@ package evolutionaryrobotics.neuralnetworks;
 import java.util.ArrayList;
 
 import controllers.Controller;
+import controllers.FixedLenghtGenomeEvolvableController;
 import factories.ControllerFactory;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class BehaviorController extends Controller {
+public class BehaviorController extends Controller implements FixedLenghtGenomeEvolvableController {
 	
-	ArrayList<Controller> subControllers = new ArrayList<Controller>();
-	NeuralNetworkController mainController;
+	private ArrayList<Controller> subControllers = new ArrayList<Controller>();
+	private NeuralNetworkController mainController;
 	int currentSubNetwork = 0;
 	boolean keepFeeding = false;
 	boolean resetChosen = true;
 	boolean master = false;
 	
 	public BehaviorController(Simulator simulator, Robot robot, Arguments args) {
-		super(simulator, robot);
-		setupControllers(simulator,args);
+		super(simulator, robot, args);
+		setupControllers(simulator, args);
 	}
 	
 	@Override
@@ -104,16 +105,16 @@ public class BehaviorController extends Controller {
 		}
 	}
 	
-	@Override
-	public Controller getEvolvingController() {
-		return mainController;
-	}
-	
 	public ArrayList<Controller> getSubControllers() {
 		return subControllers;
 	}
 	
 	public int getCurrentSubNetwork() {
 		return currentSubNetwork;
+	}
+	
+	@Override
+	public void setNNWeights(double[] weights) {
+		this.mainController.setNNWeights(weights);
 	}
 }
