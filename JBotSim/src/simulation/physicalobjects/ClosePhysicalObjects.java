@@ -62,7 +62,7 @@ public class ClosePhysicalObjects implements Serializable {
 		if(farObjects.size()>0){
 			Iterator<PhysicalObjectDistance> i = farObjects.iterator();
 			PhysicalObjectDistance next = i.next();
-			double doneTime=farTime - EXTENDED_VISIBILITY; 
+			double doneTime = farTime - EXTENDED_VISIBILITY; 
 			while( next.getTime() <= doneTime ){
 				i.remove();
 				closeObjects.add(next);

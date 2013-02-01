@@ -10,24 +10,22 @@ import java.util.LinkedList;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.physicalobjects.ArtificialPheromoneObject;
 import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
-import simulation.physicalobjects.Wall;
 import simulation.physicalobjects.collisionhandling.SimpleCollisionManager;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CollisionManager;
 import simulation.robot.Robot;
 
 public abstract class Environment implements KeyListener, Serializable {
 
-	private static final double MAX_APPROX_SPEED = 0.1;
+	protected final double MAX_APPROX_SPEED = 0.1;
 
-	public static int MAXOBJECTS = 5000;
+	protected final int MAXOBJECTS = 5000;
 
-	protected static final int MAX_WALLS = 4;
+	protected final int MAX_WALLS = 4;
 	
 	// private static Environment instance;
 
@@ -158,7 +156,7 @@ public abstract class Environment implements KeyListener, Serializable {
 		}
 	}
 
-	public static double getMaxApproximationSpeed() {
+	public double getMaxApproximationSpeed() {
 		return MAX_APPROX_SPEED;
 	}
 

@@ -7,7 +7,6 @@ import simulation.util.MathUtils;
 
 public class Wall extends PhysicalObject{
 
-	private static final long serialVersionUID = 1800381786314536993L;
 	private double width, height;
 
 	private Edge left, right, top, bottom;
