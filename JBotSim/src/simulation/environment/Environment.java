@@ -37,7 +37,6 @@ public class Environment implements KeyListener, Serializable {
 	protected ArrayList<PhysicalObject> staticObjects = new ArrayList<PhysicalObject>(MAXOBJECTS);
 	protected ArrayList<MovableObject> movableObjects = new ArrayList<MovableObject>(MAXOBJECTS);
 	protected ArrayList<PhysicalObject> teleported = new ArrayList<PhysicalObject>(MAXOBJECTS);
-	protected ArrayList<ArtificialPheromoneObject> artificialPheromones = new ArrayList<ArtificialPheromoneObject>(MAXOBJECTS);
 	
 	protected CollisionManager collisionManager;
 	protected double height;
@@ -68,10 +67,6 @@ public class Environment implements KeyListener, Serializable {
 
 	public ArrayList<Robot> getRobots() {
 		return robots;
-	}
-	
-	public ArrayList<ArtificialPheromoneObject> getPlacedPheromones(){
-		return artificialPheromones;
 	}
 
 	public ArrayList<MovableObject> getMovableObjects() {
@@ -119,19 +114,6 @@ public class Environment implements KeyListener, Serializable {
 	public void addRobot(Robot r) {
 		robots.add(r);
 		addMovableObject(r);
-	}
-	
-	public void addPheromone(ArtificialPheromoneObject a){
-		addObject(a);
-		artificialPheromones.add(a);
-	}
-	
-	public void removePheromones(){
-		for(int i= 0; i<artificialPheromones.size(); i++){
-			if(artificialPheromones.get(i).getPheromoneIntensity()<0.5)
-				artificialPheromones.remove(i);
-		}
-		
 	}
 
 	public void addPrey(Prey p) {
