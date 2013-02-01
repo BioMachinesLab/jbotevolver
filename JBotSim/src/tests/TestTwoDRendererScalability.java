@@ -72,7 +72,7 @@ public class TestTwoDRendererScalability {
 //		
 //		e.addPrey( new Prey("prey1", -1, -1, 0, 1,0.10));
 		
-		int time = 0;
+		double time = 0;
 		long startTime = System.currentTimeMillis();
 		while (time < STEPS) {
 			if (time % FRAMEFREQUENCY == 0) render.drawFrame();

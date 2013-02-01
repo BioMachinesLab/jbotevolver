@@ -65,8 +65,7 @@ public class TwoRoomsEnvironment extends Environment {
 	}
 	
 	@Override
-	public void update(int time) {
-		super.update(time);
+	public void update(double time) {
 		
 		if(!teleported && teleport) {
 			double sign = 1;
@@ -151,7 +150,7 @@ public class TwoRoomsEnvironment extends Environment {
 	}
 	
 	protected Wall createWall(double x, double y, double width, double height, PhysicalObjectType type) {
-		Wall w = new Wall(simulator,"wall",x,y,Math.PI,1,1,1,0,width,height,type);
+		Wall w = new Wall(simulator,"wall",x,y,Math.PI,1,1,0,width,height,type);
 		if(!removeWalls || type.equals(PhysicalObjectType.WALLBUTTON))
 			addObject(w);
 		return w;

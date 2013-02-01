@@ -59,5 +59,6 @@ public class DoubleLightPoleEnvironment extends Environment {
 		renderer.drawCircle(lightPoleRight.getPosition(),
 				lightPoleRight.getRadius());
 	}
-
+	@Override
+	public void update(double time) {}
 }

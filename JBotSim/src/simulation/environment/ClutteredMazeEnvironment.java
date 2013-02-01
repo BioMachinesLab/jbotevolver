@@ -82,23 +82,14 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		
 		objects = (int)(objects*(arenaWidth*arenaHeight));
 		
-//		double allotedWidths = Math.max(arenaWidth,arenaHeight)/3;
-		
 		for(int i = 0 ; i < objects ; i++) {
 			
-//			if(allotedWidths > 0) {
 				double objectW = objectWidth+objectWidth*(simulator.getRandom().nextDouble()-0.5);
-				
-//				allotedWidths-=objectW;
-				
-//				if(allotedWidths < 0)
-//					objectW+=allotedWidths;
 				
 				double objectX = -arenaWidth/2 + 0.1 + simulator.getRandom().nextDouble()*(arenaWidth-0.1*2);
 				double objectY = (arenaHeight/2 - objectW - simulator.getRandom().nextDouble()*(arenaHeight/2))*0.6;
 				
 				createWall(objectX,objectY,objectW,objectW);
-//			}
 		}
 	}
 	

@@ -25,17 +25,15 @@ public class OpenDoorBehavior extends Behavior{
 	}
 	
 	@Override
-	public void controlStep(int time) {
+	public void controlStep(double time) {
 		applyBehavior();
 	}
 
 	@Override
 	public void applyBehavior() {
-		if(env == null)
-			env = (TwoRoomsEnvironment)simulator.getEnvironment();
 		
 		LinkedList<Wall> buttons = env.getButtons();
-		Robot rob = simulator.getEnvironment().getRobots().get(0);
+		Robot rob = env.getRobots().get(0);
 		Vector2d r = rob.getPosition(); 
 		
 		for(Wall b : buttons) {
@@ -47,5 +45,4 @@ public class OpenDoorBehavior extends Behavior{
 		}
 		rob.setWheelSpeed(0, 0);
 	}
-	
 }

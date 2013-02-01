@@ -60,8 +60,7 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 		return new Vector2d(radius*Math.cos(angle),radius*Math.sin(angle));
 	}
 	@Override
-	public void update(int time) {
-		super.update(time);
+	public void update(double time) {
 		nest.shape.getClosePrey().update(time, teleported);
 		CloseObjectIterator i = nest.shape.getClosePrey().iterator();
 

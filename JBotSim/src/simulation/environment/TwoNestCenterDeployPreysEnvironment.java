@@ -64,7 +64,7 @@ public class TwoNestCenterDeployPreysEnvironment extends
 	}
 
 	@Override
-	public void update(int time) {
+	public void update(double time) {
 		super.update(time);
 		reDeployPreys();
 	}

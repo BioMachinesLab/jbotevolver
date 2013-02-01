@@ -95,8 +95,7 @@ public class GroupedPreyEnvironment extends Environment {
 	}
 	
 	@Override
-	public void update(int time) {
-		super.update(time);
+	public void update(double time) {
 		if(redeployPrey && !anyActivePrey()){ 
 			//There are no prey active, so we have to redeploy
 			redeployPrey();

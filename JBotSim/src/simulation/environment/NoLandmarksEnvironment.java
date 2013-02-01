@@ -9,9 +9,7 @@ public class NoLandmarksEnvironment extends Environment {
 	public NoLandmarksEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")       : 5.0,
 				  arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 5.0);
-		
 	}
-	
 	
 	public double getForageRadius() {
 		return forageLimit;
@@ -20,5 +18,7 @@ public class NoLandmarksEnvironment extends Environment {
 	public double getForbiddenArea() {
 		return forbiddenArea;
 	}
-
+	
+	@Override
+	public void update(double time) {}
 }

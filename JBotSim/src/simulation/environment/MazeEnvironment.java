@@ -239,7 +239,7 @@ public class MazeEnvironment extends Environment {
 	
 	private void createWall(double x, double y, double width, double height) {
 		
-		Wall w = new Wall(simulator,"wall",x,y,Math.PI,1,1,1,0,width,height,PhysicalObjectType.WALL);
+		Wall w = new Wall(simulator,"wall",x,y,Math.PI,1,1,0,width,height,PhysicalObjectType.WALL);
 		this.addObject(w);
 	}
 	
@@ -285,8 +285,7 @@ public class MazeEnvironment extends Environment {
 	}
 	
 	@Override
-	public void update(int time) {
-		super.update(time);
+	public void update(double time) {
 		rgb = findColorRobot(robots.get(0).getPosition().getX(),robots.get(0).getPosition().getY());
 	}
 	

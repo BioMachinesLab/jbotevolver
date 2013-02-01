@@ -6,8 +6,11 @@ import simulation.robot.Robot;
 
 public class DestructiveBehavior extends Behavior{
 
+	private TMazeEnvironment env;
+	
 	public DestructiveBehavior(Simulator simulator, Robot r, boolean lock) {
 		super(simulator, r, lock);
+		this.env = (TMazeEnvironment)simulator.getEnvironment();
 	}
 
 	@Override
@@ -17,7 +20,6 @@ public class DestructiveBehavior extends Behavior{
 
 	@Override
 	public void applyBehavior() {
-		TMazeEnvironment t = (TMazeEnvironment) simulator.getEnvironment();
-		t.killSample(true);
+		env.killSample(true);
 	}
 }

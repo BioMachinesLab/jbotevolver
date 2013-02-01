@@ -96,8 +96,7 @@ public class TwoNestForageEnvironment extends Environment implements
 	}
 
 	@Override
-	public void update(int time) {
-		super.update(time);
+	public void update(double time) {
 		nestA.shape.getClosePrey().update(time, teleported);
 		nestB.shape.getClosePrey().update(time, teleported);
 		dropPreysDueToCollison();

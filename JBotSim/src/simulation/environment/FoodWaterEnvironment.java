@@ -89,8 +89,7 @@ public class FoodWaterEnvironment extends Environment {
 	}
 
 	@Override
-	public void update(int time) {
-		super.update(time);
+	public void update(double time) {
 		boolean anyAlive = false;
 		for (Robot robot : robots) {
 			if (robot.getParameterAsInteger(FoodWaterExperiment.BORN_TIME)
@@ -143,8 +142,7 @@ public class FoodWaterEnvironment extends Environment {
 		robot.setParameter(FoodWaterExperiment.FOOD, new Double(1));
 		robot.setParameter(FoodWaterExperiment.WATER, new Double(1));
 		robot.setParameter(FoodWaterExperiment.RECHARGED, new Integer(0));
-		robot.setParameter(FoodWaterExperiment.BORN_TIME,
-				new Integer(simulator.getTime()));
+		robot.setParameter(FoodWaterExperiment.BORN_TIME, new Double(simulator.getTime()));
 	}
 
 	private void spend(Robot robot) {

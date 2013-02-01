@@ -21,7 +21,7 @@ import simulation.physicalobjects.collisionhandling.SimpleCollisionManager;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CollisionManager;
 import simulation.robot.Robot;
 
-public class Environment implements KeyListener, Serializable {
+public abstract class Environment implements KeyListener, Serializable {
 
 	private static final double MAX_APPROX_SPEED = 0.1;
 
@@ -55,16 +55,7 @@ public class Environment implements KeyListener, Serializable {
 		// instance=this;
 	}
 
-	// public static Environment getInstance() {
-	// return instance;
-	// }
-
-	// public static void forgetInstance() {
-	// instance = null;
-	// }
-
-	public void update(int time) {
-	}
+	public abstract void update(double time);
 
 	public ArrayList<Robot> getRobots() {
 		return robots;
@@ -203,6 +194,4 @@ public class Environment implements KeyListener, Serializable {
 	public void addRobots(LinkedList<Robot> robots) {
 		this.robots.addAll(robots);
 	}
-
-	
 }

@@ -244,7 +244,7 @@ public class TMazeEnvironment extends Environment {
 	}
 	
 	protected void createWall(double x, double y, double width, double height) {
-		Wall w = new Wall(simulator,"wall",x,y,Math.PI,1,1,1,0,width,height,PhysicalObjectType.WALL);
+		Wall w = new Wall(simulator,"wall",x,y,Math.PI,1,1,0,width,height,PhysicalObjectType.WALL);
 		this.addObject(w);
 	}
 	
@@ -253,8 +253,7 @@ public class TMazeEnvironment extends Environment {
 	}
 	
 	@Override
-	public void update(int time) {
-		super.update(time);
+	public void update(double time) {
 		
 		if(!teleported && robots.size() > 1) {
 			double orientation = -Math.PI/2;
@@ -338,7 +337,7 @@ public class TMazeEnvironment extends Environment {
 		double squareSize = getSquareSize()/2;
 		
 		Rectangle2D.Double squareRect = new Rectangle2D.Double(sq.getX()-squareSize/2,sq.getY()-squareSize/2,squareSize,squareSize);
-		double robotDiameter = r.getDiameter()+r.getExtraRadius()*2;
+		double robotDiameter = r.getDiameter();
 		Rectangle2D.Double robotRect = new Rectangle2D.Double(r.getPosition().getX()-robotDiameter/2,r.getPosition().getY()-robotDiameter/2,robotDiameter,robotDiameter);
 		
 		return squareRect.intersects(robotRect);
