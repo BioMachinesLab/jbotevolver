@@ -3,23 +3,19 @@ package simulation.robot.behaviors;
 import simulation.Simulator;
 import simulation.environment.TMazeEnvironment;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class DestructiveBehavior extends Behavior{
 
 	private TMazeEnvironment env;
 	
-	public DestructiveBehavior(Simulator simulator, Robot r, boolean lock) {
-		super(simulator, r, lock);
+	public DestructiveBehavior(Simulator simulator, Robot r, Arguments args) {
+		super(simulator, r, args);
 		this.env = (TMazeEnvironment)simulator.getEnvironment();
 	}
-
+	
 	@Override
-	public boolean isLocked() {
-		return false;
-	}
-
-	@Override
-	public void applyBehavior() {
+	public void controlStep(double time) {
 		env.killSample(true);
 	}
 }

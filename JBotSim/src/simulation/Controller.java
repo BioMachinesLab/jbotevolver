@@ -12,7 +12,7 @@ import simulation.robot.Robot;
  * @author alc
  */
 
-public  class Controller extends SimulatorObject implements Serializable {
+public abstract class Controller extends SimulatorObject implements Serializable {
 	/**
 	 *  Robot controlled by this controller
 	 */
@@ -39,7 +39,7 @@ public  class Controller extends SimulatorObject implements Serializable {
 	/**
 	 *  Called just before the simulation starts (at time = 0)
 	 */
-	public void controlStep(double time) {};
+	public abstract void controlStep(double time);
 
 	/**
 	 *  Called after the simulation has ended
@@ -61,5 +61,3 @@ public  class Controller extends SimulatorObject implements Serializable {
 	 */
 	public Controller getEvolvingController() { return this; };
 }
-
-

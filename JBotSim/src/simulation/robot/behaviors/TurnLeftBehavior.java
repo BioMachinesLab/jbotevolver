@@ -2,6 +2,7 @@ package simulation.robot.behaviors;
 
 import simulation.Simulator;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class TurnLeftBehavior extends Behavior {
 
@@ -9,37 +10,29 @@ public class TurnLeftBehavior extends Behavior {
 
 	private double leftSpeed = -0.01;
 	private double rightSpeed = 0.01;
-	private boolean active = false;
 	private double startOrientation = 0;
 	
-	public TurnLeftBehavior(Simulator simulator, Robot r, boolean lock) {
-		super(simulator, r, lock);
-	}
-	
-	public boolean isLocked() {
-		if(lock)
-			return active;
-		else
-			return false;
+	public TurnLeftBehavior(Simulator simulator, Robot r, Arguments args) {
+		super(simulator, r, args);
 	}
 	
 	@Override
-	public void applyBehavior() {
+	public void controlStep(double time) {
 		
 		if(!lock)
-			active = false;
+			isLocked = false;
 		
-		if(!active)
+		if(!isLocked)
 			startOrientation = robot.getOrientation();
 		
-		active = true;
+		isLocked = true;
 		
 		double currentOrientation = robot.getOrientation();
 		
 		if(Math.abs(currentOrientation-startOrientation) >= Math.PI/2-0.05)
 		{
 			robot.setWheelSpeed(0, 0);
-			active = false;
+			isLocked = false;
 		} else {
 			/*leftSpeed *= (1 + simulator.getRandom().nextGaussian() * NOISESTDEV);
 			rightSpeed *= (1 + simulator.getRandom().nextGaussian() * NOISESTDEV);
@@ -60,7 +53,6 @@ public class TurnLeftBehavior extends Behavior {
 	
 	@Override
 	public String toString() {
-		return "TurnLeftActuator [active=" + active + "]";
+		return "TurnLeftActuator [active=" + isLocked + "]";
 	}
-
 }

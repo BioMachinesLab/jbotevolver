@@ -14,24 +14,13 @@ public class OpenDoorBehavior extends Behavior{
 	private double distanceToDoor = 0.2;
 
 	public OpenDoorBehavior(Simulator simulator, Robot r, Arguments args) {
-		super(simulator, r, false);
+		super(simulator, r, args);
 		env = (TwoRoomsEnvironment)simulator.getEnvironment();
 		distanceToDoor = args.getArgumentAsDoubleOrSetDefault("distancetodoor", distanceToDoor);
 	}
 
 	@Override
-	public boolean isLocked() {
-		return false;
-	}
-	
-	@Override
 	public void controlStep(double time) {
-		applyBehavior();
-	}
-
-	@Override
-	public void applyBehavior() {
-		
 		LinkedList<Wall> buttons = env.getButtons();
 		Robot rob = env.getRobots().get(0);
 		Vector2d r = rob.getPosition(); 

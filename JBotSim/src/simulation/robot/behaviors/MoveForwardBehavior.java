@@ -3,6 +3,7 @@ package simulation.robot.behaviors;
 import simulation.Simulator;
 import simulation.robot.Epuck;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class MoveForwardBehavior extends Behavior {
 	
@@ -13,24 +14,15 @@ public class MoveForwardBehavior extends Behavior {
 	private double prev = 0;
 	private double noise = 0;
 	
-	public MoveForwardBehavior(Simulator simulator, Robot r, boolean lock) {
-		super(simulator, r, lock);
+	public MoveForwardBehavior(Simulator simulator, Robot r, Arguments args) {
+		super(simulator, r, args);
 		this.noise = simulator.getRandom().nextGaussian()*NOISESTDEV;
 		leftSpeed+=leftSpeed*noise;
 		rightSpeed+=rightSpeed*noise;
 	}
-	
-	public boolean isLocked() {
-		return false;
-	}
-	
-	public void setSpeed(double left, double right) {
-		this.leftSpeed = left;
-		this.rightSpeed = right;
-	}
-	
+
 	@Override
-	public void applyBehavior() {
+	public void controlStep(double time) {
 		
 		double percentage = 0.15/2.0;
 		
@@ -124,5 +116,4 @@ public class MoveForwardBehavior extends Behavior {
 	public String toString() {
 		return "MoveForward";
 	}
-
 }

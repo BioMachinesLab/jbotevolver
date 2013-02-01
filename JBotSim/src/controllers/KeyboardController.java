@@ -16,11 +16,11 @@ public class KeyboardController extends simulation.Controller {
 		super(simulator, robot);
 	}
 
-	public void controlStep(int time) {
+	public void controlStep(double time) {
 		robot.setWheelSpeed(leftSpeed, rightSpeed);
 		//System.out.println(robot.getSensors());
 	}
-
+	
 	public void keyTyped(KeyEvent e) {
 		if (e.getKeyChar() == 'a' || e.getKeyChar() == 'A') {
 			leftSpeed -= SPEEDCHANGE;

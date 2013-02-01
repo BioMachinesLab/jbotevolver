@@ -3,26 +3,22 @@ package simulation.robot.behaviors;
 import simulation.Controller;
 import simulation.Simulator;
 import simulation.robot.Robot;
-import simulation.robot.actuators.Actuator;
+import simulation.util.Arguments;
 
 public abstract class Behavior extends Controller{
 	
 	protected int numberOfOutputs = 1;
-	protected Robot robot;
-	protected boolean lock;
+	protected boolean lock = false;
+	protected boolean isLocked = false;
 	
-	public Behavior(Simulator simulator, Robot r, boolean lock) {
+	public Behavior(Simulator simulator, Robot r, Arguments args) {
 		super(simulator, r);
+		
+		lock = args.getArgumentAsIntOrSetDefault("lock", 0) == 1;
 		this.robot = r;
-		this.lock = lock;
 	}
 
-	public abstract boolean isLocked();
-	
-	public abstract void applyBehavior();
-
-	public void setValue(int index, double value) {}
-	
-	public int getNumberOfOutputs() {return numberOfOutputs;}
-
+	public boolean isLocked() {
+		return isLocked;
+	}
 }

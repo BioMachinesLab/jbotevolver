@@ -259,12 +259,12 @@ public class RobotFactory extends Factory implements Serializable {
 
 		} else if (name.equalsIgnoreCase("color")
 				|| name.equalsIgnoreCase("coloractuator")) {
-			return new RobotColorActuator(simulator, id);
+			return new RobotColorActuator(simulator, id, arguments);
 		} else if (name.equalsIgnoreCase("rgbcolor")
 				|| name.equalsIgnoreCase("rgbcoloractuator")
 				|| name.equalsIgnoreCase("robotrgbcolor")
 				|| name.equalsIgnoreCase("robotrgbcoloractuator")) {
-			return new RobotRGBColorActuator(simulator, id);
+			return new RobotRGBColorActuator(simulator, id, arguments);
 		} else if (name.equalsIgnoreCase("preypicker")
 				|| name.equalsIgnoreCase("preypickeractuator")) {
 			return new PreyPickerActuator(simulator, id, arguments);
