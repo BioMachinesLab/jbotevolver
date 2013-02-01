@@ -2,7 +2,6 @@ package controllers;
 
 import java.util.Random;
 
-import simulation.Controller;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.environment.RoundForageEnvironment;

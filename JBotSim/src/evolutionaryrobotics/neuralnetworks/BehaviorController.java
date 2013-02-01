@@ -1,8 +1,9 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.ArrayList;
+
+import controllers.Controller;
 import factories.ControllerFactory;
-import simulation.Controller;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;

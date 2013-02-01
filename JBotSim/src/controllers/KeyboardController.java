@@ -6,7 +6,7 @@ import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 
-public class KeyboardController extends simulation.Controller {
+public class KeyboardController extends controllers.Controller {
 
 	public static final double SPEEDCHANGE = 0.01;
 

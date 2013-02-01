@@ -1,7 +1,9 @@
-package simulation;
+package controllers;
 
 import java.io.Serializable;
 
+import simulation.Simulator;
+import simulation.SimulatorObject;
 import simulation.robot.Robot;
 
 /**

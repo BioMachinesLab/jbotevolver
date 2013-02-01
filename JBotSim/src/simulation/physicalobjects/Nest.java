@@ -10,7 +10,4 @@ public class Nest extends PhysicalObject {
 		super(simulator, name, x, y, 0, 0, PhysicalObjectType.NEST);
 		this.shape = new CircularShape(simulator, name + "CollisionObject", this, x, y, 2 * radius, radius);
 	}
-
-	
-	
 }

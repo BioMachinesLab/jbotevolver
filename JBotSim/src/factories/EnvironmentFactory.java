@@ -4,8 +4,11 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import javax.annotation.processing.RoundEnvironment;
+
 import simulation.Simulator;
 import simulation.environment.Environment;
+import simulation.environment.RoundForageEnvironment;
 import simulation.util.Arguments;
 
 public class EnvironmentFactory extends Factory implements Serializable {
@@ -15,6 +18,8 @@ public class EnvironmentFactory extends Factory implements Serializable {
 	}
 
 	public Environment getEnvironment(Arguments arguments) {
+		
+		System.out.println(RoundForageEnvironment.class.getName());
 
 		if (!arguments.getArgumentIsDefined("name")) {
 			throw new RuntimeException("Environment 'name' not defined: "
@@ -31,17 +36,7 @@ public class EnvironmentFactory extends Factory implements Serializable {
 				return (Environment) constructor.newInstance(simulator,arguments);
 			}
 
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 

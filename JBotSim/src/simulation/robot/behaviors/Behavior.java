@@ -1,6 +1,6 @@
 package simulation.robot.behaviors;
 
-import simulation.Controller;
+import controllers.Controller;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;

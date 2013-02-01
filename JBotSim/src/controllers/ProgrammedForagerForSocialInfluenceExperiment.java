@@ -1,6 +1,5 @@
 package controllers;
 
-import simulation.Controller;
 import simulation.Simulator;
 import simulation.environment.RoundForageEnvironment;
 import simulation.robot.Robot;

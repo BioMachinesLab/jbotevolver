@@ -2,7 +2,6 @@ package controllers;
 
 import java.util.Iterator;
 
-import simulation.Controller;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.behaviors.Behavior;

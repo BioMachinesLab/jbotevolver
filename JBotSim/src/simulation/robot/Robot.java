@@ -4,7 +4,8 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Iterator;
-import simulation.Controller;
+
+import controllers.Controller;
 import simulation.Simulator;
 import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;

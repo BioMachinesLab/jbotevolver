@@ -1,7 +1,6 @@
 package controllers;
 
 import java.awt.Color;
-import simulation.Controller;
 import simulation.Simulator;
 import simulation.robot.Robot;
 // import simulation.robot.sensors.BehaviorSensor;

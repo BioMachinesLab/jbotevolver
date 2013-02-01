@@ -1,9 +1,6 @@
 package simulation.environment;
 
-
 import gui.renderer.Renderer;
-
-import java.util.Random;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -19,7 +16,6 @@ import simulation.util.SimRandom;
 
 public class RoundForageEnvironment extends Environment implements NestEnvironment{
 
-	
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1;
 	private double nestLimit;
@@ -103,7 +99,7 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 
 	@Override
 	public void draw(Renderer renderer){
-            renderer.drawCircle(nest.getPosition(), forageLimit);
-            renderer.drawCircle(nest.getPosition(), forbiddenArea);
+		renderer.drawCircle(nest.getPosition(), forageLimit);
+		renderer.drawCircle(nest.getPosition(), forbiddenArea);
 	}
 }

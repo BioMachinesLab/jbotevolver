@@ -2,19 +2,16 @@ package factories;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Vector;
-import simulation.Controller;
+import controllers.Controller;
 import simulation.Simulator;
-import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.actuators.RobotColorActuator;
 import simulation.robot.actuators.RobotRGBColorActuator;
 import simulation.robot.actuators.TwoWheelActuator;
-import simulation.robot.behaviors.OpenDoorBehavior;
 import simulation.robot.sensors.EpuckLightSensor;
 import simulation.robot.sensors.WallButtonSensor;
 import simulation.robot.sensors.XRayPreySensor;
@@ -81,7 +78,7 @@ public class ControllerFactory extends Factory implements Serializable {
 			Constructor<?>[] constructors = Class.forName(controllerName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
-				return (Controller) constructor.newInstance(simulator,arguments);
+				return (Controller) constructor.newInstance(simulator,robot);
 			}
 
 		} catch (Exception e) {
