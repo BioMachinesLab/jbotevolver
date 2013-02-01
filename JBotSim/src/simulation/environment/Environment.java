@@ -25,11 +25,7 @@ public abstract class Environment implements KeyListener, Serializable {
 	protected final double MAX_APPROX_SPEED = 0.1;
 
 	protected final int MAXOBJECTS = 5000;
-
-	protected final int MAX_WALLS = 4;
 	
-	// private static Environment instance;
-
 	protected Simulator simulator;
 	protected ArrayList<Robot> robots = new ArrayList<Robot>(MAXOBJECTS);
 	protected ArrayList<Prey>  prey   = new ArrayList<Prey>(MAXOBJECTS);
@@ -42,13 +38,14 @@ public abstract class Environment implements KeyListener, Serializable {
 	protected double height;
 	protected double width;
 
-	private GeometricCalculator geometricCalculator = new GeometricCalculator();// movableObjects);
+	private GeometricCalculator geometricCalculator;
 
 	public Environment(Simulator simulator, Arguments args) {
 		this.simulator = simulator;
 		this.width = args.getArgumentAsDoubleOrSetDefault("width", 5);
 		this.height = args.getArgumentAsDoubleOrSetDefault("height", 5);
 		collisionManager = new SimpleCollisionManager(simulator);
+		this.geometricCalculator = simulator.getGeoCalculator();
 	}
 
 	public abstract void update(double time);
