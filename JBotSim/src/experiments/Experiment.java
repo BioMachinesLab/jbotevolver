@@ -161,8 +161,6 @@ public class Experiment implements Serializable {
 			
 			for(Robot r: robots) {
 				
-				r.setExtraRadius(r.getExtraRadius()*3.0);
-				
 				do{
 					
 					double x = robotArguments.getArgumentAsDouble("positionx");
@@ -184,9 +182,7 @@ public class Experiment implements Serializable {
 					environment.updateRobotCloseObjects(0);
 					environment.updateCollisions(0);
 				
-				}while(r.isInvolvedInCollison());
-				
-				r.setExtraRadius(r.getExtraRadius()/3.0);
+				} while(r.isInvolvedInCollison());				
 			}
 		}
 	}
@@ -228,7 +224,7 @@ public class Experiment implements Serializable {
 		Robot r = createOneRobot(this.robotArguments, this.controllerArguments);
 		if(r.getEvolvingController() instanceof NeuralNetworkController){
 			NeuralNetworkController nnController = (NeuralNetworkController) r.getEvolvingController();
-			nnController.setWeights(lastWeights);
+			nnController.setNNWeights(lastWeights);
 		}
 		environment.addRobot(r);
 		r.setPosition(new Vector2d(0, -10));
@@ -237,7 +233,7 @@ public class Experiment implements Serializable {
 
 	protected Robot createOneRobot(Arguments argumentsRobot, Arguments argumentsController) {
 
-		Robot robot = robotFactory.getRobot(argumentsRobot, this);
+		Robot robot = robotFactory.getRobot(argumentsRobot);
 		addControllerToRobot(robot,argumentsController);
 		return robot;
 	}
@@ -255,11 +251,11 @@ public class Experiment implements Serializable {
 		for (Robot r : robots) {
 			if(r.getEvolvingController() instanceof NeuralNetworkController){
 				NeuralNetworkController nnController = (NeuralNetworkController) r.getEvolvingController();
-				nnController.setWeights(weights);
+				nnController.setNNWeights(weights);
 			}else if(r.getEvolvingController() instanceof BehaviorController){
 				BehaviorController bController = (BehaviorController)r.getEvolvingController();
 				NeuralNetworkController nnController = (NeuralNetworkController) bController.getEvolvingController();
-				nnController.setWeights(weights);
+				nnController.setNNWeights(weights);
 			}
 		}	
 	}
