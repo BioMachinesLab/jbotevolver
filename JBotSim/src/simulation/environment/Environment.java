@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -197,6 +198,10 @@ public class Environment implements KeyListener, Serializable {
 	
 	public int[] getGroundColor(int robotId) {
 		return null;
+	}
+
+	public void addRobots(LinkedList<Robot> robots) {
+		this.robots.addAll(robots);
 	}
 
 	

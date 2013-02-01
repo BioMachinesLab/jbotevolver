@@ -27,7 +27,7 @@ public  class Controller extends SimulatorObject implements Serializable {
 	 *  Initialize a new controller for a {@link Robot}
 	 */
 	public Controller(Simulator simulator,Robot robot) {
-		super(simulator);
+		super();
 			this.robot = robot;
 	}
 			
