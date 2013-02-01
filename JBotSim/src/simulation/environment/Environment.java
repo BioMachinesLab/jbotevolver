@@ -46,6 +46,8 @@ public abstract class Environment implements KeyListener, Serializable {
 		collisionManager = new SimpleCollisionManager(simulator);
 		this.geometricCalculator = simulator.getGeoCalculator();
 	}
+	
+	public abstract void setup();
 
 	public abstract void update(double time);
 

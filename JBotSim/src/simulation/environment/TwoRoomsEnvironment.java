@@ -57,8 +57,11 @@ public class TwoRoomsEnvironment extends Environment {
 		
 		if(arguments.getArgumentAsIntOrSetDefault("randomizesplitratio",1) > 0)
 			splitRatio = r.nextDouble();
-		
-		createRoom();
+	}
+	
+	@Override
+	public void setup() {
+		createRoom();	
 	}
 	
 	public int getNumberOfPicks() {

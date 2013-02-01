@@ -18,7 +18,7 @@ public class ClosePhysicalObjects implements Serializable {
 	private LinkedList<PhysicalObjectDistance> farObjects   = new LinkedList<PhysicalObjectDistance>();
 	private Double time;
 	private double farTime;
-	private boolean notInitialized								= true;
+	private boolean notInitialized = true;
 
 	private double visibility;
 	private AllowedObjectsChecker allowedObjectsChecker;
@@ -29,9 +29,9 @@ public class ClosePhysicalObjects implements Serializable {
 			AllowedObjectsChecker allowedObjectsChecker) {
 		this.env = env;
 		this.time = time;
-		this.visibility 				   = (range/env.getMaxApproximationSpeed()) + EXTENDED_VISIBILITY;
+		this.visibility = (range/env.getMaxApproximationSpeed()) + EXTENDED_VISIBILITY;
 		this.allowedObjectsChecker = allowedObjectsChecker;
-		farTime					   = time + visibility;
+		farTime = time + visibility;
 	}
 
 	public void update(double time, ArrayList<PhysicalObject> teleported){
@@ -156,7 +156,5 @@ public class ClosePhysicalObjects implements Serializable {
 		public void updateCurrentDistance(Double distanceBetween) {
 			currentObject.setTime(time+((distanceBetween)/MovableObject.TWICEMAXIMUMSPEEDPERTIMESTEP));	
 		}
-
 	}
-
 }

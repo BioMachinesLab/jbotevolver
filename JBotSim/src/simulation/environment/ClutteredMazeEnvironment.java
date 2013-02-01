@@ -12,17 +12,22 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 	private int objects = 3;
 	private double objectWidth = 0.15+0.1;
 	private Vector2d exitPosition;
+	double maxWidth,maxHeight,minWidth,minHeight;
 
 	public ClutteredMazeEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments, false);
-		double maxWidth = arguments.getArgumentAsDoubleOrSetDefault("maxwidth",this.width-1);
-		double maxHeight = arguments.getArgumentAsDoubleOrSetDefault("maxheight",this.height-1);
+		maxWidth = arguments.getArgumentAsDoubleOrSetDefault("maxwidth",this.width-1);
+		maxHeight = arguments.getArgumentAsDoubleOrSetDefault("maxheight",this.height-1);
 		
-		double minWidth = arguments.getArgumentAsDoubleOrSetDefault("minwidth",maxWidth);
-		double minHeight = arguments.getArgumentAsDoubleOrSetDefault("minheight",maxHeight);
+		minWidth = arguments.getArgumentAsDoubleOrSetDefault("minwidth",maxWidth);
+		minHeight = arguments.getArgumentAsDoubleOrSetDefault("minheight",maxHeight);
 		exitWidth = arguments.getArgumentAsDoubleOrSetDefault("exitwidth",exitWidth);
 		objects = arguments.getArgumentAsIntOrSetDefault("objects",objects);
-
+	}
+	
+	@Override
+	public void setup() {
+		super.setup();
 		createRoom(minWidth,maxWidth,minHeight,maxHeight);
 	}
 	

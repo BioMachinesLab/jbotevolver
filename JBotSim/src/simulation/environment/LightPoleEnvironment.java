@@ -18,9 +18,8 @@ public class LightPoleEnvironment extends Environment {
 	private double lightPoleDistance;
 	private double forageLimit, forbiddenArea;
 	private int currentSample;
-	private int maxNumberRobots;
 	private int lightPoleNumber;
-	String randomPoles;
+	private String vary,randomPoles;
 	private ArrayList<LightPole> poles;
 
 	/**
@@ -30,35 +29,28 @@ public class LightPoleEnvironment extends Environment {
 	 */
 	public LightPoleEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
-		lightPoleDistance = arguments.getArgumentIsDefined("lightpoledistance") ? arguments
-				.getArgumentAsDouble("lightpoledistance") : 2.0;
-		lightPoleRadius = arguments.getArgumentIsDefined("lightpoleradius") ? arguments
-				.getArgumentAsDouble("lightpoleradius") : 0.10;
-		lightPoleNumber = arguments.getArgumentIsDefined("lightPoleNumber") ? arguments
-				.getArgumentAsInt("lightPoleNumber") : 0;
-		String vary = arguments.getArgumentIsDefined("varyexperiments") ? arguments
-				.getArgumentAsString("varyexperiments") : "false";
-		currentSample = arguments.getArgumentIsDefined("fitnesssample") ? arguments
-				.getArgumentAsInt("fitnesssample") : 0;
-		randomPoles = arguments.getArgumentIsDefined("israndom") ? arguments
-				.getArgumentAsString("israndom") : "false";
+		lightPoleDistance = arguments.getArgumentIsDefined("lightpoledistance") ? arguments .getArgumentAsDouble("lightpoledistance") : 2.0;
+		lightPoleRadius = arguments.getArgumentIsDefined("lightpoleradius") ? arguments.getArgumentAsDouble("lightpoleradius") : 0.10;
+		lightPoleNumber = arguments.getArgumentIsDefined("lightPoleNumber") ? arguments.getArgumentAsInt("lightPoleNumber") : 0;
+		vary = arguments.getArgumentIsDefined("varyexperiments") ? arguments.getArgumentAsString("varyexperiments") : "false";
+		currentSample = arguments.getArgumentIsDefined("fitnesssample") ? arguments.getArgumentAsInt("fitnesssample") : 0;
+		randomPoles = arguments.getArgumentIsDefined("israndom") ? arguments.getArgumentAsString("israndom") : "false";
+		currentSample = arguments.getArgumentIsDefined("fitnesssample") ? arguments.getArgumentAsInt("fitnesssample") : 0;
+	}
+	
+	@Override
+	public void setup() {
 		if (vary.equalsIgnoreCase("true")) {
-
 			poles = createMultipleEnvironments(lightPoleRadius);
 		} else {
 			if (randomPoles.equalsIgnoreCase("true")) {
-				poles = createPoles(getRandomPositions(lightPoleNumber),
-						lightPoleRadius);
+				poles = createPoles(getRandomPositions(lightPoleNumber),lightPoleRadius);
 			} else
-				poles = createPoles(getPositions(lightPoleNumber),
-						lightPoleRadius);
+				poles = createPoles(getPositions(lightPoleNumber),lightPoleRadius);
 		}
-		currentSample = arguments.getArgumentIsDefined("fitnesssample") ? arguments
-				.getArgumentAsInt("fitnesssample") : 0;
 
 		for (LightPole p : poles)
 			addObject(p);
-
 	}
 
 	/**

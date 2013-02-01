@@ -60,9 +60,12 @@ public class GroupedPreyEnvironment extends Environment {
 		
 		if(redeployPrey)
 			currentRedeployCounter = redeployCounter;
-		
+	}
+	
+	@Override
+	public void setup() {
 		preyCenter = calculatePreyCenter();
-				
+		
 		for(int i = 0; i < amountOfFood; i++ ){
 			addPrey(new Prey(simulator,"Prey "+i, newPreyPosition(), 0, PREY_MASS, PREY_RADIUS));
 		}

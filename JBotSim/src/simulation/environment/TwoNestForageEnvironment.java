@@ -32,22 +32,13 @@ public class TwoNestForageEnvironment extends Environment implements
 	protected double nestDistance;
 	protected Vector2d center = new Vector2d(0, 0);
 
-	// public TwoNestForageEnvironment(Simulator simulator, double width,
-	// double height) {
-	// super(simulator, width, height);
-	// }
-
 	public TwoNestForageEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 
-		nestDistance = arguments.getArgumentIsDefined("nestdistance") ? arguments
-				.getArgumentAsDouble("nestdistance") : 2;
-		nestLimit = arguments.getArgumentIsDefined("nestlimit") ? arguments
-				.getArgumentAsDouble("nestlimit") : .5;
-		forageLimit = arguments.getArgumentIsDefined("foragelimit") ? arguments
-				.getArgumentAsDouble("foragelimit") : 2.0;
-		forbiddenArea = arguments.getArgumentIsDefined("forbiddenarea") ? arguments
-				.getArgumentAsDouble("forbiddenarea") : 5.0;
+		nestDistance = arguments.getArgumentIsDefined("nestdistance") ? arguments.getArgumentAsDouble("nestdistance") : 2;
+		nestLimit = arguments.getArgumentIsDefined("nestlimit") ? arguments.getArgumentAsDouble("nestlimit") : .5;
+		forageLimit = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit") : 2.0;
+		forbiddenArea = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 5.0;
 
 		if (arguments.getArgumentIsDefined("densityoffood")) {
 			double densityoffood = arguments
@@ -58,7 +49,10 @@ public class TwoNestForageEnvironment extends Environment implements
 			amountOfFood = arguments.getArgumentIsDefined("amountfood") ? arguments
 					.getArgumentAsInt("amountfood") : 20;
 		}
-
+	}
+	
+	@Override
+	public void setup() {
 		nestA = new Nest(simulator, "NestA", -nestDistance / 2, 0, nestLimit);
 		nestA.setParameter("TEAM", 1);
 		nestB = new Nest(simulator, "NestB", nestDistance / 2, 0, nestLimit);
@@ -66,7 +60,7 @@ public class TwoNestForageEnvironment extends Environment implements
 		addObject(nestA);
 		addObject(nestB);
 
-		deployPreys();
+		deployPreys();	
 	}
 
 	protected void deployPreys() {
@@ -74,7 +68,6 @@ public class TwoNestForageEnvironment extends Environment implements
 			addPrey(new Prey(simulator, "Prey " + i, newRandomPosition(), 0,
 					PREY_MASS, PREY_RADIUS));
 		}
-
 	}
 
 	protected int getAmoutOfFood() {

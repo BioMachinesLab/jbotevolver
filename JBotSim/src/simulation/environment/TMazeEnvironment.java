@@ -1,11 +1,13 @@
 package simulation.environment;
 
 import gui.renderer.Renderer;
+
 import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
+
 import mathutils.Point2d;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -15,6 +17,7 @@ import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.SimRandom;
 
 public class TMazeEnvironment extends Environment {
 
@@ -41,6 +44,10 @@ public class TMazeEnvironment extends Environment {
 	private double widthChange = 0;
 	private double randomizeOrientation = 0;
 	private double randomizeY = 0;
+	private String mazeName;
+	private SimRandom random;
+	private int numberOfMazes;
+	private int numberOfDifferentSamples;
 
 	public TMazeEnvironment(Simulator simulator, Arguments arguments) {
 		this(simulator,arguments,true);
@@ -50,6 +57,7 @@ public class TMazeEnvironment extends Environment {
 		
 		super(simulator, arguments);
 		
+		this.random = simulator.getRandom();
 		this.firstWall = firstWall;
 		
 		forbiddenArea = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")	: 7;
@@ -58,19 +66,22 @@ public class TMazeEnvironment extends Environment {
 		randomize = arguments.getArgumentAsIntOrSetDefault("randomize",1) == 1;
 		squareSize = arguments.getArgumentAsDoubleOrSetDefault("squaresize",squareSize);
 		
-		String mazeName = arguments.getArgumentAsStringOrSetDefault("mazename", "tmaze");
+		mazeName = arguments.getArgumentAsStringOrSetDefault("mazename", "tmaze");
 
 		inverse = arguments.getArgumentAsInt("inverse") == 1;
 		mirror = arguments.getArgumentAsInt("mirror") == 1;
 		
 		mixed = arguments.getArgumentAsIntOrSetDefault("mixed",0) == 1;
-		
 		mixedSamples = arguments.getArgumentAsIntOrSetDefault("mixedsamples",12);
 		
 		widthChange = arguments.getArgumentAsDoubleOrSetDefault("widthchange",0.0);
-		
 		randomizeY = arguments.getArgumentAsDoubleOrSetDefault("randomizey",0.0);
 		randomizeOrientation = arguments.getArgumentAsDoubleOrSetDefault("randomizeorientation",0.0);
+		
+		teleport = arguments.getArgumentAsIntOrSetDefault("teleport",0) == 1;
+		
+		numberOfMazes = arguments.getArgumentAsIntOrSetDefault("numberofmazes", 0);
+		numberOfDifferentSamples = arguments.getArgumentAsIntOrSetDefault("numberofdifferentsamples",1);
 		
 		double wC = simulator.getRandom().nextDouble() * 3;
 		
@@ -79,20 +90,17 @@ public class TMazeEnvironment extends Environment {
 		else if(wC > 2)
 			squareSize-=widthChange;
 		
-		teleport = arguments.getArgumentAsIntOrSetDefault("teleport",0) == 1;
-		
 		if(mixed) {
 			onlyMaze = currentSample % mixedSamples < 4*2; //0-7
 			inverse = currentSample % mixedSamples < 4;//0-3
 			if(inverse && !mazeName.equals("inversetmaze"))
 				mazeName = "inversetmaze";
 		}
-		
-		if(arguments.getArgumentIsDefined("numberofmazes"))
+	}
+	
+	public void setup() {
+		if(numberOfMazes > 0)
 		{
-			int numberOfMazes = arguments.getArgumentAsInt("numberofmazes");
-			int numberOfDifferentSamples = arguments.getArgumentAsInt("numberofdifferentsamples");
-
 			int currentMaze = currentSample % numberOfMazes;
 			
 			try {

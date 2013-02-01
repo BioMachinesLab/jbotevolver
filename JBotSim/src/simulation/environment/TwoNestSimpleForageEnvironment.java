@@ -61,6 +61,10 @@ public class TwoNestSimpleForageEnvironment extends TwoNestForageEnvironment
 		// .getArgumentAsInt("amountfood") : 20;
 		// }
 		//
+	}
+	
+	@Override
+	public void setup() {
 		// nestA = new Nest(simulator, "NestA", -nestDistance / 2, 0,
 		// nestLimit);
 		// nestA.setParameter("TEAM", 1);
@@ -72,7 +76,7 @@ public class TwoNestSimpleForageEnvironment extends TwoNestForageEnvironment
 		// for (int i = 0; i < amountOfFood; i++) {
 		// addPrey(new Prey(simulator, "Prey " + i, newRandomPosition(), 0,
 		// PREY_MASS, PREY_RADIUS));
-		// }
+		// }	
 	}
 
 	// private Vector2d newRandomPosition() {

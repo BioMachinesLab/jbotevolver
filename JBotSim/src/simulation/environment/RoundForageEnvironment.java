@@ -25,7 +25,6 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 	private Nest   nest;
 	private int    numberOfFoodSuccessfullyForaged = 0;
 
-
 	public RoundForageEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 
@@ -34,17 +33,20 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 		forbiddenArea   = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")       : 5.0;
 		
 		if(arguments.getArgumentIsDefined("densityofpreys")){
-			double densityoffood       = arguments.getArgumentAsDouble("densityofpreys");
+			double densityoffood = arguments.getArgumentAsDouble("densityofpreys");
 			numberOfPreys = (int)(densityoffood*Math.PI*forageLimit*forageLimit+.5);
 		} else {
 			numberOfPreys = arguments.getArgumentIsDefined("numberofpreys") ? arguments.getArgumentAsInt("numberofpreys") : 20;
 		}
-				
+	}
+	
+	@Override
+	public void setup() {
 		for(int i = 0; i < numberOfPreys; i++ ){
 			addPrey(new Prey(simulator, "Prey "+i, newRandomPosition(), 0, PREY_MASS, PREY_RADIUS));
 		}
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
-		addObject(nest);
+		addObject(nest);	
 	}
 
 	private Vector2d newRandomPosition() {

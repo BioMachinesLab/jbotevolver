@@ -26,21 +26,13 @@ public class TwoNestCenterDeployPreysEnvironment extends
 		rateOfNewPreyPerCycle = arguments
 				.getArgumentIsDefined("rateOfNewPreyPerCycle") ? arguments
 				.getArgumentAsDouble("rateOfNewPreyPerCycle") : .1;
-
+	}
+	
+	@Override
+	public void setup() {
+		super.setup();
 		deployPreys();
 	}
-
-	// private Vector2d newRandomPosition() {
-	// Vector2d position;
-	// do {
-	// double radius = simulator.getRandom().nextDouble() * (forageLimit);
-	// double angle = simulator.getRandom().nextDouble() * 2 * Math.PI;
-	// position = new Vector2d(radius * Math.cos(angle), radius
-	// * Math.sin(angle));
-	// } while (position.distanceTo(nestA.getPosition()) < nestA.getRadius()
-	// || position.distanceTo(nestB.getPosition()) < nestB.getRadius());
-	// return position;
-	// }
 
 	protected Vector2d newRandomPosition() {
 		return new Vector2d(0, simulator.getRandom().nextDouble()
@@ -54,7 +46,6 @@ public class TwoNestCenterDeployPreysEnvironment extends
 			newPrey.setEnabled(true);
 			newPrey.teleportTo(newRandomPosition());
 		}
-
 	}
 
 	@Override
@@ -73,5 +64,4 @@ public class TwoNestCenterDeployPreysEnvironment extends
 	protected int getAmoutOfFood() {
 		return numberOfPreysAvailable;
 	}
-
 }

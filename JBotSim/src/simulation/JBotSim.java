@@ -73,6 +73,7 @@ public class JBotSim {
 
 		Environment environment = environmentFactory.getEnvironment(environmentArguments);
 		simulator.setEnvironment(environment);
+		environment.setup();
 		
 		return simulator;
 	}
