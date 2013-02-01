@@ -3,6 +3,7 @@ package controllers;
 import java.awt.event.KeyEvent;
 
 import simulation.Simulator;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 
 public class KeyboardController extends simulation.Controller {
@@ -17,8 +18,7 @@ public class KeyboardController extends simulation.Controller {
 	}
 
 	public void controlStep(double time) {
-		robot.setWheelSpeed(leftSpeed, rightSpeed);
-		//System.out.println(robot.getSensors());
+		((DifferentialDriveRobot) robot).setWheelSpeed(leftSpeed, rightSpeed);
 	}
 	
 	public void keyTyped(KeyEvent e) {

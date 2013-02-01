@@ -4,7 +4,7 @@ import simulation.Simulator;
 import simulation.robot.sensors.EpuckIRSensor;
 import simulation.robot.sensors.EpuckLightSensor;
 
-public class Epuck extends Robot {
+public class Epuck extends DifferentialDriveRobot {
 
 	public Epuck(Simulator simulator, String name, double x, double y,
 			double orientation, double mass, double radius,

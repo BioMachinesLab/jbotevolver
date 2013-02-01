@@ -19,6 +19,11 @@ public class DifferentialDriveRobot extends Robot {
 	 */	
 	protected double     rightWheelSpeed    = 0;
 	
+	/**
+	 * Distance between the wheels of the robot.
+	 */
+	protected double distanceBetweenWheels = 0.05;
+		
 
 	public DifferentialDriveRobot(Simulator simulator, String name, double x,
 			double y, double orientation, double mass, double radius,
@@ -66,6 +71,15 @@ public class DifferentialDriveRobot extends Robot {
 
 	public double getDistanceBetweenWheels() {
 		return distanceBetweenWheels;
+	}
+	
+	
+	public double getRightWheelSpeed() {
+		return rightWheelSpeed;
+	}
+	
+	public double getLeftWheelSpeed() {
+		return leftWheelSpeed;
 	}
 	
 }

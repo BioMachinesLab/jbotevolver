@@ -50,32 +50,7 @@ public class Robot extends MovableObject {
 	public static final int GREENINDEX = 1;
 	public static final int BLUEINDEX  = 2;
 	
-	/**
-	 * Diameter of the robot's wheels.
-	 */
-	protected double     wheelDiameter      = 0.05;
-
-	/**
-	 * Current speed of the left wheel.
-	 */	
-	protected double     leftWheelSpeed     = 0;
-	/**
-	 * Current speed of the right wheel.
-	 */	
-	protected double     rightWheelSpeed    = 0;
 	
-	/**
-	 * Reference to the prey carried (if any). If no prey is carried this field is null.
-	 */	
-	protected   Prey		 preyCarried;
-
-	private int numDrops 					= 0;
-	
-	/**
-	 * Distance between the wheels of the robot.
-	 */
-	protected double distanceBetweenWheels = 0.05;
-		
 	/**
 	 * Initialize a new robot.
 	 * 
@@ -87,9 +62,8 @@ public class Robot extends MovableObject {
 	 * @param radius the radius of the robot
 	 * @param color 
 	 */
-	public Robot(Simulator simulator, String name, double x, double y, double orientation, double mass, double radius, double distanceBetweenwheels, String color) {
+	public Robot(Simulator simulator, String name, double x, double y, double orientation, double mass, double radius, String color) {
 		super(simulator, name, x, y, orientation, mass, PhysicalObjectType.ROBOT, null);
-		this.distanceBetweenWheels = distanceBetweenwheels;
 		this.controller            = new Controller(simulator,this);	
 		this.shape       = new CircularShape(simulator, name + "CollisionObject", this, x, y, 
 															2 * radius, radius);
@@ -109,9 +83,9 @@ public class Robot extends MovableObject {
 	 * is needed because some controllers have sub-controllers in an hierarchical fashion.
 	 * @return the reference to the evolving controller for the robot (or null)
 	 */
-	public Controller getEvolvingController() {
-		return controller.getEvolvingController();
-	}
+//	public Controller getEvolvingController() {
+//		return controller.getEvolvingController();
+//	}
 	
 	/**
 	 * Get a list of the robot's sensors.
@@ -358,14 +332,7 @@ public class Robot extends MovableObject {
 	public double[] getBodyColorAsDoubles() {
 		return this.bodyColor;
 	}
-	
-	public double getRightWheelSpeed() {
-		return rightWheelSpeed;
-	}
-	
-	public double getLeftWheelSpeed() {
-		return leftWheelSpeed;
-	}
+
 	
 	public Sensor getSensorByType(String sensorClass){
 		

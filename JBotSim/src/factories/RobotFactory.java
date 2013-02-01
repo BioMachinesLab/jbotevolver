@@ -14,7 +14,6 @@ import simulation.robot.actuators.OpenDoorActuator;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.actuators.RobotColorActuator;
 import simulation.robot.actuators.RobotRGBColorActuator;
-import simulation.robot.actuators.SimplePreyPickerActuator;
 import simulation.robot.actuators.TwoWheelActuator;
 import simulation.robot.sensors.BehaviorSensor;
 import simulation.robot.sensors.EpuckLightSensor;
@@ -111,7 +110,7 @@ public class RobotFactory extends Factory implements Serializable {
 
 			if (robotName.equalsIgnoreCase("differentialdrive") || robotName.equalsIgnoreCase("simulation.robot.Robot"))
 				robot = new Robot(simulator, robotName + numberOfRobots++,
-						position.x, position.y, orientation, mass, radius,distanceWheels,color);
+						position.x, position.y, orientation, mass, radius,color);
 			
 			if (robotName.equalsIgnoreCase("ardrone")) 
 				robot = new ARDrone(simulator, robotName + numberOfRobots++,
@@ -268,8 +267,6 @@ public class RobotFactory extends Factory implements Serializable {
 		} else if (name.equalsIgnoreCase("preypicker")
 				|| name.equalsIgnoreCase("preypickeractuator")) {
 			return new PreyPickerActuator(simulator, id, arguments);
-		} else if (name.equalsIgnoreCase("SimplePreyPickerActuator")) {
-			return new SimplePreyPickerActuator(simulator, id, arguments);
 		} else if (name.equalsIgnoreCase("multipreypicker")
 				|| name.equalsIgnoreCase("multipreypickeractuator")) {
 			return new MultiPreyPickerActuator(simulator, id, arguments);
