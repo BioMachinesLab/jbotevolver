@@ -1,6 +1,7 @@
 package simulation.robot.behaviors;
 
 import simulation.Simulator;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
@@ -31,7 +32,7 @@ public class TurnLeftBehavior extends Behavior {
 		
 		if(Math.abs(currentOrientation-startOrientation) >= Math.PI/2-0.05)
 		{
-			robot.setWheelSpeed(0, 0);
+			((DifferentialDriveRobot) robot).setWheelSpeed(0, 0);
 			isLocked = false;
 		} else {
 			/*leftSpeed *= (1 + simulator.getRandom().nextGaussian() * NOISESTDEV);
@@ -47,7 +48,7 @@ public class TurnLeftBehavior extends Behavior {
 			else if (rightSpeed > Robot.MAXIMUMSPEED)
 				rightSpeed = Robot.MAXIMUMSPEED;*/
 			
-			robot.setWheelSpeed(leftSpeed, rightSpeed);
+			((DifferentialDriveRobot) robot).setWheelSpeed(leftSpeed, rightSpeed);
 		}
 	}
 	

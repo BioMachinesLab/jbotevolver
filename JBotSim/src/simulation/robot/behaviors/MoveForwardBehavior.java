@@ -1,6 +1,7 @@
 package simulation.robot.behaviors;
 
 import simulation.Simulator;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Epuck;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -61,7 +62,7 @@ public class MoveForwardBehavior extends Behavior {
 		    }
 		}
 		
-		robot.setWheelSpeed(speedLeft, speedRight);
+		((DifferentialDriveRobot) robot).setWheelSpeed(speedLeft, speedRight);
 		
 		/*if(robot.getIrSensor() != null) {
 		
