@@ -20,7 +20,6 @@ import simulation.robot.sensors.WallButtonSensor;
 import simulation.robot.sensors.XRayPreySensor;
 import simulation.robot.sensors.CompassSensor;
 import simulation.robot.sensors.DoubleParameterSensor;
-import simulation.robot.sensors.EnergySensor;
 import simulation.robot.sensors.EpuckIRSensor;
 import simulation.robot.sensors.GroundRGBColorSensor;
 import simulation.robot.sensors.InNestSensor;
@@ -198,8 +197,6 @@ public class RobotFactory extends Factory implements Serializable {
 			return new CompassSensor(simulator, id, robot, arguments);
 		} else if (name.equalsIgnoreCase("positionsensor")) {
 			return new PositionSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("energysensor")) {
-			return new EnergySensor(simulator, id, robot, arguments);
 		} else if (name.equalsIgnoreCase("robotcolorsensor")) {
 			return new RobotColorSensor(simulator, id, robot, arguments);
 		} else if (name.equalsIgnoreCase("simplerobotcolorsensor")) {

@@ -10,7 +10,6 @@ import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.MultiPreyPickerActuator;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.actuators.RobotColorActuator;
 import simulation.robot.actuators.RobotRGBColorActuator;
@@ -22,7 +21,6 @@ import simulation.robot.sensors.WallButtonSensor;
 import simulation.robot.sensors.XRayPreySensor;
 import simulation.robot.sensors.CompassSensor;
 import simulation.robot.sensors.DoubleParameterSensor;
-import simulation.robot.sensors.EnergySensor;
 import simulation.robot.sensors.EpuckIRSensor;
 import simulation.robot.sensors.GroundRGBColorSensor;
 import simulation.robot.sensors.InNestSensor;
@@ -251,8 +249,6 @@ public class ControllerFactory extends Factory implements Serializable {
 			} else if (sensor.getClass().equals(CompassSensor.class)) {
 				nnInputs.add(createInput(robot, "Compass", new Arguments("id="
 						+ sensor.getId() + ",name=compasssensor")));
-			}else if(sensor.getClass().equals(EnergySensor.class)) {
-				nnInputs.add(createInput(robot, "Energy", new Arguments("id=" + sensor.getId() + ",name=energysensor")));
 			}else if(sensor.getClass().equals(PositionSensor.class)) {
 				nnInputs.add(createInput(robot, "Position", new Arguments("id=" + sensor.getId() + ",name=positionsensor")));
 			}else if(sensor.getClass().equals(DoubleParameterSensor.class)) {
@@ -376,9 +372,6 @@ public class ControllerFactory extends Factory implements Serializable {
 			} else if (actuator.getClass().equals(PreyPickerActuator.class)) {
 				nnOutputs.add(createOutput(robot, "PreyPicker", new Arguments(
 						"id=" + actuator.getId() + ",name=preypicker")));
-			}else if (actuator.getClass().equals(MultiPreyPickerActuator.class)) {
-				nnOutputs.add(createOutput(robot, "MultiPreyPicker", new Arguments(
-						"id=" + actuator.getId() + ",name=multipreypicker")));
 			} else {
 				throw new RuntimeException(
 						"Trying to automatically create output for actuator: "
