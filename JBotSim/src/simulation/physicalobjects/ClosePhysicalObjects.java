@@ -23,12 +23,12 @@ public class ClosePhysicalObjects implements Serializable {
 	private double visibility;
 	private AllowedObjectsChecker allowedObjectsChecker;
 
-	protected Simulator simulator;
+	protected Environment env;
 
-
-	public ClosePhysicalObjects(Simulator simulator, double range, AllowedObjectsChecker allowedObjectsChecker) {
-		this.simulator = simulator;
-		this.time = simulator.getTime();
+	public ClosePhysicalObjects(Environment env, Double time, double range, 
+			AllowedObjectsChecker allowedObjectsChecker) {
+		this.env = env;
+		this.time = time;
 		this.visibility 				   = (range/Environment.getMaxApproximationSpeed()) + EXTENDED_VISIBILITY;
 		this.allowedObjectsChecker = allowedObjectsChecker;
 		farTime					   = time + visibility;
@@ -36,7 +36,7 @@ public class ClosePhysicalObjects implements Serializable {
 
 	public void update(Double time, ArrayList<PhysicalObject> teleported){
 		if(notInitialized){
-			teleported=simulator.getEnvironment().getAllObjects();
+			teleported = env.getAllObjects();
 			notInitialized=false;
 		}
 		this.time = time;
