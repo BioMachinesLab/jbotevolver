@@ -27,10 +27,6 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 	private Nest   nest;
 	private int    numberOfFoodSuccessfullyForaged = 0;
 
-	
-	public RoundForageEnvironment(Simulator simulator, double width, double height) {
-		super(simulator, width, height);
-	}
 
 	public RoundForageEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")       : 5.0, 

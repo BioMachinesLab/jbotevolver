@@ -86,9 +86,10 @@ public class RobotFactory extends Factory implements Serializable {
 		}
 
 		String robotName = arguments.getArgumentAsString("name");
-
+		System.out.println("Robot name = " + robotName);
 		Robot robot = null;
-		if (robotName.equalsIgnoreCase("differentialdrive")
+		if (robotName.equalsIgnoreCase("differentialdrive") 
+				|| (robotName.equalsIgnoreCase("simulation.robot.Robot"))
 				|| (robotName.equalsIgnoreCase("bee"))
 				|| (robotName.equalsIgnoreCase("MultiPreyForagerRobot"))
 				|| (robotName.equalsIgnoreCase("ardrone"))) {
@@ -108,7 +109,7 @@ public class RobotFactory extends Factory implements Serializable {
 			String color = arguments.getArgumentIsDefined("color") ? arguments
 					.getArgumentAsString("color") : "black";
 
-			if (robotName.equalsIgnoreCase("differentialdrive"))
+			if (robotName.equalsIgnoreCase("differentialdrive") || robotName.equalsIgnoreCase("simulation.robot.Robot"))
 				robot = new Robot(simulator, robotName + numberOfRobots++,
 						position.x, position.y, orientation, mass, radius,distanceWheels,color);
 			

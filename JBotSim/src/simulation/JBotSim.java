@@ -35,13 +35,13 @@ public class JBotSim {
 	protected String[]  commandlineArguments = null;
 	protected Simulator simulator;
 	
-	public JBotSim(String[] commandLineArgs) throws IOException {
+	public JBotSim(String[] commandLineArgs) throws IOException, ClassNotFoundException {
 		if (commandLineArgs != null) {
 			parseArguments(commandLineArgs);
 		}	
 	}
 	
-	public void parseArguments(String[] args) throws IOException{		
+	public void parseArguments(String[] args) throws IOException, ClassNotFoundException{		
 		HashMap<String,Arguments> arguments = Arguments.parseArgs(args);
 		
 		guiArguments          = arguments.get("--gui");

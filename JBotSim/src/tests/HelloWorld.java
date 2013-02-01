@@ -12,14 +12,14 @@ import simulation.robot.Robot;
 
 public class HelloWorld {
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, ClassNotFoundException {
 		LinkedList<String> arguments = new LinkedList<String>();
 		arguments.add("--robots");
-		arguments.add("robotconfigid=1,name=differentialdrive,placement=rectangle,radius=.05,color=red,sensors=(),actuators=()");
+		arguments.add("robotconfigid=1,name=Robot,radius=.05,color=red,sensors=(),actuators=()");
 		arguments.add("--controllers");
-		arguments.add("name=keyboard");
+		arguments.add("name=KeyboardController");
 		arguments.add("--environment");
-		arguments.add("name=RoundForage,densityoffood=1,nestlimit=0.25,foragelimit=2,forbiddenarea=5");
+		arguments.add("name=RoundForageEnvironment,densityoffood=1,nestlimit=0.25,foragelimit=2,forbiddenarea=5");
 		
 		JBotSim jbot             = new JBotSim(arguments.toArray(new String[0]));
 		Simulator sim            = jbot.createSimulator();
