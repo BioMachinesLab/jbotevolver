@@ -4,13 +4,13 @@ import java.awt.Color;
 import simulation.Controller;
 import simulation.Simulator;
 import simulation.robot.Robot;
-import simulation.robot.sensors.BehaviorSensor;
+// import simulation.robot.sensors.BehaviorSensor;
 import simulation.robot.sensors.GroundRGBColorSensor;
 import simulation.util.Arguments;
 
 public class ProgrammedMazeSolver extends Controller {
 
-	private BehaviorSensor behaviorSensor;
+//	private BehaviorSensor behaviorSensor;
 	private GroundRGBColorSensor rgbSensor;
 	private Color lastColor = Color.BLACK;
 
@@ -21,7 +21,7 @@ public class ProgrammedMazeSolver extends Controller {
 	public ProgrammedMazeSolver(Simulator simulator, Robot robot, Arguments arguments) {
 		super(simulator, robot);
 		rgbSensor = (GroundRGBColorSensor) (robot.getSensorWithId(1));
-		behaviorSensor = (BehaviorSensor) (robot.getSensorWithId(2));
+//		behaviorSensor = (BehaviorSensor) (robot.getSensorWithId(2));
 	}
 
 	@Override

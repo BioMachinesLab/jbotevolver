@@ -48,12 +48,10 @@ import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import evolutionaryrobotics.neuralnetworks.inputs.BehaviorNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.CompassNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.DoubleParameterNNInput;
-import evolutionaryrobotics.neuralnetworks.inputs.EnergyNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.EpuckIRNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.GroundRGBColorNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.InNestNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.LightTypeNNInput;
-import evolutionaryrobotics.neuralnetworks.inputs.MultiPreyCarriedNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.NearRobotNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.PositionNNInput;
@@ -63,17 +61,14 @@ import evolutionaryrobotics.neuralnetworks.inputs.RobotRGBColorNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.SimpleLightTypeNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.SimpleRobotColorNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
-import evolutionaryrobotics.neuralnetworks.outputs.BehaviorNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.FixedNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.MultiNeuronRobotColorNNOutput;
-import evolutionaryrobotics.neuralnetworks.outputs.MultiPreyPickerNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.OpenDoorNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.PreyPickerNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.RobotColorNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.RobotRGBColorNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.SimpleNNOutput;
-import evolutionaryrobotics.neuralnetworks.outputs.SimplePreyPickerNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.SysoutNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.TwoWheelNNOutput;
 
@@ -303,8 +298,6 @@ public class ControllerFactory extends Factory implements Serializable {
 		} else if (name.equalsIgnoreCase("preycarried")
 				|| name.equalsIgnoreCase("preycarriedinput")) {
 			return new PreyCarriedNNInput(robot.getSensorWithId(id));
-		} else if (name.equalsIgnoreCase("MultyPreyCarriedSensor")) {
-			return new MultiPreyCarriedNNInput(robot.getSensorWithId(id));
 		} else if (name.equalsIgnoreCase("innest")
 				|| name.equalsIgnoreCase("innestinput")) {
 			return new InNestNNInput(robot.getSensorWithId(id));
@@ -317,8 +310,6 @@ public class ControllerFactory extends Factory implements Serializable {
 			return new PositionNNInput(robot.getSensorWithId(id));
 		} else if (name.equalsIgnoreCase("doubleparameter")) {
 			return new DoubleParameterNNInput(robot.getSensorWithId(id));
-		} else if (name.equalsIgnoreCase("energy")) {
-			return new EnergyNNInput(robot.getSensorWithId(id));
 		} else if (name.equalsIgnoreCase("monitor") || name.equalsIgnoreCase("monitorinput")) {
 			String new_name=arguments.getArgumentAt(0);
 			Arguments actuators = new Arguments(arguments.getArgumentAsString(new_name));				
@@ -391,18 +382,12 @@ public class ControllerFactory extends Factory implements Serializable {
 			return new TwoWheelNNOutput(robot.getActuatorWithId(id), arguments);
 		} else 	if (name.equalsIgnoreCase("robotcolor") || name.equalsIgnoreCase("robotcoloroutput")) {		
 			return new RobotColorNNOutput(robot.getActuatorWithId(id),arguments);
-		}else if(name.equalsIgnoreCase("behavior") || name.equalsIgnoreCase("behavioroutput")){
-			return new BehaviorNNOutput(robot.getActuatorWithId(id), arguments);
 		}else 	if (name.equalsIgnoreCase("robotrgbcolor") || name.equalsIgnoreCase("robotrgbcoloroutput")) { 
 			return new RobotRGBColorNNOutput(robot.getActuatorWithId(id),arguments);
 		} else if (name.equalsIgnoreCase("multineuroncolor") || name.equalsIgnoreCase("multineuroncoloroutput")) {
 			return new MultiNeuronRobotColorNNOutput(robot.getActuatorWithId(id), arguments);
 		} else if (name.equalsIgnoreCase("preypicker") || name.equalsIgnoreCase("preypickeroutput")) {
 			return new PreyPickerNNOutput(robot.getActuatorWithId(id), arguments);
-		} else if (name.equalsIgnoreCase("simplepreypicker")) {
-			return new SimplePreyPickerNNOutput(robot.getActuatorWithId(id), arguments);
-		} else if (name.equalsIgnoreCase("multipreypicker") || name.equalsIgnoreCase("multipreypickeroutput")) {
-			return new MultiPreyPickerNNOutput(robot.getActuatorWithId(id), arguments);
 		} else if (name.equalsIgnoreCase("monitor") || name.equalsIgnoreCase("monitoroutput")) {
 			//TODO
 			String new_name = arguments.getArgumentAt(0);
