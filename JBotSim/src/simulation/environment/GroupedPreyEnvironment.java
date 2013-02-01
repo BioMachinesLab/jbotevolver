@@ -13,6 +13,9 @@ import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
+import simulation.robot.actuators.PreyPickerActuator;
+import simulation.robot.sensors.PreyCarriedSensor;
+import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 
 public class GroupedPreyEnvironment extends Environment {
@@ -127,8 +130,10 @@ public class GroupedPreyEnvironment extends Environment {
 		}
 		
 		for(Robot robot: robots){
-			if (robot.isCarryingPrey() && robot.isInvolvedInCollison()){
-				Prey preyToDrop = robot.dropPrey();
+			PreyCarriedSensor sensor = (PreyCarriedSensor)robot.getSensorByType(PreyCarriedSensor.class.getName());
+			if (sensor.preyCarried() && robot.isInvolvedInCollison()){
+				PreyPickerActuator actuator = (PreyPickerActuator)robot.getActuatorByType(PreyPickerActuator.class.getName());
+				Prey preyToDrop = actuator.dropPrey();
 				preyToDrop.teleportTo(newPreyPosition());
 			}
 		}
