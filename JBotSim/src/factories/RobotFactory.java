@@ -10,7 +10,6 @@ import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.actuators.RobotColorActuator;
 import simulation.robot.actuators.RobotRGBColorActuator;
 import simulation.robot.actuators.TwoWheelActuator;
-import simulation.robot.sensors.BehaviorSensor;
 import simulation.robot.sensors.EpuckLightSensor;
 import simulation.robot.sensors.NestSensor;
 import simulation.robot.sensors.SimpleNestSensor;
@@ -207,8 +206,6 @@ public class RobotFactory extends Factory implements Serializable {
 			return new RobotRGBColorSensor(simulator, id, robot, arguments);
 		} else if (name.equalsIgnoreCase("groundrgbcolorsensor")) {
 			return new GroundRGBColorSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("behaviorsensor")) {
-			return new BehaviorSensor(simulator, id, robot, arguments);
 		} else if (name.equalsIgnoreCase("epuckirsensor")) {
 			return new EpuckIRSensor(simulator, id, robot,arguments);
 		} else if (name.equalsIgnoreCase("wallbuttonsensor")) {
