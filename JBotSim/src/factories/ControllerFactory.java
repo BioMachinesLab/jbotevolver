@@ -1,10 +1,13 @@
 package factories;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
 import java.util.Vector;
 import simulation.Controller;
 import simulation.Simulator;
+import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.MultiPreyPickerActuator;
@@ -56,7 +59,6 @@ import evolutionaryrobotics.neuralnetworks.inputs.LightTypeNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.MultiPreyCarriedNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.NearRobotNNInput;
-import evolutionaryrobotics.neuralnetworks.inputs.PheromoneNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.PositionNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.PreyCarriedNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.RobotColorNNInput;
@@ -86,74 +88,91 @@ public class ControllerFactory extends Factory implements Serializable {
 	}
 
 	public Controller getController(Robot robot, Arguments arguments) {
-		Controller controller = null;
-
+		
 		if (!arguments.getArgumentIsDefined("name")) {
-			throw new RuntimeException("Controller 'name' not defined: "
-					+ arguments.toString());
+			throw new RuntimeException("Controller 'name' not defined: "+ arguments.toString());
 		}
 
 		String controllerName = arguments.getArgumentAsString("name");
-		if (controllerName.equalsIgnoreCase("MultilayerPerceptron")) {
-			Vector<NNInput> inputs = getNNInputs(robot, arguments);
-			Vector<NNOutput> outputs = getNNOutputs(robot, arguments);
 
-			controller = new NeuralNetworkController(simulator, robot,
-					new MulitlayerPerceptron(inputs, outputs, arguments));
-			chromosomeLength = ((NeuralNetworkController) controller)
-					.getRequiredNumberOfWeights();
-		} else if (controllerName.equalsIgnoreCase("CTRNNMultilayer")) {
-			int numberOfHiddenNodes = arguments
-					.getArgumentIsDefined("hiddennodes") ? arguments
-					.getArgumentAsInt("hiddennodes") : 5;
-
-			Vector<NNInput> inputs = getNNInputs(robot, arguments);
-			Vector<NNOutput> outputs = getNNOutputs(robot, arguments);
-
-			controller = new NeuralNetworkController(simulator, robot,
-					new CTRNNMultilayer(inputs, outputs, arguments));
-			
-			if(arguments.getArgumentIsDefined("weights")) {
-				String[] rawArray = arguments.getArgumentAsString("weights").split(",");
-				double[] weights = new double[rawArray.length];
-				for(int i = 0 ; i < weights.length ; i++)
-					weights[i] = Double.parseDouble(rawArray[i]);
-				((NeuralNetworkController) controller).setNNWeights(weights);
+		try {
+			Constructor<?>[] constructors = Class.forName(controllerName).getDeclaredConstructors();
+			for (Constructor<?> constructor : constructors) {
+				Class<?>[] params = constructor.getParameterTypes();
+				return (Controller) constructor.newInstance(simulator,arguments);
 			}
-			
-			chromosomeLength = ((NeuralNetworkController) controller)
-					.getRequiredNumberOfWeights();
-		}else if (controllerName.equalsIgnoreCase("ProgrammedForger")) {
 
-			controller = new ProgrammedForager(simulator, robot, arguments);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
 
-		} else if (controllerName.equalsIgnoreCase("ProgrammedMazeSolver")) {
+		throw new RuntimeException("Unknown controller: " + controllerName);
 
-			controller = new ProgrammedMazeSolver(simulator, robot, arguments);
+//		if (!arguments.getArgumentIsDefined("name")) {
+//			throw new RuntimeException("Controller 'name' not defined: "
+//					+ arguments.toString());
+//		}
+//
+//		String controllerName = arguments.getArgumentAsString("name");
+//		if (controllerName.equalsIgnoreCase("MultilayerPerceptron")) {
+//			Vector<NNInput> inputs = getNNInputs(robot, arguments);
+//			Vector<NNOutput> outputs = getNNOutputs(robot, arguments);
+//
+//			controller = new NeuralNetworkController(simulator, robot,
+//					new MulitlayerPerceptron(inputs, outputs, arguments));
+//			chromosomeLength = ((NeuralNetworkController) controller)
+//					.getRequiredNumberOfWeights();
+//		} else if (controllerName.equalsIgnoreCase("CTRNNMultilayer")) {
+//			int numberOfHiddenNodes = arguments
+//					.getArgumentIsDefined("hiddennodes") ? arguments
+//					.getArgumentAsInt("hiddennodes") : 5;
+//
+//			Vector<NNInput> inputs = getNNInputs(robot, arguments);
+//			Vector<NNOutput> outputs = getNNOutputs(robot, arguments);
+//
+//			controller = new NeuralNetworkController(simulator, robot,
+//					new CTRNNMultilayer(inputs, outputs, arguments));
+//			
+//			if(arguments.getArgumentIsDefined("weights")) {
+//				String[] rawArray = arguments.getArgumentAsString("weights").split(",");
+//				double[] weights = new double[rawArray.length];
+//				for(int i = 0 ; i < weights.length ; i++)
+//					weights[i] = Double.parseDouble(rawArray[i]);
+//				((NeuralNetworkController) controller).setNNWeights(weights);
+//			}
+//			
+//			chromosomeLength = ((NeuralNetworkController) controller)
+//					.getRequiredNumberOfWeights();
+//		}else if (controllerName.equalsIgnoreCase("ProgrammedForger")) {
+//
+//			controller = new ProgrammedForager(simulator, robot, arguments);
+//
+//		} else if (controllerName.equalsIgnoreCase("ProgrammedMazeSolver")) {
+//
+//			controller = new ProgrammedMazeSolver(simulator, robot, arguments);
+//
+//		} else if (controllerName.equalsIgnoreCase("controllers.KeyboardController")) {
+//			controller = new KeyboardController(simulator, robot);
+//		} else if (controllerName.equalsIgnoreCase("Behavior")) {
+//			controller = new BehaviorController(simulator, robot,arguments);
+//			chromosomeLength = ((NeuralNetworkController) controller.getEvolvingController())
+//			.getRequiredNumberOfWeights();
+//		} else if (controllerName.equalsIgnoreCase("robotfollower")) {
+//			controller = new RobotFollower(simulator, robot, arguments);
+//		} else if (controllerName.equalsIgnoreCase("preprogrammed")) {
+//			
+//			String behaviorType = arguments.getArgumentAsString("type");
+//			
+//			controller = null;
+//			
+//			if(behaviorType.equals("opendoor")) {
+//				controller = new OpenDoorBehavior(simulator, robot, arguments);
+//			}
+//		} else {
+//			throw new RuntimeException("Unknown controller name: "
+//					+ controllerName);
+//		}
 
-		} else if (controllerName.equalsIgnoreCase("controllers.KeyboardController")) {
-			controller = new KeyboardController(simulator, robot);
-		} else if (controllerName.equalsIgnoreCase("Behavior")) {
-			controller = new BehaviorController(simulator, robot,arguments);
-			chromosomeLength = ((NeuralNetworkController) controller.getEvolvingController())
-			.getRequiredNumberOfWeights();
-		} else if (controllerName.equalsIgnoreCase("robotfollower")) {
-			controller = new RobotFollower(simulator, robot, arguments);
-		} else if (controllerName.equalsIgnoreCase("preprogrammed")) {
-			
-			String behaviorType = arguments.getArgumentAsString("type");
-			
-			controller = null;
-			
-			if(behaviorType.equals("opendoor")) {
-				controller = new OpenDoorBehavior(simulator, robot, arguments);
-			}
-		} else {
-			throw new RuntimeException("Unknown controller name: "
-					+ controllerName);
-		}
-
-		return controller;
 	}
 
 	public Vector<NNInput> getNNInputs(Robot robot, Arguments arguments) {
@@ -300,8 +319,6 @@ public class ControllerFactory extends Factory implements Serializable {
 		} else if (name.equalsIgnoreCase("nearrobot")
 				|| name.equalsIgnoreCase("nearrobotinput")) {
 			return new NearRobotNNInput(robot.getSensorWithId(id));
-		} else if(name.equalsIgnoreCase("PheromoneSensor")){
-			return new PheromoneNNInput(robot.getSensorWithId(id));
 		} else if (name.equalsIgnoreCase("compass")) {
 			return new CompassNNInput(robot.getSensorWithId(id));
 		} else if (name.equalsIgnoreCase("position")) {

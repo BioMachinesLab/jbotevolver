@@ -1,23 +1,11 @@
 package controllers;
 
 import java.awt.Color;
-
 import simulation.Controller;
 import simulation.Simulator;
-import simulation.environment.RoundForageEnvironment;
 import simulation.robot.Robot;
-import simulation.robot.actuators.BehaviorActuator;
-import simulation.robot.actuators.PreyPickerActuator;
-import simulation.robot.actuators.RobotColorActuator;
-import simulation.robot.actuators.TwoWheelActuator;
-import simulation.robot.behaviors.MoveForwardBehavior;
-import simulation.robot.behaviors.TurnLeftBehavior;
-import simulation.robot.behaviors.TurnRightBehavior;
 import simulation.robot.sensors.BehaviorSensor;
-import simulation.robot.sensors.ConeTypeSensor;
 import simulation.robot.sensors.GroundRGBColorSensor;
-import simulation.robot.sensors.LightTypeSensor;
-import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 
 public class ProgrammedMazeSolver extends Controller {
