@@ -3,7 +3,6 @@ package gui;
 import java.awt.Component;
 import java.awt.KeyboardFocusManager;
 import javax.swing.JFrame;
-import experiments.Experiment;
 import gui.renderer.Renderer;
 import simulation.Simulator;
 import simulation.util.Arguments;
@@ -73,7 +72,7 @@ public class RendererOnlyGui implements Gui {
 					}
 				}
 			}
-			simulator.performOneSimulationStep(currentStep);
+			simulator.performOneSimulationStep(new Double(currentStep));
 			currentStep++;
 		}
 //		frame.getContentPane().removeKeyListener(experiment.getEnvironment());

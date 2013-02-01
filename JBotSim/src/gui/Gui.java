@@ -1,7 +1,6 @@
 package gui;
 
 import simulation.Simulator;
-import experiments.Experiment;
 import gui.renderer.Renderer;
 
 /**
