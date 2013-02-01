@@ -3,6 +3,7 @@ package simulation.robot.sensors;
 import java.util.ArrayList;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
+import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.Prey;
@@ -12,9 +13,12 @@ import simulation.util.Arguments;
 
 public class XRayPreySensor extends SimpleLightTypeSensor {
 
+	protected GeometricCalculator calc;
+	
 	public XRayPreySensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 		setAllowedObjectsChecker(new AllowOrderedPreyChecker(robot.getId()));
+		this.calc = simulator.getGeoCalculator();
 	}
 
 	@Override

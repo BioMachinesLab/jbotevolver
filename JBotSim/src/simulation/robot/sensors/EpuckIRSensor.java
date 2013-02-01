@@ -321,7 +321,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 				PhysicalObjectDistance source=iterator.next();
 				if (source.getObject().isEnabled()){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(calc.getDistanceBetween(
+					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(
 							sensorPosition, source.getObject()));
 				}
 			}
@@ -467,7 +467,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 				Math.sin(orientation) * robot.getRadius()
 						+ robot.getPosition().getY());
 
-		GeometricInfo sensorInfo = calc.getGeometricInfoBetweenPoints(sensorPosition, 
+		GeometricInfo sensorInfo = geoCalc.getGeometricInfoBetweenPoints(sensorPosition, 
 				orientation,source, time);
 
 		return sensorInfo;

@@ -17,7 +17,7 @@ public class InNestSensor extends Sensor {
 	public InNestSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 
-		this.closeObjects = new ClosePhysicalObjects(simulator,
+		this.closeObjects = new ClosePhysicalObjects(simulator.getEnvironment(), simulator.getTime(),
 				0,//((NestEnvironment) simulator.getEnvironment()).getNestRadius(),
 				new AllowNestChecker());
 	}
