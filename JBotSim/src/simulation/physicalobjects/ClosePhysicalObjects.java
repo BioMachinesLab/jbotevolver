@@ -29,7 +29,7 @@ public class ClosePhysicalObjects implements Serializable {
 			AllowedObjectsChecker allowedObjectsChecker) {
 		this.env = env;
 		this.time = time;
-		this.visibility 				   = (range/Environment.getMaxApproximationSpeed()) + EXTENDED_VISIBILITY;
+		this.visibility 				   = (range/env.getMaxApproximationSpeed()) + EXTENDED_VISIBILITY;
 		this.allowedObjectsChecker = allowedObjectsChecker;
 		farTime					   = time + visibility;
 	}
