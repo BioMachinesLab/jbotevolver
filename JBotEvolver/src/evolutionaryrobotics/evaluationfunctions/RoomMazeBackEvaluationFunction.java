@@ -19,7 +19,7 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 	}
 
 	@Override
-	public void step() {
+	public void update(double time) {
 		
 		if(env.isMixed() && firstStep) {
 			int sample = env.getMixedSample();

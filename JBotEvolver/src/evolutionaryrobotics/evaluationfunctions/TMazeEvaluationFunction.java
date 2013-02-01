@@ -47,7 +47,7 @@ public class TMazeEvaluationFunction  extends EvaluationFunction {
 	}
 	
 	@Override
-	public void step() {
+	public void update(double time) {
 		steps++;
 		
 		if(env.killSample())

@@ -2,13 +2,11 @@ package evolutionaryrobotics.evaluationfunctions;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.environment.Environment;
 import simulation.environment.GroupedPreyEnvironment;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.robot.sensors.PreySensor;
 import simulation.util.Arguments;
-import experiments.Experiment;
 
 public class AndersForageWithCommunicationEvaluationFunction extends EvaluationFunction{
 	private double 	    fitness;
@@ -53,7 +51,7 @@ public class AndersForageWithCommunicationEvaluationFunction extends EvaluationF
 	}
 
 	//@Override
-	public void step() {			
+	public void update(double time) {			
 		int numberOfRobotsWithPrey            = 0;
 		int numberOfRobotsBeyondForbidenLimit = 0;
 		int numberOfRobotsBeyondForagingLimit = 0;
@@ -127,4 +125,5 @@ public class AndersForageWithCommunicationEvaluationFunction extends EvaluationF
 			(numberOfRobotsWithPrey * withPreyReward) / (double) numberOfRobots + 
 			preyDistanceReward * preyDistanceRewardFactor;
 	}
+	
 }

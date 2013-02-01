@@ -28,7 +28,7 @@ public class CenterOfMassEvaluationFunction extends EvaluationFunction {
 		super(simulator);
 	}
 
-	public void step(){
+	public void update(double time){
 		steps++;
 		Vector2d coord = new Vector2d();
 		double x=0.0, y=0.0;

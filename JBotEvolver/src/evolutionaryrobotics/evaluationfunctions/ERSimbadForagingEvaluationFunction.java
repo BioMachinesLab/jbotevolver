@@ -30,7 +30,7 @@ public class ERSimbadForagingEvaluationFunction extends EvaluationFunction {
 	}
 
 	// @Override
-	public void step() {
+	public void update(double time) {
 		int numberOfRobotsTooCloseToNest = 0;
 		int numberOfRobotsTooFarFromNest = 0;
 		int numberOfRobotsCloseToAPrey = 0;

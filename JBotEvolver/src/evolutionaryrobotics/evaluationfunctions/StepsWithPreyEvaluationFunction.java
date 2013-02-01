@@ -22,7 +22,7 @@ public class StepsWithPreyEvaluationFunction extends EvaluationFunction{
 	}
 
 	//@Override
-	public void step() {				
+	public void update(double time) {				
 		int robotsWithPrey = 0;
 		int robotsCounted  = 0;
 		

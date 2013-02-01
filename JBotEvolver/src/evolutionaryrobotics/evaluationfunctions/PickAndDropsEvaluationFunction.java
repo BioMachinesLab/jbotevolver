@@ -30,7 +30,7 @@ public class PickAndDropsEvaluationFunction extends EvaluationFunction {
 	}
 
 	// @Override
-	public void step() {
+	public void update(double time) {
 
 	}
 

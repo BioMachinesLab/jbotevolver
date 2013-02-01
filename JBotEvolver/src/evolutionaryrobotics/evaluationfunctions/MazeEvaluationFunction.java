@@ -59,7 +59,7 @@ public class MazeEvaluationFunction  extends EvaluationFunction {
 	}
 
 	@Override
-	public void step() {
+	public void update(double time) {
 		
 		/*if(++currentStep-stepLastIndex>stepThreshold) {
 			touchedWhite = true;

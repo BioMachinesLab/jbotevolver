@@ -27,7 +27,7 @@ public class FoodWaterEvaluationFunction extends EvaluationFunction{
 	}
 
 	//@Override
-	public void step() {			
+	public void update(double time) {			
 		Environment e = simulator.getEnvironment();
 		for(Robot r : simulator.getEnvironment().getRobots()){
 			Vector2d p = r.getPosition();

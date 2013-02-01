@@ -32,7 +32,7 @@ public class CrossRoomsEvaluationFunction extends EvaluationFunction {
 	}
 
 	@Override
-	public void step() {
+	public void update(double time) {
 		
 		if(debug && time == 0) {
 			startingX = simulator.getEnvironment().getRobots().get(0).getPosition().getX();

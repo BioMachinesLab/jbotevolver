@@ -24,7 +24,7 @@ public class FindWallButtonEvaluationFunction extends EvaluationFunction {
 	}
 
 	@Override
-	public void step() {
+	public void update(double time) {
 		timeAlive++;
 		LinkedList<Wall> buttons = ((TwoRoomsEnvironment)simulator.getEnvironment()).getButtons();
 		Vector2d robotPos = simulator.getEnvironment().getRobots().get(0).getPosition();

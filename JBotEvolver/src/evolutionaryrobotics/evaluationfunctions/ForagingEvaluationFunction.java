@@ -23,7 +23,7 @@ public class ForagingEvaluationFunction extends EvaluationFunction{
 	}
 
 	//@Override
-	public void step() {			
+	public void update(double time) {			
 		int numberOfRobotsWithPrey       = 0;
 		int numberOfRobotsBeyondForbidenLimit       = 0;
 		int numberOfRobotsBeyondForagingLimit       = 0;

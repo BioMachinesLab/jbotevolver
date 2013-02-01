@@ -30,7 +30,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 	}
 
 	@Override
-	public void step() {
+	public void update(double time) {
 
 		if(r.isInvolvedInCollison())
 			simulator.getExperiment().endExperiment();

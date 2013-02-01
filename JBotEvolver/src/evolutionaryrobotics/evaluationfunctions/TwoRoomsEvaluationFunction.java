@@ -29,7 +29,7 @@ public class TwoRoomsEvaluationFunction extends EvaluationFunction {
 	}
 
 	@Override
-	public void step() {
+	public void update(double time) {
 		timeAlive++;
 		picks = ((TwoRoomsEnvironment)simulator.getEnvironment()).getNumberOfPicks();
 		

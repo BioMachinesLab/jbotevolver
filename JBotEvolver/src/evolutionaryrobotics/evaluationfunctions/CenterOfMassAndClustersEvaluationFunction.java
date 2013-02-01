@@ -19,7 +19,7 @@ public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunctio
 
 	}
 
-	public void step(){
+	public void update(double time){
 		Vector2d coord = new Vector2d();
 		double x=0.0, y=0.0;
 		double distance = 0.0;

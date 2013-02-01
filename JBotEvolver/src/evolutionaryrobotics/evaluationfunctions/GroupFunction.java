@@ -30,7 +30,7 @@ public class GroupFunction  extends EvaluationFunction {
 	 * 
 	 */
 	@Override
-	public void step() {
+	public void update(double time) {
 		int numberOfRobotsClustered = 0;
 		double distance = Integer.MAX_VALUE;
 		double auxDist = 0;

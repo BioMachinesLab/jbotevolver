@@ -19,7 +19,7 @@ public class StayInTheNestEvaluationFunction extends EvaluationFunction{
 	}
 
 	//@Override
-	public void step() {			
+	public void update(double time) {			
 		int numberOfRobotsCloseToNest = 0;
 		double preyDistanceReward        = 0.0;
 

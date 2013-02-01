@@ -33,7 +33,7 @@ public class GoToDoorEvaluationFunction extends EvaluationFunction {
 	}
 
 	@Override
-	public void step() {
+	public void update(double time) {
 		
 		if(time == 0) {
 			env = ((TwoRoomsEnvironment)simulator.getEnvironment());

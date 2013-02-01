@@ -19,7 +19,7 @@ public class ColorMatchEvaluationFunction extends EvaluationFunction{
 	}
 
 	//@Override
-	public void step() {			
+	public void update(double time) {			
 		Iterator<Robot> i = simulator.getEnvironment().getRobots().iterator();
 		Robot base = i.next();
 		double   colorToMatch[]  = base.getBodyColorAsDoubles();

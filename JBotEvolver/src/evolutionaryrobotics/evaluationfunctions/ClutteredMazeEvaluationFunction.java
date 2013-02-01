@@ -30,7 +30,7 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 	}
 
 	@Override
-	public void step() {
+	public void update(double time) {
 		if(!finishedRoom && reachedRoomFinish()) {
 			finishedRoom = true;
 			if(onlyRoom)

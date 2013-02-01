@@ -30,7 +30,7 @@ public class OpenDoorEvaluationFunction extends EvaluationFunction {
 	}
 
 	@Override
-	public void step() {
+	public void update(double time) {
 		timeAlive++;
 		TwoRoomsEnvironment env = ((TwoRoomsEnvironment)simulator.getEnvironment());
 		LinkedList<Wall> buttons = env.getButtons();

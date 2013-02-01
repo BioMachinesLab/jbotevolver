@@ -30,7 +30,7 @@ public class AverageDistanceFromCenterEvaluationFunction extends EvaluationFunct
 	}
 
 	//@Override
-	public void step() {			
+	public void update(double time) {			
 		Vector2d coord = new Vector2d();
 		double distanceToNest = 0;
 		int    robotsCounted  = 0;

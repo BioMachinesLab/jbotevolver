@@ -56,7 +56,7 @@ public class BeeEvaluationFunction extends EvaluationFunction{
 	}
 
 	//@Override
-	public void step() {
+	public void update(double time) {
 		
 		printStuff();
 		
