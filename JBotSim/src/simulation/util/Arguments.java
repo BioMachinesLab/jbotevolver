@@ -1,0 +1,640 @@
+package simulation.util;
+
+import gui.StartupGui;
+
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Vector;
+
+import mathutils.Vector2d;
+
+/**
+ * Recursive configuration argument of the form "--argument identifier1=value1,identifier2=(id21=value21,id...)"
+ * The Arguments class is can parse a string of arguments and allows for querying arguments and their values. 
+ * Furthermore, checking mechanisms are in place to ensure that all arguments have been queried. Examples of 
+ * argument string and how to parse them:
+ * <p>
+ * Non-case sensitive,parses parenthesis correctly
+ * 
+ * @author alc
+ *
+ */
+
+public class Arguments implements Serializable {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	/**
+	 * Complete unparsed argument string
+	 */	
+	protected String unparsedArgumentString;
+
+	/**
+	 * Keeps track of which arguments have been queried and which have not.
+	 */	
+	protected Vector<Boolean> argumentQueried = new Vector<Boolean>();
+	/**
+	 * Vector of the arguments their corresponding values are found in "values".
+	 */	
+	protected Vector<String>  arguments       = new Vector<String>();
+	/**
+	 * Vector of the values for the arguments in "arguments".
+	 */	
+	protected Vector<String>  values          = new Vector<String>();
+
+
+	/**
+	 * Initializes a new arguments instance and sets all arguments to non-queried.
+	 * @param unparsedArgumentString Raw, unparsed argument string.
+	 */		
+	public Arguments(String unparsedArgumentString) {
+		parseString(unparsedArgumentString);
+	}
+	
+	/**
+	 * Parses a string of arguments.
+	 * @param unparsedArgumentString the raw, unparsed argument string.
+	 */		
+	protected void parseString(String unparsedArgumentString) {
+		this.unparsedArgumentString = unparsedArgumentString;
+
+		int stringIndex        = 0;
+		boolean currentlyValue = false;
+		int parenthesisLevel   = 0;
+
+		StringBuffer currentArgument = new StringBuffer();
+		StringBuffer currentValue    = new StringBuffer();
+
+		while(stringIndex < unparsedArgumentString.length()) {
+			char currentChar = unparsedArgumentString.charAt(stringIndex++);
+			if (currentChar == '(') {
+				if (parenthesisLevel > 0 && currentlyValue)
+					currentValue.append(currentChar);
+					
+				parenthesisLevel++;
+				
+			} 
+			else if (currentChar == ')') {
+				parenthesisLevel--;
+
+				if (parenthesisLevel > 0 && currentlyValue)
+					currentValue.append(currentChar);
+
+			}
+			else if (currentChar == '=' && parenthesisLevel == 0) {
+				if (currentArgument.length() == 0)
+					throw new java.lang.RuntimeException("Something is wrong. Argument starts with a = " + unparsedArgumentString);
+
+				currentlyValue = true;
+			}
+			else if (currentChar == ',' && parenthesisLevel == 0) {
+				if (currentArgument.length() > 0) {
+					argumentQueried.add(new Boolean(false));
+					arguments.add(currentArgument.toString());
+					values.add(currentValue.toString());
+					currentArgument = new StringBuffer();
+					currentValue    = new StringBuffer();						
+				}
+				currentlyValue = false;
+			} else if (!currentlyValue) {
+				currentArgument.append(currentChar);
+			} else 
+				currentValue.append(currentChar);
+		}		
+
+		if (currentArgument.length() > 0) {
+			if (!getArgumentIsDefined(currentArgument.toString())) {
+				argumentQueried.add(new Boolean(false));					
+				arguments.add(currentArgument.toString());
+				values.add(currentValue.toString());
+			}
+		}
+	}
+	
+	/**
+	 * Get the String value of an argument.
+	 * 
+	 * @param  argument case insensitive name of the argument
+	 * @return          the value of the argument or null if the argument does not exist
+	 */		
+	public String getArgumentValue(String argument) {
+		int      index = 0;
+		boolean  found = false;
+
+		while (index < arguments.size() && !found) {
+			if (arguments.elementAt(index).equalsIgnoreCase(argument)) 
+				found = true;
+			else
+				index++;
+		}
+
+		if (!found)
+			return null;
+		else {
+			argumentQueried.setElementAt(Boolean.TRUE, index);
+			return values.elementAt(index);
+		}
+	}
+
+	/**
+	 * Query an argument to discover if it is defined.
+	 * 
+	 * @param  argument case insensitive name of the argument
+	 * @return          true if the argument was defined, false otherwise.
+	 */		
+	public boolean getArgumentIsDefined(String argument) {
+		if (getArgumentValue(argument) == null)
+		{
+			return false;
+		} else {
+			return true;
+		}   
+	}
+
+	/**
+	 * Get the int value of an argument. Use {@link #getArgumentIsDefined} to query if the argument is 
+	 * defined before calling this method.
+	 * 
+	 * @param  argument case insensitive name of the argument
+	 * @return          the int value of the argument or 0 if the argument does not exist.
+	 */		
+	public int getArgumentAsInt(String argument) {
+		return  getArgumentAsIntOrSetDefault(argument, 0);
+	}
+
+	/**
+	 * Get the double value of an argument or return the default value in case the argument does not exist. 
+	 * 
+	 * @param  argument     case insensitive name of the argument
+	 * @param  defaultValue default value returned in case the argument isn't defined.
+	 * @return              the double value of the argument or the default value if it does not exist.
+	 */		
+
+	public int getArgumentAsIntOrSetDefault(String argument, int defaultValue) {
+		String value = getArgumentValue(argument);
+		if (value == null) {
+			return defaultValue;
+		}		
+
+		int result = defaultValue;
+		try {
+			result = Integer.parseInt(value);
+		} catch(NumberFormatException e) {
+			throw new RuntimeException("Trying to parse the argument \"" + argument + "\" as an int, but the specified value \"" + value + "\" isn't an int");
+		}	   
+		return result;
+
+	}
+	
+	/**
+	 * Set the value of an argument. If the argument is not define, a new one will be added.
+	 *
+	 * @param argument the argument for which a new value should be set
+	 * @value the new value for the argument 
+	 */
+	public void setArgument(String argument, String value) {
+		if (getArgumentIsDefined(argument)) {
+			int      index = 0;
+			boolean  found = false;
+
+			while (index < arguments.size() && !found) {
+				if (arguments.elementAt(index).equalsIgnoreCase(argument)) 
+					found = true;
+				else
+					index++;
+			}
+			arguments.set(index, argument);
+			values.set(index, value);
+		} else {
+			arguments.add(argument);
+			values.add(value);
+			argumentQueried.add(Boolean.FALSE);
+		}
+	}
+
+	
+	/**
+	 * Set the value of an argument. If the argument is not define, a new one will be added.
+	 *
+	 * @param argument the argument for which a new value should be set
+	 * @value the new value for the argument 
+	 */
+	public void setArgument(String argument, int value) {
+		setArgument(argument, "" + value);
+	}
+
+	
+	/**
+	 * Set the value of an argument. If the argument is not define, a new one will be added.
+	 *
+	 * @param argument the argument for which a new value should be set
+	 * @value the new value for the argument 
+	 */
+	public void setArgument(String argument, double value) {
+		setArgument(argument, "" + value);
+	}
+	
+	/**
+	 * Get the double value of an argument. Use {@link #getArgumentIsDefined} to query if the argument is 
+	 * defined before calling this method.
+	 * 
+	 * @param  argument case insensitive name of the argument
+	 * @return          the double value of the argument or 0 if the argument does not exist.
+	 */		
+	public double getArgumentAsDouble(String argument) {
+		return getArgumentAsDoubleOrSetDefault(argument, 0.0);
+	}
+
+	/**
+	 * Get the double value of an argument or return the default value in case the argument does not exist. 
+	 * 
+	 * @param  argument     case insensitive name of the argument
+	 * @param  defaultValue default value returned in case the argument isn't defined.
+	 * @return              the double value of the argument or the default value if it does not exist.
+	 */		
+	public double getArgumentAsDoubleOrSetDefault(String argument, double defaultValue) {
+		String value = getArgumentValue(argument);
+		if (value == null) {
+			return defaultValue;
+		}		
+
+		try {
+			return Double.parseDouble(value);
+		} catch(NumberFormatException e) {
+			throw new RuntimeException("Trying to parse the argument \"" + argument + "\" as a double, but the specified value \"" + value + "\" isn't a double");
+		}	   
+	}
+	
+	
+	/**
+	 * Get the String value of an argument. Use {@link #getArgumentIsDefined} to query if the argument is 
+	 * defined before calling this method.
+	 * 
+	 * @param  argument case insensitive name of the argument
+	 * @return          the value of the argument or null if the argument does not exist.
+	 */		
+	public String getArgumentAsString(String argument)	{
+		return getArgumentValue(argument);
+	}
+
+	/**
+	 * Get the String value of an argument or return the default value in case the argument does not exist. 
+	 * 
+	 * @param  argument case insensitive name of the argument
+	 * @param  defaultValue default value returned in case the argument is not defined.	 
+	 * @return          the value of the argument or null if the argument does not exist.
+	 */		
+	public String getArgumentAsStringOrSetDefault(String argument, String defaultValue)	{
+		String value = getArgumentValue(argument);
+		if (value == null) {
+			value = defaultValue;
+		}
+		return value;
+	}
+
+	/**
+	 * Get the argument as a Vector2d value (x,y). Example:
+	 * <p>
+	 *   --robot startposition=(1.0,2.0)
+	 * <p>
+	 * Calling getArgumentAsVector2d("startposition") will return a Vector2d with x = 1.0 and y = 2.0.
+	 * 
+	 * Use {@link #getArgumentIsDefined} to query if the argument is 
+	 * defined before calling this method. 
+	 * 
+	 * @param  argument case insensitive name of the argument
+	 * @return          the (x,y) value of the argument or null if the argument does not exist.
+	 */		
+	public Vector2d getArgumentAsVector2d(String argument)	{ 
+		Arguments coordinateArguments = new Arguments(getArgumentValue(argument));
+		
+		try {
+			double x = Double.parseDouble(coordinateArguments.getArgumentAt(0));
+			double y = Double.parseDouble(coordinateArguments.getArgumentAt(1));
+			return new Vector2d(x, y);
+		
+		} catch(NumberFormatException e) {
+			throw new java.lang.RuntimeException("Error - cannot convert " + getArgumentValue(argument) + " into a Vector2d");
+		}
+	}
+
+	/**
+	 * Get the complete argument String. Any modifications made after the arguments were parsed are included.
+	 *
+	 * @return the unparsed string containing all arguments and values 
+	 */
+	public String getCompleteArgumentString() {
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < arguments.size(); i++) {
+			if (sb.length() > 0)
+				sb.append(",");
+			
+			sb.append(arguments.get(i));
+			if (values.get(i).length() > 0) {
+				sb.append("=" + values.get(i));
+			}
+		}
+		
+		return unparsedArgumentString;
+	}
+
+
+	/**
+	 * Get the number of arguments in the rare string.
+	 * @return the number of arguments in the raw, unparsed argument string 
+	 */
+	public int getNumberOfArguments() {
+		return arguments.size();
+	}
+	
+	/**
+	 * Check if all arguments have been queried. This should be called after anyone interested in 
+	 * querying the arguments have had the chance. In case not all of the arguments have been queried, 
+	 * the method {@link #getUnqueiredArgument} can be used to figure out which arguments have not been 
+	 * queried.
+	 * 
+	 * @return true if all the arguments have been queried, false otherwise.
+	 */
+	public boolean checkIfAllArgumentsHaveBeenQueried() {
+		int      i = 0;
+		boolean  allQueriedSoFar = true;
+
+		while (i < argumentQueried.size() && allQueriedSoFar) {
+			allQueriedSoFar = argumentQueried.elementAt(i++).booleanValue();
+		}
+
+		return allQueriedSoFar;
+	}
+
+	/**
+	 * Check if all arguments have been queried. This should be called after anyone interested in querying the arguments have had the chance.
+	 * @return true if all the arguments have been queried, false otherwise. 
+	 */
+	public String getUnqueriedArgument() {
+		int      i = 0;
+		boolean  allQueriedSoFar = true;
+		String result = null;
+
+		while (i < argumentQueried.size() && allQueriedSoFar) {
+			allQueriedSoFar = argumentQueried.elementAt(i).booleanValue();
+			if (allQueriedSoFar)
+				i++;
+			else {
+				result = arguments.elementAt(i)+"=" + values.elementAt(i);
+			}
+		}	
+		return result;
+	}
+
+	/**
+	 * Get the argument at a specific index.
+	 * @param  index    index of the argument (the argument name and not its value!)
+	 * @return name of the argument at the specified index. 
+	 */
+	public String getArgumentAt(int index) {
+		return arguments.elementAt(index);
+	}
+		
+	/**
+	 * Get the value at a specific index. 
+	 * @param  index    index of the value 
+	 * @return value argument at the specified index. 
+	 */
+	public String getValueAt(int index) {
+		return values.elementAt(index);
+	}
+
+	/** 
+	 * Query if a argument interpreted as a flag is set to true. A flag is on if the flag appears in argument list and
+	 * if is has a value of one of (yes, on, 1, enable, enabled, true) otherwise this method will return false.
+	 *  
+	 * @see #getFlagIsFalse(String)
+	 * @param  argument case insensitive name of the argument
+	 * @return true if the flag is defined and on.
+	 */
+	public boolean getFlagIsTrue(String argument) {
+		String value = getArgumentValue(argument);
+		if (value == null) {
+			return false;
+		} else if (
+				value.equalsIgnoreCase("true") ||
+				value.equalsIgnoreCase("on") ||
+				value.equalsIgnoreCase("enable") ||
+				value.equalsIgnoreCase("enabled") ||
+				value.equalsIgnoreCase("yes") ||
+				value.equalsIgnoreCase("1")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/** 
+	 * Query if a argument interpreted as a flag is set to false. A flag is off if the flag appears in argument list and
+	 * if is has a value of one of (no, off, 0, disable, disabled, false) otherwise this method will return false. Note, that
+	 * a flag is not returned as being false if it not defined.
+	 *  
+	 * @see #getFlagIsTrue(String)
+	 * @param  argument case insensitive name of the argument
+	 * @return true if the flag is defined and off (although this may be counter-intuitive, the opposite would have been ambiguous).
+	 */
+	public boolean getFlagIsFalse(String argument) {
+		String value = getArgumentValue(argument);
+		if (value == null) {
+			return false;
+		} else if (
+				value.equalsIgnoreCase("false") ||
+				value.equalsIgnoreCase("off") ||
+				value.equalsIgnoreCase("disable") ||
+				value.equalsIgnoreCase("disabled") ||
+				value.equalsIgnoreCase("no") ||
+				value.equalsIgnoreCase("0")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static HashMap<String,Arguments> parseArgs(String[] args) throws IOException {
+		String optionsFilename = null;
+		
+//		for(String s : args)
+//			System.out.println(s);
+		
+		if (args.length == 0) {
+
+			StartupGui gui = new StartupGui();
+			gui.execute();
+
+			String[] tempArgs = gui.getArguments();
+			int numberOfNonEmptyArgs = 0;
+			for (int i = 0; i < tempArgs.length; i++) {
+				if (tempArgs[i].trim().length() > 0) {
+					numberOfNonEmptyArgs++;
+				}
+			}
+
+			int currentArg = 0;
+			if (!gui.getConfFile().trim().equals("")) {
+				args = new String[numberOfNonEmptyArgs + 1];
+				args[0] = gui.getConfFile();
+				currentArg++;
+			} else {
+				args = new String[numberOfNonEmptyArgs];
+			}
+
+			for (int i = 0; i < tempArgs.length; i++) {
+				if (tempArgs[i].trim().length() > 0) {
+					args[currentArg++] = tempArgs[i];
+				}
+			}
+		}
+
+		int currentIndex = 0;
+
+//		if (args.length == 1) {
+//			if (args[currentIndex].equalsIgnoreCase("-h")
+//					|| args[currentIndex].equalsIgnoreCase("--help")
+//					|| args[currentIndex].equalsIgnoreCase("help")) {
+//				System.out.println(Util.usageToString());
+//				System.exit(0);
+//			}
+//		}
+
+		if (args[0].charAt(0) != '-') {
+			optionsFilename = args[0];
+			String[] argsFromFile = readOptionsFromFile(optionsFilename);
+			String[] argsFromCommandline = args;
+			String[] newArgs = new String[argsFromFile.length + args.length - 1];
+
+			// System.out.println("file: " + argsFromFile.length + " cmd: " +
+			// args.length + ", new: " + newArgs.length);
+
+			for (int i = 0; i < argsFromFile.length; i++) {
+				newArgs[i] = argsFromFile[i];
+			}
+
+			for (int i = 1; i < argsFromCommandline.length; i++) {
+				newArgs[argsFromFile.length + i - 1] = argsFromCommandline[i];
+			}
+
+			args = newArgs;
+		}
+		
+		HashMap<String, Arguments> result = new HashMap<String, Arguments>();
+
+		while (currentIndex < args.length) {
+			if (currentIndex + 1 == args.length) {
+				System.err.println("Error: " + args[currentIndex]
+						+ " misses an argument");
+				System.exit(-1);
+			}
+
+			if (!args[currentIndex].equalsIgnoreCase("--random-seed")
+					&& args[currentIndex + 1].charAt(0) == '-') {
+				System.err.println("Error: Argument for " + args[currentIndex]
+						+ " cannot start with a '-' (and therefore cannot be "
+						+ args[currentIndex + 1] + ")");
+				System.exit(-1);
+			}
+			
+			String key = args[currentIndex].toLowerCase();
+			//this replaces the big ol' if then
+//			System.out.println(args[currentIndex]+" # "+args[currentIndex+1]);
+			result.put(key,createOrPrependArguments(result.get(key),args[currentIndex+1]));
+
+			currentIndex += 2;
+		}
+
+		if ((result.get("--experiment") == null || !result.get("--experiment").getArgumentIsDefined("description"))
+				&& optionsFilename != null) {
+			result.put("--experiment", createOrPrependArguments(result.get("--experiment"),
+					"+description=" + optionsFilename));
+		}
+		
+		String commandLine = "";
+		
+		for(String s : args) {
+			if(s.startsWith("--"))
+				commandLine+="\n";
+			commandLine+=s+" ";
+		}
+		
+		result.put("commandline", createOrPrependArguments(null,commandLine.trim()));
+		
+		return result;
+	}
+	
+	public static String[] readOptionsFromFile(String filename) throws IOException {
+		String oldString = readContentFromFile(filename);
+		return readOptionsFromString(oldString);
+	}
+	
+	public static String readContentFromFile(String filename) throws IOException{
+		BufferedReader bufferedReader;
+		StringBuffer sb = new StringBuffer();
+		String nextLine;
+
+		bufferedReader = new BufferedReader(new InputStreamReader(
+				new DataInputStream(new FileInputStream(filename))));
+
+		while ((nextLine = bufferedReader.readLine()) != null) {
+			int index = nextLine.indexOf('#');
+			if (index > -1) {
+				if (index == 0)
+					nextLine = "";
+				else
+					nextLine = nextLine.substring(0, index - 1);
+			}
+
+			sb.append(nextLine + " ");
+		}
+
+		return sb.toString();
+	}
+	
+	public static String[] readOptionsFromString(String oldString) {
+
+		String newString = oldString;
+		do {
+			oldString = newString;
+			newString = oldString.replace("  ", " ");
+			newString = newString.replace("\t", " ");
+			newString = newString.replace("\n", " ");
+			newString = newString.replace(", ", ",");
+			newString = newString.replace("( ", "(");
+			newString = newString.replace(" )", ")");
+		} while (!newString.equals(oldString));
+
+		return newString.trim().split(" ");
+	}
+	
+	public static Arguments createOrPrependArguments(Arguments previous,
+			String newArgumentString) {
+		if (newArgumentString.charAt(0) == '+') {
+			if (previous != null) {
+				return new Arguments(newArgumentString.substring(1,
+						newArgumentString.length())
+						+ ","
+						+ previous.getCompleteArgumentString());
+			} else {
+				return new Arguments(newArgumentString.substring(1,
+						newArgumentString.length()));
+			}
+		} else {
+			return new Arguments(newArgumentString);
+		}
+	}
+	
+	public String toString() {
+		return getCompleteArgumentString();
+	}
+}

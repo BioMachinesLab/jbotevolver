@@ -1,0 +1,69 @@
+package controllers;
+
+import java.awt.event.KeyEvent;
+
+import simulation.Simulator;
+import simulation.robot.Robot;
+
+public class KeyboardController extends simulation.Controller {
+
+	public static final double SPEEDCHANGE = 0.01;
+
+	double leftSpeed = 0;
+	double rightSpeed = 0;
+
+	public KeyboardController(Simulator simulator, Robot robot) {
+		super(simulator, robot);
+	}
+
+	public void controlStep(int time) {
+		robot.setWheelSpeed(leftSpeed, rightSpeed);
+		//System.out.println(robot.getSensors());
+	}
+
+	public void keyTyped(KeyEvent e) {
+		if (e.getKeyChar() == 'a' || e.getKeyChar() == 'A') {
+			leftSpeed -= SPEEDCHANGE;
+			rightSpeed += SPEEDCHANGE;
+		}
+
+		if (e.getKeyChar() == 'd' || e.getKeyChar() == 'D') {
+			leftSpeed += SPEEDCHANGE;
+			rightSpeed -= SPEEDCHANGE;
+		}
+
+		if (e.getKeyChar() == 'w' || e.getKeyChar() == 'W') {
+			leftSpeed += SPEEDCHANGE;
+			rightSpeed += SPEEDCHANGE;
+		}
+
+		if (e.getKeyChar() == 's' || e.getKeyChar() == 'S') {
+			leftSpeed -= SPEEDCHANGE;
+			rightSpeed -= SPEEDCHANGE;
+		}
+
+		if (e.getKeyChar() == ' ') {
+			leftSpeed = 0;
+			rightSpeed = 0;
+		}
+		boundSpeeds();
+	}
+
+	protected void boundSpeeds() {
+		if (leftSpeed < -Robot.MAXIMUMSPEED) {
+			leftSpeed = -Robot.MAXIMUMSPEED;
+		}
+
+		if (leftSpeed > Robot.MAXIMUMSPEED) {
+			leftSpeed = Robot.MAXIMUMSPEED;
+		}
+
+		if (rightSpeed < -Robot.MAXIMUMSPEED) {
+			rightSpeed = -Robot.MAXIMUMSPEED;
+		}
+
+		if (rightSpeed > Robot.MAXIMUMSPEED) {
+			rightSpeed = Robot.MAXIMUMSPEED;
+		}
+	}
+}

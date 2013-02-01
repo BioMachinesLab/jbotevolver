@@ -1,0 +1,6 @@
+-Robots go through walls/other objects if they have enough speed
+-stepsPerRun is duplicated in Population and Experiment. It should only be in one, because they have to be manually sync'd
+
+-BUG: there is a strange bug that allows robots to overlap. Hint: The bug may be on the closeRange object list. CHECK.
+
+ 
