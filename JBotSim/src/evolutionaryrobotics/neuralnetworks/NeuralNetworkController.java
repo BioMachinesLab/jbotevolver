@@ -40,11 +40,11 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	public int getRequiredNumberOfWeights() {
 		return neuralNetwork.getRequiredNumberOfWeights();
 	}
-	
+
 	public NeuralNetwork getNeuralNetwork() {
 		return neuralNetwork;
 	}
-	
+
 	@Override
 	public void reset() {
 		super.reset();
@@ -54,23 +54,21 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	@Override
 	public void setNNWeights(double[] weights) {
 		neuralNetwork.setWeights(weights);
-//		setWeights(weights);		
+		//		setWeights(weights);		
 	}
 
 	public static void setNNWeights(LinkedList<Robot> robots, double[] weights) {
 		for (Robot r : robots) {
-			if (r.getEvolvingController() instanceof NeuralNetworkController){
-				NeuralNetworkController nnController = (NeuralNetworkController) r.getEvolvingController();
+			if (r.getController() instanceof FixedLenghtGenomeEvolvableController){
+				FixedLenghtGenomeEvolvableController nnController = (FixedLenghtGenomeEvolvableController) r.getController();
 				if (nnController != null)
 					nnController.setNNWeights(weights);
 			} //TODO: Miguel: you have to get the BehaviorController to implement the FixedLengthGenomeEvolvableController so that 
-			  //              weights can be set tranparently.
-			else if (r.getEvolvingController() instanceof BehaviorController){
-				BehaviorController bController       = (BehaviorController) r.getEvolvingController();
-				NeuralNetworkController nnController = (NeuralNetworkController) bController.getEvolvingController();
-				nnController.setNNWeights(weights);
-			}
-		}	
-	}
-
+			//              weights can be set tranparently.
+			//			else if (r.getEvolvingController() instanceof BehaviorController){
+			//				BehaviorController bController       = (BehaviorController) r.getEvolvingController();
+			//				NeuralNetworkController nnController = (NeuralNetworkController) bController.getEvolvingController();
+			//				nnController.setNNWeights(weights);
+		}
+	}	
 }
