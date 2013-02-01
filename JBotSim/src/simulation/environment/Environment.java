@@ -18,6 +18,7 @@ import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.collisionhandling.SimpleCollisionManager;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CollisionManager;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public abstract class Environment implements KeyListener, Serializable {
 
@@ -43,14 +44,11 @@ public abstract class Environment implements KeyListener, Serializable {
 
 	private GeometricCalculator geometricCalculator = new GeometricCalculator();// movableObjects);
 
-	public Environment(Simulator simulator, double width, double height) {
-		// if (instance != null)
-		// throw new RuntimeException("Already have an environment");
+	public Environment(Simulator simulator, Arguments args) {
 		this.simulator = simulator;
-		this.width = width;
-		this.height = height;
+		this.width = args.getArgumentAsDoubleOrSetDefault("width", 1);
+		this.height = args.getArgumentAsDoubleOrSetDefault("height", 1);
 		collisionManager = new SimpleCollisionManager(simulator);
-		// instance=this;
 	}
 
 	public abstract void update(double time);

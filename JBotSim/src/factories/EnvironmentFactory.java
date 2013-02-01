@@ -28,9 +28,7 @@ public class EnvironmentFactory extends Factory implements Serializable {
 					.getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
-				return (Environment) constructor.newInstance(simulator,
-						arguments);
-
+				return (Environment) constructor.newInstance(simulator,arguments);
 			}
 
 		} catch (SecurityException e) {
