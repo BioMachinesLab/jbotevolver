@@ -30,8 +30,8 @@ public class MoveForwardBehavior extends Behavior {
 		double speedRight = rightSpeed;
 		double speedLeft = leftSpeed;
 		
-		if(((Epuck) robot).getIrSensor() != null) {
-			
+		if(robot instanceof Epuck && ((Epuck)robot).getIrSensor() != null) {
+		
 			double distRight = ((Epuck) robot).getIrSensor().last2;
 			double distLeft  = ((Epuck) robot).getIrSensor().last5;
 

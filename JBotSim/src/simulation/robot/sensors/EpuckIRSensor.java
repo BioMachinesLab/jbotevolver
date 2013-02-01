@@ -79,6 +79,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		super(simulator,id,robot,args);
 		this.random = simulator.getRandom();
 		numberOfSensors = 4;
+		this.readings = new double[numberOfSensors];
 		range = RANGE;
 		
 		boolean fixedSensor = args.getArgumentAsIntOrSetDefault("fixedsensor", 0) == 1;

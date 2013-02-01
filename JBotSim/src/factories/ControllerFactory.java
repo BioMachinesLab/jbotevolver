@@ -154,7 +154,7 @@ public class ControllerFactory extends Factory implements Serializable {
 					for (Constructor<?> constructor : constructors) {
 						Class<?>[] params = constructor.getParameterTypes();
 						if (params.length == 1 && params[0] == Actuator.class) {
-							nnOutputs.add((NNOutput) constructor.newInstance(nnOutputs));
+							nnOutputs.add((NNOutput) constructor.newInstance(actuator));
 						}
 					}
 			}
