@@ -34,7 +34,7 @@ public class ClosePhysicalObjects implements Serializable {
 		farTime					   = time + visibility;
 	}
 
-	public void update(Double time, ArrayList<PhysicalObject> teleported){
+	public void update(double time, ArrayList<PhysicalObject> teleported){
 		if(notInitialized){
 			teleported = env.getAllObjects();
 			notInitialized=false;
