@@ -80,11 +80,9 @@ public class ControllerFactory extends Factory implements Serializable {
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
 				if (params.length == 2 && params[0] == Simulator.class
-						&& params[1] == Robot.class) {
-					return (Controller) constructor.newInstance(simulator,
-							robot);
+						&& params[1] == Robot.class && params[2] == Arguments.class) {
+					return (Controller) constructor.newInstance(simulator,robot,arguments);
 				}
-
 			}
 
 		} catch (Exception e) {
