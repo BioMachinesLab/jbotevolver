@@ -301,7 +301,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 //	}
 	
 	@Override
-	public void update(int time, ArrayList<PhysicalObject> teleported) {
+	public void update(double time, ArrayList<PhysicalObject> teleported) {
 		
 //		if(!newMode) {
 //			super.update(time, teleported);
