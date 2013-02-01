@@ -33,6 +33,7 @@ import simulation.robot.sensors.Sensor;
 import simulation.robot.sensors.SimpleLightTypeSensor;
 import simulation.robot.sensors.SimpleRobotColorSensor;
 import simulation.util.Arguments;
+import simulation.util.ClassSearchUtils;
 import evolutionaryrobotics.neuralnetworks.inputs.CompassNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.DoubleParameterNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.EpuckIRNNInput;
@@ -87,6 +88,7 @@ public class ControllerFactory extends Factory implements Serializable {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.exit(-1);
 		}
 
 		throw new RuntimeException("Unknown controller: " + controllerName);
@@ -116,86 +118,27 @@ public class ControllerFactory extends Factory implements Serializable {
 	protected Vector<NNInput> getInputsAutomatically(Robot robot) {
 		Vector<NNInput> nnInputs = new Vector<NNInput>();
 		Iterator<Sensor> i = robot.getSensors().iterator();
-
-		while (i.hasNext()) {
-			Sensor sensor = i.next();
-
-			if (sensor.getClass().equals(LightTypeSensor.class)) {
-				nnInputs.add(createInput(robot, "LightType", new Arguments(
-						"id=" + sensor.getId() + ",name=lighttype")));
-			} else if (sensor.getClass().equals(EpuckLightSensor.class)) {
-				nnInputs.add(createInput(robot, "EpuckLight", new Arguments(
-						"id=" + sensor.getId() + ",name=epucklight")));
-			} else if (sensor.getClass().equals(PreySensor.class)) {
-				nnInputs.add(createInput(robot, "Prey", new Arguments("id="
-						+ sensor.getId() + ",name=prey")));
-			} else if (sensor.getClass().equals(SimpleLightTypeSensor.class)) {
-				nnInputs.add(createInput(robot, "SimpleLightType",
-						new Arguments("id=" + sensor.getId()
-								+ ",name=simplelighttype")));
-			} else if (sensor.getClass().equals(XRayPreySensor.class)) {
-				nnInputs.add(createInput(robot, "SimpleLightType",
-						new Arguments("id=" + sensor.getId()
-								+ ",name=simplelighttype")));
-			} else if (sensor.getClass().equals(
-					PerimeterSimpleLightTypeSensor.class)) {
-				nnInputs.add(createInput(robot, "SimpleLightType",
-						new Arguments("id=" + sensor.getId()
-								+ ",name=simplelighttype")));
-			} else if (sensor.getClass().equals(PreyCarriedSensor.class)) {
-				nnInputs.add(createInput(robot, "PreyCarried", new Arguments(
-						"id=" + sensor.getId() + ",name=preycarried")));
-			} else if (sensor.getClass().equals(InNestSensor.class)) {
-				nnInputs.add(createInput(robot, "InNest", new Arguments("id="
-						+ sensor.getId() + ",name=innest")));
-			} else if (sensor.getClass().equals(RobotColorSensor.class)) {
-				nnInputs.add(createInput(robot, "RobotColor", new Arguments(
-						"id=" + sensor.getId() + ",name=robotcolorsensor")));
-			} else if (sensor.getClass().equals(RobotRGBColorSensor.class)) {
-				nnInputs.add(createInput(robot, "RobotRGBColor", new Arguments(
-						"id=" + sensor.getId() + ",name=robotcolorsensor")));
-			} else if (sensor.getClass().equals(SimpleRobotColorSensor.class)) {
-				nnInputs.add(createInput(robot, "SimpleRobotColor",
-						new Arguments("id=" + sensor.getId()
-								+ ",name=simplerobotcolorsensor")));
-			} else if (sensor.getClass().equals(
-					PerimeterSimpleRobotColorSensor.class)) {
-				nnInputs.add(createInput(robot, "SimpleRobotColor",
-						new Arguments("id=" + sensor.getId()
-								+ ",name=simplerobotcolorsensor")));
-			} else if (sensor.getClass().equals(NearRobotSensor.class)) {
-				nnInputs.add(createInput(robot, "NearRobot", new Arguments(
-						"id=" + sensor.getId() + ",name=nearrobotsensor")));
-			} else if (sensor.getClass().equals(CompassSensor.class)) {
-				nnInputs.add(createInput(robot, "Compass", new Arguments("id="
-						+ sensor.getId() + ",name=compasssensor")));
-			} else if (sensor.getClass().equals(PositionSensor.class)) {
-				nnInputs.add(createInput(robot, "Position", new Arguments("id="
-						+ sensor.getId() + ",name=positionsensor")));
-			} else if (sensor.getClass().equals(DoubleParameterSensor.class)) {
-				nnInputs.add(createInput(robot, "DoubleParameter",
-						new Arguments("id=" + sensor.getId()
-								+ ",name=doubleparametersensor")));
-			} else if (sensor.getClass().equals(GroundRGBColorSensor.class)) {
-				nnInputs.add(createInput(robot, "GroundRGBColorSensor",
-						new Arguments("id=" + sensor.getId()
-								+ ",name=groundrgbcolorsensor")));
-			} else if (sensor.getClass().equals(EpuckIRSensor.class)) {
-				nnInputs.add(createInput(robot, "EPuckIRSensor", new Arguments(
-						"id=" + sensor.getId() + ",name=epuckirsensor")));
-			} else if (sensor.getClass().equals(WallButtonSensor.class)) {
-				nnInputs.add(createInput(robot, "LightType", new Arguments(
-						"id=" + sensor.getId() + ",name=lighttypesensor")));
-			} else {
-				throw new RuntimeException(
-						"Trying to automatically create input for sensor: "
-								+ sensor
-								+ ", but sensor unknown here -- sensor.class: "
-								+ sensor.getClass() + ", LightType.class: "
-								+ LightTypeSensor.class);
+		
+		try {
+			while (i.hasNext()) {
+				Sensor sensor = i.next();
+				String inputName = sensor.getClass().getSimpleName().replace("Sensor","NNInput");
+				inputName = ClassSearchUtils.getClassFullName(inputName);
+				
+					Constructor<?>[] constructors = Class.forName(inputName)
+							.getDeclaredConstructors();
+					for (Constructor<?> constructor : constructors) {
+						Class<?>[] params = constructor.getParameterTypes();
+						if (params.length == 1 && params[0] == Sensor.class) {
+							nnInputs.add((NNInput) constructor.newInstance(sensor));
+						}
+					}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
 		}
-
+		
 		return nnInputs;
 	}
 
@@ -281,28 +224,26 @@ public class ControllerFactory extends Factory implements Serializable {
 		Vector<NNOutput> nnOutputs = new Vector<NNOutput>();
 		Iterator<Actuator> i = robot.getActuators().iterator();
 
-		while (i.hasNext()) {
-			Actuator actuator = i.next();
-			if (actuator.getClass().equals(TwoWheelActuator.class)) {
-				nnOutputs.add(createOutput(robot, "TwoWheel", new Arguments(
-						"id=" + actuator.getId() + ",name=twowheel")));
-			} else if (actuator.getClass().equals(RobotColorActuator.class)) {
-				nnOutputs.add(createOutput(robot, "RobotColor", new Arguments(
-						"id=" + actuator.getId() + ",name=robotcolor")));
-			} else if (actuator.getClass().equals(RobotRGBColorActuator.class)) {
-				nnOutputs.add(createOutput(robot, "RobotRGBColor",
-						new Arguments("id=" + actuator.getId()
-								+ ",name=robotcolor")));
-			} else if (actuator.getClass().equals(PreyPickerActuator.class)) {
-				nnOutputs.add(createOutput(robot, "PreyPicker", new Arguments(
-						"id=" + actuator.getId() + ",name=preypicker")));
-			} else {
-				throw new RuntimeException(
-						"Trying to automatically create output for actuator: "
-								+ actuator + ", but actuator unknown here");
+		try {
+			while (i.hasNext()) {
+				Actuator actuator = i.next();
+				String inputName = actuator.getClass().getSimpleName().replace("Actuator","NNOutput");
+				inputName = ClassSearchUtils.getClassFullName(inputName);
+				
+					Constructor<?>[] constructors = Class.forName(inputName)
+							.getDeclaredConstructors();
+					for (Constructor<?> constructor : constructors) {
+						Class<?>[] params = constructor.getParameterTypes();
+						if (params.length == 1 && params[0] == Actuator.class) {
+							nnOutputs.add((NNOutput) constructor.newInstance(nnOutputs));
+						}
+					}
 			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
 		}
-
+		
 		return nnOutputs;
 	}
 
@@ -313,7 +254,7 @@ public class ControllerFactory extends Factory implements Serializable {
 
 		if (name.equalsIgnoreCase("twowheel")
 				|| name.equalsIgnoreCase("twowheeloutput")) {
-			return new TwoWheelNNOutput(robot.getActuatorWithId(id), arguments);
+			return new TwoWheelNNOutput(robot.getActuatorWithId(id));
 		} else if (name.equalsIgnoreCase("robotcolor")
 				|| name.equalsIgnoreCase("robotcoloroutput")) {
 			return new RobotColorNNOutput(robot.getActuatorWithId(id),
