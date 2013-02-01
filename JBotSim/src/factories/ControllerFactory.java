@@ -66,23 +66,30 @@ public class ControllerFactory extends Factory implements Serializable {
 	}
 
 	public Controller getController(Robot robot, Arguments arguments) {
-		
+
 		if (!arguments.getArgumentIsDefined("name")) {
-			throw new RuntimeException("Controller 'name' not defined: "+ arguments.toString());
+			throw new RuntimeException("Controller 'name' not defined: "
+					+ arguments.toString());
 		}
 
 		String controllerName = arguments.getArgumentAsString("name");
 
 		try {
-			Constructor<?>[] constructors = Class.forName(controllerName).getDeclaredConstructors();
+			Constructor<?>[] constructors = Class.forName(controllerName)
+					.getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
-				return (Controller) constructor.newInstance(simulator,robot,arguments);
+				if (params.length == 2 && params[0] == Simulator.class
+						&& params[1] == Robot.class) {
+					return (Controller) constructor.newInstance(simulator,
+							robot);
+				}
+
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} 
+		}
 
 		throw new RuntimeException("Unknown controller: " + controllerName);
 	}
@@ -111,10 +118,10 @@ public class ControllerFactory extends Factory implements Serializable {
 	protected Vector<NNInput> getInputsAutomatically(Robot robot) {
 		Vector<NNInput> nnInputs = new Vector<NNInput>();
 		Iterator<Sensor> i = robot.getSensors().iterator();
-		
+
 		while (i.hasNext()) {
 			Sensor sensor = i.next();
-			
+
 			if (sensor.getClass().equals(LightTypeSensor.class)) {
 				nnInputs.add(createInput(robot, "LightType", new Arguments(
 						"id=" + sensor.getId() + ",name=lighttype")));
@@ -145,7 +152,7 @@ public class ControllerFactory extends Factory implements Serializable {
 						+ sensor.getId() + ",name=innest")));
 			} else if (sensor.getClass().equals(RobotColorSensor.class)) {
 				nnInputs.add(createInput(robot, "RobotColor", new Arguments(
-						"id=" + sensor.getId() + ",name=robotcolorsensor"))); 
+						"id=" + sensor.getId() + ",name=robotcolorsensor")));
 			} else if (sensor.getClass().equals(RobotRGBColorSensor.class)) {
 				nnInputs.add(createInput(robot, "RobotRGBColor", new Arguments(
 						"id=" + sensor.getId() + ",name=robotcolorsensor")));
@@ -164,16 +171,23 @@ public class ControllerFactory extends Factory implements Serializable {
 			} else if (sensor.getClass().equals(CompassSensor.class)) {
 				nnInputs.add(createInput(robot, "Compass", new Arguments("id="
 						+ sensor.getId() + ",name=compasssensor")));
-			}else if(sensor.getClass().equals(PositionSensor.class)) {
-				nnInputs.add(createInput(robot, "Position", new Arguments("id=" + sensor.getId() + ",name=positionsensor")));
-			}else if(sensor.getClass().equals(DoubleParameterSensor.class)) {
-				nnInputs.add(createInput(robot, "DoubleParameter", new Arguments("id=" + sensor.getId() + ",name=doubleparametersensor")));
-			}else if(sensor.getClass().equals(GroundRGBColorSensor.class)){
-				nnInputs.add(createInput(robot,"GroundRGBColorSensor", new Arguments("id=" +sensor.getId() + ",name=groundrgbcolorsensor")));
-			} else if(sensor.getClass().equals(EpuckIRSensor.class)){
-				nnInputs.add(createInput(robot,"EPuckIRSensor", new Arguments("id=" +sensor.getId() + ",name=epuckirsensor")));
-			} else if(sensor.getClass().equals(WallButtonSensor.class)){
-				nnInputs.add(createInput(robot,"LightType", new Arguments("id=" +sensor.getId() + ",name=lighttypesensor")));
+			} else if (sensor.getClass().equals(PositionSensor.class)) {
+				nnInputs.add(createInput(robot, "Position", new Arguments("id="
+						+ sensor.getId() + ",name=positionsensor")));
+			} else if (sensor.getClass().equals(DoubleParameterSensor.class)) {
+				nnInputs.add(createInput(robot, "DoubleParameter",
+						new Arguments("id=" + sensor.getId()
+								+ ",name=doubleparametersensor")));
+			} else if (sensor.getClass().equals(GroundRGBColorSensor.class)) {
+				nnInputs.add(createInput(robot, "GroundRGBColorSensor",
+						new Arguments("id=" + sensor.getId()
+								+ ",name=groundrgbcolorsensor")));
+			} else if (sensor.getClass().equals(EpuckIRSensor.class)) {
+				nnInputs.add(createInput(robot, "EPuckIRSensor", new Arguments(
+						"id=" + sensor.getId() + ",name=epuckirsensor")));
+			} else if (sensor.getClass().equals(WallButtonSensor.class)) {
+				nnInputs.add(createInput(robot, "LightType", new Arguments(
+						"id=" + sensor.getId() + ",name=lighttypesensor")));
 			} else {
 				throw new RuntimeException(
 						"Trying to automatically create input for sensor: "
@@ -193,13 +207,13 @@ public class ControllerFactory extends Factory implements Serializable {
 			id = arguments.getArgumentAsInt("id");
 
 		if (name.equalsIgnoreCase("lighttype")
-				|| name.equalsIgnoreCase("lighttypeinput") ||
-				name.equalsIgnoreCase("epucklight")
-				|| name.equalsIgnoreCase("epucklightinput")||
-				name.equalsIgnoreCase("prey")
-				|| name.equalsIgnoreCase("preyinput") ||
-				name.equalsIgnoreCase("wallbutton") || 
-				name.equalsIgnoreCase("wallbuttoninput") ) {
+				|| name.equalsIgnoreCase("lighttypeinput")
+				|| name.equalsIgnoreCase("epucklight")
+				|| name.equalsIgnoreCase("epucklightinput")
+				|| name.equalsIgnoreCase("prey")
+				|| name.equalsIgnoreCase("preyinput")
+				|| name.equalsIgnoreCase("wallbutton")
+				|| name.equalsIgnoreCase("wallbuttoninput")) {
 			return new LightTypeNNInput(robot.getSensorWithId(id));
 		} else if (name.equalsIgnoreCase("simplelighttype")
 				|| name.equalsIgnoreCase("simplelighttypeinput")) {
@@ -228,13 +242,17 @@ public class ControllerFactory extends Factory implements Serializable {
 			return new PositionNNInput(robot.getSensorWithId(id));
 		} else if (name.equalsIgnoreCase("doubleparameter")) {
 			return new DoubleParameterNNInput(robot.getSensorWithId(id));
-		} else if (name.equalsIgnoreCase("monitor") || name.equalsIgnoreCase("monitorinput")) {
-			String new_name=arguments.getArgumentAt(0);
-			Arguments actuators = new Arguments(arguments.getArgumentAsString(new_name));				
+		} else if (name.equalsIgnoreCase("monitor")
+				|| name.equalsIgnoreCase("monitorinput")) {
+			String new_name = arguments.getArgumentAt(0);
+			Arguments actuators = new Arguments(
+					arguments.getArgumentAsString(new_name));
 			return new SysoutNNInput(createInput(robot, new_name, actuators));
-		} else if (name.equalsIgnoreCase("groundrgbcolor") || name.equalsIgnoreCase("groundrgbcolorsensor")) {
+		} else if (name.equalsIgnoreCase("groundrgbcolor")
+				|| name.equalsIgnoreCase("groundrgbcolorsensor")) {
 			return new GroundRGBColorNNInput(robot.getSensorWithId(id));
-		} else if (name.equalsIgnoreCase("epuckir") || name.equalsIgnoreCase("epuckirsensor")) {
+		} else if (name.equalsIgnoreCase("epuckir")
+				|| name.equalsIgnoreCase("epuckirsensor")) {
 			return new EpuckIRNNInput(robot.getSensorWithId(id));
 		} else
 			throw new RuntimeException("Unknown nn input: " + name);
@@ -268,7 +286,8 @@ public class ControllerFactory extends Factory implements Serializable {
 		while (i.hasNext()) {
 			Actuator actuator = i.next();
 			if (actuator.getClass().equals(TwoWheelActuator.class)) {
-				nnOutputs.add(createOutput(robot, "TwoWheel", new Arguments("id=" + actuator.getId() + ",name=twowheel")));
+				nnOutputs.add(createOutput(robot, "TwoWheel", new Arguments(
+						"id=" + actuator.getId() + ",name=twowheel")));
 			} else if (actuator.getClass().equals(RobotColorActuator.class)) {
 				nnOutputs.add(createOutput(robot, "RobotColor", new Arguments(
 						"id=" + actuator.getId() + ",name=robotcolor")));
@@ -294,33 +313,47 @@ public class ControllerFactory extends Factory implements Serializable {
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
 
-		if (name.equalsIgnoreCase("twowheel") || name.equalsIgnoreCase("twowheeloutput")) {		
+		if (name.equalsIgnoreCase("twowheel")
+				|| name.equalsIgnoreCase("twowheeloutput")) {
 			return new TwoWheelNNOutput(robot.getActuatorWithId(id), arguments);
-		} else 	if (name.equalsIgnoreCase("robotcolor") || name.equalsIgnoreCase("robotcoloroutput")) {		
-			return new RobotColorNNOutput(robot.getActuatorWithId(id),arguments);
-		}else 	if (name.equalsIgnoreCase("robotrgbcolor") || name.equalsIgnoreCase("robotrgbcoloroutput")) { 
-			return new RobotRGBColorNNOutput(robot.getActuatorWithId(id),arguments);
-		} else if (name.equalsIgnoreCase("multineuroncolor") || name.equalsIgnoreCase("multineuroncoloroutput")) {
-			return new MultiNeuronRobotColorNNOutput(robot.getActuatorWithId(id), arguments);
-		} else if (name.equalsIgnoreCase("preypicker") || name.equalsIgnoreCase("preypickeroutput")) {
-			return new PreyPickerNNOutput(robot.getActuatorWithId(id), arguments);
-		} else if (name.equalsIgnoreCase("monitor") || name.equalsIgnoreCase("monitoroutput")) {
-			//TODO
+		} else if (name.equalsIgnoreCase("robotcolor")
+				|| name.equalsIgnoreCase("robotcoloroutput")) {
+			return new RobotColorNNOutput(robot.getActuatorWithId(id),
+					arguments);
+		} else if (name.equalsIgnoreCase("robotrgbcolor")
+				|| name.equalsIgnoreCase("robotrgbcoloroutput")) {
+			return new RobotRGBColorNNOutput(robot.getActuatorWithId(id),
+					arguments);
+		} else if (name.equalsIgnoreCase("multineuroncolor")
+				|| name.equalsIgnoreCase("multineuroncoloroutput")) {
+			return new MultiNeuronRobotColorNNOutput(
+					robot.getActuatorWithId(id), arguments);
+		} else if (name.equalsIgnoreCase("preypicker")
+				|| name.equalsIgnoreCase("preypickeroutput")) {
+			return new PreyPickerNNOutput(robot.getActuatorWithId(id),
+					arguments);
+		} else if (name.equalsIgnoreCase("monitor")
+				|| name.equalsIgnoreCase("monitoroutput")) {
+			// TODO
 			String new_name = arguments.getArgumentAt(0);
-			Arguments actuators = new Arguments(arguments.getArgumentAsString(new_name));
+			Arguments actuators = new Arguments(
+					arguments.getArgumentAsString(new_name));
 			return new SysoutNNOutput(createOutput(robot, new_name, actuators));
 		} else if (name.equalsIgnoreCase("fixed")
 				|| name.equalsIgnoreCase("fixedoutput")) {
-			//TODO
+			// TODO
 			String new_name = arguments.getArgumentAt(0);
 			Arguments actuators = new Arguments(
 					arguments.getArgumentAsString(new_name));
 			return new FixedNNOutput(createOutput(robot, new_name, actuators),
 					arguments.getArgumentAsDouble("value"));
-		} else if (name.equalsIgnoreCase("simple") || name.equalsIgnoreCase("simpleoutput")) {
-			//TODO
-			return new SimpleNNOutput(arguments.getArgumentAsInt("numberofoutputs"));
-		} else if (name.equalsIgnoreCase("opendooroutput") || name.equalsIgnoreCase("opendoor")) {
+		} else if (name.equalsIgnoreCase("simple")
+				|| name.equalsIgnoreCase("simpleoutput")) {
+			// TODO
+			return new SimpleNNOutput(
+					arguments.getArgumentAsInt("numberofoutputs"));
+		} else if (name.equalsIgnoreCase("opendooroutput")
+				|| name.equalsIgnoreCase("opendoor")) {
 			return new OpenDoorNNOutput(robot.getActuatorWithId(id), arguments);
 		} else
 			throw new RuntimeException("Unknown nn output: " + name);
