@@ -40,14 +40,8 @@ public class GroupedPreyEnvironment extends Environment {
 	private int    numberOfFoodSuccessfullyForaged = 0;
 	private Random preyPlacementRandom;
 
-	public GroupedPreyEnvironment(Simulator simulator, double width, double height) {
-		super(simulator,width, height);
-		preyPlacementRandom = new Random(simulator.getRandom().nextLong());
-	}
-
 	public GroupedPreyEnvironment(Simulator simulator, Arguments arguments) {
-		super(simulator,arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")				: 7, 
-			  arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")				: 7);
+		super(simulator, arguments);
 
 		preyPlacementRandom = new Random(simulator.getRandom().nextLong());
 

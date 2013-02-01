@@ -29,11 +29,7 @@ public class LightPoleEnvironment extends Environment {
 	 * @param arguments
 	 */
 	public LightPoleEnvironment(Simulator simulator, Arguments arguments) {
-		super(simulator,
-				arguments.getArgumentIsDefined("forbiddenarea") ? arguments
-						.getArgumentAsDouble("forbiddenarea") : 5.0, arguments
-						.getArgumentIsDefined("forbiddenarea") ? arguments
-						.getArgumentAsDouble("forbiddenarea") : 5.0);
+		super(simulator, arguments);
 		lightPoleDistance = arguments.getArgumentIsDefined("lightpoledistance") ? arguments
 				.getArgumentAsDouble("lightpoledistance") : 2.0;
 		lightPoleRadius = arguments.getArgumentIsDefined("lightpoleradius") ? arguments

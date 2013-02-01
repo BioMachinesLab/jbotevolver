@@ -52,8 +52,7 @@ public class MazeEnvironment extends Environment {
 	private int imageSize = 0;
 
 	public MazeEnvironment(Simulator simulator, Arguments arguments) {
-		super(simulator,arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 7, 
-			  arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 7);
+		super(simulator, arguments);
 
 		forbiddenArea = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")	: 7;
 		totalSamples = arguments.getArgumentIsDefined("totalsamples") ? arguments.getArgumentAsInt("totalsamples")	: 5;

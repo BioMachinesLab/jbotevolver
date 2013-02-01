@@ -11,6 +11,8 @@ import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
+import simulation.robot.actuators.PreyPickerActuator;
+import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 
 public class TwoRoomsEnvironment extends Environment {
@@ -38,8 +40,7 @@ public class TwoRoomsEnvironment extends Environment {
 	private boolean removeWalls = false;
 
 	public TwoRoomsEnvironment(Simulator simulator, Arguments arguments) {
-		super(simulator,arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 7, 
-				  arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 7);
+		super(simulator,arguments);
 		
 		r.setSeed(simulator.getRandom().nextLong());
 		splitRatio = arguments.getArgumentAsDoubleOrSetDefault("splitratio",splitRatio);
@@ -89,9 +90,13 @@ public class TwoRoomsEnvironment extends Environment {
 		}
 		
 		Robot r = simulator.getEnvironment().getRobots().get(0);
-		if(r.isCarryingPrey()) {
+		
+		PreyCarriedSensor sensor = (PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class.getName());
+		if (sensor.preyCarried() && r.isInvolvedInCollison()){
 			numberOfPicks++;
-			r.dropPrey().teleportTo(new Vector2d(0,-3));
+			PreyPickerActuator actuator = (PreyPickerActuator)r.getActuatorByType(PreyPickerActuator.class.getName());
+			Prey preyToDrop = actuator.dropPrey();
+			preyToDrop.teleportTo(new Vector2d(0,-3));
 			numberOfPreys--;
 		}
 		

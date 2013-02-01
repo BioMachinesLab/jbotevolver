@@ -46,8 +46,8 @@ public abstract class Environment implements KeyListener, Serializable {
 
 	public Environment(Simulator simulator, Arguments args) {
 		this.simulator = simulator;
-		this.width = args.getArgumentAsDoubleOrSetDefault("width", 1);
-		this.height = args.getArgumentAsDoubleOrSetDefault("height", 1);
+		this.width = args.getArgumentAsDoubleOrSetDefault("width", 5);
+		this.height = args.getArgumentAsDoubleOrSetDefault("height", 5);
 		collisionManager = new SimpleCollisionManager(simulator);
 	}
 

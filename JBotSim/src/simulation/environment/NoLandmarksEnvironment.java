@@ -7,8 +7,7 @@ public class NoLandmarksEnvironment extends Environment {
 
 	private double forageLimit, forbiddenArea;
 	public NoLandmarksEnvironment(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")       : 5.0,
-				  arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 5.0);
+		super(simulator, arguments);
 	}
 	
 	public double getForageRadius() {

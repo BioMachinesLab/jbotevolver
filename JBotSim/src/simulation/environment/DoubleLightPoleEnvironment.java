@@ -13,11 +13,7 @@ public class DoubleLightPoleEnvironment extends Environment {
 	private LightPole lightPoleLeft, lightPoleRight;
 
 	public DoubleLightPoleEnvironment(Simulator simulator, Arguments arguments) {
-		super(simulator,
-				arguments.getArgumentIsDefined("forbiddenarea") ? arguments
-						.getArgumentAsDouble("forbiddenarea") : 5.0, arguments
-						.getArgumentIsDefined("forbiddenarea") ? arguments
-						.getArgumentAsDouble("forbiddenarea") : 5.0);
+		super(simulator, arguments);
 		double widthPole = arguments.getArgumentIsDefined("width") ? arguments
 				.getArgumentAsDouble("width") : -1.0;
 		double heightPole = arguments.getArgumentIsDefined("height") ? arguments

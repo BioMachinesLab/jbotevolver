@@ -48,8 +48,7 @@ public class TMazeEnvironment extends Environment {
 	
 	public TMazeEnvironment(Simulator simulator, Arguments arguments, boolean firstWall) {
 		
-		super(simulator,arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 7, 
-				  arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 7);
+		super(simulator, arguments);
 		
 		this.firstWall = firstWall;
 		

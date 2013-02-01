@@ -11,6 +11,8 @@ import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
+import simulation.robot.actuators.PreyPickerActuator;
+import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 import simulation.util.SimRandom;
 
@@ -36,11 +38,7 @@ public class TwoNestForageEnvironment extends Environment implements
 	// }
 
 	public TwoNestForageEnvironment(Simulator simulator, Arguments arguments) {
-		super(simulator,
-				arguments.getArgumentIsDefined("forbiddenarea") ? arguments
-						.getArgumentAsDouble("forbiddenarea") : 5.0, arguments
-						.getArgumentIsDefined("forbiddenarea") ? arguments
-						.getArgumentAsDouble("forbiddenarea") : 5.0);
+		super(simulator, arguments);
 
 		nestDistance = arguments.getArgumentIsDefined("nestdistance") ? arguments
 				.getArgumentAsDouble("nestdistance") : 2;
@@ -111,9 +109,11 @@ public class TwoNestForageEnvironment extends Environment implements
 	}
 
 	protected void dropPreysDueToCollison() {
-		for (Robot robot : robots) {
-			if (robot.isCarryingPrey() && robot.isInvolvedInCollison()) {
-				Prey preyToDrop = robot.dropPrey();
+		for(Robot robot: robots){
+			PreyCarriedSensor sensor = (PreyCarriedSensor)robot.getSensorByType(PreyCarriedSensor.class.getName());
+			if (sensor.preyCarried() && robot.isInvolvedInCollison()){
+				PreyPickerActuator actuator = (PreyPickerActuator)robot.getActuatorByType(PreyPickerActuator.class.getName());
+				Prey preyToDrop = actuator.dropPrey();
 				preyToDrop.teleportTo(newRandomPosition());
 			}
 		}
