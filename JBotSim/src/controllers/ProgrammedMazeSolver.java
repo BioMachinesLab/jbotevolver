@@ -41,7 +41,7 @@ public class ProgrammedMazeSolver extends Controller {
 	}
 
 	@Override
-	public void controlStep(int time) {
+	public void controlStep(double time) {
 		chooseBehavior();
 	}
 	

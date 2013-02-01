@@ -66,7 +66,7 @@ public abstract class NeuralNetwork implements Serializable{
 		}
 	}
 
-	public void controlStep(int time) {
+	public void controlStep(double time) {
 		int currentInputValue = 0;
 		//		boolean difZero=false;
 		for (NNInput i : inputs) {

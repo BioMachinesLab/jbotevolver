@@ -1,11 +1,11 @@
 package controllers;
 
 import simulation.Simulator;
-import simulation.environment.Environment;
 import simulation.environment.RoundForageEnvironment;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
+import simulation.util.SimRandom;
 
 public class ProgrammedRGBNeutralForagerForSocialInfluenceExperiment extends
 		ProgrammedRGBForagerForSocialInfluenceExperiment {
@@ -13,7 +13,7 @@ public class ProgrammedRGBNeutralForagerForSocialInfluenceExperiment extends
 	private static final double SPEED_FRACTION = .5;
 	private static final double PROB_GRAB = .5;
 	private static final double PROB_RELEASE = .001;
-
+	private SimRandom random;
 	private double onLimitDistance;
 	private double maxNestReading;
 	private double grabLimit;
@@ -28,6 +28,7 @@ public class ProgrammedRGBNeutralForagerForSocialInfluenceExperiment extends
 		grabLimit = (range - .75 * ((RoundForageEnvironment) simulator.getEnvironment()).getForageRadius()) / range;
 		moveForwardSpeed *= SPEED_FRACTION;
 		RED_COLOR_LEVEL = .5;
+		this.random = simulator.getRandom();
 	}
 
 	protected Action chooseAction() {
@@ -42,11 +43,11 @@ public class ProgrammedRGBNeutralForagerForSocialInfluenceExperiment extends
 
 		updateTopLight(isLoaded);
 		
-		if (isLoaded && simulator.getRandom().nextDouble() < PROB_RELEASE) {
+		if (isLoaded && random.nextDouble() < PROB_RELEASE) {
 			newAction = Action.RELEASE;
 		} else if (!isLoaded && maxNestReading > grabLimit
 				&& near(foodSensors, nearPreyDistance)
-				&& simulator.getRandom().nextDouble() < PROB_GRAB) {
+				&& random.nextDouble() < PROB_GRAB) {
 			newAction = Action.GRAB;
 		} else {
 			front_sensor_measure = nestSensors.getSensorReading(0);
@@ -69,7 +70,7 @@ public class ProgrammedRGBNeutralForagerForSocialInfluenceExperiment extends
 				} else {
 					newAction = Action.FORWORD;
 				}
-			} else if (simulator.getRandom().nextInt(2) == 0) {
+			} else if (random.nextInt(2) == 0) {
 				newAction = Action.DETOUR_RIGHT;
 			} else {
 				newAction = Action.DETOUR_LEFT;

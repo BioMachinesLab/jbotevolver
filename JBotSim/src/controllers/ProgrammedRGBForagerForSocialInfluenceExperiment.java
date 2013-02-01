@@ -135,7 +135,7 @@ public class ProgrammedRGBForagerForSocialInfluenceExperiment extends
 	}
 
 	@Override
-	public void controlStep(int time) {
+	public void controlStep(double time) {
 		topLight.setRed(RED_COLOR_LEVEL);
 
 		if (nextAction == Action.NA) {

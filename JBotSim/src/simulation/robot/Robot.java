@@ -3,7 +3,6 @@ package simulation.robot;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import simulation.Controller;
 import simulation.Simulator;
@@ -13,9 +12,6 @@ import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.BehaviorActuator;
-import simulation.robot.sensors.EpuckIRSensor;
-import simulation.robot.sensors.EpuckLightSensor;
 import simulation.robot.sensors.Sensor;
 import simulation.util.MathUtils;
 

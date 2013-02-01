@@ -67,7 +67,6 @@ import evolutionaryrobotics.neuralnetworks.inputs.RobotRGBColorNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.SimpleLightTypeNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.SimpleRobotColorNNInput;
 import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
-import evolutionaryrobotics.neuralnetworks.outputs.ArtificialPheromoneNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.BehaviorNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.FixedNNOutput;
 import evolutionaryrobotics.neuralnetworks.outputs.MultiNeuronRobotColorNNOutput;
@@ -400,8 +399,6 @@ public class ControllerFactory extends Factory implements Serializable {
 			return new TwoWheelNNOutput(robot.getActuatorWithId(id), arguments);
 		} else 	if (name.equalsIgnoreCase("robotcolor") || name.equalsIgnoreCase("robotcoloroutput")) {		
 			return new RobotColorNNOutput(robot.getActuatorWithId(id),arguments);
-		}else if(name.equalsIgnoreCase("artificialpheromone")){
-			return new ArtificialPheromoneNNOutput(robot.getActuatorWithId(id),arguments);
 		}else if(name.equalsIgnoreCase("behavior") || name.equalsIgnoreCase("behavioroutput")){
 			return new BehaviorNNOutput(robot.getActuatorWithId(id), arguments);
 		}else 	if (name.equalsIgnoreCase("robotrgbcolor") || name.equalsIgnoreCase("robotrgbcoloroutput")) { 

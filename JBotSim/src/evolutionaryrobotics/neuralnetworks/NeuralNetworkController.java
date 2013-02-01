@@ -29,7 +29,7 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	}
 
 	@Override
-	public void controlStep(int time) {
+	public void controlStep(double time) {
 		neuralNetwork.controlStep(time);
 	}
 

@@ -1,14 +1,10 @@
 package experiments;
 
-import java.util.LinkedList;
-import java.util.Random;
-import java.util.Vector;
-
+import java.util.ArrayList;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.RobotRGBColorActuator;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 public class ColorMatchExperiment extends Experiment {
 	protected int numberOfNonMovingRobots;
@@ -23,8 +19,8 @@ public class ColorMatchExperiment extends Experiment {
 
 	}
 
-	public LinkedList<Robot> createRobots() {
-		LinkedList<Robot> evolvingRobots = super.createRobots();
+	public ArrayList<Robot> createRobots() {
+		ArrayList<Robot> evolvingRobots = super.createRobots();
 		numberOfNonMovingRobots = 1;
 		if (experimentArguments != null) {
 			if (experimentArguments.getArgumentIsDefined("nonmovingrobots")) {
@@ -33,7 +29,7 @@ public class ColorMatchExperiment extends Experiment {
 			}
 		}
 
-		robots = new LinkedList<Robot>();
+		robots = new ArrayList<Robot>();
 		colorToMatch = new double[3];
 		colorToMatch[0] = simulator.getRandom().nextDouble();
 		colorToMatch[1] = simulator.getRandom().nextDouble();
@@ -48,7 +44,7 @@ public class ColorMatchExperiment extends Experiment {
 	}
 
 	private Robot createNonMovingRobot(Arguments robotArguments) {
-		Robot robot = robotFactory.getRobot(robotArguments, this);
+		Robot robot = robotFactory.getRobot(robotArguments);
 		robot.setBodyColor(colorToMatch);
 		((RobotRGBColorActuator) robot.getActuatorWithId(2))
 				.setAll(colorToMatch);

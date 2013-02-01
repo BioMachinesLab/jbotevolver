@@ -127,7 +127,7 @@ public class ProgrammedForagerForSocialInfluenceExperiment extends Controller {
 	}
 
 	@Override
-	public void controlStep(int time) {
+	public void controlStep(double time) {
 
 		if (nextAction == Action.NA) {
 			nextAction = chooseAction();

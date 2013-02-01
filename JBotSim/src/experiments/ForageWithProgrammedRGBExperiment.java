@@ -1,14 +1,11 @@
 package experiments;
 
-import java.util.LinkedList;
-import java.util.Vector;
-
+import java.util.ArrayList;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.RoundForageEnvironment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 import controllers.ProgrammedRGBAntiForagerForSocialInfluenceExperiment;
 import controllers.ProgrammedRGBForagerForSocialInfluenceExperiment;
 import controllers.ProgrammedRGBNeutralForagerForSocialInfluenceExperiment;
@@ -28,7 +25,7 @@ public class ForageWithProgrammedRGBExperiment extends Experiment {
 	}
 
 	@Override
-	public LinkedList<Robot> createRobots() {
+	public ArrayList<Robot> createRobots() {
 		robots = super.createRobots();
 
 		// double speedOfPreProgrammedRobot = Robot.MAXIMUMSPEED;
@@ -56,7 +53,6 @@ public class ForageWithProgrammedRGBExperiment extends Experiment {
 				// speedOfPreProgrammedRobot *=
 				// experimentArguments.getArgumentAsDouble("speedofpreprogrammedrobots");
 			}
-
 		}
 
 		for (int i = 0; i < numberOfProgrammedRobots; i++)
@@ -75,7 +71,7 @@ public class ForageWithProgrammedRGBExperiment extends Experiment {
 
 	private Robot createOnePreProgrmmedRobot( double speed,
 			Arguments robotArguments, Arguments controllerArguments) {
-		Robot robot = robotFactory.getRobot(robotArguments, this);
+		Robot robot = robotFactory.getRobot(robotArguments);
 		// robot.setController(new ProgrammedForager(robot,
 		// controllerArguments));
 		robot.setController(new ProgrammedRGBForagerForSocialInfluenceExperiment(
@@ -85,7 +81,7 @@ public class ForageWithProgrammedRGBExperiment extends Experiment {
 
 	private Robot createOneEnemyRobot( Arguments robotArguments,
 			Arguments controllerArguments) {
-		Robot robot = robotFactory.getRobot(robotArguments, this);
+		Robot robot = robotFactory.getRobot(robotArguments);
 		robot.setController(new ProgrammedRGBAntiForagerForSocialInfluenceExperiment(
 				simulator,robot, controllerArguments));
 		return robot;
@@ -94,7 +90,7 @@ public class ForageWithProgrammedRGBExperiment extends Experiment {
 
 	private Robot createOneNeutralRobot( Arguments robotArguments,
 			Arguments controllerArguments) {
-		Robot robot = robotFactory.getRobot(robotArguments, this);
+		Robot robot = robotFactory.getRobot(robotArguments);
 		robot.setController(new ProgrammedRGBNeutralForagerForSocialInfluenceExperiment(
 				simulator,robot, controllerArguments));
 		return robot;

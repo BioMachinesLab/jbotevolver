@@ -1,7 +1,7 @@
 package experiments;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -32,7 +32,7 @@ public class CoevolutionExperiment extends Experiment {
 	}
 
 	@Override
-	public LinkedList<Robot> createRobots() {
+	public ArrayList<Robot> createRobots() {
 		robots.clear();
 		if (numberOfrobotsTeamA == 0) {
 			numberOfrobotsTeamA = numberOfRobots / 2;
@@ -53,7 +53,7 @@ public class CoevolutionExperiment extends Experiment {
 
 	private Robot createOneRobotFromTeam(Arguments argumentsRobot, Arguments argumentsControler, int team) {
 
-		Robot robot = robotFactory.getRobotFromTeam(argumentsRobot, this, team);
+		Robot robot = robotFactory.getRobotFromTeam(argumentsRobot, team);
 		addControllerToRobot(robot,argumentsControler);
 		return robot;
 	}
@@ -68,7 +68,7 @@ public class CoevolutionExperiment extends Experiment {
 			if (r.getController() instanceof NeuralNetworkController) {
 				NeuralNetworkController nnController = (NeuralNetworkController) r
 						.getController();
-				nnController.setWeights(chromosome.getAlleles());
+				nnController.setNNWeights(chromosome.getAlleles());
 			}
 		}
 
@@ -77,7 +77,7 @@ public class CoevolutionExperiment extends Experiment {
 			if (r.getController() instanceof NeuralNetworkController) {
 				NeuralNetworkController nnController = (NeuralNetworkController) r
 						.getController();
-				nnController.setWeights(adversary.getAlleles());
+				nnController.setNNWeights(adversary.getAlleles());
 			}
 		}
 

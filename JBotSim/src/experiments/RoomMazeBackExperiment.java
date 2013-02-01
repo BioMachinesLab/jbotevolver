@@ -19,13 +19,19 @@ public class RoomMazeBackExperiment extends Experiment{
 
 	private void createAdditionalRobots(int additionalRobots) {
 		
-		Arguments controller = Arguments.createOrPrependArguments(null, "name=robotfollower");
-		Arguments robot = Arguments.createOrPrependArguments(this.robotArguments, "+sensors=(epuckirsensor=(id=1,angle=60,numberofsensors=4),nearrobot=(id=2,range=0.1))");
+		try {
 		
-		for(int i = 0 ; i < additionalRobots ; i ++) {
-			Robot r = createOneRobot(robot, controller);
-			environment.addRobot(r);
-			r.setPosition(new Vector2d(3, 3));
+			Arguments controller = Arguments.createOrPrependArguments(null, "name=robotfollower");
+			Arguments robot = Arguments.createOrPrependArguments(this.robotArguments, "+sensors=(epuckirsensor=(id=1,angle=60,numberofsensors=4),nearrobot=(id=2,range=0.1))");
+			
+			for(int i = 0 ; i < additionalRobots ; i ++) {
+				Robot r = createOneRobot(robot, controller);
+				environment.addRobot(r);
+				r.setPosition(new Vector2d(3, 3));
+			}
+		}catch(ClassNotFoundException e) {
+			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 }

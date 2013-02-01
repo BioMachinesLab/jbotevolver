@@ -45,7 +45,7 @@ public class RobotFollower extends Controller{
 	}
 	
 	@Override
-	public void controlStep(int time) {
+	public void controlStep(double time) {
 		
 //		double reading = nrs.getSensorReading(0);
 //		double threshold = 0.5;
