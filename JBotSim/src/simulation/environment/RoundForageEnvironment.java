@@ -25,7 +25,7 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 	private double nestLimit;
 	private double forageLimit;
 	private	double forbiddenArea;
-	private int    amountOfFood;
+	private int    numberOfPreys;
 	private Nest   nest;
 	private int    numberOfFoodSuccessfullyForaged = 0;
 
@@ -37,14 +37,14 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 		forageLimit     = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit")       : 2.0;
 		forbiddenArea   = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")       : 5.0;
 		
-		if(arguments.getArgumentIsDefined("densityoffood")){
-			double densityoffood       = arguments.getArgumentAsDouble("densityoffood");
-			amountOfFood = (int)(densityoffood*Math.PI*forageLimit*forageLimit+.5);
+		if(arguments.getArgumentIsDefined("densityofpreys")){
+			double densityoffood       = arguments.getArgumentAsDouble("densityofpreys");
+			numberOfPreys = (int)(densityoffood*Math.PI*forageLimit*forageLimit+.5);
 		} else {
-			amountOfFood = arguments.getArgumentIsDefined("amountfood") ? arguments.getArgumentAsInt("amountfood") : 20;
+			numberOfPreys = arguments.getArgumentIsDefined("numberofpreys") ? arguments.getArgumentAsInt("numberofpreys") : 20;
 		}
 				
-		for(int i = 0; i < amountOfFood; i++ ){
+		for(int i = 0; i < numberOfPreys; i++ ){
 			addPrey(new Prey(simulator, "Prey "+i, newRandomPosition(), 0, PREY_MASS, PREY_RADIUS));
 		}
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);

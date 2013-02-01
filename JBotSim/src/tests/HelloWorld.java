@@ -19,7 +19,7 @@ public class HelloWorld {
 		arguments.add("--controllers");
 		arguments.add("name=KeyboardController");
 		arguments.add("--environment");
-		arguments.add("name=RoundForageEnvironment,densityoffood=1,nestlimit=0.25,foragelimit=2,forbiddenarea=5");
+		arguments.add("name=RoundForageEnvironment,densityofpreys=0,nestlimit=0.25,foragelimit=2,forbiddenarea=5");
 		
 		JBotSim jbot             = new JBotSim(arguments.toArray(new String[0]));
 		Simulator sim            = jbot.createSimulator();
