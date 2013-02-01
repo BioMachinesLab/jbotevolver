@@ -36,11 +36,8 @@ public abstract class Shape implements Serializable {
 	protected ClosePhysicalObjects closeLightPoles;
 	protected ClosePhysicalObjects closeWalls;//, closeHoles;
 	
-	protected Simulator simulator;
-	
 	public Shape(Simulator simulator, String name, PhysicalObject parent, 
 			double relativePosX, double relativePosY, double range) {  
-		this.simulator   = simulator;
 		this.enabled 	 = true; 
 		this.parent  	 = parent;
 		this.aabb    	 = new AxisAlignedBoundingBox(parent == null ? relativePosX : parent.getPosition().getX(),  
@@ -48,10 +45,14 @@ public abstract class Shape implements Serializable {
 		collidedWith 	 = new ArrayList<Shape>(10);
 		relativePosition = new Vector2d(relativePosX, relativePosY);
 		
-		closeRobots 	 = new ClosePhysicalObjects(simulator, range,new AllowOrderedRobotsChecker(parent.getId()));
-		closePrey   	 = new ClosePhysicalObjects(simulator, range,new AllowOrderedPreyChecker(parent.getId()));
-		closeLightPoles  = new ClosePhysicalObjects(simulator, range,new AllowOrderedLightChecker(parent.getId()));
-		closeWalls = new ClosePhysicalObjects(simulator, range, new AllowWallChecker());
+		closeRobots 	 = new ClosePhysicalObjects(simulator.getEnvironment(), 
+				simulator.getTime(), range,new AllowOrderedRobotsChecker(parent.getId()));
+		closePrey   	 = new ClosePhysicalObjects(simulator.getEnvironment(), 
+				simulator.getTime(), range,new AllowOrderedPreyChecker(parent.getId()));
+		closeLightPoles  = new ClosePhysicalObjects(simulator.getEnvironment(), 
+				simulator.getTime(), range,new AllowOrderedLightChecker(parent.getId()));
+		closeWalls = new ClosePhysicalObjects(simulator.getEnvironment(), 
+				simulator.getTime(), range, new AllowWallChecker());
 		//closeHoles = new ClosePhysicalObjects(simulator, range, new AllowHoleChecker());
 		
 		if (parent != null) {
