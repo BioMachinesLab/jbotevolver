@@ -19,7 +19,7 @@ public class BehaviorSensor extends Sensor{
 	
 	@Override
 	public double getSensorReading(int sensorNumber) {
-		BehaviorActuator b = (BehaviorActuator)robot.getActuatorWithId(behaviorActuatorNumber);
+		BehaviorActuator b = (BehaviorActuator) robot.getActuatorWithId(behaviorActuatorNumber);
 		
 		if(binary)
 			return b.getActiveBehaviorIndex() == sensorNumber ? 1 : 0;
