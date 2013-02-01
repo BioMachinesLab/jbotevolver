@@ -137,8 +137,7 @@ public class BeeEnvironment extends Environment {
 	}
 
 	@Override
-	public void update(int time) {
-		super.update(time);
+	public void update(double time) {
 
 		if(firstUpdate){
 			//Set robot energy level

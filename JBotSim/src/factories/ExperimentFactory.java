@@ -1,18 +1,13 @@
 package factories;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import simulation.Simulator;
 import simulation.util.Arguments;
-import experiments.AggregationExperiment;
 import experiments.CoevolutionExperiment;
-import experiments.ColorMatchExperiment;
 import experiments.Experiment;
-import experiments.FoodWaterExperiment;
-import experiments.ForageWithCommunicationExperiment;
-import experiments.ForageWithProgrammedExperiment;
-import experiments.ForageWithProgrammedRGBExperiment;
-import experiments.RoomMazeBackExperiment;
 
 public class ExperimentFactory extends Factory implements Serializable {
 
@@ -22,7 +17,7 @@ public class ExperimentFactory extends Factory implements Serializable {
 
 	public Experiment getExperiment(Arguments arguments,
 			Arguments environmentArguments, Arguments robotArguments,
-			Arguments controllerArguments)  {
+			Arguments controllerArguments) {
 		if (arguments == null) {
 			return new Experiment(simulator, arguments, environmentArguments,
 					robotArguments, controllerArguments);
@@ -33,48 +28,40 @@ public class ExperimentFactory extends Factory implements Serializable {
 					robotArguments, controllerArguments);
 		} else {
 			String name = arguments.getArgumentAsString("name");
-			if (name.equals("foragewithrgbprogrammed")) {
-				return new ForageWithProgrammedRGBExperiment(simulator,
-						arguments, environmentArguments, robotArguments,
-						controllerArguments);
-			} else if (name.equals("foragewithprogrammed")) {
-				return new ForageWithProgrammedExperiment(simulator, arguments,
-						environmentArguments, robotArguments,
-						controllerArguments);
-			} else if (name.equals("foragewithtwoteamsandtwonests")) {
-				return new CoevolutionExperiment(simulator, arguments,
-						environmentArguments, robotArguments,
-						controllerArguments);	
-			} else if (name.equals("foragewithcommunication")) {
-				return new ForageWithCommunicationExperiment(simulator,
-						arguments, environmentArguments, robotArguments,
-						controllerArguments);
-			} else if (name.equals("foodwaterexperiment")) {
-				return new FoodWaterExperiment(simulator,
-						arguments, environmentArguments, robotArguments,
-						controllerArguments);
-			} else if (name.equals("colormatch")) {
-				return new ColorMatchExperiment(simulator, arguments,
-						environmentArguments, robotArguments,
-						controllerArguments);
-			} else if (name.equals("aggregation")) {
-				return new AggregationExperiment(simulator, arguments,
-						environmentArguments, robotArguments,
-						controllerArguments);
-			} else if (name.equals("roommazeback")) {
-				return new RoomMazeBackExperiment(simulator, arguments,
-						environmentArguments, robotArguments,
-						controllerArguments);
-			} else {
-				throw new RuntimeException("Unknown experiment specified: "
-						+ name);
+
+			try {
+				Constructor<?>[] constructors = Class.forName(name)
+						.getDeclaredConstructors();
+				for (Constructor<?> constructor : constructors) {
+					Class<?>[] params = constructor.getParameterTypes();
+					return (Experiment) constructor.newInstance(simulator,
+							arguments, environmentArguments, robotArguments,
+							controllerArguments);
+				}
+
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
 			}
+
+				throw new RuntimeException("Unknown experiment specified: " + name);
+
 		}
 	}
 
 	public CoevolutionExperiment getCoevolutionExperiment(
 			Arguments experimentArguments, Arguments environmentArguments,
 			Arguments robotArguments, Arguments controllerArguments) {
-		return new CoevolutionExperiment(simulator, experimentArguments, environmentArguments, robotArguments, controllerArguments);
+		return new CoevolutionExperiment(simulator, experimentArguments,
+				environmentArguments, robotArguments, controllerArguments);
 	}
 }
