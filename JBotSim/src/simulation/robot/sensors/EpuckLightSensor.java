@@ -6,12 +6,11 @@ import java.util.Arrays;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
-import simulation.physicalobjects.checkers.AllowLightChecker;
-import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
+import simulation.physicalobjects.checkers.AllowLightChecker;
 import simulation.robot.Epuck;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -176,7 +175,7 @@ public class EpuckLightSensor extends LightTypeSensor {
 	}
 	
 	@Override
-	public void update(int time, ArrayList<PhysicalObject> teleported) {
+	public void update(double time, ArrayList<PhysicalObject> teleported) {
 		
 		if(closeObjects != null)
 			closeObjects.update(time, teleported);

@@ -84,7 +84,7 @@ public abstract class ConeTypeSensor extends Sensor {
 		return range;
 	}
 
-	public void update(int time, ArrayList<PhysicalObject> teleported) {
+	public void update(double time, ArrayList<PhysicalObject> teleported) {
 		if(closeObjects != null)
 			closeObjects.update(time, teleported);
 		try { 

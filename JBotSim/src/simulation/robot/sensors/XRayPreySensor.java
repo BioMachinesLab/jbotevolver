@@ -18,7 +18,7 @@ public class XRayPreySensor extends SimpleLightTypeSensor {
 	}
 
 	@Override
-	public void update(int time, ArrayList<PhysicalObject> teleported) {
+	public void update(double time, ArrayList<PhysicalObject> teleported) {
 		if(getCloseObjects() != null)
 			getCloseObjects().update(time, teleported);
 		try { 
