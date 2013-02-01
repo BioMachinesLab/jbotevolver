@@ -70,7 +70,6 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	@Override
 	public void setNNWeights(double[] weights) {
 		neuralNetwork.setWeights(weights);
-		//		setWeights(weights);		
 	}
 
 	public static void setNNWeights(LinkedList<Robot> robots, double[] weights) {
@@ -79,12 +78,7 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 				FixedLenghtGenomeEvolvableController nnController = (FixedLenghtGenomeEvolvableController) r.getController();
 				if (nnController != null)
 					nnController.setNNWeights(weights);
-			} //TODO: Miguel: you have to get the BehaviorController to implement the FixedLengthGenomeEvolvableController so that 
-			//              weights can be set tranparently.
-			//			else if (r.getEvolvingController() instanceof BehaviorController){
-			//				BehaviorController bController       = (BehaviorController) r.getEvolvingController();
-			//				NeuralNetworkController nnController = (NeuralNetworkController) bController.getEvolvingController();
-			//				nnController.setNNWeights(weights);
+			}
 		}
 	}	
 }
