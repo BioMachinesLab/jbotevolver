@@ -3,12 +3,8 @@ package factories;
 import java.io.Serializable;
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.robot.ARDrone;
-import simulation.robot.BeeRobot;
-import simulation.robot.MultiPreyForagerRobot;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.BehaviorActuator;
 import simulation.robot.actuators.MultiPreyPickerActuator;
 import simulation.robot.actuators.OpenDoorActuator;
 import simulation.robot.actuators.PreyPickerActuator;
@@ -30,11 +26,9 @@ import simulation.robot.sensors.EpuckIRSensor;
 import simulation.robot.sensors.GroundRGBColorSensor;
 import simulation.robot.sensors.InNestSensor;
 import simulation.robot.sensors.LightTypeSensor;
-import simulation.robot.sensors.MultyPreyCarriedSensor;
 import simulation.robot.sensors.NearRobotSensor;
 import simulation.robot.sensors.PerimeterSimpleLightTypeSensor;
 import simulation.robot.sensors.PerimeterSimpleRobotColorSensor;
-import simulation.robot.sensors.PheromoneSensor;
 import simulation.robot.sensors.PositionSensor;
 import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.robot.sensors.PreySensor;
@@ -44,7 +38,6 @@ import simulation.robot.sensors.Sensor;
 import simulation.robot.sensors.SimpleLightTypeSensor;
 import simulation.robot.sensors.SimpleRobotColorSensor;
 import simulation.util.Arguments;
-
 
 public class RobotFactory extends Factory implements Serializable {
 
@@ -111,15 +104,7 @@ public class RobotFactory extends Factory implements Serializable {
 			if (robotName.equalsIgnoreCase("differentialdrive") || robotName.equalsIgnoreCase("simulation.robot.Robot"))
 				robot = new Robot(simulator, robotName + numberOfRobots++,
 						position.x, position.y, orientation, mass, radius,color);
-			
-			if (robotName.equalsIgnoreCase("ardrone")) 
-				robot = new ARDrone(simulator, robotName + numberOfRobots++,
-						position.x, position.y, orientation, mass, radius,distanceWheels,color);
-			
-			if (robotName.equalsIgnoreCase("bee"))
-				robot = new BeeRobot(simulator, robotName + numberOfRobots++,
-						position.x, position.y, orientation, mass, radius, distanceWheels,
-						color);
+						
 			if (robotName.equalsIgnoreCase("MultiPreyForagerRobot")) {
 				int limit = arguments.getArgumentIsDefined("preyslimit") ? arguments
 						.getArgumentAsInt("preyslimit") : 10;
@@ -135,11 +120,6 @@ public class RobotFactory extends Factory implements Serializable {
 						.getArgumentIsDefined("amountOfSafeTime") ? arguments
 						.getArgumentAsInt("amountOfSafeTime") : 10;
 
-				robot = new MultiPreyForagerRobot(simulator, robotName
-						+ numberOfRobots++, position.x, position.y,
-						orientation, mass, radius, distanceWheels,color, limit,
-						preysCarriedSpeedReductionFactor,
-						penalizationDueToColision, amountOfSafeTime);
 			}
 			
 //			robot.setExtraRadius(extraRadius);
@@ -195,8 +175,6 @@ public class RobotFactory extends Factory implements Serializable {
 			return new LightTypeSensor(simulator, id, robot,arguments);
 		} else if (name.equalsIgnoreCase("epucklightsensor")) {
 			return new EpuckLightSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("PheromoneSensor")) {
-			return new PheromoneSensor(simulator, id, robot, arguments);
 		} else if (name.equalsIgnoreCase("preysensor")) {
 			return new PreySensor(simulator, id, robot, arguments);
 		} else if (name.equalsIgnoreCase("simplenestsensor")) {
@@ -213,8 +191,6 @@ public class RobotFactory extends Factory implements Serializable {
 			return new SimplePreySensorPerimeter(simulator, id, robot,arguments);
 		} else if (name.equalsIgnoreCase("doubleparametersensor")) {
 			return new DoubleParameterSensor(simulator, id, robot,arguments);
-		} else if (name.equalsIgnoreCase("multypreycarriedsensor")) {
-			return new MultyPreyCarriedSensor(simulator, id, robot,arguments);
 		} else if (name.equalsIgnoreCase("preycarriedsensor")) {
 			return new PreyCarriedSensor(simulator, id, robot,arguments);
 		} else if (name.equalsIgnoreCase("innestsensor")) {
@@ -256,14 +232,6 @@ public class RobotFactory extends Factory implements Serializable {
 				|| name.equalsIgnoreCase("twowheelactuator")) {
 			return new TwoWheelActuator(simulator, id, arguments);
 
-		} else if (name.equalsIgnoreCase("color")
-				|| name.equalsIgnoreCase("coloractuator")) {
-			return new RobotColorActuator(simulator, id, arguments);
-		} else if (name.equalsIgnoreCase("rgbcolor")
-				|| name.equalsIgnoreCase("rgbcoloractuator")
-				|| name.equalsIgnoreCase("robotrgbcolor")
-				|| name.equalsIgnoreCase("robotrgbcoloractuator")) {
-			return new RobotRGBColorActuator(simulator, id, arguments);
 		} else if (name.equalsIgnoreCase("preypicker")
 				|| name.equalsIgnoreCase("preypickeractuator")) {
 			return new PreyPickerActuator(simulator, id, arguments);
@@ -273,12 +241,6 @@ public class RobotFactory extends Factory implements Serializable {
 		} else if (name.equalsIgnoreCase("opendoor")
 				|| name.equalsIgnoreCase("opendooractuator")) {
 			return new OpenDoorActuator(simulator, id,arguments);
-		}
-		if (name.equalsIgnoreCase("behavior")
-				|| name.equalsIgnoreCase("behavioractuator")) {
-			BehaviorActuator b = new BehaviorActuator(simulator, id, robot,
-					arguments);
-			return b;
 		}
 
 		else

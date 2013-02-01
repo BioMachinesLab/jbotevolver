@@ -63,10 +63,8 @@ public class Robot extends MovableObject {
 	 * @param color 
 	 */
 	public Robot(Simulator simulator, String name, double x, double y, double orientation, double mass, double radius, String color) {
-		super(simulator, name, x, y, orientation, mass, PhysicalObjectType.ROBOT, null);
-		this.controller            = new Controller(simulator,this);	
-		this.shape       = new CircularShape(simulator, name + "CollisionObject", this, x, y, 
-															2 * radius, radius);
+		super(simulator, name, x, y, orientation, mass, PhysicalObjectType.ROBOT, null);	
+		this.shape = new CircularShape(simulator, name + "CollisionObject", this, x, y, 2.0 * radius, radius);
 	}
 	
 	/**

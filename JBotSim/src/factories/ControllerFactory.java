@@ -27,7 +27,6 @@ import simulation.robot.sensors.EpuckIRSensor;
 import simulation.robot.sensors.GroundRGBColorSensor;
 import simulation.robot.sensors.InNestSensor;
 import simulation.robot.sensors.LightTypeSensor;
-import simulation.robot.sensors.MultyPreyCarriedSensor;
 import simulation.robot.sensors.NearRobotSensor;
 import simulation.robot.sensors.PerimeterSimpleLightTypeSensor;
 import simulation.robot.sensors.PerimeterSimpleRobotColorSensor;
@@ -228,9 +227,6 @@ public class ControllerFactory extends Factory implements Serializable {
 			} else if (sensor.getClass().equals(PreyCarriedSensor.class)) {
 				nnInputs.add(createInput(robot, "PreyCarried", new Arguments(
 						"id=" + sensor.getId() + ",name=preycarried")));
-			} else if (sensor.getClass().equals(MultyPreyCarriedSensor.class)) {
-				nnInputs.add(createInput(robot, "MultyPreyCarriedSensor", new Arguments(
-						"id=" + sensor.getId() + ",name=MultyPreyCarriedSensor")));
 			} else if (sensor.getClass().equals(InNestSensor.class)) {
 				nnInputs.add(createInput(robot, "InNest", new Arguments("id="
 						+ sensor.getId() + ",name=innest")));

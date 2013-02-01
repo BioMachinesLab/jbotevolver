@@ -28,7 +28,9 @@ public class DifferentialDriveRobot extends Robot {
 	public DifferentialDriveRobot(Simulator simulator, String name, double x,
 			double y, double orientation, double mass, double radius,
 			double distanceWheels, String color) {
-		super(simulator, name, x, y, orientation, mass, radius, distanceWheels, color);
+		super(simulator, name, x, y, orientation, mass, radius, color);
+
+		this.distanceBetweenWheels = radius * 2.0;
 	}
 
 	
