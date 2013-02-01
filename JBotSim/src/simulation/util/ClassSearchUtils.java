@@ -13,6 +13,20 @@ import java.util.jar.JarFile;
 public class ClassSearchUtils {
 
 
+	public static String getClassFullName(String className){
+		List<String> names = ClassSearchUtils
+				.searchFullNameInPath(className);
+		if (names.size() == 0) {
+			throw new RuntimeException("Class not found " + className);
+		} else if (names.size() > 1) {
+			throw new RuntimeException(
+					"Multiple implementations of class: "
+							+ className + " - " + names);
+		}
+		return names.get(0);
+	}
+	
+	
 	public static List<String> searchFullNameInPath(String className) {
 		ArrayList<String> classNames = new ArrayList<String>();
 		ClassLoader classloader = className.getClass().getClassLoader();
