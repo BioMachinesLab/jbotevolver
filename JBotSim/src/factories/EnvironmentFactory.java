@@ -5,6 +5,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import javax.annotation.processing.RoundEnvironment;
+import javax.management.RuntimeErrorException;
 
 import simulation.Simulator;
 import simulation.environment.Environment;
@@ -18,7 +19,7 @@ public class EnvironmentFactory extends Factory implements Serializable {
 	}
 
 	public Environment getEnvironment(Arguments arguments) {
-		
+
 		System.out.println(RoundForageEnvironment.class.getName());
 
 		if (!arguments.getArgumentIsDefined("name")) {
@@ -33,9 +34,15 @@ public class EnvironmentFactory extends Factory implements Serializable {
 					.getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
-				return (Environment) constructor.newInstance(simulator,arguments);
+				if (params.length == 2 && params[0] == Simulator.class
+						&& params[1] == Arguments.class) {
+					return (Environment) constructor.newInstance(simulator,
+							arguments);
+				}
 			}
-
+			throw new RuntimeException("Missing constructor on class "
+					+ environmentName + " - " + environmentName + "("
+					+ Simulator.class + ", " + Arguments.class + ")");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
