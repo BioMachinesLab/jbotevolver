@@ -27,17 +27,12 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected Vector2d 			   sensorPosition 	= new Vector2d();
 	protected double openingAngle = 90;
 
-	protected SimRandom random;
-	protected GeometricCalculator calc;
-	protected Double time;
+	protected Simulator sim;
 	
 	public ConeTypeSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id, robot, args);
-		calc = simulator.getGeoCalculator();
-		time = simulator.getTime();
 		
-		
-		this.random = simulator.getRandom();
+		this.sim = simulator;
 		
 		numberOfSensors = (args.getArgumentIsDefined("numbersensors")) ? args.getArgumentAsInt("numbersensors") : 1;
 		range = (args.getArgumentIsDefined("range")) ? args.getArgumentAsDouble("range") : 1;
@@ -52,7 +47,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	
 	public void setAllowedObjectsChecker(AllowedObjectsChecker aoc) {
 		if(aoc != null)
-			this.closeObjects 	= new ClosePhysicalObjects(simulator,range,aoc);
+			this.closeObjects 	= new ClosePhysicalObjects(sim,range,aoc);
 	}
 	
 	public void setupPositions(Vector2d[] positions) {
@@ -96,7 +91,7 @@ public abstract class ConeTypeSensor extends Sensor {
 				PhysicalObjectDistance source=iterator.next();
 				if (source.getObject().isEnabled()){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(this.calc.getDistanceBetween(
+					iterator.updateCurrentDistance(sim.getGeoCalculator().getDistanceBetween(
 							sensorPosition, source.getObject(), time));
 				}
 			}
@@ -113,7 +108,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
 		for(int j=0; j<numberOfSensors; j++){
 			readings[j] = Math.max(calculateContributionToSensor(j, source)*(1 + 
-					random.nextGaussian()* NOISESTDEV), readings[j]);
+					sim.getRandom().nextGaussian()* NOISESTDEV), readings[j]);
 		}
 	}
 
@@ -123,16 +118,16 @@ public abstract class ConeTypeSensor extends Sensor {
 //		sensorPosition.set(Math.cos(orientation)*robot.getRadius()+robot.getPosition().getX(),
 //				Math.sin(orientation)*robot.getRadius()+robot.getPosition().getY());
 		sensorPosition.set(robot.getPosition().getX(), robot.getPosition().getY());
-		GeometricInfo sensorInfo = calc.getGeometricInfoBetween(sensorPosition, 
-				orientation, source.getObject(), time);
+		GeometricInfo sensorInfo = sim.getGeoCalculator().getGeometricInfoBetween(sensorPosition, 
+				orientation, source.getObject(), sim.getTime());
 		return sensorInfo;
 	}
 
 	protected GeometricInfo getSensorGeometricInfo(int sensorNumber, Vector2d toPoint){
 		double orientation=angles[sensorNumber]+robot.getOrientation();
 		sensorPosition.set(robot.getPosition().getX(), robot.getPosition().getY());
-		GeometricInfo sensorInfo = calc.getGeometricInfoBetweenPoints(
-				sensorPosition, orientation, toPoint, time);
+		GeometricInfo sensorInfo = sim.getGeoCalculator().getGeometricInfoBetweenPoints(
+				sensorPosition, orientation, toPoint, sim.getTime());
 		return sensorInfo;
 	}
 	
