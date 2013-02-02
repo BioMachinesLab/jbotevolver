@@ -1,32 +1,20 @@
 package evolutionaryrobotics.evaluationfunctions;
 
-import experiments.FoodWaterExperiment;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
-import simulation.environment.RoundForageEnvironment;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
+import experiments.FoodWaterExperiment;
 
 public class FoodWaterEvaluationFunction extends EvaluationFunction{
 	private int numberOfRobotStepsOutsideArena = 0;
 	
-	
-	public FoodWaterEvaluationFunction(Simulator simulator) {
-		super(simulator);
+	public FoodWaterEvaluationFunction(Simulator simulator, Arguments args) {
+		super(simulator, args);
 	}
 
-	//@Override
-	public double getFitness() {
-		int numberOfRecharges = 0;
-		
-		for(Robot r : simulator.getEnvironment().getRobots()) {
-			numberOfRecharges += r.getParameterAsInteger(FoodWaterExperiment.RECHARGED).intValue();
-		}
-			
-		return (double) numberOfRecharges - ((double) numberOfRobotStepsOutsideArena) / 100.0;
-	}
-
-	//@Override
+	@Override
 	public void update(double time) {			
 		Environment e = simulator.getEnvironment();
 		for(Robot r : simulator.getEnvironment().getRobots()){
@@ -38,6 +26,11 @@ public class FoodWaterEvaluationFunction extends EvaluationFunction{
 				p.y > e.getHeight() / 2)
 				numberOfRobotStepsOutsideArena++;
 		}
+		int numberOfRecharges = 0;
+		
+		for(Robot r : simulator.getEnvironment().getRobots())
+			numberOfRecharges += r.getParameterAsInteger(FoodWaterExperiment.RECHARGED).intValue();
 			
+		fitness = (double) numberOfRecharges - ((double) numberOfRobotStepsOutsideArena) / 100.0;
 	}
 }

@@ -4,15 +4,16 @@ import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.RoundForageEnvironment;
 import simulation.robot.Robot;
+import simulation.robot.sensors.PreyCarriedSensor;
+import simulation.util.Arguments;
 
 public class ForagingEvaluationFunction extends EvaluationFunction{
-	private double 	    fitness;
 	private Vector2d    nestPosition = new Vector2d(0, 0);
 	private double forbidenArea;
 	private double foragingArea;
 
-	public ForagingEvaluationFunction(Simulator simulator) {
-		super(simulator);
+	public ForagingEvaluationFunction(Simulator simulator, Arguments args) {
+		super(simulator, args);
 		forbidenArea =  ((RoundForageEnvironment)(simulator.getEnvironment())).getForbiddenArea();
 		foragingArea =  ((RoundForageEnvironment)(simulator.getEnvironment())).getForageRadius();		
 	}
@@ -39,11 +40,10 @@ public class ForagingEvaluationFunction extends EvaluationFunction{
 			}
 
 			
-			if (r.isCarryingPrey()) {
+			if (((PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class)).preyCarried()) {
 				numberOfRobotsWithPrey++;
 			}
 		}
-
 		fitness += (double) numberOfRobotsWithPrey * 0.001 + numberOfRobotsBeyondForbidenLimit * -0.1 + numberOfRobotsBeyondForagingLimit * -0.0001;
 	}
 }

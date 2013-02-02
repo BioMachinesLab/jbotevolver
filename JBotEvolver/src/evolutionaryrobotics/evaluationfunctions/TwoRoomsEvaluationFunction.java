@@ -7,7 +7,6 @@ import simulation.util.Arguments;
 public class TwoRoomsEvaluationFunction extends EvaluationFunction {
 	
 	private int picks = 0;
-	private double fitness = 0;
 	private double timeAlive = 0;
 	private double maxNumberOfSteps = 500;
 	boolean punishCollision = true;
@@ -15,17 +14,12 @@ public class TwoRoomsEvaluationFunction extends EvaluationFunction {
 	boolean rewardStepsAlive = true;
 
 	public TwoRoomsEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator);
+		super(simulator, arguments);
 		punishCollision = arguments.getArgumentAsIntOrSetDefault("punishcollision", 1) == 1;
 		allowCollision = arguments.getArgumentAsIntOrSetDefault("allowcollision", 0) == 1;
 		
 		rewardStepsAlive = arguments.getArgumentAsIntOrSetDefault("rewardstepsalive", 1) == 1;
 		maxNumberOfSteps = arguments.getArgumentAsDoubleOrSetDefault("maxnumberofsteps", maxNumberOfSteps);
-	}
-
-	@Override
-	public double getFitness() {
-		return fitness;
 	}
 
 	@Override
@@ -41,8 +35,7 @@ public class TwoRoomsEvaluationFunction extends EvaluationFunction {
 		if(!allowCollision && simulator.getEnvironment().getRobots().get(0).isInvolvedInCollison()) {
 			if(punishCollision)
 				fitness /=  2;
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 		}
 	}
-
 }

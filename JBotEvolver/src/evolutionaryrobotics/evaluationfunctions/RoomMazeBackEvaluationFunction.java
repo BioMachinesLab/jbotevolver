@@ -10,7 +10,6 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 	private boolean finishedMaze = false;
 	private boolean wentBack = false;
 	private boolean firstStep = true;
-	
 	private double mazePenalty = 0;
 
 	public RoomMazeBackEvaluationFunction(Simulator simulator, Arguments args) {
@@ -37,7 +36,7 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 			stepMixed();
 		else {
 			if(r.isInvolvedInCollison())
-				simulator.getExperiment().endExperiment();
+				simulator.stopSimulation();
 			
 			if(!finishedRoom) { //Didn't clear the Cluttered Room
 				stepUnfinishedRoom();
@@ -46,7 +45,7 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 			} else if(!wentBack) { //Cleared the Maze
 				stepFinishedMaze();
 			} else { //Cleared everything
-				simulator.getExperiment().endExperiment();
+				simulator.stopSimulation();
 			}
 		}
 		
@@ -61,15 +60,15 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		if(sample < 4) {//inverse
 			stepFinishedMaze();
 			if(wentBack)
-				simulator.getExperiment().endExperiment();
+				simulator.stopSimulation();
 		} else if (sample < 4*2) {//normal tmaze
 			stepFinishedRoom();
 			if(finishedMaze)
-				simulator.getExperiment().endExperiment();
+				simulator.stopSimulation();
 		} else if(sample < 4*3) {//room
 			stepUnfinishedRoom();
 			if(finishedRoom)
-				simulator.getExperiment().endExperiment();
+				simulator.stopSimulation();
 		}
 	}
 	
@@ -88,7 +87,7 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		}
 		
 		if(inForbiddenSquare)
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 	}
 
 	private void stepFinishedMaze() {
@@ -98,7 +97,7 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		wentBack = inRoom();
 		
 		if(wentBack || inForbiddenSquare)
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 	}
 	
 	private double computeFitness() {
@@ -171,11 +170,6 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 	
 	private double computeFitnessWentBack() {
 		return (maxSteps-steps)/maxSteps;
-	}
-
-	@Override
-	public double getFitness() {
-		return fitness;
 	}
 	
 	public double getDistanceToRoomFinish() {

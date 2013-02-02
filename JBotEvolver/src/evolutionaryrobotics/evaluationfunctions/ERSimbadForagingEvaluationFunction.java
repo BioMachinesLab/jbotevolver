@@ -7,29 +7,28 @@ import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
+import simulation.robot.sensors.PreyCarriedSensor;
+import simulation.util.Arguments;
 
 public class ERSimbadForagingEvaluationFunction extends EvaluationFunction {
-	private double fitness;
 	private Vector2d nestPosition = new Vector2d(0, 0);
 	private double FORAGINGAREARADIUS;
 	private double NESTRADIUS;
 
-	public ERSimbadForagingEvaluationFunction(Simulator simulator) {
-		super(simulator);
+	public ERSimbadForagingEvaluationFunction(Simulator simulator, Arguments args) {
+		super(simulator, args);
 	}
 
-	// @Override
+	@Override
 	public double getFitness() {
 		// double aux=fitness +
 		// ((RoundForageEnvironment)(Environment.getInstance())).getNumberOfFoodSuccessfullyForaged()
 		// * 1.0;
 
-		return fitness
-				+ ((RoundForageEnvironment) (simulator.getEnvironment()))
-						.getNumberOfFoodSuccessfullyForaged() * 1000.0;
+		return fitness + ((RoundForageEnvironment)simulator.getEnvironment()).getNumberOfFoodSuccessfullyForaged()*1000.0;
 	}
 
-	// @Override
+	@Override
 	public void update(double time) {
 		int numberOfRobotsTooCloseToNest = 0;
 		int numberOfRobotsTooFarFromNest = 0;
@@ -57,7 +56,7 @@ public class ERSimbadForagingEvaluationFunction extends EvaluationFunction {
 				numberOfRobotsCloseToAPrey++;
 			}
 
-			if (r.isCarryingPrey()) {
+			if (((PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class)).preyCarried()) {
 				numberOfRobotsWithPrey++;
 			}
 		}
@@ -77,7 +76,6 @@ public class ERSimbadForagingEvaluationFunction extends EvaluationFunction {
 				- numberOfRobotsTooFarFromNest * 0.1
 				+ numberOfRobotsCloseToAPrey * 0.1 + numberOfRobotsWithPrey * 0.01)
 				+ preyDistanceReward * 0.001;
-
 	}
 
 	public boolean getRobotIsCloseToPrey(Robot robot) {
@@ -93,7 +91,6 @@ public class ERSimbadForagingEvaluationFunction extends EvaluationFunction {
 				found = true;
 			}
 		}
-
 		return found;
 	}
 }

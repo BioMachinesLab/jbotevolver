@@ -6,9 +6,7 @@ import simulation.util.Arguments;
 
 public class CrossRoomsEvaluationFunction extends EvaluationFunction {
 	
-	private double fitness = 0;
 	private double targetX = 0;
-	private double time = 0;
 	private double steps = 0;
 	private boolean punishCollision = true;
 	private boolean awardBest = false;
@@ -17,18 +15,13 @@ public class CrossRoomsEvaluationFunction extends EvaluationFunction {
 	private double startingX = 0;
 
 	public CrossRoomsEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator);
+		super(simulator, arguments);
 		targetX = arguments.getArgumentAsDoubleOrSetDefault("targetx", targetX);
 		steps = arguments.getArgumentAsDoubleOrSetDefault("steps", steps);
 		punishCollision = arguments.getArgumentAsIntOrSetDefault("punishcollision", 1) == 1;
 		awardBest = arguments.getArgumentAsIntOrSetDefault("awardbest", 0) == 1;
 		debug = arguments.getArgumentAsIntOrSetDefault("debug", 0) == 1;
 		
-	}
-
-	@Override
-	public double getFitness() {
-		return fitness;
 	}
 
 	@Override
@@ -58,17 +51,16 @@ public class CrossRoomsEvaluationFunction extends EvaluationFunction {
 			if(punishCollision && percentage < 0.5){
 				fitness=-1;
 			}
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 		}
 		
 		if(percentage > 0.85) {
 			fitness = 1;
 			fitness+= 10*((steps-time)/steps);
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 		}
 		
 		if(awardBest && prevFitness > fitness)
 			fitness = prevFitness;
 	}
-
 }

@@ -9,18 +9,12 @@ import simulation.util.Arguments;
 
 public class FindWallButtonEvaluationFunction extends EvaluationFunction {
 	
-	private double fitness = 0;
 	private double maxSteps = 300;
 	private double timeAlive = 0;
 
 	public FindWallButtonEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator);
+		super(simulator, arguments);
 		maxSteps = arguments.getArgumentAsDoubleOrSetDefault("steps", maxSteps);
-	}
-
-	@Override
-	public double getFitness() {
-		return fitness;
 	}
 
 	@Override
@@ -44,7 +38,7 @@ public class FindWallButtonEvaluationFunction extends EvaluationFunction {
 			if(fitness > 0.8){
 				fitness+= (maxSteps-timeAlive)/maxSteps;
 			}
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 		}
 	}
 }

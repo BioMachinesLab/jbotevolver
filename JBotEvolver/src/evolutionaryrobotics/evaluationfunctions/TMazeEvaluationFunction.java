@@ -4,7 +4,6 @@ import simulation.Simulator;
 import simulation.environment.TMazeEnvironment;
 import simulation.environment.TMazeEnvironment.Square;
 import simulation.robot.Robot;
-import simulation.robot.actuators.BehaviorActuator;
 import simulation.util.Arguments;
 
 public class TMazeEvaluationFunction  extends EvaluationFunction {
@@ -12,22 +11,15 @@ public class TMazeEvaluationFunction  extends EvaluationFunction {
 	protected boolean touchedWall = false;
 	protected boolean inForbiddenSquare = false;
 	protected boolean inFinalSquare = false;
-	
-	protected BehaviorActuator behaviorActuator;
-	
 	protected TMazeEnvironment env;
-	
 	protected double startDistance = 0;
 	protected double steps = 0;
-	
 	protected double maxSteps = 500;
-	
 	protected double progress = 0;
-	
 	private boolean dieOnForbidden = true;
 	
 	public TMazeEvaluationFunction(Simulator simulator, Arguments args){
-		super(simulator);
+		super(simulator,args);
 		this.env = (TMazeEnvironment)simulator.getEnvironment();
 		this.startDistance = env.getSquares().peek().getDistance();
 		maxSteps = (double)(args.getArgumentAsIntOrSetDefault("maxsteps", (int)maxSteps));
@@ -35,33 +27,28 @@ public class TMazeEvaluationFunction  extends EvaluationFunction {
 	}
 	
 	@Override
-	public double getFitness() {
-		
-		if(inFinalSquare)
-			return 1 + (maxSteps-steps)/maxSteps;
-		
-		if(touchedWall || inForbiddenSquare)
-			return wallCollisionFitness();
-
-		return progress;
-	}
-	
-	@Override
 	public void update(double time) {
 		steps++;
 		
 		if(env.killSample())
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 		else if(env.getRobots().get(0).isInvolvedInCollison()) {
 			touchedWall = true;
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 		}else {
 			checkSquares();
 			if(inFinalSquare || inForbiddenSquare)
-				simulator.getExperiment().endExperiment();
+				simulator.stopSimulation();
 		}
 		
 		progress = getProgress();
+		
+		if(inFinalSquare)
+			fitness = 1 + (maxSteps-steps)/maxSteps;
+		else if(touchedWall || inForbiddenSquare)
+			fitness = wallCollisionFitness();
+		else
+			fitness = progress;
 	}
 
 	protected void checkSquares() {

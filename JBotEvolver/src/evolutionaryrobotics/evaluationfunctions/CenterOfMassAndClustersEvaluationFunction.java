@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
-import simulation.robot.sensors.*;
+import simulation.util.Arguments;
 import simulation.util.ClusterUtil;
 
 public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunction{
@@ -14,9 +14,8 @@ public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunctio
 	private int numClusters=0;
 	private static final long serialVersionUID = 1L;
 
-	public CenterOfMassAndClustersEvaluationFunction(Simulator simulator) {
-		super(simulator);
-
+	public CenterOfMassAndClustersEvaluationFunction(Simulator simulator, Arguments args) {
+		super(simulator,args);
 	}
 
 	public void update(double time){
@@ -56,7 +55,7 @@ public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunctio
 	}
 	@Override
 	public double getFitness() {
-		return fitness/1200;
+		return fitness/1200.0;
 	}
 
 	private int nearRobots(Robot robot){

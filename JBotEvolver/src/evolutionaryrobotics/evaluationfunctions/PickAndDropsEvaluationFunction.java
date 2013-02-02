@@ -3,35 +3,29 @@ package evolutionaryrobotics.evaluationfunctions;
 import simulation.Simulator;
 import simulation.environment.RoundForageEnvironment;
 import simulation.robot.Robot;
+import simulation.robot.actuators.PreyPickerActuator;
+import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 
 public class PickAndDropsEvaluationFunction extends EvaluationFunction {
-	private double fitness;
 	private boolean countEvolvingRobotsOnly = false;
-	private boolean hadPrey = false;
 
-	public PickAndDropsEvaluationFunction(Simulator simulator) {
-		super(simulator);
+	public PickAndDropsEvaluationFunction(Simulator simulator, Arguments args) {
+		super(simulator, args);
 	}
 
-	public double getFitness() {
-
+	@Override
+	public void update(double time) {
+		
+		double tempFitness = 0;
+		
 		for (Robot r : simulator.getEnvironment().getRobots()) {
-			if (!countEvolvingRobotsOnly
-					|| r.getController().getClass()
-							.equals(NeuralNetworkController.class)) {
-				fitness += r.getNumDrops();
+			if (!countEvolvingRobotsOnly || r.getController() instanceof NeuralNetworkController) {
+				PreyPickerActuator actuator = (PreyPickerActuator)r.getActuatorByType(PreyPickerActuator.class);
+				tempFitness += actuator.getNumDrops();
 			}
 		}
-
-		return fitness
-				/ ((RoundForageEnvironment) (simulator.getEnvironment()))
-						.getNumberOfFoodSuccessfullyForaged() * 1.0;
-	}
-
-	// @Override
-	public void update(double time) {
-
+		fitness = tempFitness / ((RoundForageEnvironment) (simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged() * 1.0;
 	}
 
 	public void enableCountEvolvingRobotsOnly() {

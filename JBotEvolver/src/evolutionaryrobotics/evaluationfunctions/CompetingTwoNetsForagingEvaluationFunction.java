@@ -9,11 +9,11 @@ import simulation.Simulator;
 import simulation.environment.RoundForageEnvironment;
 import simulation.environment.TwoNestForageEnvironment;
 import simulation.robot.Robot;
+import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 
 public class CompetingTwoNetsForagingEvaluationFunction extends
 		EvaluationFunction {
-	private double fitness;
 	private Vector2d nestAPosition;
 	// private Vector2d nestBPosition = new Vector2d(0, 0);
 	private double forbidenArea;
@@ -21,30 +21,25 @@ public class CompetingTwoNetsForagingEvaluationFunction extends
 	private TwoNestForageEnvironment env;
 	private int numberOfRobotInTeam;
 
-	public CompetingTwoNetsForagingEvaluationFunction(Simulator simulator,
-			Arguments arguments) {
-		super(simulator);
+	public CompetingTwoNetsForagingEvaluationFunction(Simulator simulator, Arguments arguments) {
+		super(simulator, arguments);
 		env = ((TwoNestForageEnvironment) (simulator.getEnvironment()));
 		forbidenArea = env.getForbiddenArea();
 		foragingArea = env.getForageRadius();
 		nestAPosition = env.getNestAPosition();
-		numberOfRobotInTeam = ((CoevolutionExperiment) simulator
-				.getExperiment()).numberOfrobotsTeamA;
+		numberOfRobotInTeam = ((CoevolutionExperiment) simulator.getExperiment()).numberOfrobotsTeamA;
 	}
 
-	// @Override
+	@Override
 	public double getFitness() {
-		TwoNestForageEnvironment environment = ((TwoNestForageEnvironment) (simulator
-				.getEnvironment()));
-		return fitness
-				+ ((double) environment
-						.getNumberOfFoodSuccessfullyForagedNestA());
+		TwoNestForageEnvironment environment = ((TwoNestForageEnvironment) (simulator.getEnvironment()));
+		return fitness + ((double) environment.getNumberOfFoodSuccessfullyForagedNestA());
 		// return fitness +
 		// ((RoundForageEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged()
 		// * 1.0;
 	}
 
-	// @Override
+	@Override
 	public void update(double time) {
 		int numberOfRobotsWithPrey = 0;
 		int numberOfRobotsBeyondForbidenLimit = 0;
@@ -62,7 +57,7 @@ public class CompetingTwoNetsForagingEvaluationFunction extends
 				numberOfRobotsBeyondForagingLimit++;
 			}
 
-			if (r.isCarryingPrey()) {
+			if (((PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class)).preyCarried()) {
 				numberOfRobotsWithPrey++;
 			}
 		}

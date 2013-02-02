@@ -5,20 +5,15 @@ import java.util.Iterator;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class ColorMatchEvaluationFunction extends EvaluationFunction{
-	private double 	    fitness;
 
-	public ColorMatchEvaluationFunction(Simulator simulator) {
-		super(simulator);
+	public ColorMatchEvaluationFunction(Simulator simulator, Arguments args) {
+		super(simulator, args);
 	}
 
-	//@Override
-	public double getFitness() {
-		return fitness;
-	}
-
-	//@Override
+	@Override
 	public void update(double time) {			
 		Iterator<Robot> i = simulator.getEnvironment().getRobots().iterator();
 		Robot base = i.next();

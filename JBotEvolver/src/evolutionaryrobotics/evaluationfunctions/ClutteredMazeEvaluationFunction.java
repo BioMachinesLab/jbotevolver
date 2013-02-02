@@ -34,14 +34,14 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 		if(!finishedRoom && reachedRoomFinish()) {
 			finishedRoom = true;
 			if(onlyRoom)
-				simulator.getExperiment().endExperiment();
+				simulator.stopSimulation();
 		} else if(r.isInvolvedInCollison()) {
 			touchedWall = true;
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 		} else if(finishedRoom) {
 			checkSquares();
 			if(inFinalSquare || inForbiddenSquare)
-				simulator.getExperiment().endExperiment();
+				simulator.stopSimulation();
 		}
 		
 		steps++;
@@ -83,11 +83,6 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 		return fitness;
 	}
 
-	@Override
-	public double getFitness() {
-		return fitness;
-	}
-	
 	public boolean inRoom() {
 		
 		Vector2d robot = r.getPosition();
@@ -106,5 +101,4 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 		
 		return (start.distanceTo(exit)-robot.distanceTo(exit))/start.distanceTo(exit);
 	}
-
 }

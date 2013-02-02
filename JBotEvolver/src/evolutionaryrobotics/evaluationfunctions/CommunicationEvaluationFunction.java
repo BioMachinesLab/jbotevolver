@@ -2,32 +2,33 @@ package evolutionaryrobotics.evaluationfunctions;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.environment.Environment;
 import simulation.environment.GroupedPreyEnvironment;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
+import simulation.robot.sensors.PreyCarriedSensor;
+import simulation.util.Arguments;
 
 public class CommunicationEvaluationFunction extends EvaluationFunction{
-	private double 	    fitness;
 	private Vector2d    nestPosition = new Vector2d(0, 0);
 	private double		forbidenArea;
 	private double		foragingArea;
 
-	public CommunicationEvaluationFunction(Simulator simulator) {
-		super(simulator);
+	public CommunicationEvaluationFunction(Simulator simulator, Arguments args) {
+		super(simulator,args);
 		forbidenArea =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForbiddenArea();
 		foragingArea =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForageRadius();		
 	}
-
-	//@Override
+	
+	@Override
 	public double getFitness() {
 		return fitness + ((GroupedPreyEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged() * 1.0;
 	}
-	
+
 	private boolean haveForaged(){
 		return ((GroupedPreyEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged() > 0;
 	}
 
-	//@Override
+	@Override
 	public void update(double time) {			
 		int numberOfRobotsWithPrey       = 0;
 		int numberOfRobotsBeyondForbidenLimit       = 0;
@@ -44,13 +45,14 @@ public class CommunicationEvaluationFunction extends EvaluationFunction{
 				numberOfRobotsBeyondForagingLimit++;
 			}
 			
-			if (r.isCarryingPrey()) {
+			if (((PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class)).preyCarried()) {
 				numberOfRobotsWithPrey++;
 			}
 			
-			if(haveForaged())
-				collectiveSpeed+= (Math.abs(r.getLeftWheelSpeed())+Math.abs(r.getRightWheelSpeed()))/2;
-			
+			if(haveForaged()) {
+				DifferentialDriveRobot ddr = (DifferentialDriveRobot)r;
+				collectiveSpeed+= (Math.abs(ddr.getLeftWheelSpeed())+Math.abs(ddr.getRightWheelSpeed()))/2;
+			}
 		}
 
 		fitness += (double) numberOfRobotsWithPrey * 0.001 + 

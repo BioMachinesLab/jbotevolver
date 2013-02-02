@@ -4,12 +4,13 @@ import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.GroupedPreyEnvironment;
 import simulation.physicalobjects.Prey;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
+import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.robot.sensors.PreySensor;
 import simulation.util.Arguments;
 
 public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
-	private double 	    fitness;
 	private Vector2d    nestPosition = new Vector2d(0, 0);
 	private double		forbidenArea;
 	private double		foragingArea;
@@ -19,7 +20,7 @@ public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 	private double      preyDistanceRewardFactor;
 
 	public ColorNearPreyEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator);
+		super(simulator,arguments);
 		forbidenArea    =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForbiddenArea();
 		foragingArea    =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForageRadius();
 		redFarPenalty   = (arguments.getArgumentIsDefined("redfarpenalty")) ? arguments.getArgumentAsDouble("redfarpenalty") : 0;
@@ -28,7 +29,7 @@ public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 		preyDistanceRewardFactor = (arguments.getArgumentIsDefined("preydistancerewardfactor")) ? arguments.getArgumentAsDouble("preydistancerewardfactor") : 0.001;
 	}
 
-	//@Override
+	@Override
 	public double getFitness() {
 		return fitness + ((GroupedPreyEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged() * 1.0;
 	}
@@ -38,7 +39,7 @@ public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 		return ((GroupedPreyEnvironment)(Environment.getInstance())).getNumberOfFoodSuccessfullyForaged() > 0;
 	}*/
 
-	//@Override
+	@Override
 	public void update(double time) {			
 		int numberOfRobotsWithPrey = 0;
 		int numberOfRobotsBeyondForbidenLimit = 0;
@@ -57,13 +58,13 @@ public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 				numberOfRobotsBeyondForagingLimit++;
 			}
 			
-			if (r.isCarryingPrey()) {
+			if (((PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class)).preyCarried()) {
 				numberOfRobotsWithPrey++;
 			}
 			
 			//Check which robots are lighting up red near the prey
 			if(redNearBonus != 0 && r.getBodyColorAsDoubles()[Robot.REDINDEX] > 0){
-				 PreySensor preySensor = (PreySensor)r.getSensorByType("PreySensor");
+				 PreySensor preySensor = (PreySensor)r.getSensorByType(PreySensor.class);
 				 
 				 boolean nearPrey = false;
 				 
@@ -77,8 +78,8 @@ public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 					 numberOfRedRobotsFarFromPrey++;
 					 
 			}
-			
-			collectiveSpeed+= (Math.abs(r.getLeftWheelSpeed())+Math.abs(r.getRightWheelSpeed()))/2;			
+			DifferentialDriveRobot ddr = (DifferentialDriveRobot)r;
+			collectiveSpeed+= (Math.abs(ddr.getLeftWheelSpeed())+Math.abs(ddr.getRightWheelSpeed()))/2;			
 		}
 		
 		double nestRadius         = ((GroupedPreyEnvironment)(simulator.getEnvironment())).getNestRadius();
@@ -97,7 +98,6 @@ public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 
 		if (preyCounted > 0)
 			preyDistanceReward /= preyCounted;
-
 
 		fitness += (double) numberOfRobotsWithPrey * 0.001 + 
 			numberOfRobotsBeyondForbidenLimit * -0.1 + 

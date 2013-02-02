@@ -33,7 +33,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 	public void update(double time) {
 
 		if(r.isInvolvedInCollison())
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 		
 		if(!finishedRoom) { //Didn't clear the Cluttered Room
 			stepUnfinishedRoom();
@@ -42,7 +42,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 		} else if(!wentBack) { //Cleared the Maze
 			stepFinishedMaze();
 		} else { //Cleared everything
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 		}
 		
 		steps++;
@@ -75,7 +75,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 		}
 		
 		if(inForbiddenSquare)
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 	}
 
 	private void stepFinishedMaze() {
@@ -91,7 +91,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 		wentBack = inRoom();
 		
 		if(wentBack || inForbiddenSquare)
-			simulator.getExperiment().endExperiment();
+			simulator.stopSimulation();
 	}
 	
 	private void computeFitness() {
@@ -130,11 +130,6 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 		return (goBackTicks/goBackTime);
 	}
 
-	@Override
-	public double getFitness() {
-		return fitness;
-	}
-	
 	public double getDistanceToRoomFinish() {
 		
 		Vector2d start = startPosition;

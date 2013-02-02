@@ -9,11 +9,10 @@ import simulation.Simulator;
 import simulation.environment.RoundForageEnvironment;
 import simulation.environment.TwoNestForageEnvironment;
 import simulation.robot.Robot;
+import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 
-public class CollaboratingTwoNetsForagingEvaluationFunction extends
-		EvaluationFunction {
-	private double fitness;
+public class CollaboratingTwoNetsForagingEvaluationFunction extends EvaluationFunction {
 	private Vector2d nestAPosition;
 	private Vector2d nestBPosition;
 	private double forbidenArea;
@@ -21,9 +20,8 @@ public class CollaboratingTwoNetsForagingEvaluationFunction extends
 	private TwoNestForageEnvironment env;
 	private int numberOfRobotInTeam;
 
-	public CollaboratingTwoNetsForagingEvaluationFunction(Simulator simulator,
-			Arguments arguments) {
-		super(simulator);
+	public CollaboratingTwoNetsForagingEvaluationFunction(Simulator simulator,Arguments arguments) {
+		super(simulator,arguments);
 		env = ((TwoNestForageEnvironment) (simulator.getEnvironment()));
 		forbidenArea = env.getForbiddenArea();
 		foragingArea = env.getForageRadius();
@@ -68,7 +66,7 @@ public class CollaboratingTwoNetsForagingEvaluationFunction extends
 				numberOfRobotsBeyondForagingLimit++;
 			}
 
-			if (r.isCarryingPrey()) {
+			if (((PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class)).preyCarried()) {
 				numberOfRobotsWithPrey++;
 			}
 		}
