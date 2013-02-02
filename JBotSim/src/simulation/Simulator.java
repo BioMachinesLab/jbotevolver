@@ -26,12 +26,11 @@ public class Simulator implements Serializable {
 	private int numberRobots = 0;
 	private int numberPhysicalObjects = 0;
 	private ArrayList<Runnable> callbacks = new ArrayList<Runnable>(); 
-	
 	protected ControllerFactory      controllerFactory; 
 	protected RobotFactory           robotFactory;
 	protected EnvironmentFactory     environmentFactory;
-
 	private GeometricCalculator calculator;
+	private boolean stopSimulation = false;
 	
 	public Simulator(SimRandom random) {
 		this.random = random;
@@ -84,8 +83,7 @@ public class Simulator implements Serializable {
 		updateAllRobotSensors(time);
 		// Call the controllers:
 		updateAllControllers(time);
-		// Compute the actions of the robot's actuators on the environment and
-		// on itself
+		// Compute the actions of the robot's actuators on the environment and on itself
 		updateAllRobotActuators(time);
 		// Update non-robot objects in the environment
 		updateEnvironment(time);
@@ -113,6 +111,7 @@ public class Simulator implements Serializable {
 
 	protected void updateAllRobotActuators(double time) {
 		ArrayList<Robot> robots = (ArrayList<Robot>) environment.getRobots().clone();
+		//TODO is this really necessary??
 		Collections.shuffle(robots,random);
 		for (Robot r : robots) {
 			r.updateActuators(time, timeDelta);
@@ -127,7 +126,7 @@ public class Simulator implements Serializable {
 	}
 
 	public void simulate(int numIterations) {
-		for (time = Double.valueOf(0); time < numIterations; time++) {
+		for (time = Double.valueOf(0); time < numIterations && !stopSimulation; time++) {
 			performOneSimulationStep(time);
 			for (Runnable r : callbacks) {
 				r.run();
@@ -157,5 +156,9 @@ public class Simulator implements Serializable {
 	
 	public RobotFactory getRobotFactory() {
 		return robotFactory;
+	}
+	
+	public void stopSimulation() {
+		stopSimulation = true;
 	}
 }

@@ -94,10 +94,10 @@ public class TwoRoomsEnvironment extends Environment {
 		
 		Robot r = simulator.getEnvironment().getRobots().get(0);
 		
-		PreyCarriedSensor sensor = (PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class.getName());
+		PreyCarriedSensor sensor = (PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class);
 		if (sensor.preyCarried() && r.isInvolvedInCollison()){
 			numberOfPicks++;
-			PreyPickerActuator actuator = (PreyPickerActuator)r.getActuatorByType(PreyPickerActuator.class.getName());
+			PreyPickerActuator actuator = (PreyPickerActuator)r.getActuatorByType(PreyPickerActuator.class);
 			Prey preyToDrop = actuator.dropPrey();
 			preyToDrop.teleportTo(new Vector2d(0,-3));
 			numberOfPreys--;

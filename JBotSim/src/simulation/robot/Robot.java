@@ -329,20 +329,20 @@ public class Robot extends MovableObject {
 	}
 
 	
-	public Sensor getSensorByType(String sensorClass){
+	public Sensor getSensorByType(Class sensorClass){
 		
 		for(Sensor s : sensors){
-			if(s.getClass().getSimpleName().equals(sensorClass))
+			if(s.getClass().equals(sensorClass))
 				return s;
 		}
 		
 		return null;
 	}
 	
-	public Actuator getActuatorByType(String actuatorClass){
+	public Actuator getActuatorByType(Class actuatorClass){
 		
 		for(Actuator a : actuators){
-			if(a.getClass().getSimpleName().equals(actuatorClass))
+			if(a.getClass().equals(actuatorClass))
 				return a;
 		}
 		

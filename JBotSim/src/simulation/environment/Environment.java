@@ -185,6 +185,7 @@ public abstract class Environment implements KeyListener, Serializable {
 	}
 
 	public void addRobots(LinkedList<Robot> robots) {
-		this.robots.addAll(robots);
+		for(Robot r : robots)
+			addRobot(r);
 	}
 }

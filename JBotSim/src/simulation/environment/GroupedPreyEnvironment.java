@@ -127,9 +127,9 @@ public class GroupedPreyEnvironment extends Environment {
 		}
 		
 		for(Robot robot: robots){
-			PreyCarriedSensor sensor = (PreyCarriedSensor)robot.getSensorByType(PreyCarriedSensor.class.getName());
+			PreyCarriedSensor sensor = (PreyCarriedSensor)robot.getSensorByType(PreyCarriedSensor.class);
 			if (sensor.preyCarried() && robot.isInvolvedInCollison()){
-				PreyPickerActuator actuator = (PreyPickerActuator)robot.getActuatorByType(PreyPickerActuator.class.getName());
+				PreyPickerActuator actuator = (PreyPickerActuator)robot.getActuatorByType(PreyPickerActuator.class);
 				Prey preyToDrop = actuator.dropPrey();
 				preyToDrop.teleportTo(newPreyPosition());
 			}

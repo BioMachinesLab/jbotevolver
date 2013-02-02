@@ -72,7 +72,6 @@ public class DifferentialDriveRobot extends Robot {
 		return distanceBetweenWheels;
 	}
 	
-	
 	public double getRightWheelSpeed() {
 		return rightWheelSpeed;
 	}
@@ -80,5 +79,4 @@ public class DifferentialDriveRobot extends Robot {
 	public double getLeftWheelSpeed() {
 		return leftWheelSpeed;
 	}
-	
 }

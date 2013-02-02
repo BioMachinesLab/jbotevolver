@@ -70,7 +70,7 @@ public class JBotSim {
 		for (int i = 0; i < numberOfRobots; i++) {
 			Robot r = createOneRobot(robotArguments, controllerArguments);
 			result.add(r);
-			simulator.getEnvironment().addRobot(r);
+//			simulator.getEnvironment().addRobot(r);
 		}
 		
 		return result;
