@@ -11,9 +11,7 @@ public class StepsWithPreyEvaluationFunction extends EvaluationFunction{
 	
 	public StepsWithPreyEvaluationFunction(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
-		if (arguments.getFlagIsTrue("countevolvingrobotsonly")) {
-			countEvolvingRobotsOnly = true;
-		}
+		countEvolvingRobotsOnly = arguments.getFlagIsTrue("countevolvingrobotsonly");
 	}
 
 	@Override
@@ -29,7 +27,6 @@ public class StepsWithPreyEvaluationFunction extends EvaluationFunction{
 				robotsCounted++;
 			}
 		}
-
 		fitness+= (double) robotsWithPrey / (double) robotsCounted;
 	}
 

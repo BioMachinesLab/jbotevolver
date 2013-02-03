@@ -284,10 +284,6 @@ public class Experiment implements Serializable {
 		numberOfStepsPerRun = steps;
 	}
 	
-	public int getGenomeLength() {
-		return controllerFactory.getChromosomeLength();
-	}
-
 	public String getDescription() {
 		return experimentArguments.getArgumentAsStringOrSetDefault("description", "Unknown");
 	}

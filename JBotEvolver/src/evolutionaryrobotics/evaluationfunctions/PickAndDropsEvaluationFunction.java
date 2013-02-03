@@ -12,6 +12,7 @@ public class PickAndDropsEvaluationFunction extends EvaluationFunction {
 
 	public PickAndDropsEvaluationFunction(Simulator simulator, Arguments args) {
 		super(simulator, args);
+		countEvolvingRobotsOnly = args.getArgumentIsDefined("countevolvingrobotsonly");
 	}
 
 	@Override
@@ -26,9 +27,5 @@ public class PickAndDropsEvaluationFunction extends EvaluationFunction {
 			}
 		}
 		fitness = tempFitness / ((RoundForageEnvironment) (simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged() * 1.0;
-	}
-
-	public void enableCountEvolvingRobotsOnly() {
-		countEvolvingRobotsOnly = true;
 	}
 }

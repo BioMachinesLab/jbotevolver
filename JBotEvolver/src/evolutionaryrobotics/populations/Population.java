@@ -8,13 +8,11 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 import simulation.Simulator;
 import simulation.util.Arguments;
 
-
 /**
  * Super-class for populations/evolutionary algorithms.
  * 
  * @author alc
  */
-
 public abstract class Population implements Serializable {
 	protected int generationRandomSeed;
 	protected int numberOfSamplesPerChromosome;
@@ -31,7 +29,7 @@ public abstract class Population implements Serializable {
 	protected int     increaseStartStepsPerSample;
 	protected int     increaseMaxStepsPerSample;
 	protected double  increaseAdditionalSamplesPerGeneration;
-	protected double  mutationRate;//                            = 0.05;
+	protected double  mutationRate;
 	
 	protected double  fitnessThreshold                                 = 0;
 	protected boolean enableFitnessThreshhold                          = false;
@@ -39,21 +37,51 @@ public abstract class Population implements Serializable {
 	protected int     currentNumberOfGenerationsAboveFitnessThreshold  = 0;
 	
 	protected Random    randomNumberGenerator;
-		
 	
-	public Population(Simulator simulator) {
+	public Population(Simulator simulator, Arguments arguments) {
 		super();
 		this.randomNumberGenerator = simulator.getRandom();
 		generationRandomSeed = randomNumberGenerator.nextInt();
+		
+		if (arguments.getArgumentIsDefined("stepsperrun")) {
+			setNumberOfStepsPerSample(arguments.getArgumentAsInt("stepsperrun"));
+		}
+		
+		if (arguments.getArgumentIsDefined("increasestepsperrun")) {
+			setIncreasingStepPerFitnessSample(arguments.getArgumentAsInt("startsteps"), 
+					arguments.getArgumentAsInt("endsteps"), 
+					arguments.getArgumentAsDouble("stepspergeneration"));
+		}
 
+		if (arguments.getArgumentIsDefined("increasesamplesperindividual")) {
+				setIncreasingSamplesPerFitnessSample(arguments.getArgumentAsInt("startsamples"), 
+				arguments.getArgumentAsInt("endsamples"), 
+				arguments.getArgumentAsDouble("samplespergeneration"));
+		}
+
+		if (arguments.getArgumentIsDefined("enablefitnessthreshold")) {
+			enableFitnessThreshold(arguments.getArgumentAsDouble("fitnessthreshold"), 
+					arguments.getArgumentAsInt("numberofgenerationsabovefitnessthresholdrequired"));
+		}
+
+		if (arguments.getArgumentIsDefined("mutationrate")) { 
+			setMutationRate(arguments.getArgumentAsDouble("mutationrate"));
+		}
+
+		if (arguments.getArgumentIsDefined("samples")) {
+			setNumberOfSamplesPerChromosome(arguments.getArgumentAsInt("samples"));
+		}
+
+		if (arguments.getArgumentIsDefined("generations")) {
+			setNumberOfGenerations(arguments.getArgumentAsInt("generations"));
+		}
+		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 	}
-
 
 	/** 
      *   Create a new random population
      */
     public abstract void createRandomPopulation();
-
 
 	/** 
 	 * Check if an evolution is done
@@ -183,7 +211,6 @@ public abstract class Population implements Serializable {
     public void setNumberOfGenerations(int generations) {
     	this.numberOfGenerations = generations;
     }
-	
 
 	/** Get the number of fitness samples per chromosome. 
      * 
@@ -236,7 +263,6 @@ public abstract class Population implements Serializable {
     public void setNumberOfSamplesPerChromosome(int samples) {
     	this.numberOfSamplesPerChromosome = samples;
     }
-   
 
 	/** Set the number of fitness samples to increase throughout an evolution. This allows for 
 	 * chromosomes to be sampled quickly (fewer samples) in the beginning of an evolutionary run and more accurately 
@@ -254,7 +280,6 @@ public abstract class Population implements Serializable {
 		this.increaseMaxSamplesPerChromosome         = maxSamples;
 		this.increaseAdditionalSamplesPerGeneration  = additionalSamplesPerGeneration;
 	}
-
 
 	/** Set the number of simulation steps per fitness sample to a fixed value. 
      *  This will cancel any previously set increasing number of step (see {@link #enableIncreasingStepsPerSample}).
@@ -331,48 +356,4 @@ public abstract class Population implements Serializable {
 		
 		return currentNumberOfGenerationsAboveFitnessThreshold >= numberOfGenerationsAboveFitnessThresholdRequired;
 	}
-
-	/**
-	 * Parses a list of arguments and (re-)configures the population.
-	 * 
-	 * @param arguments
-	 */
-	
-	public void parseArguments(Arguments arguments) {
-		if (arguments.getArgumentIsDefined("stepsperrun")) {
-			setNumberOfStepsPerSample(arguments.getArgumentAsInt("stepsperrun"));
-		}
-		
-		if (arguments.getArgumentIsDefined("increasestepsperrun")) {
-			setIncreasingStepPerFitnessSample(arguments.getArgumentAsInt("startsteps"), 
-					arguments.getArgumentAsInt("endsteps"), 
-					arguments.getArgumentAsDouble("stepspergeneration"));
-		}
-
-		if (arguments.getArgumentIsDefined("increasesamplesperindividual")) {
-				setIncreasingSamplesPerFitnessSample(arguments.getArgumentAsInt("startsamples"), 
-				arguments.getArgumentAsInt("endsamples"), 
-				arguments.getArgumentAsDouble("samplespergeneration"));
-		}
-
-		if (arguments.getArgumentIsDefined("enablefitnessthreshold")) {
-			enableFitnessThreshold(arguments.getArgumentAsDouble("fitnessthreshold"), 
-					arguments.getArgumentAsInt("numberofgenerationsabovefitnessthresholdrequired"));
-		}
-
-		if (arguments.getArgumentIsDefined("mutationrate")) { 
-			setMutationRate(arguments.getArgumentAsDouble("mutationrate"));
-		}
-
-		if (arguments.getArgumentIsDefined("samples")) {
-			setNumberOfSamplesPerChromosome(arguments.getArgumentAsInt("samples"));
-		}
-
-		if (arguments.getArgumentIsDefined("generations")) {
-			setNumberOfGenerations(arguments.getArgumentAsInt("generations"));
-		}					
-	}
-
 }
-
-

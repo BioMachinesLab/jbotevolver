@@ -8,23 +8,22 @@ import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 
 public class AverageDistanceFromCenterEvaluationFunction extends EvaluationFunction{
 	private Vector2d    centerPosition = new Vector2d(0, 0);
-	private int         numberOfSteps;
 	private boolean     countEvolvingRobotsOnly = false;
+	private double time;
 	
 	public AverageDistanceFromCenterEvaluationFunction(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 		countEvolvingRobotsOnly = arguments.getFlagIsTrue("countevolvingrobotsonly");
-
-		numberOfSteps = 0;
 	}
 	
 	@Override
 	public double getFitness() {
-		return numberOfSteps > 0 ? fitness/numberOfSteps : 0;
+		return time > 0 ? fitness/time : 0;
 	}
 
 	@Override
-	public void update(double time) {			
+	public void update(double time) {
+		this.time = time;
 		Vector2d coord = new Vector2d();
 		double distanceToNest = 0;
 		int    robotsCounted  = 0;
@@ -40,6 +39,5 @@ public class AverageDistanceFromCenterEvaluationFunction extends EvaluationFunct
 		distanceToNest /= (double) robotsCounted;
 		
 		fitness += (double) distanceToNest * 0.1;
-		numberOfSteps++;
 	}
 }
