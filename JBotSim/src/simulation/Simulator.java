@@ -16,8 +16,7 @@ import simulation.util.SimRandom;
 
 public class Simulator implements Serializable {
 
-	public final int MAXNUMBEROFROBOTS = 100000;
-
+	private static int maxNumberRobots = 100000;
 	protected Double time = Double.valueOf(0);
 	protected double timeDelta = 0.1;
 	protected Environment environment;
@@ -26,11 +25,11 @@ public class Simulator implements Serializable {
 	private int numberRobots = 0;
 	private int numberPhysicalObjects = 0;
 	private ArrayList<Runnable> callbacks = new ArrayList<Runnable>(); 
-	protected ControllerFactory      controllerFactory; 
-	protected RobotFactory           robotFactory;
-	protected EnvironmentFactory     environmentFactory;
 	private GeometricCalculator calculator;
 	private boolean stopSimulation = false;
+	protected ControllerFactory controllerFactory; 
+	protected RobotFactory robotFactory;
+	protected EnvironmentFactory environmentFactory;
 	
 	public Simulator(SimRandom random) {
 		this.random = random;
@@ -139,7 +138,7 @@ public class Simulator implements Serializable {
 	}
 
 	public int getAndIncrementNumberPhysicalObjects(PhysicalObjectType type) {
-		return type == PhysicalObjectType.ROBOT ? this.numberRobots++ : MAXNUMBEROFROBOTS + numberPhysicalObjects++;
+		return type == PhysicalObjectType.ROBOT ? this.numberRobots++ : maxNumberRobots + numberPhysicalObjects++;
 	}
 
 	public void addNumbetrOfPhysicalObjects() {

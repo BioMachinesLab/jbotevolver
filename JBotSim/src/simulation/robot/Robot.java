@@ -16,7 +16,7 @@ import simulation.util.Arguments;
 import controllers.Controller;
 
 /**
- * Representation of a circular, differential drive robot, including its physical characteristics such as size 
+ * Representation of a robot, including its physical characteristics such as size 
  * and color, sensors and actuators and the controller.
  * 
  * @author alc
@@ -63,10 +63,15 @@ public class Robot extends MovableObject {
 	 */
 	public Robot(Simulator simulator, Arguments args) {
 		super(simulator, args);
-		double x = args.getArgumentAsDoubleOrSetDefault("relativex",0);
-		double y = args.getArgumentAsDoubleOrSetDefault("relaivey",0);
+		
+		double relativeX = args.getArgumentAsDoubleOrSetDefault("relativex",0);
+		double relativeY = args.getArgumentAsDoubleOrSetDefault("relativey",0);
 		double diameter = args.getArgumentAsDoubleOrSetDefault("diameter",0.1);
-		this.shape = new CircularShape(simulator, name + "CollisionObject", this, x, y, diameter, diameter/2);
+		this.shape = new CircularShape(simulator, name + "CollisionObject", this, relativeX, relativeY, diameter, diameter/2);
+		
+		double x = args.getArgumentAsDoubleOrSetDefault("x",0);
+		double y = args.getArgumentAsDoubleOrSetDefault("y",0);
+		setPosition(x, y);
 	}
 	 public Robot(Simulator simulator, String name, double x, double y, double orientation, double mass, double radius, String color) {
 		super(simulator, name, x, y, orientation, mass, PhysicalObjectType.ROBOT);
@@ -157,11 +162,8 @@ public class Robot extends MovableObject {
 		if (!found) {
 			throw new RuntimeException("Cannot find actuator with id: " + id + ". (" + actuators.size() + " actuators available)");
 		}
-		
 		return actuator;
 	}
-	
-	
 	
 	/**
 	 * Add a new actuator to the robot.
@@ -217,7 +219,6 @@ public class Robot extends MovableObject {
 			actuator.apply(this);
 		}
 	}
-	
 		
 	/**
 	 * TODO: Sancho
@@ -233,10 +234,7 @@ public class Robot extends MovableObject {
 	/**
 	 * Stops the robot in case it is moving
 	 */
-	public void stop() {
-		
-	}
-	
+	public void stop() {}
 	
 	/**
 	 * Set the controller for the robot
@@ -275,7 +273,6 @@ public class Robot extends MovableObject {
 		for (Actuator a : actuators) {
 			a.keyReleased(e);
 		}
-
 		controller.keyReleased(e);
 	}
 
@@ -328,24 +325,19 @@ public class Robot extends MovableObject {
 		return this.bodyColor;
 	}
 
-	
 	public Sensor getSensorByType(Class sensorClass){
-		
 		for(Sensor s : sensors){
 			if(s.getClass().equals(sensorClass))
 				return s;
 		}
-		
 		return null;
 	}
 	
 	public Actuator getActuatorByType(Class actuatorClass){
-		
 		for(Actuator a : actuators){
 			if(a.getClass().equals(actuatorClass))
 				return a;
 		}
-		
 		return null;
 	}
 }

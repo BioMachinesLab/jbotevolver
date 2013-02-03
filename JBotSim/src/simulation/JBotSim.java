@@ -3,9 +3,6 @@ package simulation;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
-import factories.ControllerFactory;
-import factories.EnvironmentFactory;
-import factories.RobotFactory;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -13,11 +10,12 @@ import simulation.util.SimRandom;
 
 public class JBotSim {
 	
-	protected Arguments experimentArguments  = null;
+	protected HashMap<String,Arguments> arguments;
+	protected Arguments experimentArguments = null;
 	protected Arguments environmentArguments = null;
-	protected Arguments robotArguments       = null;
-	protected Arguments controllerArguments  = null;
-	protected Arguments guiArguments         = null;
+	protected Arguments robotArguments = null;
+	protected Arguments controllerArguments = null;
+	protected Arguments guiArguments = null;
 	
 	protected SimRandom simRandom  = new SimRandom();
 	protected long      randomSeed = 0;
@@ -32,7 +30,7 @@ public class JBotSim {
 	}
 	
 	public void parseArguments(String[] args) throws IOException, ClassNotFoundException{		
-		HashMap<String,Arguments> arguments = Arguments.parseArgs(args);
+		arguments = Arguments.parseArgs(args);
 		
 		guiArguments          = arguments.get("--gui");
 		environmentArguments  = arguments.get("--environment");
@@ -40,8 +38,6 @@ public class JBotSim {
 		controllerArguments   = arguments.get("--controllers");
 		System.out.println(robotArguments);
 		System.out.println(controllerArguments);
-		
-		
 		
 		if(arguments.get("--random-seed") != null)
 			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());			
@@ -51,7 +47,6 @@ public class JBotSim {
 		//split on whitespace
 		commandlineArguments = arguments.get("commandline").getCompleteArgumentString().split("\\s+");
 	}
-
 	
 	public Simulator createSimulator() {	
 		SimRandom simRandom = new SimRandom();
@@ -72,14 +67,16 @@ public class JBotSim {
 			result.add(r);
 //			simulator.getEnvironment().addRobot(r);
 		}
-		
 		return result;
 	}
 	
 	protected Robot createOneRobot(Arguments robotArguments, Arguments controllerArguments) {
 		Robot robot = simulator.getRobotFactory().getRobot(robotArguments);
 		robot.setController(simulator.getControllerFactory().getController(robot, controllerArguments));
-		robot.setPosition((simRandom.nextDouble() - 0.5) * simulator.getEnvironment().getWidth(), (simRandom.nextDouble() - 0.5) * simulator.getEnvironment().getHeight());
 		return robot;
+	}
+	
+	public HashMap<String, Arguments> getArguments() {
+		return arguments;
 	}
 }

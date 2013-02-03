@@ -9,5 +9,4 @@ public class Factory {
 		super();
 		this.simulator = simulator;
 	}
-
 }
