@@ -1,10 +1,10 @@
 package evolutionaryrobotics.evaluationfunctions;
 
+import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 
 public class AverageDistanceFromCenterEvaluationFunction extends EvaluationFunction{
 	private Vector2d    centerPosition = new Vector2d(0, 0);

@@ -39,7 +39,6 @@ public abstract class Population implements Serializable {
 	protected Random    randomNumberGenerator;
 	
 	public Population(Simulator simulator, Arguments arguments) {
-		super();
 		this.randomNumberGenerator = simulator.getRandom();
 		generationRandomSeed = randomNumberGenerator.nextInt();
 		

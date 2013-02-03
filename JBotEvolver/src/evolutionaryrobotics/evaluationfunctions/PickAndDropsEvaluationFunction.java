@@ -1,11 +1,11 @@
 package evolutionaryrobotics.evaluationfunctions;
 
+import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import simulation.Simulator;
 import simulation.environment.RoundForageEnvironment;
 import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.util.Arguments;
-import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 
 public class PickAndDropsEvaluationFunction extends EvaluationFunction {
 	private boolean countEvolvingRobotsOnly = false;

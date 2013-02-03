@@ -35,6 +35,7 @@ import com.panayotis.gnuplot.style.NamedPlotColor;
 import com.panayotis.gnuplot.style.PlotStyle;
 import com.panayotis.gnuplot.style.Smooth;
 import com.panayotis.gnuplot.style.Style;
+
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.mains.ResultViewerMain;
 import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;

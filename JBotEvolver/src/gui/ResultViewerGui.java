@@ -53,6 +53,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+
 import simulation.Simulator;
 
 public class ResultViewerGui implements Gui {

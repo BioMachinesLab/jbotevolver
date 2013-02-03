@@ -4,8 +4,7 @@ import simulation.util.SimRandom;
 
 public class AgeChromosomeListedPopulation extends ListedPopulation<AgeChromosome>{
 
-	public AgeChromosomeListedPopulation(SimRandom random, int populationSize,
-			int chromosomeLength) {
+	public AgeChromosomeListedPopulation(SimRandom random, int populationSize, int chromosomeLength) {
 		super(random, populationSize, chromosomeLength);
 	}
 

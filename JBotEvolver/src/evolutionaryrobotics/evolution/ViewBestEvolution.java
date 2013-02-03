@@ -9,9 +9,9 @@ import simulation.util.Arguments;
  * the results of a previously evolved population.
  * @author miguelduarte
  */
-public class ViewOnlyEvolution extends Evolution {
+public class ViewBestEvolution extends Evolution {
 	
-	public ViewOnlyEvolution(Simulator simulator, Population population, Arguments args) {
+	public ViewBestEvolution(Simulator simulator, Population population, Arguments args) {
 		super(simulator, population, args);
 	}
 	

@@ -19,7 +19,7 @@ import simulation.util.Arguments;
 public class MuLambdaPopulation extends Population implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	protected int chromosomeLength;
+	protected int genomelength;
 	protected int populationSize;
 	protected int currentGeneration;
 	protected Chromosome bestChromosome;
@@ -38,18 +38,13 @@ public class MuLambdaPopulation extends Population implements Serializable {
 	private double[] initialWeights;
 	private boolean fixedInitialPopulation = false;
 
-	public MuLambdaPopulation(Simulator simulator, int chromosomeLength,
-			Arguments arguments) {
-		super(simulator);
-		populationSize = arguments.getArgumentIsDefined("size") ? arguments
-				.getArgumentAsInt("size") : 50;
-		numberOfGenerations = arguments.getArgumentIsDefined("generations") ? arguments
-				.getArgumentAsInt("generations") : 100;
-		numberOfSamplesPerChromosome = arguments
-				.getArgumentIsDefined("samples") ? arguments
-				.getArgumentAsInt("samples") : 3;
+	public MuLambdaPopulation(Simulator simulator, Arguments arguments) {
+		super(simulator, arguments);
+		populationSize = arguments.getArgumentAsIntOrSetDefault("size",50);
+		numberOfGenerations = arguments.getArgumentAsIntOrSetDefault("generations",100);
+		numberOfSamplesPerChromosome = arguments.getArgumentAsIntOrSetDefault("samples",3);
 
-		this.chromosomeLength = chromosomeLength;
+		genomelength = arguments.getArgumentAsInt("genomelength");
 		
 		fixedInitialPopulation = arguments.getArgumentAsIntOrSetDefault("fixedinitialpopulation", 0) == 1;
 		
@@ -124,11 +119,11 @@ public class MuLambdaPopulation extends Population implements Serializable {
 			if (!parentIterator.hasNext()) {
 				parentIterator = parents.iterator();
 			}
-			double[] alleles = new double[chromosomeLength];
+			double[] alleles = new double[genomelength];
 
 			Chromosome parent = parentIterator.next();
 
-			for (int j = 0; j < chromosomeLength; j++) {
+			for (int j = 0; j < genomelength; j++) {
 				double allele = parent.getAlleles()[j];
 				if (randomNumberGenerator.nextDouble() < mutationRate) {
 					allele = allele + randomNumberGenerator.nextGaussian();
@@ -175,8 +170,8 @@ public class MuLambdaPopulation extends Population implements Serializable {
 			bestChromosome = chromosomes[0];
 		} else {
 			for (int i = 0; i < populationSize; i++) {
-				double[] alleles = new double[chromosomeLength];
-				for (int j = 0; j < chromosomeLength; j++) {
+				double[] alleles = new double[genomelength];
+				for (int j = 0; j < genomelength; j++) {
 					alleles[j] = randomNumberGenerator.nextGaussian() * 2;
 				}
 				chromosomes[i] = new Chromosome(alleles, i);
