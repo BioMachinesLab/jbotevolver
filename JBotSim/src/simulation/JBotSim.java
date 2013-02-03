@@ -36,8 +36,6 @@ public class JBotSim {
 		environmentArguments  = arguments.get("--environment");
 		robotArguments        = arguments.get("--robots");
 		controllerArguments   = arguments.get("--controllers");
-		System.out.println(robotArguments);
-		System.out.println(controllerArguments);
 		
 		if(arguments.get("--random-seed") != null)
 			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());			
@@ -54,7 +52,7 @@ public class JBotSim {
 
 		Environment environment = simulator.getEnvironmentFactory().getEnvironment(environmentArguments);
 		simulator.setEnvironment(environment);
-		environment.setup();
+		environment.setup(simulator);
 		
 		return simulator;
 	}
@@ -65,7 +63,6 @@ public class JBotSim {
 		for (int i = 0; i < numberOfRobots; i++) {
 			Robot r = createOneRobot(robotArguments, controllerArguments);
 			result.add(r);
-//			simulator.getEnvironment().addRobot(r);
 		}
 		return result;
 	}

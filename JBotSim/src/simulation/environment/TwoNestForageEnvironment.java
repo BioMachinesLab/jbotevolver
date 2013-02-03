@@ -16,8 +16,7 @@ import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 import simulation.util.SimRandom;
 
-public class TwoNestForageEnvironment extends Environment implements
-		NestEnvironment {
+public class TwoNestForageEnvironment extends Environment {
 
 	protected static final double PREY_RADIUS = 0.025;
 	protected static final double PREY_MASS = 1;
@@ -31,6 +30,7 @@ public class TwoNestForageEnvironment extends Environment implements
 	protected int numberOfFoodSuccessfullyForagedNestB = 0;
 	protected double nestDistance;
 	protected Vector2d center = new Vector2d(0, 0);
+	protected SimRandom random;
 
 	public TwoNestForageEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
@@ -40,6 +40,8 @@ public class TwoNestForageEnvironment extends Environment implements
 		forageLimit = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit") : 2.0;
 		forbiddenArea = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea") : 5.0;
 
+		this.random = simulator.getRandom();
+		
 		if (arguments.getArgumentIsDefined("densityoffood")) {
 			double densityoffood = arguments
 					.getArgumentAsDouble("densityoffood");
@@ -52,7 +54,7 @@ public class TwoNestForageEnvironment extends Environment implements
 	}
 	
 	@Override
-	public void setup() {
+	public void setup(Simulator simulator) {
 		nestA = new Nest(simulator, "NestA", -nestDistance / 2, 0, nestLimit);
 		nestA.setParameter("TEAM", 1);
 		nestB = new Nest(simulator, "NestB", nestDistance / 2, 0, nestLimit);
@@ -60,10 +62,10 @@ public class TwoNestForageEnvironment extends Environment implements
 		addObject(nestA);
 		addObject(nestB);
 
-		deployPreys();	
+		deployPreys(simulator);	
 	}
 
-	protected void deployPreys() {
+	protected void deployPreys(Simulator simulator) {
 		for (int i = 0; i < getAmoutOfFood(); i++) {
 			addPrey(new Prey(simulator, "Prey " + i, newRandomPosition(), 0,
 					PREY_MASS, PREY_RADIUS));
@@ -77,8 +79,8 @@ public class TwoNestForageEnvironment extends Environment implements
 	protected Vector2d newRandomPosition() {
 		Vector2d position;
 		do {
-			double radius = simulator.getRandom().nextDouble() * (forageLimit);
-			double angle = simulator.getRandom().nextDouble() * 2 * Math.PI;
+			double radius = random.nextDouble() * (forageLimit);
+			double angle = random.nextDouble() * 2 * Math.PI;
 			position = new Vector2d(radius * Math.cos(angle), radius
 					* Math.sin(angle));
 		} while (position.distanceTo(nestA.getPosition()) < nestA.getRadius()
@@ -96,7 +98,6 @@ public class TwoNestForageEnvironment extends Environment implements
 
 		if (numberOfFoodSuccessfullyForagedNestB
 				+ numberOfFoodSuccessfullyForagedNestA >= amountOfFood) {
-			//TODO:
 //			simulator.getExperiment().endExperiment();
 		}
 	}

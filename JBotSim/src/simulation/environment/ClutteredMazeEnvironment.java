@@ -26,12 +26,12 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 	}
 	
 	@Override
-	public void setup() {
-		super.setup();
-		createRoom(minWidth,maxWidth,minHeight,maxHeight);
+	public void setup(Simulator simulator) {
+		super.setup(simulator);
+		createRoom(simulator, minWidth,maxWidth,minHeight,maxHeight);
 	}
 	
-	protected void createRoom(double minWidth, double maxWidth, double minHeight, double maxHeight) {
+	protected void createRoom(Simulator simulator, double minWidth, double maxWidth, double minHeight, double maxHeight) {
 		
 		arenaWidth = minWidth;
 		arenaHeight = minHeight;
@@ -39,8 +39,8 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		double widthDiff = Math.abs(maxWidth-minWidth);
 		double heightDiff = Math.abs(maxHeight-minHeight);
 		
-		arenaWidth+= simulator.getRandom().nextDouble()*widthDiff;
-		arenaHeight+= simulator.getRandom().nextDouble()*heightDiff;
+		arenaWidth+= random.nextDouble()*widthDiff;
+		arenaHeight+= random.nextDouble()*heightDiff;
 		
 		double offsetY = arenaHeight/2-exitWidth*4;
 		
@@ -54,7 +54,7 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		double exitX = -arenaWidth/2;
 		
 		while(exitX < -arenaWidth/2+exitWidth+0.2 || exitX > arenaWidth/2-exitWidth-0.2) {
-			double exitPercentage = simulator.getRandom().nextDouble();
+			double exitPercentage = random.nextDouble();
 			exitX = -(arenaWidth/2)+arenaWidth*exitPercentage;
 		}
 		
@@ -65,8 +65,8 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		exitPosition.y = arenaHeight/2+exitWidth;
 		
 		//Exit
-		createWall(exitX-exitWidth,arenaHeight/2+0.2,0.1,0.4);
-		createWall(exitX+exitWidth,arenaHeight/2+0.2,0.1,0.4);
+		createWall(simulator,exitX-exitWidth,arenaHeight/2+0.2,0.1,0.4);
+		createWall(simulator,exitX+exitWidth,arenaHeight/2+0.2,0.1,0.4);
 		
 		double firstDistanceEdge = exitX-exitWidth-(-arenaWidth/2);
 		double firstPartX = -arenaWidth/2+firstDistanceEdge/2;
@@ -75,26 +75,26 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		double secondPartX = arenaWidth/2-secondDistanceEdge/2;
 				
 		//Horizontal - Top
-		createWall(firstPartX,arenaHeight/2,firstDistanceEdge+0.1,0.1);
-		createWall(secondPartX,arenaHeight/2,secondDistanceEdge+0.1,0.1);
+		createWall(simulator,firstPartX,arenaHeight/2,firstDistanceEdge+0.1,0.1);
+		createWall(simulator,secondPartX,arenaHeight/2,secondDistanceEdge+0.1,0.1);
 		
 		//Horizontal - Bottom
-		createWall(0,-arenaHeight/2,arenaWidth+0.1,0.1);
+		createWall(simulator,0,-arenaHeight/2,arenaWidth+0.1,0.1);
 		
 		//Vertical
-		createWall(arenaWidth/2,0,0.1,arenaHeight);
-		createWall(-arenaWidth/2,0,0.1,arenaHeight);
+		createWall(simulator,arenaWidth/2,0,0.1,arenaHeight);
+		createWall(simulator,-arenaWidth/2,0,0.1,arenaHeight);
 		
 		objects = (int)(objects*(arenaWidth*arenaHeight));
 		
 		for(int i = 0 ; i < objects ; i++) {
 			
-				double objectW = objectWidth+objectWidth*(simulator.getRandom().nextDouble()-0.5);
+			double objectW = objectWidth+objectWidth*(random.nextDouble()-0.5);
 				
-				double objectX = -arenaWidth/2 + 0.1 + simulator.getRandom().nextDouble()*(arenaWidth-0.1*2);
-				double objectY = (arenaHeight/2 - objectW - simulator.getRandom().nextDouble()*(arenaHeight/2))*0.6;
+			double objectX = -arenaWidth/2 + 0.1 + random.nextDouble()*(arenaWidth-0.1*2);
+			double objectY = (arenaHeight/2 - objectW - random.nextDouble()*(arenaHeight/2))*0.6;
 				
-				createWall(objectX,objectY,objectW,objectW);
+			createWall(simulator,objectX,objectY,objectW,objectW);
 		}
 	}
 	
@@ -105,5 +105,4 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 	public double getExitWidth() {
 		return exitWidth;
 	}
-
 }

@@ -18,7 +18,7 @@ public class Chromosome implements Serializable, Cloneable {
 		this.id      = id;
 	}
 	
-	public void    setFitness(double fitness) {
+	public void setFitness(double fitness) {
 		this.fitness = fitness; 
 		this.fitnessSet = true;
 	}
@@ -60,5 +60,4 @@ public class Chromosome implements Serializable, Cloneable {
 		newChromo.alleles = alleles.clone();
 		return newChromo;
 	}
-
 }

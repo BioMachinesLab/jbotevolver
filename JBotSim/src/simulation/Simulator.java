@@ -24,9 +24,10 @@ public class Simulator implements Serializable {
 	protected FileProvider fileProvider = FileProvider.getDefaultFileProvider();
 	private int numberRobots = 0;
 	private int numberPhysicalObjects = 0;
-	private ArrayList<Runnable> callbacks = new ArrayList<Runnable>(); 
+	private ArrayList<Updatable> callbacks = new ArrayList<Updatable>(); 
 	private GeometricCalculator calculator;
 	private boolean stopSimulation = false;
+	
 	protected ControllerFactory controllerFactory; 
 	protected RobotFactory robotFactory;
 	protected EnvironmentFactory environmentFactory;
@@ -67,11 +68,11 @@ public class Simulator implements Serializable {
 		this.fileProvider = fileProvider;
 	}
 
-	public void addCallback(Runnable r) {
+	public void addCallback(Updatable r) {
 		callbacks.add(r);
 	}
 	
-	public void removeCallback(Runnable r) {
+	public void removeCallback(Updatable r) {
 		callbacks.remove(r);
 	}
 
@@ -88,6 +89,10 @@ public class Simulator implements Serializable {
 		updateEnvironment(time);
 		// Update the positions of everything
 		updatePositions(time);
+		
+		for (Updatable r : callbacks) {
+			r.update(time);
+		}
 	}
 
 	protected void updateAllControllers(Double time) {
@@ -109,8 +114,8 @@ public class Simulator implements Serializable {
 	}
 
 	protected void updateAllRobotActuators(double time) {
-		ArrayList<Robot> robots = (ArrayList<Robot>) environment.getRobots().clone();
 		//TODO is this really necessary??
+		ArrayList<Robot> robots = (ArrayList<Robot>) environment.getRobots().clone();
 		Collections.shuffle(robots,random);
 		for (Robot r : robots) {
 			r.updateActuators(time, timeDelta);
@@ -119,17 +124,11 @@ public class Simulator implements Serializable {
 
 	protected void updatePositions(double time) {
 		environment.updateCollisions(time);
-
-		// checkAgentAgentCollisions();
-		// checkAgents();
 	}
 
 	public void simulate(int numIterations) {
 		for (time = Double.valueOf(0); time < numIterations && !stopSimulation; time++) {
 			performOneSimulationStep(time);
-			for (Runnable r : callbacks) {
-				r.run();
-			}
 		}
 	}
 
@@ -141,10 +140,6 @@ public class Simulator implements Serializable {
 		return type == PhysicalObjectType.ROBOT ? this.numberRobots++ : maxNumberRobots + numberPhysicalObjects++;
 	}
 
-	public void addNumbetrOfPhysicalObjects() {
-		this.numberPhysicalObjects++;
-	}
-	
 	public EnvironmentFactory getEnvironmentFactory() {
 		return environmentFactory;
 	}

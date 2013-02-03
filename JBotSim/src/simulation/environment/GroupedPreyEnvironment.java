@@ -39,11 +39,13 @@ public class GroupedPreyEnvironment extends Environment {
 	private Nest   nest;
 	private int    numberOfFoodSuccessfullyForaged = 0;
 	private Random preyPlacementRandom;
+	private Simulator simulator;
 
 	public GroupedPreyEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 
 		preyPlacementRandom = new Random(simulator.getRandom().nextLong());
+		this.simulator = simulator;
 
 		forbiddenArea       = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")	: 7;
 		nestLimit       = arguments.getArgumentIsDefined("nestlimit") ? arguments.getArgumentAsDouble("nestlimit")			: .5;
@@ -63,7 +65,7 @@ public class GroupedPreyEnvironment extends Environment {
 	}
 	
 	@Override
-	public void setup() {
+	public void setup(Simulator simulator) {
 		preyCenter = calculatePreyCenter();
 		
 		for(int i = 0; i < amountOfFood; i++ ){

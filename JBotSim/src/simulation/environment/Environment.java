@@ -25,7 +25,6 @@ public abstract class Environment implements KeyListener, Serializable {
 
 	protected final int MAXOBJECTS = 5000;
 	
-	protected Simulator simulator;
 	protected ArrayList<Robot> robots = new ArrayList<Robot>(MAXOBJECTS);
 	protected ArrayList<Prey>  prey   = new ArrayList<Prey>(MAXOBJECTS);
 	protected ArrayList<PhysicalObject> allObjects = new ArrayList<PhysicalObject>(MAXOBJECTS);
@@ -40,14 +39,13 @@ public abstract class Environment implements KeyListener, Serializable {
 	private GeometricCalculator geometricCalculator;
 
 	public Environment(Simulator simulator, Arguments args) {
-		this.simulator = simulator;
 		this.width = args.getArgumentAsDoubleOrSetDefault("width", 5);
 		this.height = args.getArgumentAsDoubleOrSetDefault("height", 5);
 		collisionManager = new SimpleCollisionManager(simulator);
 		this.geometricCalculator = simulator.getGeoCalculator();
 	}
 	
-	public abstract void setup();
+	public abstract void setup(Simulator simulator);
 
 	public abstract void update(double time);
 
@@ -176,14 +174,8 @@ public abstract class Environment implements KeyListener, Serializable {
 		}
 	}
 
-	public void draw(Renderer renderer) {
-
-	}
+	public void draw(Renderer renderer) {}
 	
-	public int[] getGroundColor(int robotId) {
-		return null;
-	}
-
 	public void addRobots(LinkedList<Robot> robots) {
 		for(Robot r : robots)
 			addRobot(r);

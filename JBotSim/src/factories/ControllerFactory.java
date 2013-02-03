@@ -26,7 +26,7 @@ public class ControllerFactory extends Factory implements Serializable {
 			throw new RuntimeException("Controller 'name' not defined: "+arguments.toString());
 
 		String controllerName = arguments.getArgumentAsString("name");
-
+		
 		try {
 			Constructor<?>[] constructors = Class.forName(controllerName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {

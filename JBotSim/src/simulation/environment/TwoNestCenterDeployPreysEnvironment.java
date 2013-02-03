@@ -7,8 +7,7 @@ import simulation.Simulator;
 import simulation.physicalobjects.Prey;
 import simulation.util.Arguments;
 
-public class TwoNestCenterDeployPreysEnvironment extends
-		TwoNestSimpleForageEnvironment implements NestEnvironment {
+public class TwoNestCenterDeployPreysEnvironment extends TwoNestSimpleForageEnvironment {
 
 	private int numberOfPreysAvailable;
 	private double rateOfNewPreyPerCycle;
@@ -19,29 +18,22 @@ public class TwoNestCenterDeployPreysEnvironment extends
 			Arguments arguments) {
 		super(simulator, arguments);
 
-		numberOfPreysAvailable = arguments
-				.getArgumentIsDefined("numberOfPreysAvailable") ? arguments
-				.getArgumentAsInt("numberOfPreysAvailable") : 3;
-
-		rateOfNewPreyPerCycle = arguments
-				.getArgumentIsDefined("rateOfNewPreyPerCycle") ? arguments
-				.getArgumentAsDouble("rateOfNewPreyPerCycle") : .1;
+		numberOfPreysAvailable = arguments.getArgumentAsIntOrSetDefault("numberOfPreysAvailable",3);
+		rateOfNewPreyPerCycle = arguments.getArgumentAsIntOrSetDefault("rateOfNewPreyPerCycle",1);
 	}
 	
 	@Override
-	public void setup() {
-		super.setup();
-		deployPreys();
+	public void setup(Simulator simulator) {
+		super.setup(simulator);
+		deployPreys(simulator);
 	}
 
 	protected Vector2d newRandomPosition() {
-		return new Vector2d(0, simulator.getRandom().nextDouble()
-				* 2 * forageLimit - forageLimit);
+		return new Vector2d(0, random.nextDouble() * 2 * forageLimit - forageLimit);
 	}
 
 	protected void reDeployPreys() {
-		if (simulator.getRandom().nextFloat() < rateOfNewPreyPerCycle
-				&& foragedPreys.size() > 0) {
+		if (random.nextFloat() < rateOfNewPreyPerCycle && foragedPreys.size() > 0) {
 			Prey newPrey = foragedPreys.poll();
 			newPrey.setEnabled(true);
 			newPrey.teleportTo(newRandomPosition());

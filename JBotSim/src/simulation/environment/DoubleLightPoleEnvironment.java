@@ -20,7 +20,7 @@ public class DoubleLightPoleEnvironment extends Environment {
 	}
 	
 	@Override
-	public void setup() {
+	public void setup(Simulator simulator) {
 		double auxWidth = widthPole + lightPoleDistance;
 		lightPoleLeft = new LightPole(simulator, "Left", widthPole, heightPole,lightPoleRadius);
 		lightPoleRight = new LightPole(simulator, "Right", auxWidth, heightPole,lightPoleRadius);
@@ -46,10 +46,8 @@ public class DoubleLightPoleEnvironment extends Environment {
 
 	@Override
 	public void draw(Renderer renderer) {
-		renderer.drawCircle(lightPoleLeft.getPosition(),
-				lightPoleLeft.getRadius());
-		renderer.drawCircle(lightPoleRight.getPosition(),
-				lightPoleRight.getRadius());
+		renderer.drawCircle(lightPoleLeft.getPosition(),lightPoleLeft.getRadius());
+		renderer.drawCircle(lightPoleRight.getPosition(),lightPoleRight.getRadius());
 	}
 	@Override
 	public void update(double time) {}

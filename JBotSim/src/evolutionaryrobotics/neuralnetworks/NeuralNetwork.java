@@ -23,10 +23,7 @@ public abstract class NeuralNetwork implements Serializable{
 
 	protected int numberOfInputNeurons    = 0;
 	protected int numberOfOutputNeurons   = 0;
-	protected int requiredNumberOfWeights = -1;
-
-	public NeuralNetwork() {
-	}
+	protected int genomeLength = -1;
 
 	public void create(Vector<NNInput> inputs, Vector<NNOutput> outputs) {
 		this.inputs = inputs;
@@ -54,8 +51,8 @@ public abstract class NeuralNetwork implements Serializable{
 	}
 
 	public void setWeights(double[] weights) {
-		if (weights.length != requiredNumberOfWeights) {
-			throw new IllegalArgumentException("Found " + weights.length + " weights, but need " + requiredNumberOfWeights + " for " + this.getClass() + " with " + numberOfInputNeurons + " input neurons and " + numberOfOutputNeurons + " output neurons.\nNNInputs: " + inputs + "\nOutputs: " + outputs);
+		if (weights.length != genomeLength) {
+			throw new IllegalArgumentException("Found " + weights.length + " weights, but need " + genomeLength + " for " + this.getClass() + " with " + numberOfInputNeurons + " input neurons and " + numberOfOutputNeurons + " output neurons.\nNNInputs: " + inputs + "\nOutputs: " + outputs);
 		}
 		
 		this.weights = weights.clone();
@@ -94,11 +91,11 @@ public abstract class NeuralNetwork implements Serializable{
 	protected abstract double[] propagateInputs(double[] inputValues);
 
 	protected void setRequiredNumberOfWeights(int numberOfWeights) {
-		this.requiredNumberOfWeights = numberOfWeights;		
+		this.genomeLength = numberOfWeights;		
 	}
 
-	public int getRequiredNumberOfWeights() {
-		return requiredNumberOfWeights;
+	public int getGenomeLength() {
+		return genomeLength;
 	}
 
 	public void enableWeightNoise(double noiseAmount, Random random) {

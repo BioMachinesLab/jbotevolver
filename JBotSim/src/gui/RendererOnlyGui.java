@@ -46,8 +46,7 @@ public class RendererOnlyGui implements Gui {
 
 
 //	@Override
-	public void run(Simulator simulator, Renderer rendererTo,
-			 int maxNumberOfSteps) {
+	public void run(Simulator simulator, Renderer rendererTo, int maxNumberOfSteps) {
 
 //		frame.getContentPane().addKeyListener(experiment.getEnvironment());
 		int currentStep = 0;

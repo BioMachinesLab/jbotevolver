@@ -53,8 +53,8 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	public void end() {
 	}
 
-	public int getRequiredNumberOfWeights() {
-		return neuralNetwork.getRequiredNumberOfWeights();
+	public int getGenomeLength() {
+		return neuralNetwork.getGenomeLength();
 	}
 
 	public NeuralNetwork getNeuralNetwork() {

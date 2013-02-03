@@ -5,13 +5,15 @@ import simulation.util.Arguments;
 
 public class NoLandmarksEnvironment extends Environment {
 
-	private double forageLimit, forbiddenArea;
+	private double forageLimit;
+	private double forbiddenArea;
+	
 	public NoLandmarksEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 	}
 	
 	@Override
-	public void setup() {}
+	public void setup(Simulator simulator) {}
 	
 	public double getForageRadius() {
 		return forageLimit;

@@ -13,8 +13,7 @@ import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class TwoNestSimpleForageEnvironment extends TwoNestForageEnvironment
-		implements NestEnvironment {
+public class TwoNestSimpleForageEnvironment extends TwoNestForageEnvironment {
 
 	// private static final double PREY_RADIUS = 0.025;
 	// private static final double PREY_MASS = 1;
@@ -34,8 +33,7 @@ public class TwoNestSimpleForageEnvironment extends TwoNestForageEnvironment
 	// super(simulator, width, height);
 	// }
 
-	public TwoNestSimpleForageEnvironment(Simulator simulator,
-			Arguments arguments) {
+	public TwoNestSimpleForageEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 
 		// nestDistance = arguments.getArgumentIsDefined("nestdistance") ?
@@ -64,7 +62,7 @@ public class TwoNestSimpleForageEnvironment extends TwoNestForageEnvironment
 	}
 	
 	@Override
-	public void setup() {
+	public void setup(Simulator simulator) {
 		// nestA = new Nest(simulator, "NestA", -nestDistance / 2, 0,
 		// nestLimit);
 		// nestA.setParameter("TEAM", 1);

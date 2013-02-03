@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import comm.FileProvider;
+
 import mathutils.Point2d;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -33,7 +35,6 @@ public class TMazeEnvironment extends Environment {
 	private boolean randomize = false;
 	private LinkedList<Boolean> lightPoleEnabled = new LinkedList<Boolean>();
 	private boolean firstWall = true;
-	protected boolean inverse = false;
 	private boolean teleported = false;
 	private int fitnesssample = 0;
 	private boolean mirror = false;
@@ -45,9 +46,11 @@ public class TMazeEnvironment extends Environment {
 	private double randomizeOrientation = 0;
 	private double randomizeY = 0;
 	private String mazeName;
-	private SimRandom random;
+	private FileProvider fileProvider;
 	private int numberOfMazes;
 	private int numberOfDifferentSamples;
+	protected boolean inverse = false;
+	protected SimRandom random;
 
 	public TMazeEnvironment(Simulator simulator, Arguments arguments) {
 		this(simulator,arguments,true);
@@ -58,6 +61,8 @@ public class TMazeEnvironment extends Environment {
 		super(simulator, arguments);
 		
 		this.random = simulator.getRandom();
+		this.fileProvider = simulator.getFileProvider();
+		
 		this.firstWall = firstWall;
 		
 		forbiddenArea = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")	: 7;
@@ -98,20 +103,20 @@ public class TMazeEnvironment extends Environment {
 		}
 	}
 	
-	public void setup() {
+	public void setup(Simulator simulator) {
 		if(numberOfMazes > 0)
 		{
 			int currentMaze = currentSample % numberOfMazes;
 			
 			try {
-				Scanner s = new Scanner(simulator.getFileProvider().getFile("mazes/"+mazeName+currentMaze+".txt"));
+				Scanner s = new Scanner(fileProvider.getFile("mazes/"+mazeName+currentMaze+".txt"));
 				s.useDelimiter("\n");
 				if(!randomize || currentSample < numberOfDifferentSamples) {
 					fitnesssample = currentSample % numberOfDifferentSamples;
-					createMaze(s, fitnesssample);
+					createMaze(simulator, s, fitnesssample);
 				} else {
-					fitnesssample = simulator.getRandom().nextInt(numberOfDifferentSamples);
-					createMaze(s, fitnesssample);
+					fitnesssample = random.nextInt(numberOfDifferentSamples);
+					createMaze(simulator, s, fitnesssample);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -143,7 +148,7 @@ public class TMazeEnvironment extends Environment {
 		}
 	}
 	
-	private void createMaze(Scanner s, int currentSample) {
+	private void createMaze(Simulator simulator, Scanner s, int currentSample) {
 		
 		squares = new LinkedList<Square>();
 		allSquares = new LinkedList<Square>();
@@ -240,17 +245,17 @@ public class TMazeEnvironment extends Environment {
 			double wallSize = 0.1;
 			
 			if(sq.walls[0]==1)
-				createWall(sq.x,sq.y+squareSize/2,squareSize+0.1,wallSize);
+				createWall(simulator, sq.x,sq.y+squareSize/2,squareSize+0.1,wallSize);
 			if(sq.walls[1]==1)
-				createWall(sq.x+squareSize/2,sq.y,wallSize,squareSize+0.1);
+				createWall(simulator, sq.x+squareSize/2,sq.y,wallSize,squareSize+0.1);
 			if(sq.walls[2]==1)
-				createWall(sq.x,sq.y-squareSize/2,squareSize+0.1,wallSize);
+				createWall(simulator, sq.x,sq.y-squareSize/2,squareSize+0.1,wallSize);
 			if(sq.walls[3]==1)
-				createWall(sq.x-squareSize/2,sq.y,wallSize,squareSize+0.1);
+				createWall(simulator, sq.x-squareSize/2,sq.y,wallSize,squareSize+0.1);
 		}
 	}
 	
-	protected void createWall(double x, double y, double width, double height) {
+	protected void createWall(Simulator simulator, double x, double y, double width, double height) {
 		Wall w = new Wall(simulator,"wall",x,y,Math.PI,1,1,0,width,height,PhysicalObjectType.WALL);
 		this.addObject(w);
 	}
@@ -288,7 +293,7 @@ public class TMazeEnvironment extends Environment {
 		
 		//jesus christ... crappy code ahoy!
 		if(onlyMaze && !inverse && mixed && !teleported) {
-			double randomY = simulator.getRandom().nextDouble()*0.2-0.5;
+			double randomY = random.nextDouble()*0.2-0.5;
 			robots.get(0).teleportTo(new Vector2d(getSquares().peek().getX(),getSquares().peek().getY()+randomY));
 			robots.get(0).setOrientation(Math.PI/2);
 			teleported = true;
@@ -299,12 +304,12 @@ public class TMazeEnvironment extends Environment {
 			double orientation = Math.PI/2;
 			
 			if(randomizeOrientation > 0)
-				orientation+=simulator.getRandom().nextDouble()*randomizeOrientation;
+				orientation+=random.nextDouble()*randomizeOrientation;
 			
 			double randomY = 0;
 			
 			if(randomizeY > 0) {
-				randomY = simulator.getRandom().nextDouble()*randomizeY*-1;
+				randomY = random.nextDouble()*randomizeY*-1;
 			}
 			
 			if(fitnesssample == 1 || fitnesssample == 3) {

@@ -14,16 +14,17 @@ import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 import simulation.util.SimRandom;
 
-public class RoundForageEnvironment extends Environment implements NestEnvironment{
+public class RoundForageEnvironment extends Environment {
 
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1;
 	private double nestLimit;
 	private double forageLimit;
 	private	double forbiddenArea;
-	private int    numberOfPreys;
-	private Nest   nest;
-	private int    numberOfFoodSuccessfullyForaged = 0;
+	private int numberOfPreys;
+	private Nest nest;
+	private int numberOfFoodSuccessfullyForaged = 0;
+	private SimRandom random;
 
 	public RoundForageEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
@@ -31,6 +32,8 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 		nestLimit       = arguments.getArgumentIsDefined("nestlimit") ? arguments.getArgumentAsDouble("nestlimit")       : .5;
 		forageLimit     = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit")       : 2.0;
 		forbiddenArea   = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")       : 5.0;
+		
+		this.random = simulator.getRandom();
 		
 		if(arguments.getArgumentIsDefined("densityofpreys")){
 			double densityoffood = arguments.getArgumentAsDouble("densityofpreys");
@@ -41,7 +44,7 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 	}
 	
 	@Override
-	public void setup() {
+	public void setup(Simulator simulator) {
 		for(int i = 0; i < numberOfPreys; i++ ){
 			addPrey(new Prey(simulator, "Prey "+i, newRandomPosition(), 0, PREY_MASS, PREY_RADIUS));
 		}
@@ -50,8 +53,8 @@ public class RoundForageEnvironment extends Environment implements NestEnvironme
 	}
 
 	private Vector2d newRandomPosition() {
-		double radius=simulator.getRandom().nextDouble()*(forageLimit-nestLimit)+nestLimit;
-		double angle=simulator.getRandom().nextDouble()*2*Math.PI;
+		double radius = random.nextDouble()*(forageLimit-nestLimit)+nestLimit;
+		double angle = random.nextDouble()*2*Math.PI;
 		return new Vector2d(radius*Math.cos(angle),radius*Math.sin(angle));
 	}
 	@Override
