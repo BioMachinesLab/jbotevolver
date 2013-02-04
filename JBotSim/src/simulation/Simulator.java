@@ -3,16 +3,18 @@ package simulation;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import comm.FileProvider;
-import factories.ControllerFactory;
-import factories.EnvironmentFactory;
-import factories.RobotFactory;
+import java.util.HashMap;
+import java.util.Random;
+
 import simulation.environment.Environment;
 import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 import simulation.util.SimRandom;
+
+import comm.FileProvider;
 
 public class Simulator implements Serializable {
 
@@ -20,7 +22,7 @@ public class Simulator implements Serializable {
 	protected Double time = Double.valueOf(0);
 	protected double timeDelta = 0.1;
 	protected Environment environment;
-	protected SimRandom random;
+	protected Random random;
 	protected FileProvider fileProvider = FileProvider.getDefaultFileProvider();
 	private int numberRobots = 0;
 	private int numberPhysicalObjects = 0;
@@ -28,15 +30,11 @@ public class Simulator implements Serializable {
 	private GeometricCalculator calculator;
 	private boolean stopSimulation = false;
 	
-	protected ControllerFactory controllerFactory; 
-	protected RobotFactory robotFactory;
-	protected EnvironmentFactory environmentFactory;
+	private HashMap<String,Arguments> arguments = new HashMap<String,Arguments>(); 
 	
-	public Simulator(SimRandom random) {
+	public Simulator(Random random, HashMap<String,Arguments> arguments) {
 		this.random = random;
-		environmentFactory = new EnvironmentFactory(this);
-		controllerFactory  = new ControllerFactory(this);
-		robotFactory       = new RobotFactory(this);
+		this.arguments = arguments;
 		calculator = new GeometricCalculator();
 	}
 	
@@ -56,7 +54,7 @@ public class Simulator implements Serializable {
 		return environment;
 	}
 
-	public SimRandom getRandom() {
+	public Random getRandom() {
 		return random;
 	}
 
@@ -139,20 +137,12 @@ public class Simulator implements Serializable {
 	public int getAndIncrementNumberPhysicalObjects(PhysicalObjectType type) {
 		return type == PhysicalObjectType.ROBOT ? this.numberRobots++ : maxNumberRobots + numberPhysicalObjects++;
 	}
-
-	public EnvironmentFactory getEnvironmentFactory() {
-		return environmentFactory;
-	}
-	
-	public ControllerFactory getControllerFactory() {
-		return controllerFactory;
-	}
-	
-	public RobotFactory getRobotFactory() {
-		return robotFactory;
-	}
 	
 	public void stopSimulation() {
 		stopSimulation = true;
+	}
+	
+	public HashMap<String, Arguments> getArguments() {
+		return arguments;
 	}
 }

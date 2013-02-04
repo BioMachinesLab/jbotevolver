@@ -4,13 +4,14 @@ import java.awt.Color;
 
 import simulation.Simulator;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class RobotColorActuator extends Actuator {	
 
 	Color   color = Color.BLACK;
 	
-	public RobotColorActuator(Simulator simulator, int id) {
-		super(simulator, id);
+	public RobotColorActuator(Simulator simulator, int id, Arguments args) {
+		super(simulator, id, args);
 	}
 
 	public void turnRed(){

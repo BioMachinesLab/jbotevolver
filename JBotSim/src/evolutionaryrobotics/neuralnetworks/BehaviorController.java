@@ -16,7 +16,7 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 	int currentSubNetwork = 0;
 	boolean keepFeeding = false;
 	boolean resetChosen = true;
-	boolean master = false;
+//	boolean master = false;
 	
 	public BehaviorController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
@@ -76,25 +76,23 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 	private void setupControllers(Simulator simulator, Arguments args) {
 		
 		try {
-			ControllerFactory factory = new ControllerFactory(simulator);
-			
 			if(!args.getArgumentAsString("subcontrollers").isEmpty()) {
 				Arguments subControllerArgs = Arguments.createOrPrependArguments(null, args.getArgumentAsString("subcontrollers"));
 				
 				for(int i = 0 ; i < subControllerArgs.getNumberOfArguments() ; i++) {
 					Arguments currentSubControllerArgs = Arguments.createOrPrependArguments(null, subControllerArgs.getArgumentAsString(subControllerArgs.getArgumentAt(i)));
-					subControllers.add(factory.getController(robot, currentSubControllerArgs));
+					subControllers.add(ControllerFactory.getController(simulator, robot, currentSubControllerArgs));
 				}
 			}
 			
-	//		for(Controller c : subControllers)
-	//			if(c instanceof BehaviorController)
-	//				master = true;
+//			for(Controller c : subControllers)
+//				if(c instanceof BehaviorController)
+//					master = true;
 			
 			//Setting up main Controller
 			String oldName = args.getArgumentAsString("name");
 			args.setArgument("name", args.getArgumentAsString("type"));
-			mainController = (NeuralNetworkController)factory.getController(robot, args);
+			mainController = (NeuralNetworkController)ControllerFactory.getController(simulator, robot, args);
 			args.setArgument("name", oldName);
 			
 			resetChosen = args.getArgumentAsIntOrSetDefault("resetchosen", 1) == 1;
@@ -111,6 +109,10 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 	
 	public int getCurrentSubNetwork() {
 		return currentSubNetwork;
+	}
+	
+	public int getGenomeLength() {
+		return mainController.getGenomeLength();
 	}
 	
 	@Override

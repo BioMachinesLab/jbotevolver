@@ -16,12 +16,7 @@ import simulation.util.Arguments;
 
 public class GuiFactory extends Factory implements Serializable {
 
-	public GuiFactory(Simulator simulator) {
-		super(simulator);
-		// TODO Auto-generated constructor stub
-	}
-
-	public Gui getGui(Arguments arguments) throws Exception {
+	public static Gui getGui(Simulator simulator, Arguments arguments) throws Exception {
 		if (arguments == null) {
 			return new WithControlsGui(simulator, new TwoDRenderer(simulator)); 
 		}

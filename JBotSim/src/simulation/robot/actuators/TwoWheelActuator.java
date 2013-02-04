@@ -1,9 +1,9 @@
 package simulation.robot.actuators;
 
+import java.util.Random;
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
-import simulation.util.SimRandom;
 import simulation.util.Arguments;
 
 public class TwoWheelActuator extends Actuator {
@@ -12,12 +12,11 @@ public class TwoWheelActuator extends Actuator {
 
 	private double leftSpeed = 0;
 	private double rightSpeed = 0;
-	private SimRandom random;
-
+	private Random random;
 	protected double maxSpeed;
 	
 	public TwoWheelActuator(Simulator simulator, int id, Arguments arguments) {
-		super(simulator, id);
+		super(simulator, id, arguments);
 		this.random = simulator.getRandom();
 		this.maxSpeed = arguments.getArgumentAsDoubleOrSetDefault("maxspeed", 0.1);
 	}
@@ -37,8 +36,8 @@ public class TwoWheelActuator extends Actuator {
 
 	@Override
 	public void apply(Robot robot) {
-		leftSpeed *= (1 + random.nextGaussian() * NOISESTDEV);
-		rightSpeed *= (1 + random.nextGaussian() * NOISESTDEV);
+		leftSpeed*= (1 + random.nextGaussian() * NOISESTDEV);
+		rightSpeed*= (1 + random.nextGaussian() * NOISESTDEV);
 
 		if (leftSpeed < -Robot.MAXIMUMSPEED)
 			leftSpeed = -Robot.MAXIMUMSPEED;

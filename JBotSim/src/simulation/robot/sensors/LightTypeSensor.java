@@ -1,15 +1,14 @@
 package simulation.robot.sensors;
 
 import java.util.Arrays;
+import java.util.Random;
 
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowLightChecker;
-import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 public class LightTypeSensor extends ConeTypeSensor{
 	private static final double NOISESTDEV = 0.01;
@@ -20,7 +19,7 @@ public class LightTypeSensor extends ConeTypeSensor{
 	protected double maxDistance;	
 	protected double r;
 
-	protected SimRandom random;
+	protected Random random;
 	
 	public LightTypeSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);

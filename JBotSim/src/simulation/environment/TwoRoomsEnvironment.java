@@ -1,9 +1,7 @@
 package simulation.environment;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.PhysicalObjectType;
@@ -13,14 +11,13 @@ import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 public class TwoRoomsEnvironment extends Environment {
 	
 	private LinkedList<Wall> buttons = new LinkedList<Wall>();
 	private int numberOfPreys = 0;
 	private Random preyRandom = new Random();
-	private SimRandom random;
+	private Random random;
 	private double splitRatio = 0.7;
 	private int timeBetweenPreys = 100;
 	private int maxPreys = 10;

@@ -1,6 +1,7 @@
 package simulation.robot.sensors;
 
 import java.util.ArrayList;
+import java.util.Random;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
@@ -13,7 +14,6 @@ import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 public abstract class ConeTypeSensor extends Sensor {
 
@@ -31,7 +31,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected Environment env;
 	protected Double time;
 	protected GeometricCalculator geoCalc;
-	protected SimRandom random;
+	protected Random random;
 	
 	public ConeTypeSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id, robot, args);

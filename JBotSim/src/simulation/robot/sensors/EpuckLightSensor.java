@@ -2,6 +2,7 @@ package simulation.robot.sensors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -14,7 +15,6 @@ import simulation.physicalobjects.checkers.AllowLightChecker;
 import simulation.robot.Epuck;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 /**
  * Sensors that mimic those of the e-puck. More information here:
@@ -54,7 +54,7 @@ public class EpuckLightSensor extends LightTypeSensor {
 	double lastNetworkInputValue[];
 	double maximumNNInputValueDrop  = 0;
 
-	protected SimRandom random;
+	protected Random random;
 	
 //	public EpuckLightSensor(Simulator simulator,int id, Robot robot, Vector2d [] positions, 
 //			double openingAngle, double range, double maximumNNInputValueDrop, AllowedObjectsChecker allowedSources, int fixedTimeSteps) {

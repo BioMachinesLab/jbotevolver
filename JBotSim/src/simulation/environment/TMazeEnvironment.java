@@ -6,9 +6,8 @@ import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.Scanner;
-
-import comm.FileProvider;
 
 import mathutils.Point2d;
 import mathutils.Vector2d;
@@ -19,7 +18,8 @@ import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
+
+import comm.FileProvider;
 
 public class TMazeEnvironment extends Environment {
 
@@ -50,7 +50,7 @@ public class TMazeEnvironment extends Environment {
 	private int numberOfMazes;
 	private int numberOfDifferentSamples;
 	protected boolean inverse = false;
-	protected SimRandom random;
+	protected Random random;
 
 	public TMazeEnvironment(Simulator simulator, Arguments arguments) {
 		this(simulator,arguments,true);

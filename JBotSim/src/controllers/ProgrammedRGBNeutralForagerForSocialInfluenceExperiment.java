@@ -1,11 +1,11 @@
 package controllers;
 
+import java.util.Random;
 import simulation.Simulator;
 import simulation.environment.RoundForageEnvironment;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 public class ProgrammedRGBNeutralForagerForSocialInfluenceExperiment extends
 		ProgrammedRGBForagerForSocialInfluenceExperiment {
@@ -13,7 +13,7 @@ public class ProgrammedRGBNeutralForagerForSocialInfluenceExperiment extends
 	private static final double SPEED_FRACTION = .5;
 	private static final double PROB_GRAB = .5;
 	private static final double PROB_RELEASE = .001;
-	private SimRandom random;
+	private Random random;
 	private double onLimitDistance;
 	private double maxNestReading;
 	private double grabLimit;

@@ -2,23 +2,21 @@ package simulation.robot.sensors;
 
 import java.awt.Color;
 import java.util.Arrays;
+import java.util.Random;
 
-import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowAllRobotsChecker;
-import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 public class SimpleRobotColorSensor extends ConeTypeSensor {
 	private double openingAngle;
 	private double r;
 	private Color mode;
 
-	protected SimRandom random;
+	protected Random random;
 	
 	// public static float NOISESTDEV = 0.05f;
 

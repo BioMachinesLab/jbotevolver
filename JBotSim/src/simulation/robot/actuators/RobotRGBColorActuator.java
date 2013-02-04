@@ -2,6 +2,7 @@ package simulation.robot.actuators;
 
 import simulation.Simulator;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class RobotRGBColorActuator extends Actuator {
 
@@ -15,8 +16,8 @@ public class RobotRGBColorActuator extends Actuator {
 	protected double green = 0.0f;
 	protected double blue  = 0.0f;
 	
-	public RobotRGBColorActuator(Simulator simulator, int id) {
-		super(simulator, id);
+	public RobotRGBColorActuator(Simulator simulator, int id, Arguments args) {
+		super(simulator, id, args);
 	}
 
 	public void setRed(double red) {

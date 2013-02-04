@@ -2,21 +2,20 @@ package simulation.robot.sensors;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Random;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.physicalobjects.GeometricCalculator;
+import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Wall;
-import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.checkers.AllowWallRobotChecker;
-import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 import simulation.robot.Epuck;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 /**
  * Sensors that mimic those of the e-puck. More information here:
@@ -73,7 +72,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	
 	static double distances[] = {0,0.5,1,1.5,2,3,4,5,6,7,8,9,10,11,12};
 
-	protected SimRandom random;
+	protected Random random;
 	
 	public EpuckIRSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);

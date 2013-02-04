@@ -1,5 +1,6 @@
 package simulation.robot.actuators;
 
+import java.util.Random;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects;
@@ -7,7 +8,6 @@ import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 public class PreyPickerActuator extends Actuator {
 
@@ -21,12 +21,12 @@ public class PreyPickerActuator extends Actuator {
 	private PickerStatus status = PickerStatus.OFF;
 	private Vector2d temp = new Vector2d();
 	private boolean stopRobot;
-	private SimRandom random;
+	private Random random;
 	private Prey preyCarried;
 	private int numDrops;
 
 	public PreyPickerActuator(Simulator simulator, int id, Arguments arguments) {
-		super(simulator, id);
+		super(simulator, id, arguments);
 		this.random = simulator.getRandom();
 		this.maxPickDistance = arguments.getArgumentAsDoubleOrSetDefault("maxpickdistance", 0.1);
 

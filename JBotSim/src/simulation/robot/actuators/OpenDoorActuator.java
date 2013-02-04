@@ -17,7 +17,7 @@ public class OpenDoorActuator extends Actuator {
 	private Simulator simulator;
 
 	public OpenDoorActuator(Simulator simulator, int id, Arguments args) {
-		super(simulator, id);
+		super(simulator, id, args);
 		this.simulator = simulator;
 		args.getArgumentAsDoubleOrSetDefault("distancetodoor", distanceToDoor);
 	}

@@ -2,72 +2,45 @@ package factories;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 
-import controllers.Controller;
-import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.OpenDoorActuator;
-import simulation.robot.actuators.PreyPickerActuator;
-import simulation.robot.actuators.RobotColorActuator;
-import simulation.robot.actuators.RobotRGBColorActuator;
-import simulation.robot.actuators.TwoWheelActuator;
-import simulation.robot.sensors.EpuckLightSensor;
-import simulation.robot.sensors.NestSensor;
-import simulation.robot.sensors.SimpleNestSensor;
-import simulation.robot.sensors.SimplePreySensor;
-import simulation.robot.sensors.SimplePreySensorPerimeter;
-import simulation.robot.sensors.WallButtonSensor;
-import simulation.robot.sensors.XRayPreySensor;
-import simulation.robot.sensors.CompassSensor;
-import simulation.robot.sensors.DoubleParameterSensor;
-import simulation.robot.sensors.EpuckIRSensor;
-import simulation.robot.sensors.GroundRGBColorSensor;
-import simulation.robot.sensors.InNestSensor;
-import simulation.robot.sensors.LightTypeSensor;
-import simulation.robot.sensors.NearRobotSensor;
-import simulation.robot.sensors.PerimeterSimpleLightTypeSensor;
-import simulation.robot.sensors.PerimeterSimpleRobotColorSensor;
-import simulation.robot.sensors.PositionSensor;
-import simulation.robot.sensors.PreyCarriedSensor;
-import simulation.robot.sensors.PreySensor;
-import simulation.robot.sensors.RobotColorSensor;
-import simulation.robot.sensors.RobotRGBColorSensor;
 import simulation.robot.sensors.Sensor;
-import simulation.robot.sensors.SimpleLightTypeSensor;
-import simulation.robot.sensors.SimpleRobotColorSensor;
 import simulation.util.Arguments;
 
 public class RobotFactory extends Factory implements Serializable {
-
-	private int numberOfRobots = 0;
-
-	public RobotFactory(Simulator simulator) {
-		super(simulator);
+	
+	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
+		int numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+		ArrayList<Robot> robots = new ArrayList<Robot>(numberOfRobots);
+		for(int i = 0 ; i < numberOfRobots ; i++)
+			robots.add(getRobot(simulator, arguments));
+		return robots;
 	}
 
-	public Robot getRobot(Arguments arguments) {
-		Robot robot = createRobot(arguments);
+	public static Robot getRobot(Simulator simulator, Arguments arguments) {
+		Robot robot = createRobot(simulator, arguments);
 
-		addSensors(robot, arguments);
-		addActuators(robot, arguments);
+		addSensors(simulator, robot, arguments);
+		addActuators(simulator, robot, arguments);
 
 		return robot;
 	}
 
-	public Robot getRobotFromTeam(Arguments arguments, 
-			int team) {
-		Robot robot = createRobot(arguments);
+	public static Robot getRobotFromTeam(Simulator simulator, Arguments arguments, int team) {
+		Robot robot = createRobot(simulator, arguments);
 		robot.setParameter("TEAM", team);
 
-		addSensors(robot, arguments);
-		addActuators(robot, arguments);
+		addSensors(simulator, robot, arguments);
+		addActuators(simulator, robot, arguments);
 		
 		return robot;
 	}
 
-	private Robot createRobot(Arguments arguments) {
+	private static Robot createRobot(Simulator simulator, Arguments arguments) {
+		
 		if (!arguments.getArgumentIsDefined("name")) {
 			throw new RuntimeException("Controller 'name' not defined: "+ arguments.toString());
 		}
@@ -78,9 +51,10 @@ public class RobotFactory extends Factory implements Serializable {
 			Constructor<?>[] constructors = Class.forName(robotName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
-				return (Robot) constructor.newInstance(simulator,arguments);
+				if (params.length == 2 && params[0] == Simulator.class
+						&& params[1] == Arguments.class)
+					return (Robot) constructor.newInstance(simulator,arguments);
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
@@ -88,8 +62,7 @@ public class RobotFactory extends Factory implements Serializable {
 		throw new RuntimeException("Unknown robot: " + robotName);
 	}
 
-	public void addSensors(Robot robot, 
-			Arguments arguments) {
+	public static void addSensors(Simulator simulator, Robot robot, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("sensors"))
 			return;
 
@@ -97,15 +70,12 @@ public class RobotFactory extends Factory implements Serializable {
 				arguments.getArgumentAsString("sensors"));
 
 		for (int i = 0; i < sensors.getNumberOfArguments(); i++) {
-			Sensor sensor = createSensor(i, robot, simulator,
-					sensors.getArgumentAt(i),
-					new Arguments(sensors.getValueAt(i)));
+			Sensor sensor = createSensor(i, robot, simulator,sensors.getArgumentAt(i),new Arguments(sensors.getValueAt(i)));
 			robot.addSensor(sensor);
 		}
 	}
 
-	public void addActuators(Robot robot, 
-			Arguments arguments) {
+	public static void addActuators(Simulator simulator, Robot robot, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("actuators"))
 			return;
 
@@ -113,89 +83,44 @@ public class RobotFactory extends Factory implements Serializable {
 				arguments.getArgumentAsString("actuators"));
 
 		for (int i = 0; i < actuators.getNumberOfArguments(); i++) {
-			Actuator actuator = createActuator(i, robot, 
-					actuators.getArgumentAt(i),
-					new Arguments(actuators.getValueAt(i)));
+			Actuator actuator = createActuator(simulator, i, robot, actuators.getArgumentAt(i),new Arguments(actuators.getValueAt(i)));
 			robot.addActuator(actuator);
 		}
 	}
 
-	public Sensor createSensor(int id, Robot robot, 
-			Simulator simulator, String name, Arguments arguments) {
+	public static Sensor createSensor(int id, Robot robot, Simulator simulator, String name, Arguments arguments) {
 		if (arguments.getArgumentIsDefined("id")) {
 			id = arguments.getArgumentAsInt("id");
 		}
-		if (name.equalsIgnoreCase("nestsensor")) {
-			return new NestSensor(simulator,id,robot,arguments);
-		} else if (name.equalsIgnoreCase("nearrobot") || name.equalsIgnoreCase("nearrobotsensor")) {
-			return new NearRobotSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("lightsensor")) {
-			return new LightTypeSensor(simulator, id, robot,arguments);
-		} else if (name.equalsIgnoreCase("epucklightsensor")) {
-			return new EpuckLightSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("preysensor")) {
-			return new PreySensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("simplenestsensor")) {
-			return new SimpleNestSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("simpleteamnestsensor")) {
-			return new SimpleLightTypeSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("simplenestsensorperimeter")) {
-			return new PerimeterSimpleLightTypeSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("simplepreysensor")) {
-			return new SimplePreySensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("XRayPreySensor")) {
-			return new XRayPreySensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("simplepreysensorperimeter")) {
-			return new SimplePreySensorPerimeter(simulator, id, robot,arguments);
-		} else if (name.equalsIgnoreCase("doubleparametersensor")) {
-			return new DoubleParameterSensor(simulator, id, robot,arguments);
-		} else if (name.equalsIgnoreCase("preycarriedsensor")) {
-			return new PreyCarriedSensor(simulator, id, robot,arguments);
-		} else if (name.equalsIgnoreCase("innestsensor")) {
-			return new InNestSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("compasssensor")) {
-			return new CompassSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("positionsensor")) {
-			return new PositionSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("robotcolorsensor")) {
-			return new RobotColorSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("simplerobotcolorsensor")) {
-			return new SimpleRobotColorSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("simplerobotcolorsensorperimeter")) {
-			return new PerimeterSimpleRobotColorSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("robotrgbcolorsensor")) {
-			return new RobotRGBColorSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("groundrgbcolorsensor")) {
-			return new GroundRGBColorSensor(simulator, id, robot, arguments);
-		} else if (name.equalsIgnoreCase("epuckirsensor")) {
-			return new EpuckIRSensor(simulator, id, robot,arguments);
-		} else if (name.equalsIgnoreCase("wallbuttonsensor")) {
-			return new WallButtonSensor(simulator, id, robot, arguments);
-		} else {
-			throw new RuntimeException("Unknown sensor: " + name);
-		}
+		try {
+			Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
+			for (Constructor<?> constructor : constructors) {
+				Class<?>[] params = constructor.getParameterTypes();
+				if (params.length == 4 && params[0] == Simulator.class && params[1] == int.class
+						&& params[2] == Robot.class && params[3] == Arguments.class)
+					return (Sensor) constructor.newInstance(simulator,id,robot,arguments);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		throw new RuntimeException("Unknown sensor: " + name);
 	}
 
-	public Actuator createActuator(int id, Robot robot, 
-			String name, Arguments arguments) {
+	public static Actuator createActuator(Simulator simulator, int id, Robot robot, String name, Arguments arguments) {
 		if (arguments.getArgumentIsDefined("id")) {
 			id = arguments.getArgumentAsInt("id");
 		}
-		if (name.equalsIgnoreCase("twowheelact")
-				|| name.equalsIgnoreCase("twowheel")
-				|| name.equalsIgnoreCase("twowheelactuator")) {
-			return new TwoWheelActuator(simulator, id, arguments);
-
-		} else if (name.equalsIgnoreCase("preypicker")
-				|| name.equalsIgnoreCase("preypickeractuator")) {
-			return new PreyPickerActuator(simulator, id, arguments);
-		
-		} else if (name.equalsIgnoreCase("opendoor")
-				|| name.equalsIgnoreCase("opendooractuator")) {
-			return new OpenDoorActuator(simulator, id,arguments);
-		}
-
-		else
-			throw new RuntimeException("Unknown actuator: " + name);
+		try {
+			Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
+			for (Constructor<?> constructor : constructors) {
+				Class<?>[] params = constructor.getParameterTypes();
+				if (params.length == 4 && params[0] == Simulator.class && params[1] == int.class
+						&& params[2] == Robot.class && params[3] == Arguments.class)
+					return (Actuator) constructor.newInstance(simulator,id,robot,arguments);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		throw new RuntimeException("Actuator sensor: " + name);
 	}
 }

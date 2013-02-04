@@ -3,6 +3,7 @@ package evolutionaryrobotics.neuralnetworks.inputs;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import factories.ControllerFactory;
 
 public class SysoutNNInput extends NNInput {
 
@@ -10,8 +11,8 @@ public class SysoutNNInput extends NNInput {
 	
 	public SysoutNNInput(Simulator simulator, Robot robot, Arguments args) {
 		String newName = args.getArgumentAt(0);
-		Arguments actuators = new Arguments(args.getArgumentAsString(newName));
-		this.nnInput = simulator.getControllerFactory().createInput(robot, newName, args);
+		Arguments newArgs = new Arguments(args.getArgumentAsString(newName));
+		this.nnInput = ControllerFactory.createInput(simulator, robot, newName, newArgs);
 	}
 	
 	public SysoutNNInput(NNInput nnInput) {
@@ -22,7 +23,7 @@ public class SysoutNNInput extends NNInput {
 		return nnInput.getNumberOfInputValues();
 	}
 
-//	@Override
+	@Override
 	public double getValue(int index) {
 		if (index == nnInput.getNumberOfInputValues()-1) {
 			System.out.print(nnInput + ": ");

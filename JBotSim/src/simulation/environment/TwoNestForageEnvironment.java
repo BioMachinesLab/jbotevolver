@@ -14,7 +14,6 @@ import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 public class TwoNestForageEnvironment extends Environment {
 
@@ -30,7 +29,7 @@ public class TwoNestForageEnvironment extends Environment {
 	protected int numberOfFoodSuccessfullyForagedNestB = 0;
 	protected double nestDistance;
 	protected Vector2d center = new Vector2d(0, 0);
-	protected SimRandom random;
+	protected Random random;
 
 	public TwoNestForageEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);

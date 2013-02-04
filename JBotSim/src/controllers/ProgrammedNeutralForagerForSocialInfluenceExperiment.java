@@ -16,7 +16,7 @@ public class ProgrammedNeutralForagerForSocialInfluenceExperiment extends
 	private static final double SPEED_FRACTION = .5;
 	private static double PROB_GRAB = .5;
 	private static double PROB_RELEASE = .001;
-	private SimRandom random;
+	private Random random;
 	private double onLimitDistance;
 	private double maxNestReading;
 	private double grabLimit;

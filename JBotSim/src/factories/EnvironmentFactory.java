@@ -9,13 +9,7 @@ import simulation.util.Arguments;
 
 public class EnvironmentFactory extends Factory implements Serializable {
 
-	public EnvironmentFactory(Simulator simulator) {
-		super(simulator);
-	}
-
-	public Environment getEnvironment(Arguments arguments) {
-
-		System.out.println(RoundForageEnvironment.class.getName());
+	public static Environment getEnvironment(Simulator simulator, Arguments arguments) {
 
 		if (!arguments.getArgumentIsDefined("name")) {
 			throw new RuntimeException("Environment 'name' not defined: "
@@ -25,14 +19,12 @@ public class EnvironmentFactory extends Factory implements Serializable {
 		String environmentName = arguments.getArgumentAsString("name");
 
 		try {
-			Constructor<?>[] constructors = Class.forName(environmentName)
-					.getDeclaredConstructors();
+			Constructor<?>[] constructors = Class.forName(environmentName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
 				if (params.length == 2 && params[0] == Simulator.class
 						&& params[1] == Arguments.class) {
-					return (Environment) constructor.newInstance(simulator,
-							arguments);
+					return (Environment) constructor.newInstance(simulator, arguments);
 				}
 			}
 			throw new RuntimeException("Missing constructor on class "
@@ -43,9 +35,5 @@ public class EnvironmentFactory extends Factory implements Serializable {
 		}
 
 		throw new RuntimeException("Unknown environment: " + environmentName);
-	}
-
-	public String getAvailableEnvironments() {
-		return "DoubleLightPole, RoundForage, GroupedPrey, NoLandmarks, Maze";
 	}
 }

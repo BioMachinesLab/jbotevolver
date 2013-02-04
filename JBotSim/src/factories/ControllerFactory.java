@@ -16,11 +16,7 @@ import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 public class ControllerFactory extends Factory implements Serializable {
 
-	public ControllerFactory(Simulator simulator) {
-		super(simulator);
-	}
-
-	public Controller getController(Robot robot, Arguments arguments) {
+	public static Controller getController(Simulator simulator, Robot robot, Arguments arguments) {
 
 		if (!arguments.getArgumentIsDefined("name"))
 			throw new RuntimeException("Controller 'name' not defined: "+arguments.toString());
@@ -45,7 +41,7 @@ public class ControllerFactory extends Factory implements Serializable {
 		throw new RuntimeException("Unknown controller: " + controllerName);
 	}
 
-	public Vector<NNInput> getNNInputs(Robot robot, Arguments arguments) {
+	public static Vector<NNInput> getNNInputs(Simulator simulator, Robot robot, Arguments arguments) {
 
 		Arguments inputs = new Arguments(arguments.getArgumentAsString("inputs"));
 		Vector<NNInput> nnInputs = new Vector<NNInput>();
@@ -54,14 +50,14 @@ public class ControllerFactory extends Factory implements Serializable {
 			nnInputs = getInputsAutomatically(robot);
 		} else {
 			for (int i = 0; i < inputs.getNumberOfArguments(); i++) {
-				NNInput nnInput = createInput(robot, inputs.getArgumentAt(i),new Arguments(inputs.getValueAt(i)));
+				NNInput nnInput = createInput(simulator, robot, inputs.getArgumentAt(i),new Arguments(inputs.getValueAt(i)));
 				nnInputs.add(nnInput);
 			}
 		}
 		return nnInputs;
 	}
 
-	private Vector<NNInput> getInputsAutomatically(Robot robot) {
+	private static Vector<NNInput> getInputsAutomatically(Robot robot) {
 		Vector<NNInput> nnInputs = new Vector<NNInput>();
 		Iterator<Sensor> i = robot.getSensors().iterator();
 		
@@ -87,7 +83,7 @@ public class ControllerFactory extends Factory implements Serializable {
 		return nnInputs;
 	}
 
-	public NNInput createInput(Robot robot, String name, Arguments arguments) {
+	public static NNInput createInput(Simulator simulator, Robot robot, String name, Arguments arguments) {
 		int id = 0;
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
@@ -124,7 +120,7 @@ public class ControllerFactory extends Factory implements Serializable {
 		throw new RuntimeException("Unknown NNIinput: " + name);
 	}
 
-	public Vector<NNOutput> getNNOutputs(Robot robot, Arguments arguments) {
+	public static Vector<NNOutput> getNNOutputs(Simulator simulator, Robot robot, Arguments arguments) {
 		Arguments outputs = new Arguments(arguments.getArgumentAsString("outputs"));
 		
 		Vector<NNOutput> nnOutputs = new Vector<NNOutput>();
@@ -133,14 +129,14 @@ public class ControllerFactory extends Factory implements Serializable {
 			nnOutputs = getOutputsAutomatically(robot);
 		else {
 			for (int i = 0; i < outputs.getNumberOfArguments(); i++) {
-				NNOutput nnOutput = createOutput(robot, outputs.getArgumentAt(i),new Arguments(outputs.getValueAt(i)));
+				NNOutput nnOutput = createOutput(simulator, robot, outputs.getArgumentAt(i),new Arguments(outputs.getValueAt(i)));
 				nnOutputs.add(nnOutput);
 			}
 		}
 		return nnOutputs;
 	}
 
-	protected Vector<NNOutput> getOutputsAutomatically(Robot robot) {
+	protected static Vector<NNOutput> getOutputsAutomatically(Robot robot) {
 		Vector<NNOutput> nnOutputs = new Vector<NNOutput>();
 		Iterator<Actuator> i = robot.getActuators().iterator();
 
@@ -167,7 +163,7 @@ public class ControllerFactory extends Factory implements Serializable {
 		return nnOutputs;
 	}
 
-	public NNOutput createOutput(Robot robot, String name, Arguments arguments) {
+	public static NNOutput createOutput(Simulator simulator, Robot robot, String name, Arguments arguments) {
 		int id = 0;
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");

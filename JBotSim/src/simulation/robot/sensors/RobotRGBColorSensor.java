@@ -1,18 +1,15 @@
 package simulation.robot.sensors;
 
-import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Random;
 
-import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowAllRobotsChecker;
-import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 public class RobotRGBColorSensor extends ConeTypeSensor {
 	protected boolean detectRed;
@@ -28,7 +25,7 @@ public class RobotRGBColorSensor extends ConeTypeSensor {
 
 	public int slices;
 	
-	protected SimRandom random;
+	protected Random random;
 
 	public RobotRGBColorSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);

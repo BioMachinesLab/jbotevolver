@@ -3,6 +3,7 @@ package evolutionaryrobotics.neuralnetworks.outputs;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import factories.ControllerFactory;
 
 public class FixedNNOutput extends NNOutput {
 
@@ -16,7 +17,7 @@ public class FixedNNOutput extends NNOutput {
 		String newName = args.getArgumentAt(0);
 		Arguments newArguments = new Arguments(args.getArgumentAsString(newName));
 		
-		nnOutput = simulator.getControllerFactory().createOutput(robot, newName, newArguments);
+		nnOutput = ControllerFactory.createOutput(simulator, robot, newName, newArguments);
 	}
 
 	@Override
