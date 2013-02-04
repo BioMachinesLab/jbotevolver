@@ -38,9 +38,9 @@ public abstract class Population implements Serializable {
 	
 	protected Random    randomNumberGenerator;
 	
-	public Population(Simulator simulator, Arguments arguments) {
-		this.randomNumberGenerator = simulator.getRandom();
-		generationRandomSeed = randomNumberGenerator.nextInt();
+	public Population(Arguments arguments) {
+//		this.randomNumberGenerator = simulator.getRandom();
+//		generationRandomSeed = randomNumberGenerator.nextInt();
 		
 		if (arguments.getArgumentIsDefined("stepsperrun")) {
 			setNumberOfStepsPerSample(arguments.getArgumentAsInt("stepsperrun"));
@@ -74,7 +74,7 @@ public abstract class Population implements Serializable {
 		if (arguments.getArgumentIsDefined("generations")) {
 			setNumberOfGenerations(arguments.getArgumentAsInt("generations"));
 		}
-		setGenerationRandomSeed(randomNumberGenerator.nextInt());
+//		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 	}
 
 	/** 
@@ -354,5 +354,9 @@ public abstract class Population implements Serializable {
 		}
 		
 		return currentNumberOfGenerationsAboveFitnessThreshold >= numberOfGenerationsAboveFitnessThresholdRequired;
+	}
+	
+	public void setRandomNumberGenerator(Random r) {
+		this.randomNumberGenerator = r;
 	}
 }

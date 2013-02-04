@@ -5,15 +5,10 @@ import java.lang.reflect.Constructor;
 import simulation.Simulator;
 import simulation.util.Arguments;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import experiments.Experiment;
 
 public class EvaluationFunctionFactory extends Factory implements Serializable {
 
-	public EvaluationFunctionFactory(Simulator simulator) {
-		super(simulator);
-	}
-
-	public EvaluationFunction getEvaluationFunction(Arguments arguments, Experiment experiment) {
+	public static EvaluationFunction getEvaluationFunction(Simulator simulator, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("name"))
 			throw new RuntimeException("Evaluation 'name' not defined: "+arguments.toString());
 

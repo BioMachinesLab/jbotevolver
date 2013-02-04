@@ -12,11 +12,7 @@ import evolutionaryrobotics.populations.Population;
 
 public class PopulationFactory extends Factory implements Serializable {
 	
-	public PopulationFactory(Simulator simulator) {
-		super(simulator);
-	}
-
-	public Population getPopulation(Arguments args) throws Exception {
+	public static Population getPopulation(Arguments args) throws Exception {
 		
 		if(args.getArgumentIsDefined("load")) {
 			return loadPopulationFromFile(args);
@@ -31,7 +27,7 @@ public class PopulationFactory extends Factory implements Serializable {
 			Constructor<?>[] constructors = Class.forName(populationName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
-				if (params.length == 2 && params[0] == Simulator.class && params[1] == Arguments.class) {
+				if (params.length == 1 && params[0] == Arguments.class) {
 					return (Population) constructor.newInstance(args);
 				}
 			}
@@ -44,7 +40,7 @@ public class PopulationFactory extends Factory implements Serializable {
 		throw new RuntimeException("Unknown population: " + populationName);
 	}
 
-	private Population loadPopulationFromFile(Arguments args) throws Exception{
+	private static Population loadPopulationFromFile(Arguments args) throws Exception{
 		File f = new File(args.getArgumentAsString("load"));
 		
 		File populationFile = new File(args.getArgumentAsString("parentfolder")+"/populations/"+f.getName());

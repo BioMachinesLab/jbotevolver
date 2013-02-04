@@ -38,8 +38,8 @@ public class MuLambdaPopulation extends Population implements Serializable {
 	private double[] initialWeights;
 	private boolean fixedInitialPopulation = false;
 
-	public MuLambdaPopulation(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments);
+	public MuLambdaPopulation(Arguments arguments) {
+		super(arguments);
 		populationSize = arguments.getArgumentAsIntOrSetDefault("size",50);
 		numberOfGenerations = arguments.getArgumentAsIntOrSetDefault("generations",100);
 		numberOfSamplesPerChromosome = arguments.getArgumentAsIntOrSetDefault("samples",3);
@@ -56,8 +56,6 @@ public class MuLambdaPopulation extends Population implements Serializable {
 					initialWeights[i] = Double.parseDouble(rawArray[i]);
 			} 
 		}
-
-		createRandomPopulation();
 	}
 
 	public void setMutationRate(double mutationRate) {
