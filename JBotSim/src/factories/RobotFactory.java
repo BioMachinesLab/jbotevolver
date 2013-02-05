@@ -60,7 +60,6 @@ public class RobotFactory extends Factory implements Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
-
 		throw new RuntimeException("Unknown robot: " + robotName);
 	}
 

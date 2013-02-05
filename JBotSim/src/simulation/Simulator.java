@@ -2,6 +2,7 @@ package simulation;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
@@ -29,6 +30,7 @@ public class Simulator implements Serializable {
 	private ArrayList<Updatable> callbacks = new ArrayList<Updatable>(); 
 	private GeometricCalculator calculator;
 	private boolean stopSimulation = false;
+	private int[] robotIndexes;
 	
 	private HashMap<String,Arguments> arguments = new HashMap<String,Arguments>(); 
 	
@@ -112,12 +114,21 @@ public class Simulator implements Serializable {
 	}
 
 	protected void updateAllRobotActuators(double time) {
-		//TODO is this really necessary??
-		ArrayList<Robot> robots = (ArrayList<Robot>) environment.getRobots().clone();
-		Collections.shuffle(robots,random);
-		for (Robot r : robots) {
-			r.updateActuators(time, timeDelta);
-		}
+		ArrayList<Robot> robots = (ArrayList<Robot>) environment.getRobots();
+		
+		if(robotIndexes == null || robotIndexes.length != robots.size())
+			createRobotIndexes(robots.size());
+		
+		Collections.shuffle(Arrays.asList(robotIndexes),random);
+		
+		for (int i = 0 ; i < robotIndexes.length ; i++)
+			robots.get(robotIndexes[i]).updateActuators(time, timeDelta);
+	}
+	
+	private void createRobotIndexes(int size) {
+		robotIndexes = new int[size];
+		for(int i = 0 ; i < size ; i++)
+			robotIndexes[i] = i;
 	}
 
 	protected void updatePositions(double time) {

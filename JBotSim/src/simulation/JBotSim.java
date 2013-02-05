@@ -34,12 +34,8 @@ public class JBotSim {
 		return environment;
 	}
 	
-	public Simulator createSimulator() {	
-		Random simRandom = new Random();
-		simRandom.setSeed(random.nextLong());
-		
-		Simulator simulator = new Simulator(simRandom,arguments);
-		
+	public Simulator createSimulator(Random random) {	
+		Simulator simulator = new Simulator(random,arguments);
 		return simulator;
 	}
 	

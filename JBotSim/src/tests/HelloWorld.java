@@ -6,6 +6,7 @@ import gui.renderer.TwoDRenderer;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Random;
 
 import simulation.JBotSim;
 import simulation.Simulator;
@@ -25,7 +26,7 @@ public class HelloWorld {
 		arguments.add("name=RoundForageEnvironment,densityofpreys=0,nestlimit=0.25,foragelimit=2,forbiddenarea=5");
 		
 		JBotSim jbot             = new JBotSim(arguments.toArray(new String[0]));
-		Simulator sim            = jbot.createSimulator();
+		Simulator sim            = jbot.createSimulator(new Random());
 		Environment env 		 = jbot.getEnvironment(sim);
 		ArrayList<Robot> robots  = jbot.createRobots(sim);
 		env.addRobots(robots);
