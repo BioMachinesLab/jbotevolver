@@ -77,15 +77,14 @@ public class Arguments implements Serializable {
 				List<String> names = ClassSearchUtils
 						.searchFullNameInPath(values.get(i));
 				if (names.size() == 0) {
-					throw new RuntimeException("Class not found " + values.get(i));
+					throw new RuntimeException("Class not found "
+							+ values.get(i));
 				} else if (names.size() > 1) {
 					throw new RuntimeException(
 							"Multiple implementations of class: "
 									+ values.get(i) + " - " + names);
 				}
-				String prefix = getArgumentIsDefined(CONILON_CLIENT_ID) ? getArgumentAsString(CONILON_CLIENT_ID)
-						: "";
-				values.set(i, prefix + names.get(0));
+				values.set(i, names.get(0));
 			}
 		}
 
