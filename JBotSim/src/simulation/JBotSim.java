@@ -1,11 +1,11 @@
 package simulation;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
-
 import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -19,23 +19,11 @@ public class JBotSim {
 	protected HashMap<String,Arguments> arguments;
 	protected Random random = new Random();
 	protected String[]  commandlineArguments = null;
+	protected String parentFolder = "";
 	
 	public JBotSim(String[] commandLineArgs) throws IOException, ClassNotFoundException {
-		if (commandLineArgs != null) {
-			parseArguments(commandLineArgs);
-		}
-	}
-	
-	private void parseArguments(String[] args) throws IOException, ClassNotFoundException{		
-		arguments = Arguments.parseArgs(args);
-		
-		long randomSeed = 0;
-		if(arguments.get("--random-seed") != null)
-			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());			
-		random.setSeed(randomSeed);
-			
-		//split on whitespace
-		commandlineArguments = arguments.get("commandline").getCompleteArgumentString().split("\\s+");
+		if (commandLineArgs != null)
+			loadArguments(commandLineArgs);
 	}
 	
 	public Environment getEnvironment(Simulator simulator) {
@@ -81,5 +69,41 @@ public class JBotSim {
 	
 	public Random getRandom() {
 		return random;
+	}
+	
+	public void savePath(String file) {
+		parentFolder = (new File(file)).getParent();
+	}
+	
+	protected void loadArguments(String[] args) throws IOException,ClassNotFoundException {
+		
+		arguments = Arguments.parseArgs(args);
+		
+		long randomSeed = 0;
+		if(arguments.get("--random-seed") != null)
+			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());			
+		random.setSeed(randomSeed);
+		
+		String absolutePath = (new File("./"+arguments.get("--output").getCompleteArgumentString())).getCanonicalPath();
+		
+		if(parentFolder.isEmpty())
+			arguments.get("--population").setArgument("parentfolder", absolutePath);
+		else
+			arguments.get("--population").setArgument("parentfolder", parentFolder);
+		
+		//split on whitespace
+		commandlineArguments = arguments.get("commandline").getCompleteArgumentString().split("\\s+");
+	}
+	
+	public void loadFile(String filename, String extraArguments) throws IOException, ClassNotFoundException {
+
+		savePath(filename);
+		
+		String fileContents = Arguments.readContentFromFile(filename);
+		fileContents+="\n"+extraArguments;
+		
+		String[] args = Arguments.readOptionsFromString(fileContents);
+		
+		loadArguments(args);
 	}
 }
