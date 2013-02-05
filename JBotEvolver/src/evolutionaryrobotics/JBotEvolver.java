@@ -1,5 +1,6 @@
 package evolutionaryrobotics;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -27,6 +28,8 @@ public class JBotEvolver extends JBotSim {
 	public JBotEvolver(String[] args) throws Exception {
 		super(args);
 		taskExecutor = TaskExecutor.getTaskExecutor(arguments.get("--executor"));
+		taskExecutor.setDaemon(true);
+		taskExecutor.start();
 	}
 	
 	public EvaluationFunction getEvaluationFunction(Simulator simulator) {
@@ -57,20 +60,37 @@ public class JBotEvolver extends JBotSim {
 	}
 	
 	public void submitTask(Task task) {
-		
+		taskExecutor.addTask(task);
 	}
 
 	public Result getResult() {
-		return null;
+		return taskExecutor.getResult();
 	}
 	
 	@Override
 	protected void loadArguments(String[] args) throws IOException, ClassNotFoundException {
 		super.loadArguments(args);
+		
+		String absolutePath = "";
+		
+		if(arguments.get("--output") != null)
+			absolutePath = (new File("./"+arguments.get("--output").getCompleteArgumentString())).getCanonicalPath();
+		
+		if(parentFolder.isEmpty())
+			arguments.get("--population").setArgument("parentfolder", absolutePath);
+		else
+			arguments.get("--population").setArgument("parentfolder", parentFolder);
+		
 		diskStorage = new DiskStorage(arguments.get("--output").getCompleteArgumentString());
+		diskStorage.start();
 	}
 
 	public DiskStorage getDiskStorage() {
 		return diskStorage;
+	}
+	
+	public static void main(String[] args) throws Exception {
+		JBotEvolver j = new JBotEvolver(new String[]{"left_primitive.conf"});
+		j.getEvolution().executeEvolution();
 	}
 }

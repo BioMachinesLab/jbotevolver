@@ -1,15 +1,17 @@
 package taskexecutor;
 
 import java.lang.reflect.Constructor;
+
+import result.Result;
 import simulation.util.Arguments;
 import tasks.Task;
 
-public abstract class TaskExecutor {
+public abstract class TaskExecutor extends Thread {
 	
 	public TaskExecutor(Arguments args) {}
 	
 	public abstract void addTask(Task t);
-	public abstract Object getResult();
+	public abstract Result getResult();
 	public abstract void run();
 
 	public static TaskExecutor getTaskExecutor(Arguments arguments) {
@@ -22,7 +24,7 @@ public abstract class TaskExecutor {
 			Constructor<?>[] constructors = Class.forName(executorName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
-				if (params.length == 2 && params[0] == Arguments.class) {
+				if (params.length == 1 && params[0] == Arguments.class) {
 					return (TaskExecutor) constructor.newInstance(arguments);
 				}
 			}

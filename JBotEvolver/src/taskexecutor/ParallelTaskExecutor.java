@@ -6,13 +6,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import result.Result;
 import simulation.util.Arguments;
 import tasks.Task;
 
 public class ParallelTaskExecutor extends TaskExecutor {
 	
 	private ExecutorService executor;
-	private LinkedList<Future<Object>> list = new LinkedList<Future<Object>>();
+	private LinkedList<Future<Result>> list = new LinkedList<Future<Result>>();
 	
 	public ParallelTaskExecutor(Arguments args) {
 		super(args);
@@ -21,28 +22,32 @@ public class ParallelTaskExecutor extends TaskExecutor {
 	}
 
 	@Override
-	public synchronized void addTask(Task t) {
-		Future<Object> submit = executor.submit(new JBotCallable(t));
-	    list.add(submit);
+	public void addTask(Task t) {
+		synchronized(list) {
+			Future<Result> submit = executor.submit(new JBotCallable(t));
+			list.add(submit);
+		}
 	}
 
 	@Override
-	public synchronized Object getResult() {
+	public synchronized Result getResult() {
 		
-		Object obj = null;
+		Result obj = null;
+		Future<Result> callable;
 		
+		synchronized(list) {
+			callable = list.pop();
+		}
 		try {
-			Future<Object> callable = list.pop();
 			obj = callable.get();
 		} catch(Exception e) {e.printStackTrace();}
-		
 		return obj;
 	}
 
 	@Override
 	public void run() {}
 	
-	private class JBotCallable implements Callable<Object> {
+	private class JBotCallable implements Callable<Result> {
 		
 		private Task t;
 		
@@ -51,7 +56,7 @@ public class ParallelTaskExecutor extends TaskExecutor {
 		}
 
 		@Override
-		public Object call() throws Exception {
+		public Result call() throws Exception {
 			t.run();
 			return t.getResult();
 		}

@@ -1,15 +1,16 @@
 package taskexecutor;
 
 import comm.ClientPriority;
+import result.Result;
 import simulation.util.Arguments;
 import tasks.Task;
 import client.Client;
 
-public class ConillonExecutor extends TaskExecutor {
+public class ConillonTaskExecutor extends TaskExecutor {
 	
 	private Client client;
 	
-	public ConillonExecutor(Arguments args) {
+	public ConillonTaskExecutor(Arguments args) {
 		super(args);
 		
 		ClientPriority priority = getPriority(args.getArgumentAsIntOrSetDefault("priority", 10));
@@ -27,16 +28,12 @@ public class ConillonExecutor extends TaskExecutor {
 	}
 
 	@Override
-	public Object getResult() {
-		// TODO Auto-generated method stub
-		return null;
+	public Result getResult() {
+		return client.getNextResult();
 	}
 
 	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
-	}
+	public void run() {}
 	
 	private ClientPriority getPriority(int priority) {
 			return

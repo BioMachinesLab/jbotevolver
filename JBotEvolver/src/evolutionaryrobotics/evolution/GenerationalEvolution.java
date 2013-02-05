@@ -49,19 +49,27 @@ public class GenerationalEvolution extends Evolution {
 			
 			int totalChromosomes = 0;
 			
+			System.out.println("Generation "+population.getNumberOfCurrentGeneration());
+			
 			while ((c = population.getNextChromosomeToEvaluate()) != null) {
 				jBotEvolver.getRandom().setSeed(population.getGenerationRandomSeed());
 				
 				int samples = population.getNumberOfSamplesPerChromosome();
 				int steps = population.getNumberOfStepsPerSample();
-				jBotEvolver.submitTask(new GenerationalTask(samples,steps,c));
+				jBotEvolver.submitTask(new GenerationalTask(samples,steps,c,population.getGenerationRandomSeed()));
 				totalChromosomes++;
+				System.out.print(".");
 			}
+			
+			System.out.println();
 			
 			while(totalChromosomes-- > 0) {
 				SlaveResult result = (SlaveResult)jBotEvolver.getResult();
 				population.setEvaluationResultForId(result.getChromosomeId(), result.getFitness());
+				System.out.print("!");
 			}
+			
+			System.out.println("\n Highest Fitness: "+population.getHighestFitness());
 			
 			try {
 				jBotEvolver.getDiskStorage().savePopulation(population, jBotEvolver.getRandom());
@@ -69,11 +77,13 @@ public class GenerationalEvolution extends Evolution {
 			
 			population.createNextGeneration();
 		}
+		System.out.println("Evolution finished!");
 	}
 	
 	private int getGenomeLength() {
 		
-		Simulator sim = jBotEvolver.createSimulator();
+		Simulator sim = jBotEvolver.createSimulator(new Random(jBotEvolver.getRandom().nextLong()));
+		jBotEvolver.getEnvironment(sim);
 		
 		Robot r = RobotFactory.getRobot(sim, jBotEvolver.getArguments().get("--robots"));
 		Controller c = ControllerFactory.getController(sim,r, jBotEvolver.getArguments().get("--controllers"));
@@ -92,17 +102,19 @@ public class GenerationalEvolution extends Evolution {
 		private int samples,steps;
 		private double fitness = 0;
 		private Chromosome chromosome;
+		private Random random;
 		
-		public GenerationalTask(int samples, int steps, Chromosome chromosome) {
+		public GenerationalTask(int samples, int steps, Chromosome chromosome, int seed) {
 			this.samples = samples;
 			this.steps = steps;
 			this.chromosome = chromosome;
+			this.random = new Random(seed);
 		}
 		
 		@Override
 		public void run() {
 			for(int i = 0 ; i < samples ; i++) {
-				Simulator simulator = jBotEvolver.createSimulator();
+				Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
 				
 				jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
 				

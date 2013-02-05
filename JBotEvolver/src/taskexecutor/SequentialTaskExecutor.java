@@ -16,33 +16,53 @@ public class SequentialTaskExecutor extends TaskExecutor {
 
 	@Override
 	public void addTask(Task t) {
-		tasksToDo.add(t);
-		notifyAll();
+		synchronized(tasksToDo) {
+			tasksToDo.add(t);
+		}
+		synchronized(this) {
+			notifyAll();
+		}
 	}
 
 	@Override
-	public synchronized Result getResult() {
-		while(tasksDone.isEmpty()) {
-			try {
-				wait();
-			} catch(Exception e){e.printStackTrace();}
+	public Result getResult() {
+		synchronized(this) {
+			while(tasksDone.isEmpty()) {
+				try {
+					wait();
+				} catch(Exception e){e.printStackTrace();}
+			}
 		}
-		
-		Task t = tasksDone.pollFirst();
+		Task t;
+		synchronized(tasksDone) {
+			t = tasksDone.pollFirst();
+		}
 		return t.getResult();
 	}
 	
 	@Override
 	public void run() {
+		
 		while(true) {
 			try {
-				while(tasksToDo.isEmpty())
-					wait();
+				synchronized(this) {
+					while(tasksToDo.isEmpty())
+						wait();
+				}
 			}catch(Exception e) {e.printStackTrace();}
 			
-			Task t = tasksToDo.pollFirst();
+			Task t;
+			
+			synchronized(tasksToDo) {
+				t = tasksToDo.pollFirst();
+			}
+			
 			t.run();
-			tasksDone.add(t);
+			
+			synchronized(this) {
+				tasksDone.add(t);
+				notifyAll();
+			}
 		}
 	}
 }
