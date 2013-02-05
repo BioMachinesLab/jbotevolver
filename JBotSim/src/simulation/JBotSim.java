@@ -54,7 +54,10 @@ public class JBotSim {
 	}
 	
 	public ArrayList<Robot> createRobots(Simulator simulator) {
-		return RobotFactory.getRobots(simulator, arguments.get("--robots"));
+		ArrayList<Robot> robots = RobotFactory.getRobots(simulator, arguments.get("--robots"));
+		for(Robot r : robots)
+			r.setController(ControllerFactory.getController(simulator, r, arguments.get("--controllers")));
+		return robots;
 	}
 	
 	protected Robot createOneRobot(Simulator simulator, Arguments robotArguments, Arguments controllerArguments) {
@@ -83,13 +86,6 @@ public class JBotSim {
 		if(arguments.get("--random-seed") != null)
 			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());			
 		random.setSeed(randomSeed);
-		
-		String absolutePath = (new File("./"+arguments.get("--output").getCompleteArgumentString())).getCanonicalPath();
-		
-		if(parentFolder.isEmpty())
-			arguments.get("--population").setArgument("parentfolder", absolutePath);
-		else
-			arguments.get("--population").setArgument("parentfolder", parentFolder);
 		
 		//split on whitespace
 		commandlineArguments = arguments.get("commandline").getCompleteArgumentString().split("\\s+");

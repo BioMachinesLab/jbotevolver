@@ -1,12 +1,10 @@
 package simulation.environment;
 
 import gui.renderer.Renderer;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricCalculator;

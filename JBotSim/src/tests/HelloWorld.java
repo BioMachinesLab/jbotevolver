@@ -4,10 +4,12 @@ import gui.WithControlsGui;
 import gui.renderer.TwoDRenderer;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import simulation.JBotSim;
 import simulation.Simulator;
+import simulation.environment.Environment;
 import simulation.robot.Robot;
 
 public class HelloWorld {
@@ -24,17 +26,16 @@ public class HelloWorld {
 		
 		JBotSim jbot             = new JBotSim(arguments.toArray(new String[0]));
 		Simulator sim            = jbot.createSimulator();
-		LinkedList<Robot> robots = jbot.createRobots(1);
+		Environment env 		 = jbot.getEnvironment(sim);
+		ArrayList<Robot> robots  = jbot.createRobots(sim);
+		env.addRobots(robots);
 		System.out.println(robots.size());
-		
-		sim.getEnvironment().addRobots(robots);
-		
 		System.out.println(sim.getEnvironment().getRobots().get(0));
 		
 		TwoDRenderer renderer  = new TwoDRenderer(sim);
 		WithControlsGui gui    = new WithControlsGui(sim, renderer);
 		
-		gui.run(sim, renderer, 10000);
+		gui.run(sim, renderer, 1000);
 		
 	}	
 }

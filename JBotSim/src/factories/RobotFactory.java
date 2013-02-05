@@ -9,6 +9,7 @@ import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
+import simulation.util.ClassSearchUtils;
 
 public class RobotFactory extends Factory implements Serializable {
 	
@@ -42,7 +43,7 @@ public class RobotFactory extends Factory implements Serializable {
 	private static Robot createRobot(Simulator simulator, Arguments arguments) {
 		
 		if (!arguments.getArgumentIsDefined("name")) {
-			throw new RuntimeException("Controller 'name' not defined: "+ arguments.toString());
+			throw new RuntimeException("Robot 'name' not defined: "+ arguments.toString());
 		}
 
 		String robotName = arguments.getArgumentAsString("name");
@@ -52,8 +53,9 @@ public class RobotFactory extends Factory implements Serializable {
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
 				if (params.length == 2 && params[0] == Simulator.class
-						&& params[1] == Arguments.class)
+						&& params[1] == Arguments.class) {
 					return (Robot) constructor.newInstance(simulator,arguments);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -89,9 +91,11 @@ public class RobotFactory extends Factory implements Serializable {
 	}
 
 	public static Sensor createSensor(int id, Robot robot, Simulator simulator, String name, Arguments arguments) {
-		if (arguments.getArgumentIsDefined("id")) {
+		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
-		}
+		
+		name = ClassSearchUtils.getClassFullName(name);
+		
 		try {
 			Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
@@ -107,20 +111,23 @@ public class RobotFactory extends Factory implements Serializable {
 	}
 
 	public static Actuator createActuator(Simulator simulator, int id, Robot robot, String name, Arguments arguments) {
-		if (arguments.getArgumentIsDefined("id")) {
+		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
-		}
+		
+		name = ClassSearchUtils.getClassFullName(name);
+		
 		try {
 			Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
-				if (params.length == 4 && params[0] == Simulator.class && params[1] == int.class
-						&& params[2] == Robot.class && params[3] == Arguments.class)
-					return (Actuator) constructor.newInstance(simulator,id,robot,arguments);
+				if (params.length == 3 && params[0] == Simulator.class &&
+						params[1] == int.class &&
+						params[2] == Arguments.class)
+					return (Actuator) constructor.newInstance(simulator,id,arguments);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
-		throw new RuntimeException("Actuator sensor: " + name);
+		throw new RuntimeException("Unknown actuator: " + name);
 	}
 }
