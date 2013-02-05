@@ -18,16 +18,7 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	public NeuralNetworkController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
 		
-		Vector<NNInput> inputs = ControllerFactory.getNNInputs(simulator, robot, args);
-		Vector<NNOutput> outputs = ControllerFactory.getNNOutputs(simulator, robot, args);
-		
-		String name = args.getArgumentAsString("network");
-
-		if (name.equalsIgnoreCase("MultilayerPerceptron")) {
-			neuralNetwork = new MulitlayerPerceptron(inputs, outputs, args);
-		} else if (name.equalsIgnoreCase("CTRNNMultilayer")) {
-			neuralNetwork = new CTRNNMultilayer(inputs, outputs, args);
-		}
+		neuralNetwork = NeuralNetwork.getNeuralNetwork(simulator, robot, new Arguments(args.getArgumentAsString("network")));
 		
 		if(args.getArgumentIsDefined("weights")) {
 			String[] rawArray = args.getArgumentAsString("weights").split(",");

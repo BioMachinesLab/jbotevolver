@@ -42,11 +42,11 @@ public class RobotFactory extends Factory implements Serializable {
 
 	private static Robot createRobot(Simulator simulator, Arguments arguments) {
 		
-		if (!arguments.getArgumentIsDefined("name")) {
-			throw new RuntimeException("Robot 'name' not defined: "+ arguments.toString());
+		if (!arguments.getArgumentIsDefined("classname")) {
+			throw new RuntimeException("Robot 'classname' not defined: "+ arguments.toString());
 		}
 
-		String robotName = arguments.getArgumentAsString("name");
+		String robotName = arguments.getArgumentAsString("classname");
 
 		try {
 			Constructor<?>[] constructors = Class.forName(robotName).getDeclaredConstructors();
@@ -67,11 +67,11 @@ public class RobotFactory extends Factory implements Serializable {
 		if (!arguments.getArgumentIsDefined("sensors"))
 			return;
 
-		Arguments sensors = new Arguments(
-				arguments.getArgumentAsString("sensors"));
+		Arguments sensors = new Arguments(arguments.getArgumentAsString("sensors"));
 
 		for (int i = 0; i < sensors.getNumberOfArguments(); i++) {
-			Sensor sensor = createSensor(i, robot, simulator,sensors.getArgumentAt(i),new Arguments(sensors.getValueAt(i)));
+			Arguments sensorArgs = new Arguments(sensors.getValueAt(i));
+			Sensor sensor = createSensor(i, robot, simulator,sensorArgs.getArgumentAsString("classname"),sensorArgs);
 			robot.addSensor(sensor);
 		}
 	}
@@ -80,11 +80,11 @@ public class RobotFactory extends Factory implements Serializable {
 		if (!arguments.getArgumentIsDefined("actuators"))
 			return;
 
-		Arguments actuators = new Arguments(
-				arguments.getArgumentAsString("actuators"));
+		Arguments actuators = new Arguments(arguments.getArgumentAsString("actuators"));
 
 		for (int i = 0; i < actuators.getNumberOfArguments(); i++) {
-			Actuator actuator = createActuator(simulator, i, robot, actuators.getArgumentAt(i),new Arguments(actuators.getValueAt(i)));
+			Arguments actuatorArgs = new Arguments(actuators.getValueAt(i));
+			Actuator actuator = createActuator(simulator, i, robot,actuatorArgs.getArgumentAsString("classname"),actuatorArgs);
 			robot.addActuator(actuator);
 		}
 	}
@@ -92,8 +92,6 @@ public class RobotFactory extends Factory implements Serializable {
 	public static Sensor createSensor(int id, Robot robot, Simulator simulator, String name, Arguments arguments) {
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
-		
-		name = ClassSearchUtils.getClassFullName(name);
 		
 		try {
 			Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
@@ -112,8 +110,6 @@ public class RobotFactory extends Factory implements Serializable {
 	public static Actuator createActuator(Simulator simulator, int id, Robot robot, String name, Arguments arguments) {
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
-		
-		name = ClassSearchUtils.getClassFullName(name);
 		
 		try {
 			Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();

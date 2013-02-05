@@ -12,7 +12,7 @@ public class SysoutNNInput extends NNInput {
 	public SysoutNNInput(Simulator simulator, Robot robot, Arguments args) {
 		String newName = args.getArgumentAt(0);
 		Arguments newArgs = new Arguments(args.getArgumentAsString(newName));
-		this.nnInput = ControllerFactory.createInput(simulator, robot, newName, newArgs);
+		this.nnInput = NNInput.createInput(simulator, robot, newName, newArgs);
 	}
 	
 	public SysoutNNInput(NNInput nnInput) {

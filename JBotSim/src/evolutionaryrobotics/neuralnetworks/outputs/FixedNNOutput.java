@@ -17,7 +17,7 @@ public class FixedNNOutput extends NNOutput {
 		String newName = args.getArgumentAt(0);
 		Arguments newArguments = new Arguments(args.getArgumentAsString(newName));
 		
-		nnOutput = ControllerFactory.createOutput(simulator, robot, newName, newArguments);
+		nnOutput = NNOutput.createOutput(simulator, robot, newName, newArguments);
 	}
 
 	@Override

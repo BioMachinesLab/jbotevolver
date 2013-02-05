@@ -1,11 +1,16 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.util.Random;
 import java.util.Vector;
 
+import simulation.Simulator;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
+import factories.ControllerFactory;
 
 
 public abstract class NeuralNetwork implements Serializable{
@@ -125,4 +130,30 @@ public abstract class NeuralNetwork implements Serializable{
 	}
 	
 	public abstract void reset();
+	
+	public static NeuralNetwork getNeuralNetwork(Simulator simulator, Robot robot, Arguments arguments) {
+		
+		Vector<NNInput> inputs = NNInput.getNNInputs(simulator, robot, arguments);
+		Vector<NNOutput> outputs = NNOutput.getNNOutputs(simulator, robot, arguments);
+		
+		if (!arguments.getArgumentIsDefined("classname")) {
+			throw new RuntimeException("Neural Network 'classname' not defined: "+ arguments.toString());
+		}
+
+		String robotName = arguments.getArgumentAsString("classname");
+
+		try {
+			Constructor<?>[] constructors = Class.forName(robotName).getDeclaredConstructors();
+			for (Constructor<?> constructor : constructors) {
+				Class<?>[] params = constructor.getParameterTypes();
+				if (params.length == 3 && params[0] == inputs.getClass()
+						&& params[1] == outputs.getClass() && params[2] == Arguments.class) {
+					return (NeuralNetwork) constructor.newInstance(inputs,outputs,arguments);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		throw new RuntimeException("Unknown Neural Network: " + robotName);
+	}
 }

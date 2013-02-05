@@ -16,7 +16,6 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 	int currentSubNetwork = 0;
 	boolean keepFeeding = false;
 	boolean resetChosen = true;
-//	boolean master = false;
 	
 	public BehaviorController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
@@ -31,8 +30,6 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 			currentSubNetwork = output;
 			if(resetChosen) {
 				subControllers.get(currentSubNetwork).reset();
-//				if(master)
-//					System.out.println("Reset "+currentSubNetwork);
 			}
 		}
 		
@@ -75,32 +72,23 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 	
 	private void setupControllers(Simulator simulator, Arguments args) {
 		
-		try {
-			if(!args.getArgumentAsString("subcontrollers").isEmpty()) {
-				Arguments subControllerArgs = Arguments.createOrPrependArguments(null, args.getArgumentAsString("subcontrollers"));
-				
-				for(int i = 0 ; i < subControllerArgs.getNumberOfArguments() ; i++) {
-					Arguments currentSubControllerArgs = Arguments.createOrPrependArguments(null, subControllerArgs.getArgumentAsString(subControllerArgs.getArgumentAt(i)));
-					subControllers.add(ControllerFactory.getController(simulator, robot, currentSubControllerArgs));
-				}
+		if(!args.getArgumentAsString("subcontrollers").isEmpty()) {
+			Arguments subControllerArgs = new Arguments(args.getArgumentAsString("subcontrollers"));
+			
+			for(int i = 0 ; i < subControllerArgs.getNumberOfArguments() ; i++) {
+				Arguments currentSubControllerArgs = new Arguments(subControllerArgs.getArgumentAsString(subControllerArgs.getArgumentAt(i)));
+				subControllers.add(ControllerFactory.getController(simulator, robot, currentSubControllerArgs));
 			}
-			
-//			for(Controller c : subControllers)
-//				if(c instanceof BehaviorController)
-//					master = true;
-			
-			//Setting up main Controller
-			String oldName = args.getArgumentAsString("name");
-			args.setArgument("name", args.getArgumentAsString("type"));
-			mainController = (NeuralNetworkController)ControllerFactory.getController(simulator, robot, args);
-			args.setArgument("name", oldName);
-			
-			resetChosen = args.getArgumentAsIntOrSetDefault("resetchosen", 1) == 1;
-			keepFeeding = args.getArgumentAsIntOrSetDefault("keepfeeding", 0) == 1;
-		} catch(ClassNotFoundException e) {
-			e.printStackTrace();
-			System.exit(-1);
 		}
+		
+		//Setting up main Controller
+		String oldName = args.getArgumentAsString("name");
+		args.setArgument("name", args.getArgumentAsString("type"));
+		mainController = (NeuralNetworkController)ControllerFactory.getController(simulator, robot, args);
+		args.setArgument("name", oldName);
+		
+		resetChosen = args.getArgumentAsIntOrSetDefault("resetchosen", 1) == 1;
+		keepFeeding = args.getArgumentAsIntOrSetDefault("keepfeeding", 0) == 1;
 	}
 	
 	public ArrayList<Controller> getSubControllers() {

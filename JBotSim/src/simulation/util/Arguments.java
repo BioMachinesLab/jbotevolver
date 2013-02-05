@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import mathutils.Vector2d;
 
@@ -35,9 +38,7 @@ public class Arguments implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private static final String NAME = "name";
-
-	private static final String CONILON_CLIENT_ID = "conilonClientID";
+	public static final String CLASS_NAME_TAG = "classname";
 
 	/**
 	 * Complete unparsed argument string
@@ -68,27 +69,61 @@ public class Arguments implements Serializable {
 	 */
 	public Arguments(String unparsedArgumentString) {
 		parseString(unparsedArgumentString);
-		translate();
 	}
-
-	private void translate() {
-		for (int i = 0; i < arguments.size(); i++) {
-			if (arguments.get(i).equals(NAME)) {
-				List<String> names = ClassSearchUtils
-						.searchFullNameInPath(values.get(i));
-				if (names.size() == 0) {
-					throw new RuntimeException("Class not found "
-							+ values.get(i));
-				} else if (names.size() > 1) {
-					throw new RuntimeException(
-							"Multiple implementations of class: "
-									+ values.get(i) + " - " + names);
-				}
-				values.set(i, names.get(0));
-			}
+	public Arguments(String unparsedArgumentString, boolean translateClasses) {
+		if(translateClasses) {
+			unparsedArgumentString = translateClasses(unparsedArgumentString);
+//			System.out.println(unparsedArgumentString);
 		}
-
+		parseString(unparsedArgumentString);
 	}
+	
+	private String translateClasses(String arg) {
+		Pattern p = Pattern.compile("classname=\\w*(\\.\\w*)*");
+	 	Matcher m = p.matcher(arg);
+	 	
+	 	LinkedList<String> strings = new LinkedList<String>();
+		while(m.find()) {
+			String found = m.group();
+			String[] split = found.split("=");
+			strings.add(split[1]);
+			arg = m.replaceFirst("__PLACEHOLDER__");
+			m = p.matcher(arg);
+	 	}
+		
+		for(int i = 0 ; i < strings.size() ; i++) {
+			List<String> names = ClassSearchUtils.searchFullNameInPath(strings.get(i));
+			if (names.size() == 0) {
+				throw new RuntimeException("Class not found "+ values.get(i));
+			} else if (names.size() > 1) {
+				throw new RuntimeException("Multiple implementations of class: "+ strings.get(i) + " - " + names);
+			}
+			strings.set(i, names.get(0));
+		}
+		
+		for(String s : strings)
+			arg = arg.replaceFirst("__PLACEHOLDER__", CLASS_NAME_TAG+"="+s);
+		return arg;
+	}
+
+//	private void translate() {
+//		for (int i = 0; i < arguments.size(); i++) {
+//			if (arguments.get(i).equals(CLASS_NAME_TAG)) {
+//				List<String> names = ClassSearchUtils
+//						.searchFullNameInPath(values.get(i));
+//				if (names.size() == 0) {
+//					throw new RuntimeException("Class not found "
+//							+ values.get(i));
+//				} else if (names.size() > 1) {
+//					throw new RuntimeException(
+//							"Multiple implementations of class: "
+//									+ values.get(i) + " - " + names);
+//				}
+//				values.set(i, names.get(0));
+//			}
+//		}
+//
+//	}
 
 	/**
 	 * Parses a string of arguments.
@@ -402,14 +437,16 @@ public class Arguments implements Serializable {
 		for (int i = 0; i < arguments.size(); i++) {
 			if (sb.length() > 0)
 				sb.append(",");
-
+			
 			sb.append(arguments.get(i));
 			if (values.get(i).length() > 0) {
-				sb.append("=" + values.get(i));
+				if(values.get(i).contains("=") || values.get(i).contains(","))
+					sb.append("=(" + values.get(i)+")");
+				else
+					sb.append("=" + values.get(i));
 			}
 		}
-
-		return unparsedArgumentString;
+		return sb.toString();
 	}
 
 	/**
@@ -628,7 +665,7 @@ public class Arguments implements Serializable {
 			result.put(
 					key,
 					createOrPrependArguments(result.get(key),
-							args[currentIndex + 1]));
+							args[currentIndex + 1],true));
 
 			currentIndex += 2;
 		}
@@ -639,7 +676,7 @@ public class Arguments implements Serializable {
 			result.put(
 					"--experiment",
 					createOrPrependArguments(result.get("--experiment"),
-							"+description=" + optionsFilename));
+							"+description=" + optionsFilename,true));
 		}
 
 		String commandLine = "";
@@ -651,8 +688,9 @@ public class Arguments implements Serializable {
 		}
 
 		result.put("commandline",
-				createOrPrependArguments(null, commandLine.trim()));
-
+				createOrPrependArguments(null, commandLine.trim(),true));
+		AutoArgumentsGeneration.getAuto(result);
+		System.out.println(result.get("--controllers").getCompleteArgumentString());
 		return result;
 	}
 
@@ -703,19 +741,19 @@ public class Arguments implements Serializable {
 	}
 
 	public static Arguments createOrPrependArguments(Arguments previous,
-			String newArgumentString) throws ClassNotFoundException {
+			String newArgumentString, boolean translateArguments) throws ClassNotFoundException {
 		if (newArgumentString.charAt(0) == '+') {
 			if (previous != null) {
 				return new Arguments(newArgumentString.substring(1,
 						newArgumentString.length())
 						+ ","
-						+ previous.getCompleteArgumentString());
+						+ previous.getCompleteArgumentString(),translateArguments);
 			} else {
 				return new Arguments(newArgumentString.substring(1,
-						newArgumentString.length()));
+						newArgumentString.length()),translateArguments);
 			}
 		} else {
-			return new Arguments(newArgumentString);
+			return new Arguments(newArgumentString,translateArguments);
 		}
 	}
 

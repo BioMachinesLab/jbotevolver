@@ -11,12 +11,12 @@ public class EnvironmentFactory extends Factory implements Serializable {
 
 	public static Environment getEnvironment(Simulator simulator, Arguments arguments) {
 
-		if (!arguments.getArgumentIsDefined("name")) {
-			throw new RuntimeException("Environment 'name' not defined: "
+		if (!arguments.getArgumentIsDefined("classname")) {
+			throw new RuntimeException("Environment 'classname' not defined: "
 					+ arguments.toString());
 		}
 
-		String environmentName = arguments.getArgumentAsString("name");
+		String environmentName = arguments.getArgumentAsString("classname");
 
 		try {
 			Constructor<?>[] constructors = Class.forName(environmentName).getDeclaredConstructors();
@@ -27,9 +27,6 @@ public class EnvironmentFactory extends Factory implements Serializable {
 					return (Environment) constructor.newInstance(simulator, arguments);
 				}
 			}
-			throw new RuntimeException("Missing constructor on class "
-					+ environmentName + " - " + environmentName + "("
-					+ Simulator.class + ", " + Arguments.class + ")");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
