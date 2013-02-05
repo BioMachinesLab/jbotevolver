@@ -1,17 +1,24 @@
 package taskexecutor;
 
-import comm.ClientPriority;
+import java.util.HashMap;
+import java.util.List;
+
 import result.Result;
 import simulation.util.Arguments;
+import simulation.util.ClassSearchUtils;
 import tasks.Task;
 import client.Client;
+
+import comm.ClientPriority;
+
+import evolutionaryrobotics.JBotEvolver;
 
 public class ConillonTaskExecutor extends TaskExecutor {
 	
 	private Client client;
 	
-	public ConillonTaskExecutor(Arguments args) {
-		super(args);
+	public ConillonTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
+		super(jBotEvolver,args);
 		
 		ClientPriority priority = getPriority(args.getArgumentAsIntOrSetDefault("priority", 10));
 		
@@ -20,6 +27,12 @@ public class ConillonTaskExecutor extends TaskExecutor {
 		String serverName = args.getArgumentAsStringOrSetDefault("server","evolve.dcti.iscte.pt");
 		
 		client = new Client(priority, serverName, serverPort, serverName, codePort);
+		
+		prepareArguments(jBotEvolver.getArguments());
+	}
+	
+	private void prepareArguments(HashMap<String,Arguments> arguments) {
+		
 	}
 	
 	@Override

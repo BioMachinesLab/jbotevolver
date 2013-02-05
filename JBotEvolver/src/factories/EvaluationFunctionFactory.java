@@ -9,10 +9,10 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 public class EvaluationFunctionFactory extends Factory implements Serializable {
 
 	public static EvaluationFunction getEvaluationFunction(Simulator simulator, Arguments arguments) {
-		if (!arguments.getArgumentIsDefined("name"))
-			throw new RuntimeException("Evaluation 'name' not defined: "+arguments.toString());
+		if (!arguments.getArgumentIsDefined("classname"))
+			throw new RuntimeException("Evaluation 'classname' not defined: "+arguments.toString());
 
-		String evaluationName = arguments.getArgumentAsString("name");
+		String evaluationName = arguments.getArgumentAsString("classname");
 
 		try {
 			Constructor<?>[] constructors = Class.forName(evaluationName).getDeclaredConstructors();

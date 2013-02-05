@@ -18,10 +18,10 @@ public class PopulationFactory extends Factory implements Serializable {
 			return loadPopulationFromFile(args);
 		}
 		
-		if (!args.getArgumentIsDefined("name"))
-			throw new RuntimeException("Population 'name' not defined: "+args.toString());
+		if (!args.getArgumentIsDefined("classname"))
+			throw new RuntimeException("Population 'classname' not defined: "+args.toString());
 
-		String populationName = args.getArgumentAsString("name");
+		String populationName = args.getArgumentAsString("classname");
 
 		try {
 			Constructor<?>[] constructors = Class.forName(populationName).getDeclaredConstructors();

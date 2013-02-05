@@ -27,7 +27,7 @@ public class JBotEvolver extends JBotSim {
 	
 	public JBotEvolver(String[] args) throws Exception {
 		super(args);
-		taskExecutor = TaskExecutor.getTaskExecutor(arguments.get("--executor"));
+		taskExecutor = TaskExecutor.getTaskExecutor(this,arguments.get("--executor"));
 		taskExecutor.setDaemon(true);
 		taskExecutor.start();
 	}

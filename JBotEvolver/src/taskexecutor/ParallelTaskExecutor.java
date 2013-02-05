@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import evolutionaryrobotics.JBotEvolver;
+
 import result.Result;
 import simulation.util.Arguments;
 import tasks.Task;
@@ -15,8 +17,8 @@ public class ParallelTaskExecutor extends TaskExecutor {
 	private ExecutorService executor;
 	private LinkedList<Future<Result>> list = new LinkedList<Future<Result>>();
 	
-	public ParallelTaskExecutor(Arguments args) {
-		super(args);
+	public ParallelTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
+		super(jBotEvolver, args);
 		int numberThreads = args.getArgumentAsIntOrSetDefault("threads", Runtime.getRuntime().availableProcessors());
 		executor = Executors.newFixedThreadPool(numberThreads);
 	}

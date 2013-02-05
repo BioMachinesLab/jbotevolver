@@ -1,17 +1,13 @@
 package evolutionaryrobotics.evolution;
 
-import java.util.ArrayList;
 import java.util.Random;
-import result.Result;
 import simulation.Simulator;
-import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import tasks.Task;
+import taskexecutor.GenerationalTask;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.parallel.SlaveResult;
 import evolutionaryrobotics.populations.Population;
@@ -56,7 +52,7 @@ public class GenerationalEvolution extends Evolution {
 				
 				int samples = population.getNumberOfSamplesPerChromosome();
 				int steps = population.getNumberOfStepsPerSample();
-				jBotEvolver.submitTask(new GenerationalTask(samples,steps,c,population.getGenerationRandomSeed()));
+				jBotEvolver.submitTask(new GenerationalTask(jBotEvolver,samples,steps,c,population.getGenerationRandomSeed()));
 				totalChromosomes++;
 				System.out.print(".");
 			}
@@ -95,44 +91,5 @@ public class GenerationalEvolution extends Evolution {
 			genomeLength = controller.getGenomeLength();
 		}
 		return genomeLength;
-	}
-	
-	class GenerationalTask extends Task {
-		
-		private int samples,steps;
-		private double fitness = 0;
-		private Chromosome chromosome;
-		private Random random;
-		
-		public GenerationalTask(int samples, int steps, Chromosome chromosome, int seed) {
-			this.samples = samples;
-			this.steps = steps;
-			this.chromosome = chromosome;
-			this.random = new Random(seed);
-		}
-		
-		@Override
-		public void run() {
-			for(int i = 0 ; i < samples ; i++) {
-				Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
-				
-				jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
-				
-				Environment environment = jBotEvolver.getEnvironment(simulator);
-				ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
-				jBotEvolver.setChromosome(robots, chromosome);
-				environment.addRobots(robots);
-				
-				EvaluationFunction eval = jBotEvolver.getEvaluationFunction(simulator);
-				simulator.addCallback(eval);
-				simulator.simulate(steps);
-				
-				fitness = eval.getFitness();
-			}
-		}
-		public Result getResult() {
-			SlaveResult sr = new SlaveResult(chromosome.getID(),fitness);
-			return sr;
-		}
 	}
 }
