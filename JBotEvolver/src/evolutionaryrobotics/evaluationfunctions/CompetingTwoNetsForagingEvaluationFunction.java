@@ -1,12 +1,8 @@
 package evolutionaryrobotics.evaluationfunctions;
 
 import java.util.ArrayList;
-
-import experiments.CoevolutionExperiment;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.environment.RoundForageEnvironment;
 import simulation.environment.TwoNestForageEnvironment;
 import simulation.robot.Robot;
 import simulation.robot.sensors.PreyCarriedSensor;
@@ -27,13 +23,15 @@ public class CompetingTwoNetsForagingEvaluationFunction extends
 		forbidenArea = env.getForbiddenArea();
 		foragingArea = env.getForageRadius();
 		nestAPosition = env.getNestAPosition();
-		numberOfRobotInTeam = ((CoevolutionExperiment) simulator.getExperiment()).numberOfrobotsTeamA;
+		//TODO I commented this: (Miguel)
+//		numberOfRobotInTeam = ((CoevolutionExperiment) simulator.getExperiment()).numberOfrobotsTeamA;
 	}
 
 	@Override
 	public double getFitness() {
 		TwoNestForageEnvironment environment = ((TwoNestForageEnvironment) (simulator.getEnvironment()));
 		return fitness + ((double) environment.getNumberOfFoodSuccessfullyForagedNestA());
+//		TODO I commented this: (Miguel)
 		// return fitness +
 		// ((RoundForageEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged()
 		// * 1.0;

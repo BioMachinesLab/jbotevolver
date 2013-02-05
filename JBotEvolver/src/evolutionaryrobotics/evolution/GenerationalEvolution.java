@@ -2,16 +2,18 @@ package evolutionaryrobotics.evolution;
 
 import java.util.ArrayList;
 import java.util.Random;
-import java.util.concurrent.Callable;
+import result.Result;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import tasks.Task;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import evolutionaryrobotics.parallel.SlaveResult;
 import evolutionaryrobotics.populations.Population;
 import factories.ControllerFactory;
 import factories.PopulationFactory;
@@ -38,6 +40,9 @@ public class GenerationalEvolution extends Evolution {
 	@Override
 	public void executeEvolution() {
 		
+		if(population.getNumberOfCurrentGeneration() == 0)
+			population.createRandomPopulation();
+		
 		while(!population.evolutionDone()) {
 			
 			Chromosome c;
@@ -54,9 +59,15 @@ public class GenerationalEvolution extends Evolution {
 			}
 			
 			while(totalChromosomes-- > 0) {
-				ChromosomeResult result = (ChromosomeResult)jBotEvolver.getResult();
-				population.setEvaluationResult(result.chromosome, result.fitness);
+				SlaveResult result = (SlaveResult)jBotEvolver.getResult();
+				population.setEvaluationResultForId(result.getChromosomeId(), result.getFitness());
 			}
+			
+			try {
+				jBotEvolver.getDiskStorage().savePopulation(population, jBotEvolver.getRandom());
+			} catch(Exception e) {e.printStackTrace();}
+			
+			population.createNextGeneration();
 		}
 	}
 	
@@ -76,12 +87,7 @@ public class GenerationalEvolution extends Evolution {
 		return genomeLength;
 	}
 	
-	class ChromosomeResult {
-		public double fitness;
-		public Chromosome chromosome;
-	}
-	
-	class GenerationalTask implements Callable<Object> {
+	class GenerationalTask extends Task {
 		
 		private int samples,steps;
 		private double fitness = 0;
@@ -94,7 +100,7 @@ public class GenerationalEvolution extends Evolution {
 		}
 		
 		@Override
-		public Object call() {
+		public void run() {
 			for(int i = 0 ; i < samples ; i++) {
 				Simulator simulator = jBotEvolver.createSimulator();
 				
@@ -111,12 +117,10 @@ public class GenerationalEvolution extends Evolution {
 				
 				fitness = eval.getFitness();
 			}
-			
-			ChromosomeResult cr = new ChromosomeResult();
-			cr.fitness = fitness;
-			cr.chromosome = chromosome;
-			
-			return cr;
+		}
+		public Result getResult() {
+			SlaveResult sr = new SlaveResult(chromosome.getID(),fitness);
+			return sr;
 		}
 	}
 }

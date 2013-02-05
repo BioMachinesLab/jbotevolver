@@ -1,9 +1,9 @@
 package taskexecutor;
 
 import java.util.LinkedList;
-
+import result.Result;
 import simulation.util.Arguments;
-import evolutionaryrobotics.Task;
+import tasks.Task;
 
 public class SequentialTaskExecutor extends TaskExecutor {
 	
@@ -21,7 +21,7 @@ public class SequentialTaskExecutor extends TaskExecutor {
 	}
 
 	@Override
-	public synchronized Object getResult() {
+	public synchronized Result getResult() {
 		while(tasksDone.isEmpty()) {
 			try {
 				wait();

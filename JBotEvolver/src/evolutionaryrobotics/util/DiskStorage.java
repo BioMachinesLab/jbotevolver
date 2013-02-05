@@ -8,13 +8,11 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 import java.util.Vector;
 import java.util.zip.GZIPOutputStream;
-import java.util.zip.ZipOutputStream;
 
 import evolutionaryrobotics.populations.Population;
-
-import simulation.util.SimRandom;
 
 public class DiskStorage {
 	String outputDirectory;
@@ -92,8 +90,7 @@ public class DiskStorage {
 		}
 	}
 
-	public void savePopulation(Population populationA, Population populationB,
-			SimRandom simRandom) throws IOException {
+	public void savePopulation(Population populationA, Population populationB, Random simRandom) throws IOException {
 		if (outputDirectory != null) {
 			updateFitnessLog(populationA, populationB);
 
@@ -119,7 +116,7 @@ public class DiskStorage {
 		}
 	}
 
-	public void savePopulation(Population population, SimRandom simRandom)
+	public void savePopulation(Population population, Random simRandom)
 			throws IOException {
 		if (outputDirectory != null) {
 			updateFitnessLog(population);

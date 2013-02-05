@@ -5,7 +5,6 @@ import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import experiments.FoodWaterExperiment;
 
 public class FoodWaterEvaluationFunction extends EvaluationFunction{
 	private int numberOfRobotStepsOutsideArena = 0;
@@ -27,9 +26,9 @@ public class FoodWaterEvaluationFunction extends EvaluationFunction{
 				numberOfRobotStepsOutsideArena++;
 		}
 		int numberOfRecharges = 0;
-		
-		for(Robot r : simulator.getEnvironment().getRobots())
-			numberOfRecharges += r.getParameterAsInteger(FoodWaterExperiment.RECHARGED).intValue();
+//		TODO I commented this: (Miguel)
+//		for(Robot r : simulator.getEnvironment().getRobots())
+//			numberOfRecharges += r.getParameterAsInteger(FoodWaterExperiment.RECHARGED).intValue();
 			
 		fitness = (double) numberOfRecharges - ((double) numberOfRobotStepsOutsideArena) / 100.0;
 	}

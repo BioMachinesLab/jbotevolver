@@ -1,28 +1,32 @@
 package evolutionaryrobotics;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.Callable;
 
-import controllers.FixedLenghtGenomeEvolvableController;
+import result.Result;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.robot.Robot;
+import taskexecutor.TaskExecutor;
+import tasks.Task;
+import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
+import evolutionaryrobotics.util.DiskStorage;
 import factories.EvaluationFunctionFactory;
 import factories.EvolutionFactory;
 import factories.PopulationFactory;
 
 public class JBotEvolver extends JBotSim {
 	
+	private DiskStorage diskStorage;
+	private TaskExecutor taskExecutor;
+	
 	public JBotEvolver(String[] args) throws Exception {
 		super(args);
-	}
-	
-	public Evolution getEvolution() {
-		return EvolutionFactory.getEvolution(this,getArguments().get("--evolution"));
+		taskExecutor = TaskExecutor.getTaskExecutor(arguments.get("--executor"));
 	}
 	
 	public EvaluationFunction getEvaluationFunction(Simulator simulator) {
@@ -39,6 +43,10 @@ public class JBotEvolver extends JBotSim {
 		return null;
 	}
 	
+	public Evolution getEvolution() {
+		return Evolution.getEvolution(this,arguments.get("--evolution"));
+	}
+	
 	public void setChromosome(ArrayList<Robot> robots, Chromosome chromosome) {
 		for (Robot r : robots) {
 			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
@@ -48,11 +56,21 @@ public class JBotEvolver extends JBotSim {
 		}	
 	}
 	
-	public void submitTask(Callable<Object> c) {
+	public void submitTask(Task task) {
 		
 	}
 
-	public Object getResult() {
+	public Result getResult() {
 		return null;
+	}
+	
+	@Override
+	protected void loadArguments(String[] args) throws IOException, ClassNotFoundException {
+		super.loadArguments(args);
+		diskStorage = new DiskStorage(arguments.get("--output").getCompleteArgumentString());
+	}
+
+	public DiskStorage getDiskStorage() {
+		return diskStorage;
 	}
 }
