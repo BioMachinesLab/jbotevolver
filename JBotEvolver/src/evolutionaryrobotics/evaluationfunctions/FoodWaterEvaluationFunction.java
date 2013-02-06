@@ -9,12 +9,12 @@ import simulation.util.Arguments;
 public class FoodWaterEvaluationFunction extends EvaluationFunction{
 	private int numberOfRobotStepsOutsideArena = 0;
 	
-	public FoodWaterEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator, args);
+	public FoodWaterEvaluationFunction(Arguments args) {
+		super(args);
 	}
 
 	@Override
-	public void update(double time) {			
+	public void update(Simulator simulator) {			
 		Environment e = simulator.getEnvironment();
 		for(Robot r : simulator.getEnvironment().getRobots()){
 			Vector2d p = r.getPosition();

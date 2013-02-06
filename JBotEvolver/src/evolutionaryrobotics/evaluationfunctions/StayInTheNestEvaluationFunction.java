@@ -10,12 +10,12 @@ public class StayInTheNestEvaluationFunction extends EvaluationFunction{
 	private Vector2d    nestPosition = new Vector2d(0, 0);
 	private double      NESTRADIUS;
 
-	public StayInTheNestEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator, args);
+	public StayInTheNestEvaluationFunction(Arguments args) {
+		super(args);
 	}
 
 	@Override
-	public void update(double time) {			
+	public void update(Simulator simulator) {			
 		int numberOfRobotsCloseToNest = 0;
 
 		NESTRADIUS         = ((RoundForageEnvironment)(simulator.getEnvironment())).getNestRadius();

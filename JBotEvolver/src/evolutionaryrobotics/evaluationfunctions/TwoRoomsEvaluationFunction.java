@@ -13,8 +13,8 @@ public class TwoRoomsEvaluationFunction extends EvaluationFunction {
 	boolean allowCollision = false;
 	boolean rewardStepsAlive = true;
 
-	public TwoRoomsEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments);
+	public TwoRoomsEvaluationFunction(Arguments arguments) {
+		super(arguments);
 		punishCollision = arguments.getArgumentAsIntOrSetDefault("punishcollision", 1) == 1;
 		allowCollision = arguments.getArgumentAsIntOrSetDefault("allowcollision", 0) == 1;
 		
@@ -23,7 +23,7 @@ public class TwoRoomsEvaluationFunction extends EvaluationFunction {
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
 		timeAlive++;
 		picks = ((TwoRoomsEnvironment)simulator.getEnvironment()).getNumberOfPicks();
 		

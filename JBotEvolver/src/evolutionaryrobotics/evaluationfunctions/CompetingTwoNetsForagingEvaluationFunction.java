@@ -17,20 +17,15 @@ public class CompetingTwoNetsForagingEvaluationFunction extends
 	private TwoNestForageEnvironment env;
 	private int numberOfRobotInTeam;
 
-	public CompetingTwoNetsForagingEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments);
-		env = ((TwoNestForageEnvironment) (simulator.getEnvironment()));
-		forbidenArea = env.getForbiddenArea();
-		foragingArea = env.getForageRadius();
-		nestAPosition = env.getNestAPosition();
+	public CompetingTwoNetsForagingEvaluationFunction(Arguments arguments) {
+		super(arguments);
 		//TODO I commented this: (Miguel)
 //		numberOfRobotInTeam = ((CoevolutionExperiment) simulator.getExperiment()).numberOfrobotsTeamA;
 	}
 
 	@Override
 	public double getFitness() {
-		TwoNestForageEnvironment environment = ((TwoNestForageEnvironment) (simulator.getEnvironment()));
-		return fitness + ((double) environment.getNumberOfFoodSuccessfullyForagedNestA());
+		return fitness + numberOfRobotInTeam;
 //		TODO I commented this: (Miguel)
 		// return fitness +
 		// ((RoundForageEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged()
@@ -38,7 +33,13 @@ public class CompetingTwoNetsForagingEvaluationFunction extends
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
+		
+		env = ((TwoNestForageEnvironment) (simulator.getEnvironment()));
+		forbidenArea = env.getForbiddenArea();
+		foragingArea = env.getForageRadius();
+		nestAPosition = env.getNestAPosition();
+		
 		int numberOfRobotsWithPrey = 0;
 		int numberOfRobotsBeyondForbidenLimit = 0;
 		int numberOfRobotsBeyondForagingLimit = 0;

@@ -17,14 +17,14 @@ public class OpenDoorEvaluationFunction extends EvaluationFunction {
 	private boolean debug;
 	private double bonus = 0;
 
-	public OpenDoorEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments);
+	public OpenDoorEvaluationFunction(Arguments arguments) {
+		super(arguments);
 		maxSteps = arguments.getArgumentAsDoubleOrSetDefault("steps", maxSteps);
 		debug = arguments.getArgumentAsIntOrSetDefault("debug", 0) == 1;
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
 		timeAlive++;
 		TwoRoomsEnvironment env = ((TwoRoomsEnvironment)simulator.getEnvironment());
 		LinkedList<Wall> buttons = env.getButtons();

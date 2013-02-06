@@ -14,9 +14,10 @@ public class ERSimbadForagingEvaluationFunction extends EvaluationFunction {
 	private Vector2d nestPosition = new Vector2d(0, 0);
 	private double FORAGINGAREARADIUS;
 	private double NESTRADIUS;
+	private int numberOfForagedFood = 0;
 
-	public ERSimbadForagingEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator, args);
+	public ERSimbadForagingEvaluationFunction(Arguments args) {
+		super(args);
 	}
 
 	@Override
@@ -25,11 +26,11 @@ public class ERSimbadForagingEvaluationFunction extends EvaluationFunction {
 		// ((RoundForageEnvironment)(Environment.getInstance())).getNumberOfFoodSuccessfullyForaged()
 		// * 1.0;
 
-		return fitness + ((RoundForageEnvironment)simulator.getEnvironment()).getNumberOfFoodSuccessfullyForaged()*1000.0;
+		return fitness + numberOfForagedFood*1000.0;
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
 		int numberOfRobotsTooCloseToNest = 0;
 		int numberOfRobotsTooFarFromNest = 0;
 		int numberOfRobotsCloseToAPrey = 0;
@@ -76,6 +77,7 @@ public class ERSimbadForagingEvaluationFunction extends EvaluationFunction {
 				- numberOfRobotsTooFarFromNest * 0.1
 				+ numberOfRobotsCloseToAPrey * 0.1 + numberOfRobotsWithPrey * 0.01)
 				+ preyDistanceReward * 0.001;
+		this.numberOfForagedFood = ((RoundForageEnvironment)simulator.getEnvironment()).getNumberOfFoodSuccessfullyForaged();
 	}
 
 	public boolean getRobotIsCloseToPrey(Robot robot) {

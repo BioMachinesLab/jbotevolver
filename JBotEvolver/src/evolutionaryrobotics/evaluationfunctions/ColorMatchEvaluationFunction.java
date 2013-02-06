@@ -9,12 +9,12 @@ import simulation.util.Arguments;
 
 public class ColorMatchEvaluationFunction extends EvaluationFunction{
 
-	public ColorMatchEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator, args);
+	public ColorMatchEvaluationFunction(Arguments args) {
+		super(args);
 	}
 
 	@Override
-	public void update(double time) {			
+	public void update(Simulator simulator) {			
 		Iterator<Robot> i = simulator.getEnvironment().getRobots().iterator();
 		Robot base = i.next();
 		double   colorToMatch[]  = base.getBodyColorAsDoubles();

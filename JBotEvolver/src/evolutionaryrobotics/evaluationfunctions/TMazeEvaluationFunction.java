@@ -8,26 +8,27 @@ import simulation.util.Arguments;
 
 public class TMazeEvaluationFunction  extends EvaluationFunction {
 
+	protected TMazeEnvironment env;
 	protected boolean touchedWall = false;
 	protected boolean inForbiddenSquare = false;
 	protected boolean inFinalSquare = false;
-	protected TMazeEnvironment env;
 	protected double startDistance = 0;
 	protected double steps = 0;
 	protected double maxSteps = 500;
 	protected double progress = 0;
 	private boolean dieOnForbidden = true;
 	
-	public TMazeEvaluationFunction(Simulator simulator, Arguments args){
-		super(simulator,args);
-		this.env = (TMazeEnvironment)simulator.getEnvironment();
-		this.startDistance = env.getSquares().peek().getDistance();
+	public TMazeEvaluationFunction(Arguments args){
+		super(args);
 		maxSteps = (double)(args.getArgumentAsIntOrSetDefault("maxsteps", (int)maxSteps));
 		dieOnForbidden = args.getArgumentAsIntOrSetDefault("dieonforbidden",1) == 1;
 	}
 	
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
+		if(env == null)
+			env = (TMazeEnvironment)simulator.getEnvironment();
+		startDistance = env.getSquares().peek().getDistance();
 		steps++;
 		
 		if(env.killSample())

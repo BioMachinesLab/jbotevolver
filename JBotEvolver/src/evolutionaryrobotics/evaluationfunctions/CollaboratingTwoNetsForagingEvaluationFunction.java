@@ -9,20 +9,13 @@ import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 
 public class CollaboratingTwoNetsForagingEvaluationFunction extends EvaluationFunction {
-	private Vector2d nestAPosition;
-	private Vector2d nestBPosition;
-	private double forbidenArea;
-	private double foragingArea;
-	private TwoNestForageEnvironment env;
 	private int numberOfRobotInTeam;
+	private int foodNestA = 0;
+	private int foodNestB = 0;
 
-	public CollaboratingTwoNetsForagingEvaluationFunction(Simulator simulator,Arguments arguments) {
-		super(simulator,arguments);
-		env = ((TwoNestForageEnvironment) (simulator.getEnvironment()));
-		forbidenArea = env.getForbiddenArea();
-		foragingArea = env.getForageRadius();
-		nestAPosition = env.getNestAPosition();
-		nestBPosition = env.getNestBPosition();
+	public CollaboratingTwoNetsForagingEvaluationFunction(Arguments arguments) {
+		super(arguments);
+
 		//TODO I commented this: (Miguel)
 //		numberOfRobotInTeam = ((CoevolutionExperiment) simulator
 //				.getExperiment()).numberOfrobotsTeamA
@@ -31,13 +24,8 @@ public class CollaboratingTwoNetsForagingEvaluationFunction extends EvaluationFu
 
 	// @Override
 	public double getFitness() {
-		TwoNestForageEnvironment environment = ((TwoNestForageEnvironment) (simulator
-				.getEnvironment()));
-		return fitness
-				+ ((double) environment
-						.getNumberOfFoodSuccessfullyForagedNestA())
-				+ ((double) environment
-						.getNumberOfFoodSuccessfullyForagedNestB());
+
+		return fitness + foodNestA + foodNestB;
 		//TODO I commented this: (Miguel)
 		// return fitness +
 		// ((RoundForageEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged()
@@ -45,7 +33,12 @@ public class CollaboratingTwoNetsForagingEvaluationFunction extends EvaluationFu
 	}
 
 	// @Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
+		TwoNestForageEnvironment env = ((TwoNestForageEnvironment) (simulator.getEnvironment()));
+		double forbidenArea = env.getForbiddenArea();
+		double foragingArea = env.getForageRadius();
+		Vector2d nestAPosition = env.getNestAPosition();
+		Vector2d nestBPosition = env.getNestBPosition();
 		int numberOfRobotsWithPrey = 0;
 		int numberOfRobotsBeyondForbidenLimit = 0;
 		int numberOfRobotsBeyondForagingLimit = 0;
@@ -72,5 +65,8 @@ public class CollaboratingTwoNetsForagingEvaluationFunction extends EvaluationFu
 		fitness += (double) numberOfRobotsWithPrey * 0.001
 				+ numberOfRobotsBeyondForbidenLimit * -0.1
 				+ numberOfRobotsBeyondForagingLimit * -0.0001;
+		
+		this.foodNestA = env.getNumberOfFoodSuccessfullyForagedNestA();
+		this.foodNestB = env.getNumberOfFoodSuccessfullyForagedNestB();
 	}
 }

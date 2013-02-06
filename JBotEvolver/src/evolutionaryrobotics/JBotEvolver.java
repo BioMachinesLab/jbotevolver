@@ -3,7 +3,6 @@ package evolutionaryrobotics;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-
 import result.Result;
 import simulation.JBotSim;
 import simulation.Simulator;
@@ -16,9 +15,6 @@ import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
 import evolutionaryrobotics.util.DiskStorage;
-import factories.EvaluationFunctionFactory;
-import factories.EvolutionFactory;
-import factories.PopulationFactory;
 
 public class JBotEvolver extends JBotSim {
 	
@@ -33,12 +29,12 @@ public class JBotEvolver extends JBotSim {
 	}
 	
 	public EvaluationFunction getEvaluationFunction(Simulator simulator) {
-		return EvaluationFunctionFactory.getEvaluationFunction(simulator, arguments.get("--evaluation"));
+		return EvaluationFunction.getEvaluationFunction(arguments.get("--evaluation"));
 	}
 	
 	public Population getPopulation() {
 		try {
-			return PopulationFactory.getPopulation(getArguments().get("--population"));
+			return Population.getPopulation(getArguments().get("--population"));
 		} catch(Exception e) {
 			e.printStackTrace();
 			System.exit(-1);

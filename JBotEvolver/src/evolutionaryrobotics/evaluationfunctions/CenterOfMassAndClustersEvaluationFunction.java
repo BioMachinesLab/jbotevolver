@@ -14,11 +14,11 @@ public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunctio
 	private int numClusters=0;
 	private static final long serialVersionUID = 1L;
 
-	public CenterOfMassAndClustersEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator,args);
+	public CenterOfMassAndClustersEvaluationFunction(Arguments args) {
+		super(args);
 	}
 
-	public void update(double time){
+	public void update(Simulator simulator){
 		Vector2d coord = new Vector2d();
 		double x=0.0, y=0.0;
 		double distance = 0.0;
@@ -43,11 +43,11 @@ public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunctio
 //				distance =((NearRobotSensor) t.getSensorWithId(1)).getRange();
 //			}
 //			auxDist += (1-(distance/((NearRobotSensor) t.getSensorWithId(1)).getRange()));
-			near+=nearRobots(t);
+			near+=nearRobots(simulator,t);
 		}
 
 
-		numClusters=getNumClusters();
+		numClusters=getNumClusters(simulator);
 
 		finalDist = (((auxDist/nRobots)*2)/3)+(float)(1.0/numClusters)/3;
 		//finalDist = (float) (1.0/numClusters);
@@ -58,7 +58,7 @@ public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunctio
 		return fitness/1200.0;
 	}
 
-	private int nearRobots(Robot robot){
+	private int nearRobots(Simulator simulator, Robot robot){
 		double distance = Integer.MAX_VALUE;
 		int near = 0;
 		Vector2d coord = new Vector2d();
@@ -72,7 +72,7 @@ public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunctio
 		return near;
 	}
 
-	private ArrayList<ClusterUtil> setClusters(){
+	private ArrayList<ClusterUtil> setClusters(Simulator simulator){
 		ArrayList<ClusterUtil> clusters = new ArrayList<ClusterUtil>();
 		for(Robot r: simulator.getEnvironment().getRobots()){
 			clusters.add(new ClusterUtil(r));
@@ -80,11 +80,11 @@ public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunctio
 		return clusters;
 	}
 
-	private int getNumClusters(){
-		ArrayList<ClusterUtil> clusters = setClusters();
+	private int getNumClusters(Simulator simulator){
+		ArrayList<ClusterUtil> clusters = setClusters(simulator);
 		int clusterNumber=0;
 		for(ClusterUtil r: clusters){
-			searchNeighbors(clusters, r);
+			searchNeighbors(simulator, clusters, r);
 		}
 		for(ClusterUtil c: clusters){
 			if(c.getClusterElements().size()!=0)
@@ -93,7 +93,7 @@ public class CenterOfMassAndClustersEvaluationFunction extends EvaluationFunctio
 		return clusterNumber;
 	}
 
-	private void searchNeighbors(ArrayList<ClusterUtil> clusters, ClusterUtil cluster){
+	private void searchNeighbors(Simulator simulator, ArrayList<ClusterUtil> clusters, ClusterUtil cluster){
 		for(ClusterUtil c: clusters){
 			if(!cluster.equals(c) && c.getClusterElements().size()!=0){
 				if(cluster.getDistance(c)<0.3+(0.01*simulator.getEnvironment().getRobots().size())){

@@ -1,6 +1,8 @@
 package evolutionaryrobotics.evolution;
 
 import java.lang.reflect.Constructor;
+
+import simulation.Simulator;
 import simulation.util.Arguments;
 import evolutionaryrobotics.JBotEvolver;
 

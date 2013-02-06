@@ -16,10 +16,8 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 	private boolean onlyRoom = false;
 	private double closestDistance = 0;
 
-	public ClutteredMazeEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator,args);
-		r = simulator.getEnvironment().getRobots().get(0);
-		env = (ClutteredMazeEnvironment)simulator.getEnvironment();
+	public ClutteredMazeEvaluationFunction(Arguments args) {
+		super(args);
 		startPosition.x = 0;
 		startPosition.y = 0;
 		onlyRoom = args.getArgumentIsDefined("onlyroom");
@@ -30,7 +28,13 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
+		if(env == null)
+			env = (ClutteredMazeEnvironment)simulator.getEnvironment();
+		if(r == null)
+			r = simulator.getEnvironment().getRobots().get(0);
+		
+		
 		if(!finishedRoom && reachedRoomFinish()) {
 			finishedRoom = true;
 			if(onlyRoom)

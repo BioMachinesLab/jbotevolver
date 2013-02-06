@@ -10,12 +10,12 @@ public class StepsWithPreyEvaluationFunction extends EvaluationFunction{
 	private boolean     countEvolvingRobotsOnly = false;
 	
 	public StepsWithPreyEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments);
+		super(arguments);
 		countEvolvingRobotsOnly = arguments.getFlagIsTrue("countevolvingrobotsonly");
 	}
 
 	@Override
-	public void update(double time) {				
+	public void update(Simulator simulator) {				
 		int robotsWithPrey = 0;
 		int robotsCounted  = 0;
 		

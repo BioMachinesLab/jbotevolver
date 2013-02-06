@@ -12,13 +12,13 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 	private boolean firstStep = true;
 	private double mazePenalty = 0;
 
-	public RoomMazeBackEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator,args);
+	public RoomMazeBackEvaluationFunction(Arguments args) {
+		super(args);
 		mazePenalty = args.getArgumentAsDoubleOrSetDefault("mazepenalty", 0);
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
 		
 		if(env.isMixed() && firstStep) {
 			int sample = env.getMixedSample();
@@ -33,17 +33,17 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		}
 		
 		if(env.isMixed())
-			stepMixed();
+			stepMixed(simulator);
 		else {
 			if(r.isInvolvedInCollison())
 				simulator.stopSimulation();
 			
 			if(!finishedRoom) { //Didn't clear the Cluttered Room
-				stepUnfinishedRoom();
+				stepUnfinishedRoom(simulator);
 			} else if(!finishedMaze) { //Cleared the Cluttered Room
-				stepFinishedRoom();
+				stepFinishedRoom(simulator);
 			} else if(!wentBack) { //Cleared the Maze
-				stepFinishedMaze();
+				stepFinishedMaze(simulator);
 			} else { //Cleared everything
 				simulator.stopSimulation();
 			}
@@ -54,30 +54,30 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		this.fitness = computeFitness();
 	}
 	
-	private void stepMixed() {
+	private void stepMixed(Simulator simulator) {
 		int sample = env.getMixedSample();
 		
 		if(sample < 4) {//inverse
-			stepFinishedMaze();
+			stepFinishedMaze(simulator);
 			if(wentBack)
 				simulator.stopSimulation();
 		} else if (sample < 4*2) {//normal tmaze
-			stepFinishedRoom();
+			stepFinishedRoom(simulator);
 			if(finishedMaze)
 				simulator.stopSimulation();
 		} else if(sample < 4*3) {//room
-			stepUnfinishedRoom();
+			stepUnfinishedRoom(simulator);
 			if(finishedRoom)
 				simulator.stopSimulation();
 		}
 	}
 	
-	private void stepUnfinishedRoom() {
+	private void stepUnfinishedRoom(Simulator simulator) {
 		if(!inRoom())
 			finishedRoom = true;
 	}
 	
-	private void stepFinishedRoom() {
+	private void stepFinishedRoom(Simulator simulator) {
 		checkSquares();
 
 		finishedMaze = inFinalSquare;
@@ -90,7 +90,7 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 			simulator.stopSimulation();
 	}
 
-	private void stepFinishedMaze() {
+	private void stepFinishedMaze(Simulator simulator) {
 		//this is to prevent the robot from going to the forbidden squares
 		checkSquares();
 		

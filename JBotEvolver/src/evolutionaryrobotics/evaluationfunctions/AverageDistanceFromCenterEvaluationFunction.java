@@ -11,8 +11,8 @@ public class AverageDistanceFromCenterEvaluationFunction extends EvaluationFunct
 	private boolean     countEvolvingRobotsOnly = false;
 	private double time;
 	
-	public AverageDistanceFromCenterEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments);
+	public AverageDistanceFromCenterEvaluationFunction(Arguments arguments) {
+		super(arguments);
 		countEvolvingRobotsOnly = arguments.getFlagIsTrue("countevolvingrobotsonly");
 	}
 	
@@ -22,8 +22,8 @@ public class AverageDistanceFromCenterEvaluationFunction extends EvaluationFunct
 	}
 
 	@Override
-	public void update(double time) {
-		this.time = time;
+	public void update(Simulator simulator) {
+		this.time = simulator.getTime();
 		Vector2d coord = new Vector2d();
 		double distanceToNest = 0;
 		int    robotsCounted  = 0;

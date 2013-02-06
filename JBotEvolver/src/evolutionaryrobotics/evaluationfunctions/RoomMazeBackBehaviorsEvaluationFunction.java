@@ -23,14 +23,15 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 	
 	private double totalTime = 2000;
 	
-	public RoomMazeBackBehaviorsEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator,args);
-		controller = (BehaviorController)simulator.getEnvironment().getRobots().get(0).getController();
+	public RoomMazeBackBehaviorsEvaluationFunction(Arguments args) {
+		super(args);
 		totalTime = args.getArgumentAsDoubleOrSetDefault("totaltime", 2000);
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
+		if(controller == null)
+			controller = (BehaviorController)simulator.getEnvironment().getRobots().get(0).getController();
 
 		if(r.isInvolvedInCollison())
 			simulator.stopSimulation();
@@ -38,9 +39,9 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 		if(!finishedRoom) { //Didn't clear the Cluttered Room
 			stepUnfinishedRoom();
 		} else if(!finishedMaze) { //Cleared the Cluttered Room
-			stepFinishedRoom();
+			stepFinishedRoom(simulator);
 		} else if(!wentBack) { //Cleared the Maze
-			stepFinishedMaze();
+			stepFinishedMaze(simulator);
 		} else { //Cleared everything
 			simulator.stopSimulation();
 		}
@@ -60,7 +61,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 		finishedRoom = !inRoom();
 	}
 	
-	private void stepFinishedRoom() {
+	private void stepFinishedRoom(Simulator simulator) {
 		checkSquares();
 		
 		if(controller.getCurrentSubNetwork() == 1)
@@ -78,7 +79,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 			simulator.stopSimulation();
 	}
 
-	private void stepFinishedMaze() {
+	private void stepFinishedMaze(Simulator simulator) {
 		//this is to prevent the robot from going to the forbidden squares
 		
 		if(controller.getCurrentSubNetwork() == 0)

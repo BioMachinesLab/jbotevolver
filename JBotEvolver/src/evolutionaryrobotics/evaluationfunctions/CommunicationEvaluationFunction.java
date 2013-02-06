@@ -10,26 +10,23 @@ import simulation.util.Arguments;
 
 public class CommunicationEvaluationFunction extends EvaluationFunction{
 	private Vector2d    nestPosition = new Vector2d(0, 0);
-	private double		forbidenArea;
-	private double		foragingArea;
+	private int numberOfFoodForaged = 0;
 
-	public CommunicationEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator,args);
-		forbidenArea =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForbiddenArea();
-		foragingArea =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForageRadius();		
+	public CommunicationEvaluationFunction(Arguments args) {
+		super(args);	
 	}
 	
 	@Override
 	public double getFitness() {
-		return fitness + ((GroupedPreyEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged() * 1.0;
-	}
-
-	private boolean haveForaged(){
-		return ((GroupedPreyEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged() > 0;
+		return fitness + numberOfFoodForaged;
 	}
 
 	@Override
-	public void update(double time) {			
+	public void update(Simulator simulator) {			
+		
+		double forbidenArea =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForbiddenArea();
+		double foragingArea =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForageRadius();	
+		
 		int numberOfRobotsWithPrey       = 0;
 		int numberOfRobotsBeyondForbidenLimit       = 0;
 		int numberOfRobotsBeyondForagingLimit       = 0;
@@ -49,7 +46,9 @@ public class CommunicationEvaluationFunction extends EvaluationFunction{
 				numberOfRobotsWithPrey++;
 			}
 			
-			if(haveForaged()) {
+			this.numberOfFoodForaged = ((GroupedPreyEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged();
+			
+			if(numberOfFoodForaged > 0) {
 				DifferentialDriveRobot ddr = (DifferentialDriveRobot)r;
 				collectiveSpeed+= (Math.abs(ddr.getLeftWheelSpeed())+Math.abs(ddr.getRightWheelSpeed()))/2;
 			}

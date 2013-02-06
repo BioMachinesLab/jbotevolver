@@ -11,9 +11,6 @@ import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.parallel.SlaveResult;
 import evolutionaryrobotics.populations.Population;
-import factories.ControllerFactory;
-import factories.PopulationFactory;
-import factories.RobotFactory;
 
 public class GenerationalEvolution extends Evolution {
 	
@@ -25,7 +22,7 @@ public class GenerationalEvolution extends Evolution {
 		populationArguments.setArgument("genomelength", getGenomeLength());
 		
 		try {
-			population = PopulationFactory.getPopulation(jBotEvolver.getArguments().get("--population"));
+			population = Population.getPopulation(jBotEvolver.getArguments().get("--population"));
 			population.setRandomNumberGenerator(new Random(jBotEvolver.getRandom().nextInt()));
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -45,8 +42,6 @@ public class GenerationalEvolution extends Evolution {
 			
 			int totalChromosomes = 0;
 			
-			System.out.println("Generation "+population.getNumberOfCurrentGeneration());
-			
 			while ((c = population.getNextChromosomeToEvaluate()) != null) {
 				jBotEvolver.getRandom().setSeed(population.getGenerationRandomSeed());
 				
@@ -65,6 +60,11 @@ public class GenerationalEvolution extends Evolution {
 				System.out.print("!");
 			}
 			
+			System.out.println("Generation "+population.getNumberOfCurrentGeneration()+
+					"\tHighest Fitness: "+population.getHighestFitness()+
+					"\tAverageFitness: "+population.getAverageFitness()+
+					"\tLowestFitness: "+population.getLowestFitness());
+			
 			System.out.println("\n Highest Fitness: "+population.getHighestFitness());
 			
 			try {
@@ -81,8 +81,8 @@ public class GenerationalEvolution extends Evolution {
 		Simulator sim = jBotEvolver.createSimulator(new Random(jBotEvolver.getRandom().nextLong()));
 		jBotEvolver.getEnvironment(sim);
 		
-		Robot r = RobotFactory.getRobot(sim, jBotEvolver.getArguments().get("--robots"));
-		Controller c = ControllerFactory.getController(sim,r, jBotEvolver.getArguments().get("--controllers"));
+		Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots"));
+		Controller c = Controller.getController(sim,r, jBotEvolver.getArguments().get("--controllers"));
 		
 		int genomeLength = 0;
 		

@@ -12,13 +12,13 @@ public class FindWallButtonEvaluationFunction extends EvaluationFunction {
 	private double maxSteps = 300;
 	private double timeAlive = 0;
 
-	public FindWallButtonEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments);
+	public FindWallButtonEvaluationFunction(Arguments arguments) {
+		super(arguments);
 		maxSteps = arguments.getArgumentAsDoubleOrSetDefault("steps", maxSteps);
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
 		timeAlive++;
 		LinkedList<Wall> buttons = ((TwoRoomsEnvironment)simulator.getEnvironment()).getButtons();
 		Vector2d robotPos = simulator.getEnvironment().getRobots().get(0).getPosition();

@@ -10,28 +10,25 @@ public class CrossRoomsEvaluationFunction extends EvaluationFunction {
 	private double steps = 0;
 	private boolean punishCollision = true;
 	private boolean awardBest = false;
-	
 	private boolean debug = false;
 	private double startingX = 0;
 
-	public CrossRoomsEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments);
+	public CrossRoomsEvaluationFunction(Arguments arguments) {
+		super(arguments);
 		targetX = arguments.getArgumentAsDoubleOrSetDefault("targetx", targetX);
 		steps = arguments.getArgumentAsDoubleOrSetDefault("steps", steps);
 		punishCollision = arguments.getArgumentAsIntOrSetDefault("punishcollision", 1) == 1;
 		awardBest = arguments.getArgumentAsIntOrSetDefault("awardbest", 0) == 1;
 		debug = arguments.getArgumentAsIntOrSetDefault("debug", 0) == 1;
-		
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
 		
-		if(debug && time == 0) {
+		if(debug && simulator.getTime() == 0) {
 			startingX = simulator.getEnvironment().getRobots().get(0).getPosition().getX();
 		}
 		
-		time++;
 		double robotPos = simulator.getEnvironment().getRobots().get(0).getPosition().getX();
 		double totalDistance = Math.abs(targetX)*2.0;
 		double currentDistance = Math.abs(targetX-robotPos);
@@ -56,7 +53,7 @@ public class CrossRoomsEvaluationFunction extends EvaluationFunction {
 		
 		if(percentage > 0.85) {
 			fitness = 1;
-			fitness+= 10*((steps-time)/steps);
+			fitness+= 10*((steps-simulator.getTime())/steps);
 			simulator.stopSimulation();
 		}
 		

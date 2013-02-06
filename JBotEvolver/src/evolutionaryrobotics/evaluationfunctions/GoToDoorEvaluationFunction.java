@@ -17,8 +17,8 @@ public class GoToDoorEvaluationFunction extends EvaluationFunction {
 	private TwoRoomsEnvironment env;
 	private Wall closestWallButton;
 
-	public GoToDoorEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator, arguments);
+	public GoToDoorEvaluationFunction(Arguments arguments) {
+		super(arguments);
 //		targetX = arguments.getArgumentAsDoubleOrSetDefault("targetx", targetX);
 		steps = arguments.getArgumentAsDoubleOrSetDefault("steps", steps);
 		punishCollision = arguments.getArgumentAsIntOrSetDefault("punishcollision", 1) == 1;
@@ -26,9 +26,9 @@ public class GoToDoorEvaluationFunction extends EvaluationFunction {
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
 		
-		if(time == 0) {
+		if(simulator.getTime() == 0) {
 			env = ((TwoRoomsEnvironment)simulator.getEnvironment());
 			startingX = 1;//env.getRobots().get(0).getPosition().getX();
 			LinkedList<Wall> buttons = env.getButtons();
@@ -38,7 +38,6 @@ public class GoToDoorEvaluationFunction extends EvaluationFunction {
 		
 		Robot r = env.getRobots().get(0);
 		
-		time++;
 		double robotPos = env.getRobots().get(0).getPosition().getX();
 		double totalDistance = Math.abs(startingX - targetX);
 		double currentDistance = Math.abs(targetX-robotPos);
@@ -57,7 +56,7 @@ public class GoToDoorEvaluationFunction extends EvaluationFunction {
 		double robotY = env.getRobots().get(0).getPosition().getY();
 		
 		if((openDoor && env.doorsOpen) || (!openDoor && getHorizontalDistanceToWall(r,closestWallButton) < 0.1 && Math.abs(robotY) < 0.1)) {
-			fitness = 1+ ((steps-time)/steps);
+			fitness = 1+ (steps-simulator.getTime()/steps);
 			simulator.stopSimulation();
 		}
 	}

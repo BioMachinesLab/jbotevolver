@@ -12,17 +12,14 @@ import simulation.util.Arguments;
 
 public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 	private Vector2d    nestPosition = new Vector2d(0, 0);
-	private double		forbidenArea;
-	private double		foragingArea;
 	private double		redFarPenalty;
 	private double		redNearBonus;
 	private double		movementPenalty;
 	private double      preyDistanceRewardFactor;
+	private int numberOfFoodForaged = 0;
 
-	public ColorNearPreyEvaluationFunction(Simulator simulator, Arguments arguments) {
-		super(simulator,arguments);
-		forbidenArea    =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForbiddenArea();
-		foragingArea    =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForageRadius();
+	public ColorNearPreyEvaluationFunction(Arguments arguments) {
+		super(arguments);
 		redFarPenalty   = (arguments.getArgumentIsDefined("redfarpenalty")) ? arguments.getArgumentAsDouble("redfarpenalty") : 0;
 		redNearBonus    = (arguments.getArgumentIsDefined("rednearbonus")) ? arguments.getArgumentAsDouble("rednearbonus") : 0;
 		movementPenalty = (arguments.getArgumentIsDefined("movementpenalty")) ? arguments.getArgumentAsDouble("movementpenalty") : 0;
@@ -31,7 +28,7 @@ public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 
 	@Override
 	public double getFitness() {
-		return fitness + ((GroupedPreyEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged() * 1.0;
+		return fitness + numberOfFoodForaged;
 	}
 	
 	/*
@@ -40,7 +37,9 @@ public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 	}*/
 
 	@Override
-	public void update(double time) {			
+	public void update(Simulator simulator) {
+		double forbidenArea    =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForbiddenArea();
+		double foragingArea    =  ((GroupedPreyEnvironment)(simulator.getEnvironment())).getForageRadius();
 		int numberOfRobotsWithPrey = 0;
 		int numberOfRobotsBeyondForbidenLimit = 0;
 		int numberOfRobotsBeyondForagingLimit = 0;
@@ -106,5 +105,6 @@ public class ColorNearPreyEvaluationFunction extends EvaluationFunction{
 			numberOfRedRobotsNearPrey * redNearBonus +
 			numberOfRedRobotsFarFromPrey * -redFarPenalty +
 			preyDistanceReward * preyDistanceRewardFactor;
+		this.numberOfFoodForaged = ((GroupedPreyEnvironment)(simulator.getEnvironment())).getNumberOfFoodSuccessfullyForaged();
 	}
 }

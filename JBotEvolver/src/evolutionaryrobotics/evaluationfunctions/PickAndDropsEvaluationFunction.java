@@ -10,13 +10,13 @@ import simulation.util.Arguments;
 public class PickAndDropsEvaluationFunction extends EvaluationFunction {
 	private boolean countEvolvingRobotsOnly = false;
 
-	public PickAndDropsEvaluationFunction(Simulator simulator, Arguments args) {
-		super(simulator, args);
+	public PickAndDropsEvaluationFunction(Arguments args) {
+		super(args);
 		countEvolvingRobotsOnly = args.getArgumentIsDefined("countevolvingrobotsonly");
 	}
 
 	@Override
-	public void update(double time) {
+	public void update(Simulator simulator) {
 		
 		double tempFitness = 0;
 		
