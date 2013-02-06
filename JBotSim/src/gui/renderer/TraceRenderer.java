@@ -22,7 +22,7 @@ import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 
 @SuppressWarnings("serial")
-public class TraceRenderer extends Component implements Renderer {
+public class TraceRenderer extends Renderer {
 	
 	public static final int SCREEN = 0;
 	public static final int JPG    = 1;
@@ -91,11 +91,12 @@ public class TraceRenderer extends Component implements Renderer {
 	}	
 	
 	@Override
-	public void dispose() {
-	}
-
-	@Override
 	public void drawCircle(Point2d center, double radius) {
+	}
+	
+	@Override
+	public void update(Simulator simulator) {
+			
 	}
 
 	@Override
@@ -294,21 +295,6 @@ public class TraceRenderer extends Component implements Renderer {
 			g.drawRect(imageX, imageY, 1, 1);
 		}
 	}
-	
-	@Override
-	public Component getComponent() {
-		return this;
-	}
-
-	@Override
-	public int getSelectedRobot() {
-		return 0;
-	}
-
-	@Override
-	public void setSimulator(Simulator simulator) {
-		this.simulator = simulator;
-	}
 
 	@Override
 	public void resetZoom() {
@@ -326,9 +312,10 @@ public class TraceRenderer extends Component implements Renderer {
 	public void zoomOut() {
 		// TODO Auto-generated method stub
 	}
-	
+
 	@Override
-	public void drawImage(Image image) {
+	public void dispose() {
 		// TODO Auto-generated method stub
+		
 	}
 }

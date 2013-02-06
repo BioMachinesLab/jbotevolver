@@ -3,7 +3,6 @@ package evolutionaryrobotics.neuralnetworks.outputs;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import factories.ControllerFactory;
 
 public class FixedNNOutput extends NNOutput {
 

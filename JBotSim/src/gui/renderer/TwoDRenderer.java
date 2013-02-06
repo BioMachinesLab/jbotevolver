@@ -18,7 +18,7 @@ import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 
-public class TwoDRenderer extends Component implements Renderer, ComponentListener {
+public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	private static final long serialVersionUID = -1376516458026928095L;
 
@@ -28,7 +28,6 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 	double        scale;
 	double        centerX;
 	double        centerY;
-	Image		  bgImage;
 
 	private double zoomFactor = 1.0;
 	
@@ -76,11 +75,6 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 				(int) ((simulator.getEnvironment().getHeight() * scale)));
 
 		simulator.getEnvironment().draw(this);
-		
-		if(bgImage != null)
-		{
-			drawBackgroundImage(graphics, bgImage);
-		}
 		
 		if(simulator.getEnvironment().getMovableObjects().size()>0){
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
@@ -187,18 +181,6 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 		graphics.fillOval(x+circleDiameter/2-3, y+circleDiameter/2-3, 6, 6);
 		graphics.setColor(Color.BLACK);
 		
-	}
-	
-	private void drawBackgroundImage(Graphics graphics, Image img) {
-		
-		int w = (int)(simulator.getEnvironment().getWidth()*scale);
-		int h = (int)(simulator.getEnvironment().getHeight()*scale);
-		
-		
-		int x = (int)(transformX(0) - w / 2);
-		int y = (int)(transformY(0) - h / 2);
-		
-		graphics.drawImage(img, x, y, w, h, null);
 	}
 
 	private void drawPreys(Graphics graphics, Prey prey) {
@@ -322,10 +304,5 @@ public class TwoDRenderer extends Component implements Renderer, ComponentListen
 
 	public int getSelectedRobot() {
 		return -1;
-	}
-	
-	@Override
-	public void drawImage(Image image) {
-		this.bgImage = image;
 	}
 }

@@ -1,16 +1,11 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.LinkedList;
-import java.util.Vector;
-
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
-import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
-import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
-import factories.ControllerFactory;
 
 public class NeuralNetworkController extends Controller implements FixedLenghtGenomeEvolvableController {
 	protected NeuralNetwork neuralNetwork;

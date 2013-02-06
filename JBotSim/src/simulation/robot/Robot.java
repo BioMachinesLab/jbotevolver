@@ -2,6 +2,7 @@ package simulation.robot;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -339,5 +340,71 @@ public class Robot extends MovableObject {
 				return a;
 		}
 		return null;
+	}
+	
+	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
+		int numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+		ArrayList<Robot> robots = new ArrayList<Robot>(numberOfRobots);
+		for(int i = 0 ; i < numberOfRobots ; i++)
+			robots.add(getRobot(simulator, arguments));
+		return robots;
+	}
+
+	public static Robot getRobot(Simulator simulator, Arguments arguments) {
+		Robot robot = createRobot(simulator, arguments);
+
+		addSensors(simulator, robot, arguments);
+		addActuators(simulator, robot, arguments);
+
+		return robot;
+	}
+
+	private static Robot createRobot(Simulator simulator, Arguments arguments) {
+		
+		if (!arguments.getArgumentIsDefined("classname")) {
+			throw new RuntimeException("Robot 'classname' not defined: "+ arguments.toString());
+		}
+
+		String robotName = arguments.getArgumentAsString("classname");
+
+		try {
+			Constructor<?>[] constructors = Class.forName(robotName).getDeclaredConstructors();
+			for (Constructor<?> constructor : constructors) {
+				Class<?>[] params = constructor.getParameterTypes();
+				if (params.length == 2 && params[0] == Simulator.class
+						&& params[1] == Arguments.class) {
+					return (Robot) constructor.newInstance(simulator,arguments);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		throw new RuntimeException("Unknown robot: " + robotName);
+	}
+
+	private static void addSensors(Simulator simulator, Robot robot, Arguments arguments) {
+		if (!arguments.getArgumentIsDefined("sensors"))
+			return;
+
+		Arguments sensors = new Arguments(arguments.getArgumentAsString("sensors"));
+
+		for (int i = 0; i < sensors.getNumberOfArguments(); i++) {
+			Arguments sensorArgs = new Arguments(sensors.getValueAt(i));
+			Sensor sensor = Sensor.getSensor(robot, simulator,sensorArgs.getArgumentAsString("classname"),sensorArgs);
+			robot.addSensor(sensor);
+		}
+	}
+
+	private static void addActuators(Simulator simulator, Robot robot, Arguments arguments) {
+		if (!arguments.getArgumentIsDefined("actuators"))
+			return;
+
+		Arguments actuators = new Arguments(arguments.getArgumentAsString("actuators"));
+
+		for (int i = 0; i < actuators.getNumberOfArguments(); i++) {
+			Arguments actuatorArgs = new Arguments(actuators.getValueAt(i));
+			Actuator actuator = Actuator.getActuator(simulator, actuatorArgs.getArgumentAsString("classname"), actuatorArgs);
+			robot.addActuator(actuator);
+		}
 	}
 }

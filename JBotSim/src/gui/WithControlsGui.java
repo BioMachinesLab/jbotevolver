@@ -1,6 +1,7 @@
 package gui;
 
 import gui.renderer.Renderer;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -8,7 +9,9 @@ import java.awt.GridLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
+import java.util.HashMap;
+import java.util.Random;
+
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -17,11 +20,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+
+import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.environment.Environment;
-import simulation.physicalobjects.Prey;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 
-public class WithControlsGui implements Gui {
+public class WithControlsGui extends Gui {
 	JFrame      frame;
 	JTextField  simulationTimeTextField;
 	JTextField  controlStepTextField;	
@@ -29,7 +35,6 @@ public class WithControlsGui implements Gui {
 
 	JTextField  controlStepTimeTextField;
 	JTextField  rendererTimeTextField;	
-
 
 	double      maxFramesPerSecond       = 25; 	
 	int         sleepBetweenControlSteps = 10;
@@ -57,9 +62,10 @@ public class WithControlsGui implements Gui {
 	Renderer renderer;
 	protected Simulator simulator;
 
-	public WithControlsGui(Simulator simulator, Renderer renderer) {
-		this.simulator = simulator;
-		this.renderer = renderer;
+	public WithControlsGui(Arguments args) {
+		super(args);
+		this.renderer = Renderer.getRenderer(new Arguments(args.getArgumentAsString("renderer")));
+		
 		frame = new JFrame("WithControlsGui");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setSize(1000, 700);
@@ -229,22 +235,34 @@ public class WithControlsGui implements Gui {
 	public void dispose() {
 		frame.setVisible(false);
 	}
+	
+	public void loadArguments(JBotSim jBotSim) {
+		HashMap<String,Arguments> args = jBotSim.getArguments();
+		this.renderer = Renderer.getRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
+		frame.getContentPane().add(renderer);
+		renderer.enableInputMethods(true);
+		frame.getContentPane().validate();
+		long seed = args.get("--random-seed") != null ? Long.parseLong(args.get("--random-seed").getCompleteArgumentString()) : 0;
+		Simulator simulator = jBotSim.createSimulator(new Random(seed));
+		Environment env = jBotSim.getEnvironment(simulator);
+		env.addRobots(jBotSim.createRobots(simulator));
+		if (renderer != null) {
+			frame.getContentPane().add(renderer);
+			renderer.enableInputMethods(true);
+			frame.getContentPane().validate();
+		}
+	}
+	
+	@Override
+	public void update(Simulator simulator) {
+		if(renderer != null) {
+			renderer.update(simulator);
+		}
+		controlStepTextField.setText("" + simulator.getTime().intValue());
+	}
 
 	//	@Override
 	public void run(Simulator simulator, Renderer rendererTo, int maxNumberOfSteps) {
-
-		Component rendererComponent = null;
-		int currentStep = 0;
-		if(renderer != null){
-			rendererComponent = renderer.getComponent();
-			if (rendererComponent != null) {
-				frame.getContentPane().add(rendererComponent);
-//				rendererComponent.addKeyListener(experiment.getEnvironment());
-				rendererComponent.enableInputMethods(true);
-				frame.getContentPane().validate();
-			}
-		}
-
 
 		long lastFrameTime = 0;
 		while (currentStep < maxNumberOfSteps) {						

@@ -6,15 +6,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
-
 import simulation.environment.Environment;
 import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
-
 import comm.FileProvider;
 
 public class Simulator implements Serializable {
@@ -91,7 +88,7 @@ public class Simulator implements Serializable {
 		updatePositions(time);
 		
 		for (Updatable r : callbacks) {
-			r.update(time);
+			r.update(this);
 		}
 	}
 

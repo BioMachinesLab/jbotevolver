@@ -4,6 +4,7 @@ import gui.renderer.Renderer;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -177,5 +178,30 @@ public abstract class Environment implements KeyListener, Serializable {
 	public void addRobots(ArrayList<Robot> robots) {
 		for(Robot r : robots)
 			addRobot(r);
+	}
+	
+	public static Environment getEnvironment(Simulator simulator, Arguments arguments) {
+
+		if (!arguments.getArgumentIsDefined("classname")) {
+			throw new RuntimeException("Environment 'classname' not defined: "
+					+ arguments.toString());
+		}
+
+		String environmentName = arguments.getArgumentAsString("classname");
+
+		try {
+			Constructor<?>[] constructors = Class.forName(environmentName).getDeclaredConstructors();
+			for (Constructor<?> constructor : constructors) {
+				Class<?>[] params = constructor.getParameterTypes();
+				if (params.length == 2 && params[0] == Simulator.class
+						&& params[1] == Arguments.class) {
+					return (Environment) constructor.newInstance(simulator, arguments);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		throw new RuntimeException("Unknown environment: " + environmentName);
 	}
 }

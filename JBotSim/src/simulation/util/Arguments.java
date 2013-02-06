@@ -690,7 +690,6 @@ public class Arguments implements Serializable {
 		result.put("commandline",
 				createOrPrependArguments(null, commandLine.trim(),true));
 		AutoArgumentsGeneration.getAuto(result);
-		System.out.println(result.get("--controllers").getCompleteArgumentString());
 		return result;
 	}
 

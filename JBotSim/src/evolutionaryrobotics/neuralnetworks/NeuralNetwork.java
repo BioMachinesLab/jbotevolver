@@ -4,13 +4,11 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Random;
 import java.util.Vector;
-
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
-import factories.ControllerFactory;
 
 
 public abstract class NeuralNetwork implements Serializable{

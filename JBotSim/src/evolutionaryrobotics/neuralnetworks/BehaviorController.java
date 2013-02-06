@@ -1,10 +1,8 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.ArrayList;
-
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
-import factories.ControllerFactory;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -77,14 +75,14 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 			
 			for(int i = 0 ; i < subControllerArgs.getNumberOfArguments() ; i++) {
 				Arguments currentSubControllerArgs = new Arguments(subControllerArgs.getArgumentAsString(subControllerArgs.getArgumentAt(i)));
-				subControllers.add(ControllerFactory.getController(simulator, robot, currentSubControllerArgs));
+				subControllers.add(Controller.getController(simulator, robot, currentSubControllerArgs));
 			}
 		}
 		
 		//Setting up main Controller
 		String oldName = args.getArgumentAsString("name");
 		args.setArgument("name", args.getArgumentAsString("type"));
-		mainController = (NeuralNetworkController)ControllerFactory.getController(simulator, robot, args);
+		mainController = (NeuralNetworkController)Controller.getController(simulator, robot, args);
 		args.setArgument("name", oldName);
 		
 		resetChosen = args.getArgumentAsIntOrSetDefault("resetchosen", 1) == 1;

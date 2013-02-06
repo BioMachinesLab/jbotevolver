@@ -4,15 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Random;
+import controllers.Controller;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
-import factories.ControllerFactory;
-import factories.EnvironmentFactory;
-import factories.RobotFactory;
 
 public class JBotSim {
 	
@@ -27,7 +23,7 @@ public class JBotSim {
 	}
 	
 	public Environment getEnvironment(Simulator simulator) {
-		Environment environment = EnvironmentFactory.getEnvironment(simulator, arguments.get("--environment"));
+		Environment environment = Environment.getEnvironment(simulator, arguments.get("--environment"));
 		simulator.setEnvironment(environment);
 		environment.setup(simulator);
 		
@@ -50,15 +46,15 @@ public class JBotSim {
 	}
 	
 	public ArrayList<Robot> createRobots(Simulator simulator) {
-		ArrayList<Robot> robots = RobotFactory.getRobots(simulator, arguments.get("--robots"));
+		ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
 		for(Robot r : robots)
-			r.setController(ControllerFactory.getController(simulator, r, arguments.get("--controllers")));
+			r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
 		return robots;
 	}
 	
 	protected Robot createOneRobot(Simulator simulator, Arguments robotArguments, Arguments controllerArguments) {
-		Robot robot = RobotFactory.getRobot(simulator, robotArguments);
-		robot.setController(ControllerFactory.getController(simulator,robot, controllerArguments));
+		Robot robot = Robot.getRobot(simulator, robotArguments);
+		robot.setController(Controller.getController(simulator,robot, controllerArguments));
 		return robot;
 	}
 	

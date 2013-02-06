@@ -3,7 +3,6 @@ package evolutionaryrobotics.neuralnetworks.inputs;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import factories.ControllerFactory;
 
 public class SysoutNNInput extends NNInput {
 

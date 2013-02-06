@@ -1,5 +1,6 @@
 package simulation.robot.sensors;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 
 import simulation.Simulator;
@@ -22,11 +23,27 @@ public abstract class Sensor extends SimulatorObject {
 
 	public abstract double getSensorReading(int sensorNumber);
 
-	public void update(double time, ArrayList<PhysicalObject> teleported) {
-	};
+	public void update(double time, ArrayList<PhysicalObject> teleported) {}
 
 	public int getId() {
 		return id;
 	}
-
+	
+	public static Sensor getSensor(Robot robot, Simulator simulator, String name, Arguments arguments) {
+		
+		int id = arguments.getArgumentAsIntOrSetDefault("id",0);
+		
+		try {
+			Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
+			for (Constructor<?> constructor : constructors) {
+				Class<?>[] params = constructor.getParameterTypes();
+				if (params.length == 4 && params[0] == Simulator.class && params[1] == int.class
+						&& params[2] == Robot.class && params[3] == Arguments.class)
+					return (Sensor) constructor.newInstance(simulator,id,robot,arguments);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		throw new RuntimeException("Unknown sensor: " + name);
+	}
 }
