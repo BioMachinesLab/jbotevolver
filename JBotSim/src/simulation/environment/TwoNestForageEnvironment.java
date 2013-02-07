@@ -54,6 +54,7 @@ public class TwoNestForageEnvironment extends Environment {
 	
 	@Override
 	public void setup(Simulator simulator) {
+		super.setup(simulator);
 		nestA = new Nest(simulator, "NestA", -nestDistance / 2, 0, nestLimit);
 		nestA.setParameter("TEAM", 1);
 		nestB = new Nest(simulator, "NestB", nestDistance / 2, 0, nestLimit);
@@ -152,12 +153,6 @@ public class TwoNestForageEnvironment extends Environment {
 
 	public double getForbiddenArea() {
 		return forbiddenArea;
-	}
-
-	@Override
-	public void draw(Renderer renderer) {
-		renderer.drawCircle(center, forageLimit);
-		renderer.drawCircle(center, forbiddenArea);
 	}
 
 	public Vector2d getNestAPosition() {

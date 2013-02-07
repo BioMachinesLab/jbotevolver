@@ -63,6 +63,7 @@ public class TwoNestSimpleForageEnvironment extends TwoNestForageEnvironment {
 	
 	@Override
 	public void setup(Simulator simulator) {
+		super.setup(simulator);
 		// nestA = new Nest(simulator, "NestA", -nestDistance / 2, 0,
 		// nestLimit);
 		// nestA.setParameter("TEAM", 1);

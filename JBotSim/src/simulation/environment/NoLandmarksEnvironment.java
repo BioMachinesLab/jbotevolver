@@ -13,7 +13,9 @@ public class NoLandmarksEnvironment extends Environment {
 	}
 	
 	@Override
-	public void setup(Simulator simulator) {}
+	public void setup(Simulator simulator) {
+		super.setup(simulator);
+	}
 	
 	public double getForageRadius() {
 		return forageLimit;

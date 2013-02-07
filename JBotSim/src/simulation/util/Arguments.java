@@ -686,9 +686,9 @@ public class Arguments implements Serializable {
 				commandLine += "\n";
 			commandLine += s + " ";
 		}
-
-		result.put("commandline",
-				createOrPrependArguments(null, commandLine.trim(),true));
+		
+//		Arguments commandLineArguments = new Arguments(commandLine.trim(),true);
+//		result.put("commandline",result);
 		AutoArgumentsGeneration.getAuto(result);
 		return result;
 	}

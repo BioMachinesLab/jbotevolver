@@ -66,6 +66,7 @@ public class GroupedPreyEnvironment extends Environment {
 	
 	@Override
 	public void setup(Simulator simulator) {
+		super.setup(simulator);
 		preyCenter = calculatePreyCenter();
 		
 		for(int i = 0; i < amountOfFood; i++ ){
@@ -179,11 +180,5 @@ public class GroupedPreyEnvironment extends Environment {
 
 	public double getForbiddenArea() {
 		return forbiddenArea;
-	}
-
-	@Override
-	public void draw(Renderer renderer){
-            renderer.drawCircle(nest.getPosition(), forageLimit);
-            renderer.drawCircle(nest.getPosition(), forbiddenArea);
 	}
 }

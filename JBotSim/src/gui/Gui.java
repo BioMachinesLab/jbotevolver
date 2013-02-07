@@ -1,16 +1,12 @@
 package gui;
 
+import gui.renderer.Renderer;
+
 import java.lang.reflect.Constructor;
 
-import simulation.Simulator;
+import simulation.JBotSim;
 import simulation.Updatable;
 import simulation.util.Arguments;
-import gui.renderer.BlenderRenderer;
-import gui.renderer.NullRenderer;
-import gui.renderer.Renderer;
-import gui.renderer.TraceRenderer;
-import gui.renderer.TwoDRenderer;
-import gui.renderer.TwoDRendererDebug;
 
 /**
  * Base class for all GUIs. A GUI has control over a simulation run. A GUI need not display any windows. 
@@ -23,14 +19,18 @@ import gui.renderer.TwoDRendererDebug;
 
 public abstract class Gui implements Updatable {
 	
-	public Gui(Arguments args) {}
+	protected JBotSim jBotSim;
+	
+	public Gui(JBotSim jBotSim, Arguments args) {
+		this.jBotSim = jBotSim;
+	}
 
 	/**
 	 * Dispose of any windows, dialogs and other resources allocated by the GUI.
 	 */
 	public abstract void dispose();
 	
-	public static Gui getGui(Arguments arguments) throws Exception {
+	public static Gui getGui(JBotSim jBotSim, Arguments arguments) {
 		
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Gui 'classname' not defined: "+ arguments.toString());
@@ -41,8 +41,8 @@ public abstract class Gui implements Updatable {
 			Constructor<?>[] constructors = Class.forName(guiName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
-				if (params.length == 1 && params[0] == Arguments.class) {
-					return (Gui) constructor.newInstance(arguments);
+				if (params.length == 2 && params[0] == JBotSim.class && params[1] == Arguments.class) {
+					return (Gui) constructor.newInstance(jBotSim, arguments);
 				}
 			}
 		} catch (Exception e) {

@@ -34,17 +34,23 @@ public abstract class Environment implements KeyListener, Serializable {
 	protected CollisionManager collisionManager;
 	protected double height;
 	protected double width;
+	protected int steps;
+	
+	protected boolean setup = false;
 
 	private GeometricCalculator geometricCalculator;
 
 	public Environment(Simulator simulator, Arguments args) {
 		this.width = args.getArgumentAsDoubleOrSetDefault("width", 5);
 		this.height = args.getArgumentAsDoubleOrSetDefault("height", 5);
+		this.steps = args.getArgumentAsIntOrSetDefault("steps", 0);
 		collisionManager = new SimpleCollisionManager(simulator);
 		this.geometricCalculator = simulator.getGeoCalculator();
 	}
 	
-	public abstract void setup(Simulator simulator);
+	public void setup(Simulator simulator) {
+		this.setup = true;
+	}
 
 	public abstract void update(double time);
 
@@ -151,6 +157,10 @@ public abstract class Environment implements KeyListener, Serializable {
 	public double getMaxApproximationSpeed() {
 		return MAX_APPROX_SPEED;
 	}
+	
+	public int getSteps() {
+		return steps;
+	}
 
 	public void reset() {
 	}
@@ -203,5 +213,9 @@ public abstract class Environment implements KeyListener, Serializable {
 		}
 
 		throw new RuntimeException("Unknown environment: " + environmentName);
+	}
+	
+	public boolean isSetup() {
+		return setup;
 	}
 }

@@ -1,43 +1,39 @@
 package gui.renderer;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
+
 import mathutils.Point2d;
 import mathutils.Vector2d;
-import simulation.Simulator;
 import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class TwoDRenderer extends Renderer implements ComponentListener {
 
-	private static final long serialVersionUID = -1376516458026928095L;
-
-	Simulator     simulator;
-	BufferedImage image;
-	Graphics      graphics;
-	double        scale;
-	double        centerX;
-	double        centerY;
+	protected static final long serialVersionUID = -1376516458026928095L;
+	protected BufferedImage image;
+	protected Graphics      graphics;
+	protected double        scale;
+	protected double        centerX;
+	protected double        centerY;
 
 	private double zoomFactor = 1.0;
 	
-
-	public TwoDRenderer(Simulator simulator) {
-		this.simulator = simulator;
+	public TwoDRenderer(Arguments args) {
+		super(args);
 		this.addComponentListener(this);
 		createImage();
 	}
-
+	
 	public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		synchronized (this) {
@@ -46,11 +42,11 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		}
 	}	
 
-//	@Override
+	@Override
 	public synchronized void drawFrame() {
 		int width  = image.getWidth();
 		int height = image.getHeight();
-
+		
 		double envWidth  = simulator.getEnvironment().getWidth();
 		double envHeight = simulator.getEnvironment().getHeight();
 
@@ -74,14 +70,19 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				(int) ((simulator.getEnvironment().getWidth() * scale)), 
 				(int) ((simulator.getEnvironment().getHeight() * scale)));
 
-		simulator.getEnvironment().draw(this);
-		
 		if(simulator.getEnvironment().getMovableObjects().size()>0){
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
 				switch(m.getType()){
 				case NEST:
 					drawNest(graphics, (Nest)m);
 					break;
+				}
+			}
+		}
+		
+		if(simulator.getEnvironment().getMovableObjects().size()>0){
+			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
+				switch(m.getType()){
 				case PREY:
 					drawPreys(graphics, (Prey)m);
 					break;
@@ -138,10 +139,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	//	@Override
 	public void dispose() {
-	}
-
-	public void setSimulator(Simulator simulator) {	
-		this.simulator = simulator;
 	}
 
 	public void drawCircle(Point2d center, double radius) {
@@ -271,35 +268,33 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 //	@Override
 	public void componentResized(ComponentEvent arg0) {
 		createImage();
+		drawFrame();
 	}
 
 //	@Override
 	public void componentHidden(ComponentEvent arg0) {
 		createImage();
+		drawFrame();
 	}
 
 //	@Override
 	public void componentMoved(ComponentEvent arg0) {
 		// TODO Auto-generated method stub
-
 	}
 
 //	@Override
 	public void componentShown(ComponentEvent arg0) {
 		createImage();
+		drawFrame();
 	}
 
-	protected synchronized void createImage() {
+	public synchronized void createImage() {
 		if (getWidth() == 0 || getHeight() == 0) {
 			image = new BufferedImage(1, 1, BufferedImage.TYPE_INT_RGB);			
-		} else 
+		} else  if(getWidth() > 0 && getHeight() > 0){
 			image = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
+		}
 		graphics = image.getGraphics();
-	}
-
-//	@Override
-	public Component getComponent() {
-		return this;
 	}
 
 	public int getSelectedRobot() {

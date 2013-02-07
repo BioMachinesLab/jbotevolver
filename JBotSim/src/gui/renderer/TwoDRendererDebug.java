@@ -4,25 +4,21 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
 import mathutils.Vector2d;
-import simulation.Simulator;
-import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.robot.sensors.Sensor;
+import simulation.util.Arguments;
 
 public class TwoDRendererDebug extends TwoDRenderer {
 
 	protected int selectedRobot=-1;
 
-	public TwoDRendererDebug(Simulator simulator) {
-		super(simulator);
+	public TwoDRendererDebug(Arguments args) {
+		super(args);
 		this.addMouseListener(new MouseListenerSentinel());
-
 	}
-
 
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		if(robot.getId() == selectedRobot) {
@@ -67,15 +63,11 @@ public class TwoDRendererDebug extends TwoDRenderer {
 
 		}
 		super.drawRobot(graphics, robot);
-
-
 	}
 
 	public int getSelectedRobot() {
 		return selectedRobot;
 	}
-
-
 
 	public class MouseListenerSentinel implements MouseListener {
 
@@ -100,27 +92,21 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		//		@Override
 		public void mouseEntered(MouseEvent e) {
 			// TODO Auto-generated method stub
-
 		}
 
 		//		@Override
 		public void mouseExited(MouseEvent e) {
 			// TODO Auto-generated method stub
-
 		}
 
 		//		@Override
 		public void mousePressed(MouseEvent e) {
 			// TODO Auto-generated method stub
-
 		}
 
 		//		@Override
 		public void mouseReleased(MouseEvent e) {
 			// TODO Auto-generated method stub
-
 		}
-
 	}
-
 }

@@ -64,6 +64,7 @@ public class TwoRoomsEnvironment extends Environment {
 	
 	@Override
 	public void setup(Simulator simulator) {
+		super.setup(simulator);
 		createRoom(simulator);	
 		for(int i = 0 ; i < preys.length ; i++)
 			preys[i] = new Prey(simulator, "p", new Vector2d(0,-3), 0, 1, 0.03);

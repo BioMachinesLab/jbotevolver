@@ -104,6 +104,7 @@ public class TMazeEnvironment extends Environment {
 	}
 	
 	public void setup(Simulator simulator) {
+		super.setup(simulator);
 		if(numberOfMazes > 0)
 		{
 			int currentMaze = currentSample % numberOfMazes;
@@ -357,12 +358,6 @@ public class TMazeEnvironment extends Environment {
 
 	public double getForbiddenArea() {
 		return forbiddenArea;
-	}
-
-	@Override
-	public void draw(Renderer renderer){
-		robots.get(0).setBodyColor(Color.GRAY);
-		renderer.drawCircle(new Point2d(0, 0), forbiddenArea);
 	}
 	
 	public LinkedList<Square> getSquares() {

@@ -1,5 +1,7 @@
 package simulation;
 
+import gui.Gui;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,20 +16,11 @@ public class JBotSim {
 	
 	protected HashMap<String,Arguments> arguments;
 	protected Random random = new Random();
-	protected String[]  commandlineArguments = null;
 	protected String parentFolder = "";
 	
 	public JBotSim(String[] commandLineArgs) throws IOException, ClassNotFoundException {
 		if (commandLineArgs != null)
 			loadArguments(commandLineArgs);
-	}
-	
-	public Environment getEnvironment(Simulator simulator) {
-		Environment environment = Environment.getEnvironment(simulator, arguments.get("--environment"));
-		simulator.setEnvironment(environment);
-		environment.setup(simulator);
-		
-		return environment;
 	}
 	
 	public Simulator createSimulator(Random random) {	
@@ -78,9 +71,6 @@ public class JBotSim {
 		if(arguments.get("--random-seed") != null)
 			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());			
 		random.setSeed(randomSeed);
-		
-		//split on whitespace
-		commandlineArguments = arguments.get("commandline").getCompleteArgumentString().split("\\s+");
 	}
 	
 	public void loadFile(String filename, String extraArguments) throws IOException, ClassNotFoundException {
@@ -93,5 +83,9 @@ public class JBotSim {
 		String[] args = Arguments.readOptionsFromString(fileContents);
 		
 		loadArguments(args);
+	}
+
+	public Gui getGui() {
+		return Gui.getGui(this,arguments.get("--gui"));
 	}
 }

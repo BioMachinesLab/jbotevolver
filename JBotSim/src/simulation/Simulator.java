@@ -28,12 +28,14 @@ public class Simulator implements Serializable {
 	private GeometricCalculator calculator;
 	private boolean stopSimulation = false;
 	private int[] robotIndexes;
+	private boolean setup = false;
 	
 	private HashMap<String,Arguments> arguments = new HashMap<String,Arguments>(); 
 	
 	public Simulator(Random random, HashMap<String,Arguments> arguments) {
 		this.random = random;
 		this.arguments = arguments;
+		this.environment = Environment.getEnvironment(this, arguments.get("--environment"));
 		calculator = new GeometricCalculator();
 	}
 	
@@ -43,10 +45,6 @@ public class Simulator implements Serializable {
 	
 	public GeometricCalculator getGeoCalculator(){
 		return this.calculator;
-	}
-
-	public void setEnvironment(Environment environment) {
-		this.environment = environment;
 	}
 
 	public Environment getEnvironment() {
@@ -132,10 +130,12 @@ public class Simulator implements Serializable {
 		environment.updateCollisions(time);
 	}
 
-	public void simulate(int numIterations) {
-		for (time = Double.valueOf(0); time < numIterations && !stopSimulation; time++) {
+	public void simulate() {
+		setup();
+		for (time = Double.valueOf(0); time < environment.getSteps() && !stopSimulation; time++) {
 			performOneSimulationStep(time);
 		}
+		stopSimulation = true;
 	}
 
 	public double getTimeDelta() {
@@ -152,5 +152,32 @@ public class Simulator implements Serializable {
 	
 	public HashMap<String, Arguments> getArguments() {
 		return arguments;
+	}
+
+	public boolean simulationFinished() {
+		return stopSimulation;
+	}
+
+	public void addRobots(ArrayList<Robot> robots) {
+		environment.addRobots(robots);
+	}
+	
+	public ArrayList<Robot> getRobots() {
+		return environment.getRobots();
+	}
+
+	private void setup() {
+		if(!this.setup) {
+			if(!environment.isSetup()) {
+				setupEnvironment();
+				if(!environment.isSetup())
+					throw new RuntimeException("Overridden function 'setup' in Environment must call super.setup()");
+			}
+			this.setup = true;
+		}
+	}
+
+	public void setupEnvironment() {
+		environment.setup(this);
 	}
 }

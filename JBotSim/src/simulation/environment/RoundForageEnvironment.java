@@ -46,6 +46,7 @@ public class RoundForageEnvironment extends Environment {
 	
 	@Override
 	public void setup(Simulator simulator) {
+		super.setup(simulator);
 		for(int i = 0; i < numberOfPreys; i++ ){
 			addPrey(new Prey(simulator, "Prey "+i, newRandomPosition(), 0, PREY_MASS, PREY_RADIUS));
 		}
@@ -103,11 +104,5 @@ public class RoundForageEnvironment extends Environment {
 
 	public double getForbiddenArea() {
 		return forbiddenArea;
-	}
-
-	@Override
-	public void draw(Renderer renderer){
-		renderer.drawCircle(nest.getPosition(), forageLimit);
-		renderer.drawCircle(nest.getPosition(), forbiddenArea);
 	}
 }

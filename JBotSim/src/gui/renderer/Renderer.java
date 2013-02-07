@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.lang.reflect.Constructor;
 
 import mathutils.Point2d;
+import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
 import simulation.robot.Robot;
@@ -18,7 +19,11 @@ import simulation.util.Arguments;
  * @author alc
  *
  */
-public abstract class Renderer extends Component implements Updatable {
+public abstract class Renderer extends Component {
+	
+	protected Simulator simulator;
+	
+	public Renderer(Arguments args) {}
 
 	/**
 	 * Draw one frame. Notice that this method may be called several times for the same simulation step 
@@ -30,14 +35,10 @@ public abstract class Renderer extends Component implements Updatable {
 	 * Dispose of any resources allocated by the renderer.
 	 */
 	public abstract void dispose();
-
-	/**
-	 * Draw a circle in the virtual world.
-	 *
-	 * @param center center of the circle
-	 * @param radius radius of the circle
-	 */
-	public abstract void drawCircle(Point2d center, double radius);
+	
+	public void setSimulator(Simulator simulator) {
+		this.simulator = simulator;
+	}
 	
 	public abstract void zoomIn();
 	public abstract void zoomOut();
@@ -48,10 +49,10 @@ public abstract class Renderer extends Component implements Updatable {
 			throw new RuntimeException("Renderer 'classname' not defined: "+ arguments.toString());
 		}
 
-		String robotName = arguments.getArgumentAsString("classname");
+		String rendererName = arguments.getArgumentAsString("classname");
 
 		try {
-			Constructor<?>[] constructors = Class.forName(robotName).getDeclaredConstructors();
+			Constructor<?>[] constructors = Class.forName(rendererName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
 				if (params.length == 1 && params[0] == Arguments.class) {
@@ -61,6 +62,6 @@ public abstract class Renderer extends Component implements Updatable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} 
-		throw new RuntimeException("Unknown renderer: " + robotName);
+		throw new RuntimeException("Unknown renderer: " + rendererName);
 	}
 }

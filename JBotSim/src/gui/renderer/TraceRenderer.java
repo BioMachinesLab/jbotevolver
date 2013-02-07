@@ -1,10 +1,8 @@
 package gui.renderer;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +18,7 @@ import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 @SuppressWarnings("serial")
 public class TraceRenderer extends Renderer {
@@ -77,7 +76,8 @@ public class TraceRenderer extends Renderer {
 	HashMap<Robot, TracePoints> robotTraces;
 	HashMap<Prey,  TracePoints> preyTraces;
 	
-	public TraceRenderer() {
+	public TraceRenderer(Arguments args) {
+		super(args);
 		robotTraces = new HashMap<Robot, TracePoints>();
 		preyTraces  = new HashMap<Prey,  TracePoints>();
 
@@ -90,15 +90,6 @@ public class TraceRenderer extends Renderer {
 		g2.drawImage(image, (getWidth() - image.getWidth()) / 2, (getHeight() - image.getHeight()) / 2, this);
 	}	
 	
-	@Override
-	public void drawCircle(Point2d center, double radius) {
-	}
-	
-	@Override
-	public void update(Simulator simulator) {
-			
-	}
-
 	@Override
 	public void drawFrame() {
 		if(simulator.getEnvironment().getMovableObjects().size() > 0) {
@@ -134,7 +125,6 @@ public class TraceRenderer extends Renderer {
 		} else {
 			simulationFramesSinceLastOutput++;			
 		}
-		
 	}
 	
 	public void outputFrame(int frameNumber) {		

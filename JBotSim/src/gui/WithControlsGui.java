@@ -1,9 +1,9 @@
 package gui;
 
 import gui.renderer.Renderer;
+import gui.renderer.TwoDRenderer;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.KeyboardFocusManager;
@@ -23,8 +23,6 @@ import javax.swing.KeyStroke;
 
 import simulation.JBotSim;
 import simulation.Simulator;
-import simulation.environment.Environment;
-import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class WithControlsGui extends Gui {
@@ -62,9 +60,11 @@ public class WithControlsGui extends Gui {
 	Renderer renderer;
 	protected Simulator simulator;
 
-	public WithControlsGui(Arguments args) {
-		super(args);
-		this.renderer = Renderer.getRenderer(new Arguments(args.getArgumentAsString("renderer")));
+	public WithControlsGui(JBotSim jBotSim, Arguments args) {
+		super(jBotSim, args);
+
+		if(args.getArgumentIsDefined("renderer"))
+			createRenderer(new Arguments(args.getArgumentAsString("renderer")));
 		
 		frame = new JFrame("WithControlsGui");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -78,7 +78,8 @@ public class WithControlsGui extends Gui {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent evt) {  
-				WithControlsGui.this.renderer.zoomIn();  
+				if(renderer != null)
+					WithControlsGui.this.renderer.zoomIn();  
 			}
 		});  
 
@@ -89,8 +90,9 @@ public class WithControlsGui extends Gui {
 			 */
 			private static final long serialVersionUID = 1L;
 
-			public void actionPerformed(ActionEvent evt) {  
-				WithControlsGui.this.renderer.zoomOut();  
+			public void actionPerformed(ActionEvent evt) { 
+				if(renderer != null)
+					WithControlsGui.this.renderer.zoomOut();  
 			}
 		});  
 
@@ -102,7 +104,8 @@ public class WithControlsGui extends Gui {
 			private static final long serialVersionUID = 1L;
 
 			public void actionPerformed(ActionEvent evt) {  
-				WithControlsGui.this.renderer.resetZoom();  
+				if(renderer != null)
+					WithControlsGui.this.renderer.resetZoom();  
 			}
 		});  
 
@@ -151,6 +154,10 @@ public class WithControlsGui extends Gui {
 			//			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				simulationState = RUN;
+				if(simulator != null || simulator.simulationFinished()) {
+					simulator = loadSimulator();
+					new Thread(new SimulationRunner(simulator)).start();
+				}					
 			} 		
 		});
 
@@ -164,10 +171,11 @@ public class WithControlsGui extends Gui {
 		pauseButton.addActionListener(new ActionListener() {
 			//			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (simulationState == RUN)
+				if (simulationState == RUN) {
 					simulationState = PAUSED;
-				else
+				}else {
 					simulationState = RUN;
+				}
 			} 		
 		});
 
@@ -220,14 +228,13 @@ public class WithControlsGui extends Gui {
 		});		
 		sideTopPanel.add(sleepPanel);
 
-
 		JPanel sideWrapperPanel = new JPanel();
 		sideWrapperPanel.setLayout(new BorderLayout());
 		sideWrapperPanel.add(sideTopPanel, BorderLayout.NORTH);
 		frame.getContentPane().add(sideWrapperPanel, BorderLayout.EAST);
-
-		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new EnvironmentKeyDispatcher(simulator));
-
+		
+		simulator = loadSimulator();
+//		new Thread(new SimulationRunner(simulator)).start();
 		frame.setVisible(true);
 	}
 
@@ -236,69 +243,66 @@ public class WithControlsGui extends Gui {
 		frame.setVisible(false);
 	}
 	
-	public void loadArguments(JBotSim jBotSim) {
+	private void createRenderer(Arguments args) {
+		if(args.getArgumentIsDefined("classname"))
+			this.renderer = Renderer.getRenderer(args);
+	}
+	
+	public Simulator loadSimulator() {
 		HashMap<String,Arguments> args = jBotSim.getArguments();
-		this.renderer = Renderer.getRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
-		frame.getContentPane().add(renderer);
-		renderer.enableInputMethods(true);
-		frame.getContentPane().validate();
+		
+		if(renderer != null)
+			frame.getContentPane().remove(renderer);
+		
+		if(args.get("--gui").getArgumentIsDefined("renderer"))
+			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
+		
 		long seed = args.get("--random-seed") != null ? Long.parseLong(args.get("--random-seed").getCompleteArgumentString()) : 0;
 		Simulator simulator = jBotSim.createSimulator(new Random(seed));
-		Environment env = jBotSim.getEnvironment(simulator);
-		env.addRobots(jBotSim.createRobots(simulator));
+		simulator.addRobots(jBotSim.createRobots(simulator));
+		simulator.addCallback(this);
+		simulator.setupEnvironment();
+		
 		if (renderer != null) {
-			frame.getContentPane().add(renderer);
 			renderer.enableInputMethods(true);
-			frame.getContentPane().validate();
+			renderer.setSimulator(simulator);
+			frame.getContentPane().add(renderer);
+			frame.validate();
 		}
+		
+		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new EnvironmentKeyDispatcher(simulator));
+		
+		return simulator;
 	}
 	
 	@Override
 	public void update(Simulator simulator) {
-		if(renderer != null) {
-			renderer.update(simulator);
-		}
+		try {
+			while(simulationState == PAUSED)
+				Thread.sleep(10);
+		}catch(Exception e){}
+		
 		controlStepTextField.setText("" + simulator.getTime().intValue());
-	}
-
-	//	@Override
-	public void run(Simulator simulator, Renderer rendererTo, int maxNumberOfSteps) {
-
-		long lastFrameTime = 0;
-		while (currentStep < maxNumberOfSteps) {						
-
-			if (System.currentTimeMillis() - lastFrameTime > 1000.0 / maxFramesPerSecond) {
-				long startTime = System.currentTimeMillis(); 
-				renderer.drawFrame();
-				long frameTime = System.currentTimeMillis() - startTime; 
-				rendererTimeTextField.setText("" + frameTime + " ms");
-				controlStepTextField.setText("" + currentStep);
-				simulationTimeTextField.setText(String.format("%6.2fs", currentStep * simulator.getTimeDelta()));
-				lastFrameTime = System.currentTimeMillis(); 
-			}
-
-			sleepBetweenControlStepsTextField.setText("" + sleepBetweenControlSteps + " ms");
-			maxFramesPerSecondTextField.setText(String.format("%6.3f", maxFramesPerSecond));
-
-			if (sleepBetweenControlSteps > 0) {
-				try {	
-					Thread.sleep(sleepBetweenControlSteps);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
-
-			long startTime = System.currentTimeMillis(); 
-			if (simulationState == RUN) {
-				simulator.performOneSimulationStep(new Double(0));
-				long controlStepTime = System.currentTimeMillis() - startTime; 
-				controlStepTimeTextField.setText("" + controlStepTime + " ms");
-
-
-				currentStep++;
+		if(renderer != null)
+			renderer.drawFrame();
+		
+		if (sleepBetweenControlSteps > 0) {
+			try {	
+				Thread.sleep(sleepBetweenControlSteps);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
-//		if (rendererComponent != null)
-//			rendererComponent.removeKeyListener(experiment.getEnvironment());
+	}
+	
+	class SimulationRunner implements Runnable {
+		private Simulator sim;
+		public SimulationRunner(Simulator sim) {
+			this.sim = sim;
+		}
+		@Override
+		public void run() {
+			sim.simulate();
+		}
 	}
 }

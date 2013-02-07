@@ -1,9 +1,7 @@
 package gui.renderer;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -12,15 +10,15 @@ import java.util.HashMap;
 
 import mathutils.Point2d;
 import mathutils.Vector2d;
+import simulation.JBotSim;
 import simulation.Simulator;
-import simulation.environment.Environment;
-import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 @SuppressWarnings("serial")
-public class BlenderRenderer extends Component implements Renderer {	
+public class BlenderRenderer extends Renderer {	
 	protected HashMap<Robot, String> robotNames;
 	protected HashMap<Prey,  String> preyNames;
 
@@ -35,8 +33,6 @@ public class BlenderRenderer extends Component implements Renderer {
 	protected boolean firstFrame                = true;
 	protected int     nextPreyNumber            = 0;
 	protected int     nextRobotNumber           = 0;
-
-	protected Simulator simulator;
 
 	protected String masterFileHeader = "" +
 	"#!BPY\n" +
@@ -127,10 +123,10 @@ public class BlenderRenderer extends Component implements Renderer {
 	PrintStream masterFile       = null;
 	PrintStream currentFrameFile = null;
 
-	public BlenderRenderer(Simulator simulator) {
+	public BlenderRenderer(Arguments args) {
+		super(args);
 		robotNames = new HashMap<Robot, String>();
 		preyNames  = new HashMap<Prey,  String>();        
-		this.simulator = simulator;
 	}
 
 	@Override
@@ -168,11 +164,6 @@ public class BlenderRenderer extends Component implements Renderer {
 		}
 		aniFunctionsFile.println(aniFunctionsContent);
 		aniFunctionsFile.close();
-	}
-
-	@Override
-	public void drawCircle(Point2d center, double radius) {
-
 	}
 
 	public void setOutputDirectory(String directory) {
@@ -276,24 +267,6 @@ public class BlenderRenderer extends Component implements Renderer {
 		currentFrame++;
 	}
 
-	private void drawNest(Graphics graphics, Nest nest) {
-
-	}
-
-	private void drawPrey(Graphics graphics, Prey prey) {
-
-	}
-
-	@Override
-	public Component getComponent() {
-		return this;
-	}
-
-	@Override
-	public int getSelectedRobot() {
-		return 0;
-	}
-
 	@Override
 	public void setSimulator(Simulator simulator) {
 		this.simulator = simulator;
@@ -302,23 +275,15 @@ public class BlenderRenderer extends Component implements Renderer {
 	@Override
 	public void resetZoom() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void zoomIn() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void zoomOut() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	public void drawImage(Image image) {
 		// TODO Auto-generated method stub
 	}
 }
