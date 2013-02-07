@@ -1,10 +1,9 @@
-package taskexecutor;
+package taskexecutor.tasks;
 
 import java.util.ArrayList;
 import java.util.Random;
 import result.Result;
 import simulation.Simulator;
-import simulation.environment.Environment;
 import simulation.robot.Robot;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
@@ -13,16 +12,15 @@ import evolutionaryrobotics.parallel.SlaveResult;
 
 public class GenerationalTask extends JBotEvolverTask {
 	
-	private int samples,steps;
+	private int samples;
 	private double fitness = 0;
 	private Chromosome chromosome;
 	private Random random;
 	private JBotEvolver jBotEvolver;
 	
-	public GenerationalTask(JBotEvolver jBotEvolver, int samples, int steps, Chromosome chromosome, int seed) {
+	public GenerationalTask(JBotEvolver jBotEvolver, int samples, Chromosome chromosome, int seed) {
 		super(jBotEvolver);
 		this.samples = samples;
-		this.steps = steps;
 		this.chromosome = chromosome;
 		this.random = new Random(seed);
 		this.jBotEvolver = jBotEvolver;
@@ -35,14 +33,13 @@ public class GenerationalTask extends JBotEvolverTask {
 			
 			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
 			
-			Environment environment = jBotEvolver.getEnvironment(simulator);
 			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 			jBotEvolver.setChromosome(robots, chromosome);
-			environment.addRobots(robots);
+			simulator.addRobots(robots);
 			
 			EvaluationFunction eval = jBotEvolver.getEvaluationFunction(simulator);
 			simulator.addCallback(eval);
-			simulator.simulate(steps);
+			simulator.simulate();
 			
 			fitness = eval.getFitness();
 		}

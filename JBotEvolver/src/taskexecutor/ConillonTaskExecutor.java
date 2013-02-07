@@ -33,6 +33,14 @@ public class ConillonTaskExecutor extends TaskExecutor {
 	
 	private void prepareArguments(HashMap<String,Arguments> arguments) {
 		
+		String id= "_"+client.getId();
+		
+		for(String name : arguments.keySet()) {
+			Arguments args = arguments.get(name);
+			String completeArgs = args.getCompleteArgumentString();
+			completeArgs = completeArgs.replaceAll("classname=", "classname="+id);
+			args.setArgument(name, completeArgs);
+		}
 	}
 	
 	@Override

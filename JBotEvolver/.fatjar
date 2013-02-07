@@ -1,0 +1,14 @@
+#Fat Jar Configuration File
+#Wed Feb 06 18:42:36 WET 2013
+onejar.license.required=true
+manifest.classpath=
+manifest.removesigners=true
+onejar.checkbox=false
+jarname=JBotEvolver_fat.jar
+manifest.mergeall=true
+manifest.mainclass=evolutionaryrobotics.JBotEvolver
+manifest.file=<createnew>
+jarname.isextern=false
+onejar.expand=
+excludes=
+includes=

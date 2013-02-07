@@ -4,7 +4,7 @@ import java.util.Random;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import taskexecutor.GenerationalTask;
+import taskexecutor.tasks.GenerationalTask;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.JBotEvolver;
@@ -46,8 +46,7 @@ public class GenerationalEvolution extends Evolution {
 				jBotEvolver.getRandom().setSeed(population.getGenerationRandomSeed());
 				
 				int samples = population.getNumberOfSamplesPerChromosome();
-				int steps = population.getNumberOfStepsPerSample();
-				jBotEvolver.submitTask(new GenerationalTask(jBotEvolver,samples,steps,c,population.getGenerationRandomSeed()));
+				jBotEvolver.submitTask(new GenerationalTask(jBotEvolver,samples,c,population.getGenerationRandomSeed()));
 				totalChromosomes++;
 				System.out.print(".");
 			}
@@ -60,12 +59,10 @@ public class GenerationalEvolution extends Evolution {
 				System.out.print("!");
 			}
 			
-			System.out.println("Generation "+population.getNumberOfCurrentGeneration()+
+			System.out.println("\nGeneration "+population.getNumberOfCurrentGeneration()+
 					"\tHighest Fitness: "+population.getHighestFitness()+
 					"\tAverageFitness: "+population.getAverageFitness()+
 					"\tLowestFitness: "+population.getLowestFitness());
-			
-			System.out.println("\n Highest Fitness: "+population.getHighestFitness());
 			
 			try {
 				jBotEvolver.getDiskStorage().savePopulation(population, jBotEvolver.getRandom());
@@ -79,8 +76,6 @@ public class GenerationalEvolution extends Evolution {
 	private int getGenomeLength() {
 		
 		Simulator sim = jBotEvolver.createSimulator(new Random(jBotEvolver.getRandom().nextLong()));
-		jBotEvolver.getEnvironment(sim);
-		
 		Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots"));
 		Controller c = Controller.getController(sim,r, jBotEvolver.getArguments().get("--controllers"));
 		

@@ -23,8 +23,6 @@ public abstract class Population implements Serializable {
 	protected int numberOfSamplesPerChromosome;
 	protected int numberOfGenerations    = 100;
 
-	protected int numberOfStepsPerSample    = 1000;
-
 	protected boolean enableIncreasingSamplesPerChromosome = false;
 	protected int     increaseStartSamplesPerChromosome;
 	protected int     increaseMaxSamplesPerChromosome;      
@@ -46,10 +44,6 @@ public abstract class Population implements Serializable {
 	public Population(Arguments arguments) {
 //		this.randomNumberGenerator = simulator.getRandom();
 //		generationRandomSeed = randomNumberGenerator.nextInt();
-		
-		if (arguments.getArgumentIsDefined("stepsperrun")) {
-			setNumberOfStepsPerSample(arguments.getArgumentAsInt("stepsperrun"));
-		}
 		
 		if (arguments.getArgumentIsDefined("increasestepsperrun")) {
 			setIncreasingStepPerFitnessSample(arguments.getArgumentAsInt("startsteps"), 
@@ -241,23 +235,6 @@ public abstract class Population implements Serializable {
 		this.mutationRate = mutationRate;
 	}
 
-	/** Get the number of simulation steps per fitness sample. 
-     * 
-     * @return number of simulation steps per fitness sample.
-     */
-	public int getNumberOfStepsPerSample() {
-		if (enableIncreasingStepsPerSample) {
-			double stepsPerSample = increaseStartStepsPerSample;
-			stepsPerSample += (double) getNumberOfCurrentGeneration() * increaseAdditionalStepsPerSample;
-			if (stepsPerSample > increaseMaxStepsPerSample) {
-				stepsPerSample = increaseMaxStepsPerSample;
-			}
-			return (int) stepsPerSample;
-		} else {
-			return numberOfStepsPerSample;
-		}
-	}
-	
 	/** Set the number of fitness samples per chromosome. 
 	 * 
 	 * This will cancel any previously set increasing number of samples (see {@link #enableIncreasingSamplesPerChromosome}).     
@@ -283,17 +260,6 @@ public abstract class Population implements Serializable {
 		this.increaseStartSamplesPerChromosome       = startSamples;
 		this.increaseMaxSamplesPerChromosome         = maxSamples;
 		this.increaseAdditionalSamplesPerGeneration  = additionalSamplesPerGeneration;
-	}
-
-	/** Set the number of simulation steps per fitness sample to a fixed value. 
-     *  This will cancel any previously set increasing number of step (see {@link #enableIncreasingStepsPerSample}).
-     *
-     * @param numberOfStepsPerSample number of simulation steps per fitness sample.
-     */
-	public void setNumberOfStepsPerSample(int numberOfStepsPerSample) {
-		this.enableIncreasingSamplesPerChromosome = false;//TODO check this!
-		this.enableIncreasingStepsPerSample   = false;
-		this.numberOfStepsPerSample  			  = numberOfStepsPerSample;
 	}
 
 	/** Set the number of simulation steps per fitness sample to increase throughout the evolution. This allows for 

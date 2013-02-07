@@ -79,6 +79,7 @@ public class JBotEvolver extends JBotSim {
 		
 		diskStorage = new DiskStorage(arguments.get("--output").getCompleteArgumentString());
 		diskStorage.start();
+		diskStorage.saveCommandlineArguments(arguments);
 	}
 
 	public DiskStorage getDiskStorage() {

@@ -8,10 +8,11 @@ import java.io.ObjectOutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Vector;
 import java.util.zip.GZIPOutputStream;
-
+import simulation.util.Arguments;
 import evolutionaryrobotics.populations.Population;
 
 public class DiskStorage {
@@ -66,22 +67,60 @@ public class DiskStorage {
 
 	}
 
-	public void saveCommandlineArguments(String[] arguments)
-			throws FileNotFoundException {
+	public void saveCommandlineArguments(HashMap<String,Arguments> args) throws FileNotFoundException {
 		if (outputDirectory != null) {
-			PrintStream argumentsFile = openForWriting(outputDirectory + "/"
-					+ argumentsFilename);
-			for (int i = 0; i < arguments.length; i += 2) {
-				argumentsFile.println(arguments[i] + " " + arguments[i + 1]);
-				if (!arguments[i].equalsIgnoreCase("--population")) {
-					argumentsForShowBestIndividual.add(arguments[i]);
-					argumentsForShowBestIndividual.add(arguments[i + 1]);
-					argumentsForRestartEvolution.add(arguments[i]);
-					argumentsForRestartEvolution.add(arguments[i + 1]);
+			PrintStream argumentsFile = openForWriting(outputDirectory + "/" + argumentsFilename);
+			
+			for(String name : args.keySet()) {
+				String fullArgument = args.get(name).getCompleteArgumentString();
+				argumentsFile.println(name + "\n" + beautifyString(fullArgument));
+				if (!name.equalsIgnoreCase("--population")) {
+					argumentsForShowBestIndividual.add(name+"\n"+beautifyString(fullArgument));
+					argumentsForRestartEvolution.add(name+"\n"+beautifyString(fullArgument));
 				}
 			}
 			argumentsFile.close();
 		}
+	}
+	
+	private String beautifyString(String s) {
+		
+		int nParenthesis = 0;
+		String newString = "\t";
+		
+		for(int i = 0 ; i < s.length(); i++) {
+			char c = s.charAt(i);
+			
+			switch(c) {
+				case ',':
+					newString+=",\n";
+					newString+=repeatString("\t", nParenthesis+1);
+					break;
+				case '(':
+					nParenthesis++;
+					newString+="(\n";
+					newString+=repeatString("\t", nParenthesis+1);
+					break;
+				case ')':
+					nParenthesis--;
+					newString+="\n";
+					newString+=repeatString("\t", nParenthesis+1);
+					newString+=")";
+					break;
+				default:
+					newString+=c;
+			}
+		}
+		return newString;
+	}
+	
+	private String repeatString(String s, int n) {
+		String newString = "";
+		
+		for(int i = 0 ; i < n ; i++)
+			newString+=s;
+		
+		return newString;
 	}
 
 	public void close() {
@@ -179,8 +218,7 @@ public class DiskStorage {
 				+ outputDirectory + "/populations/" + prefixB
 				+ populationFilename
 				+ populationB.getNumberOfCurrentGeneration()
-				+ ",showbestCoevolved,stepsperrun="
-				+ populationA.getNumberOfStepsPerSample());
+				+ ",showbestCoevolved");
 		currentShowBestFile.println("--gui name=debug");
 		currentShowBestFile.println("--random-seed " + randomSeed);
 		currentShowBestFile.close();
@@ -194,14 +232,12 @@ public class DiskStorage {
 		for (int i = 0; i < argumentsForShowBestIndividual.size(); i += 2) {
 			currentShowBestFile.println(argumentsForShowBestIndividual
 					.elementAt(i)
-					+ " "
-					+ argumentsForShowBestIndividual.elementAt(i + 1) + "\n");
+					+ argumentsForShowBestIndividual.elementAt(i + 1)+"\n");
 		}
 		currentShowBestFile.println("--population load=" + outputDirectory
 				+ "/populations/" + populationFilename
 				+ population.getNumberOfCurrentGeneration()
-				+ ",showbest,stepsperrun="
-				+ population.getNumberOfStepsPerSample());
+				+ ",showbest");
 		currentShowBestFile.println("--gui name=debug");
 		currentShowBestFile.println("--random-seed " + randomSeed);
 		currentShowBestFile.close();
@@ -259,8 +295,7 @@ public class DiskStorage {
 				+ populationB.getNumberOfCurrentGeneration() + ",loadB="
 				+ outputDirectory + "/populations/B" + populationFilename
 				+ populationB.getNumberOfCurrentGeneration()
-				+ ",showbestCoevolved,stepsperrun="
-				+ populationA.getNumberOfStepsPerSample());
+				+ ",showbestCoevolved");
 		showBestFile.println("--gui name=debug");
 		showBestFile.println("--random-seed " + randomSeed);
 		showBestFile.close();
@@ -281,8 +316,7 @@ public class DiskStorage {
 		showBestFile.println("--population load=" + outputDirectory
 				+ "/populations/" + populationFilename
 				+ population.getNumberOfCurrentGeneration()
-				+ ",showbest,stepsperrun="
-				+ population.getNumberOfStepsPerSample());
+				+ ",showbest");
 		showBestFile.println("--gui name=debug");
 		showBestFile.println("--random-seed " + randomSeed);
 		showBestFile.close();
