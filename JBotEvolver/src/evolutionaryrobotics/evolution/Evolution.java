@@ -1,9 +1,7 @@
 package evolutionaryrobotics.evolution;
 
-import java.lang.reflect.Constructor;
-
-import simulation.Simulator;
 import simulation.util.Arguments;
+import simulation.util.Factory;
 import evolutionaryrobotics.JBotEvolver;
 
 public abstract class Evolution {
@@ -19,21 +17,7 @@ public abstract class Evolution {
 	public static Evolution getEvolution(JBotEvolver jBotEvolver, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Evolution 'classname' not defined: "+arguments.toString());
-
-		String evolutionName = arguments.getArgumentAsString("classname");
-
-		try {
-			Constructor<?>[] constructors = Class.forName(evolutionName).getDeclaredConstructors();
-			for (Constructor<?> constructor : constructors) {
-				Class<?>[] params = constructor.getParameterTypes();
-				if (params.length == 2 && params[0] == JBotEvolver.class && params[1] == Arguments.class) {
-					return (Evolution) constructor.newInstance(jBotEvolver,arguments);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		throw new RuntimeException("Unknown evolution: " + evolutionName);
+		
+		return (Evolution)Factory.getInstance(arguments.getArgumentAsString("classname"),jBotEvolver,arguments);
 	}
 }

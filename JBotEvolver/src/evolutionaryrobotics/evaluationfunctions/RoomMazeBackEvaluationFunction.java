@@ -20,56 +20,22 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 	@Override
 	public void update(Simulator simulator) {
 		
-		if(env.isMixed() && firstStep) {
-			int sample = env.getMixedSample();
-			if(sample < 4) {//inverse
-				startPosition = new Vector2d(r.getPosition());
-			} else if (sample < 4*2) {//normal tmaze
-				//nothing
-			} else if(sample < 4*3) {//room
-				startPosition = new Vector2d(0,0);
-			}
-			firstStep = false;
-		}
+		if(r.isInvolvedInCollison())
+			simulator.stopSimulation();
 		
-		if(env.isMixed())
-			stepMixed(simulator);
-		else {
-			if(r.isInvolvedInCollison())
-				simulator.stopSimulation();
-			
-			if(!finishedRoom) { //Didn't clear the Cluttered Room
-				stepUnfinishedRoom(simulator);
-			} else if(!finishedMaze) { //Cleared the Cluttered Room
-				stepFinishedRoom(simulator);
-			} else if(!wentBack) { //Cleared the Maze
-				stepFinishedMaze(simulator);
-			} else { //Cleared everything
-				simulator.stopSimulation();
-			}
+		if(!finishedRoom) { //Didn't clear the Cluttered Room
+			stepUnfinishedRoom(simulator);
+		} else if(!finishedMaze) { //Cleared the Cluttered Room
+			stepFinishedRoom(simulator);
+		} else if(!wentBack) { //Cleared the Maze
+			stepFinishedMaze(simulator);
+		} else { //Cleared everything
+			simulator.stopSimulation();
 		}
 		
 		steps++;
 		
 		this.fitness = computeFitness();
-	}
-	
-	private void stepMixed(Simulator simulator) {
-		int sample = env.getMixedSample();
-		
-		if(sample < 4) {//inverse
-			stepFinishedMaze(simulator);
-			if(wentBack)
-				simulator.stopSimulation();
-		} else if (sample < 4*2) {//normal tmaze
-			stepFinishedRoom(simulator);
-			if(finishedMaze)
-				simulator.stopSimulation();
-		} else if(sample < 4*3) {//room
-			stepUnfinishedRoom(simulator);
-			if(finishedRoom)
-				simulator.stopSimulation();
-		}
 	}
 	
 	private void stepUnfinishedRoom(Simulator simulator) {
@@ -104,9 +70,6 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		
 //		fitness = 0;
 		
-		if(env.isMixed())
-			return computeMixedFitness();
-		
 		if(!finishedRoom) { //Didn't clear the Cluttered Room
 			fitness = computeFitnessUnfinishedRoom();
 		} else if(!finishedMaze) { //Cleared the Cluttered Room
@@ -122,27 +85,6 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		
 //		if(r.isInvolvedInCollison())
 //			fitness*=0.5;
-		
-		return fitness;
-	}
-	
-	private double computeMixedFitness() {
-		
-		int sample = env.getMixedSample();
-		
-		if(sample < 4) {//inverse
-			fitness = getDistanceToRoomFinish();
-			if(fitness > 0.95)
-				fitness = 2;
-		} else if (sample < 4*2) {//normal tmaze
-			fitness = getProgress();
-			if(finishedMaze)
-				fitness = 2;
-		} else if(sample < 4*3) {//room
-			fitness = computeFitnessUnfinishedRoom();
-			if(finishedRoom)
-				fitness = 2;
-		}
 		
 		return fitness;
 	}

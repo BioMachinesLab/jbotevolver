@@ -5,10 +5,10 @@ import java.util.Random;
 import result.Result;
 import simulation.Simulator;
 import simulation.robot.Robot;
+import taskexecutor.results.SimpleFitnessResult;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
-import evolutionaryrobotics.parallel.SlaveResult;
 
 public class GenerationalTask extends JBotEvolverTask {
 	
@@ -28,6 +28,7 @@ public class GenerationalTask extends JBotEvolverTask {
 	
 	@Override
 	public void run() {
+		
 		for(int i = 0 ; i < samples ; i++) {
 			Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
 			
@@ -37,15 +38,15 @@ public class GenerationalTask extends JBotEvolverTask {
 			jBotEvolver.setChromosome(robots, chromosome);
 			simulator.addRobots(robots);
 			
-			EvaluationFunction eval = jBotEvolver.getEvaluationFunction(simulator);
+			EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
 			simulator.addCallback(eval);
 			simulator.simulate();
 			
-			fitness = eval.getFitness();
+			fitness+= eval.getFitness();
 		}
 	}
 	public Result getResult() {
-		SlaveResult sr = new SlaveResult(chromosome.getID(),fitness);
-		return sr;
+		SimpleFitnessResult fr = new SimpleFitnessResult(chromosome.getID(),fitness/samples);
+		return fr;
 	}
 }

@@ -33,12 +33,12 @@ public class ConillonTaskExecutor extends TaskExecutor {
 	
 	private void prepareArguments(HashMap<String,Arguments> arguments) {
 		
-		String id= "_"+client.getId();
+		String packageName = client.getPackageName();
 		
 		for(String name : arguments.keySet()) {
 			Arguments args = arguments.get(name);
 			String completeArgs = args.getCompleteArgumentString();
-			completeArgs = completeArgs.replaceAll("classname=", "classname="+id);
+			completeArgs = completeArgs.replaceAll("classname=", "classname="+packageName+".");
 			args.setArgument(name, completeArgs);
 		}
 	}
@@ -47,14 +47,17 @@ public class ConillonTaskExecutor extends TaskExecutor {
 	public void addTask(Task t) {
 		client.commit(t);
 	}
+	
+	@Override
+	public void stopTasks() {
+		client.cancelAllTasks();
+		client.disconnect();
+	}
 
 	@Override
 	public Result getResult() {
 		return client.getNextResult();
 	}
-
-	@Override
-	public void run() {}
 	
 	private ClientPriority getPriority(int priority) {
 			return

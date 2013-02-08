@@ -72,11 +72,15 @@ public class DiskStorage {
 			PrintStream argumentsFile = openForWriting(outputDirectory + "/" + argumentsFilename);
 			
 			for(String name : args.keySet()) {
+				
 				String fullArgument = args.get(name).getCompleteArgumentString();
-				argumentsFile.println(name + "\n" + beautifyString(fullArgument));
+				String beautifiedArgument = beautifyString(fullArgument);
+				String save = name+"\n"+beautifiedArgument;
+				
+				argumentsFile.println(save);
 				if (!name.equalsIgnoreCase("--population")) {
-					argumentsForShowBestIndividual.add(name+"\n"+beautifyString(fullArgument));
-					argumentsForRestartEvolution.add(name+"\n"+beautifyString(fullArgument));
+					argumentsForShowBestIndividual.add(save);
+					argumentsForRestartEvolution.add(save);
 				}
 			}
 			argumentsFile.close();
@@ -206,12 +210,10 @@ public class DiskStorage {
 		PrintStream currentShowBestFile = openForWriting(outputDirectory + "/_"
 				+ prefixA + showBestFilename + "_current.conf");
 
-		for (int i = 0; i < argumentsForShowBestIndividual.size(); i += 2) {
-			currentShowBestFile.println(argumentsForShowBestIndividual
-					.elementAt(i)
-					+ " "
-					+ argumentsForShowBestIndividual.elementAt(i + 1) + "\n");
-		}
+		
+		for(String s : argumentsForShowBestIndividual)
+			currentShowBestFile.println(s);
+		
 		currentShowBestFile.println("--population loadA=" + outputDirectory
 				+ "/populations/" + prefixA + populationFilename
 				+ populationA.getNumberOfCurrentGeneration() + ",loadB="
@@ -219,7 +221,7 @@ public class DiskStorage {
 				+ populationFilename
 				+ populationB.getNumberOfCurrentGeneration()
 				+ ",showbestCoevolved");
-		currentShowBestFile.println("--gui name=debug");
+		currentShowBestFile.println("--gui classname=ResultViewerGui,renderer=(classname=TwoDRenderer)");
 		currentShowBestFile.println("--random-seed " + randomSeed);
 		currentShowBestFile.close();
 	}
@@ -229,11 +231,9 @@ public class DiskStorage {
 		PrintStream currentShowBestFile = openForWriting(outputDirectory + "/_"
 				+ showBestFilename + "_current.conf");
 
-		for (int i = 0; i < argumentsForShowBestIndividual.size(); i += 2) {
-			currentShowBestFile.println(argumentsForShowBestIndividual
-					.elementAt(i)
-					+ argumentsForShowBestIndividual.elementAt(i + 1)+"\n");
-		}
+		for(String s : argumentsForShowBestIndividual)
+			currentShowBestFile.println(s);
+		
 		currentShowBestFile.println("--population load=" + outputDirectory
 				+ "/populations/" + populationFilename
 				+ population.getNumberOfCurrentGeneration()
@@ -249,10 +249,9 @@ public class DiskStorage {
 		PrintStream restartFile = openForWriting(outputDirectory + "/"
 				+ restartFilename);
 
-		for (int i = 0; i < argumentsForRestartEvolution.size(); i += 2) {
-			restartFile.println(argumentsForRestartEvolution.elementAt(i) + " "
-					+ argumentsForRestartEvolution.elementAt(i + 1) + "\n");
-		}
+		for(String s : argumentsForRestartEvolution)
+			restartFile.println(s);
+		
 		restartFile.println("--population loadA=" + outputDirectory
 				+ "/populations/A" + populationFilename
 				+ populationA.getNumberOfCurrentGeneration() + ",loadB="
@@ -267,10 +266,10 @@ public class DiskStorage {
 		PrintStream restartFile = openForWriting(outputDirectory + "/"
 				+ restartFilename);
 
-		for (int i = 0; i < argumentsForRestartEvolution.size(); i += 2) {
-			restartFile.println(argumentsForRestartEvolution.elementAt(i) + " "
-					+ argumentsForRestartEvolution.elementAt(i + 1) + "\n");
-		}
+		
+		for(String s : argumentsForRestartEvolution)
+			restartFile.println(s);
+
 		restartFile.println("--population load=" + outputDirectory
 				+ "/populations/" + populationFilename
 				+ population.getNumberOfCurrentGeneration());
@@ -285,11 +284,9 @@ public class DiskStorage {
 				+ "/show_best/" + showBestFilename
 				+ populationA.getNumberOfCurrentGeneration() + ".conf");
 
-		for (int i = 0; i < argumentsForShowBestIndividual.size(); i += 2) {
-			showBestFile.println(argumentsForShowBestIndividual.elementAt(i)
-					+ " " + argumentsForShowBestIndividual.elementAt(i + 1)
-					+ "\n");
-		}
+		for(String s : argumentsForShowBestIndividual)
+			showBestFile.println(s);
+
 		showBestFile.println("--population loadA=" + outputDirectory
 				+ "/populations/A" + populationFilename
 				+ populationB.getNumberOfCurrentGeneration() + ",loadB="
@@ -308,15 +305,10 @@ public class DiskStorage {
 				+ "/show_best/" + showBestFilename
 				+ population.getNumberOfCurrentGeneration() + ".conf");
 
-		for (int i = 0; i < argumentsForShowBestIndividual.size(); i += 2) {
-			showBestFile.println(argumentsForShowBestIndividual.elementAt(i)
-					+ " " + argumentsForShowBestIndividual.elementAt(i + 1)
-					+ "\n");
-		}
-		showBestFile.println("--population load=" + outputDirectory
-				+ "/populations/" + populationFilename
-				+ population.getNumberOfCurrentGeneration()
-				+ ",showbest");
+		for(String s : argumentsForShowBestIndividual)
+			showBestFile.println(s);
+		
+		showBestFile.println("--population load=" + outputDirectory + "/populations/" + populationFilename + population.getNumberOfCurrentGeneration()+ ",showbest");
 		showBestFile.println("--gui name=debug");
 		showBestFile.println("--random-seed " + randomSeed);
 		showBestFile.close();

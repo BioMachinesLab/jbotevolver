@@ -4,12 +4,12 @@ import java.util.Random;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import taskexecutor.results.SimpleFitnessResult;
 import taskexecutor.tasks.GenerationalTask;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
-import evolutionaryrobotics.parallel.SlaveResult;
 import evolutionaryrobotics.populations.Population;
 
 public class GenerationalEvolution extends Evolution {
@@ -54,15 +54,15 @@ public class GenerationalEvolution extends Evolution {
 			System.out.println();
 			
 			while(totalChromosomes-- > 0) {
-				SlaveResult result = (SlaveResult)jBotEvolver.getResult();
+				SimpleFitnessResult result = (SimpleFitnessResult)jBotEvolver.getResult();
 				population.setEvaluationResultForId(result.getChromosomeId(), result.getFitness());
 				System.out.print("!");
 			}
 			
 			System.out.println("\nGeneration "+population.getNumberOfCurrentGeneration()+
-					"\tHighest Fitness: "+population.getHighestFitness()+
-					"\tAverageFitness: "+population.getAverageFitness()+
-					"\tLowestFitness: "+population.getLowestFitness());
+					"\tHighest: "+population.getHighestFitness()+
+					"\tAverage: "+population.getAverageFitness()+
+					"\tLowest: "+population.getLowestFitness());
 			
 			try {
 				jBotEvolver.getDiskStorage().savePopulation(population, jBotEvolver.getRandom());
