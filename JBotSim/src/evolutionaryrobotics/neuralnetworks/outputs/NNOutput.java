@@ -4,12 +4,11 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Iterator;
 import java.util.Vector;
-
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
-import simulation.util.ClassSearchUtils;
+import simulation.util.Factory;
 
 public abstract class NNOutput implements Serializable{
 	public abstract int getNumberOfOutputValues();
@@ -63,42 +62,13 @@ public abstract class NNOutput implements Serializable{
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
 		
-		try {
-			name = ClassSearchUtils.getClassFullName(name);
-		
-			if(name.endsWith("SysoutNNOutput") || name.endsWith("FixedNNOutput")) {
-				Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
-				for (Constructor<?> constructor : constructors) {
-					Class<?>[] params = constructor.getParameterTypes();
-					if (params.length == 3 && params[0] == Simulator.class
-							&& params[1] == Robot.class && params[2] == Arguments.class) {
-						return (NNOutput) constructor.newInstance(simulator, robot, arguments);
-					}
-				}
-			} else if(name.endsWith("SimpleNNOutput")) {
-				Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
-				for (Constructor<?> constructor : constructors) {
-					Class<?>[] params = constructor.getParameterTypes();
-					if (params.length == 1 && params[1] == Arguments.class) {
-						return (NNOutput) constructor.newInstance(arguments);
-					}
-				}
-			} else {
-				Actuator actuator = robot.getActuatorWithId(id);
-				Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
-				for (Constructor<?> constructor : constructors) {
-					Class<?>[] params = constructor.getParameterTypes();
-					if (params.length == 1 && params[0] == Actuator.class) {
-						return (NNOutput) constructor.newInstance(actuator);
-					}
-				}
-			}
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
+		if(name.endsWith("SysoutNNOutput") || name.endsWith("FixedNNOutput"))
+			return (NNOutput)Factory.getInstance(arguments.getArgumentAsString("classname"),simulator, robot, arguments);
+		else if(name.endsWith("SimpleNNOutput"))
+			return (NNOutput)Factory.getInstance(arguments.getArgumentAsString("classname"),arguments);
+		else {
+			Actuator actuator = robot.getActuatorWithId(id);
+			return (NNOutput)Factory.getInstance(arguments.getArgumentAsString("classname"),actuator);
 		}
-		
-		throw new RuntimeException("Unknown NNOutput: " + name);
 	}
 }

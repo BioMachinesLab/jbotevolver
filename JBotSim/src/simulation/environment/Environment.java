@@ -4,7 +4,6 @@ import gui.renderer.Renderer;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -17,6 +16,7 @@ import simulation.physicalobjects.collisionhandling.SimpleCollisionManager;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CollisionManager;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.Factory;
 
 public abstract class Environment implements KeyListener, Serializable {
 
@@ -191,28 +191,10 @@ public abstract class Environment implements KeyListener, Serializable {
 	}
 	
 	public static Environment getEnvironment(Simulator simulator, Arguments arguments) {
-
-		if (!arguments.getArgumentIsDefined("classname")) {
-			throw new RuntimeException("Environment 'classname' not defined: "
-					+ arguments.toString());
-		}
-
-		String environmentName = arguments.getArgumentAsString("classname");
-
-		try {
-			Constructor<?>[] constructors = Class.forName(environmentName).getDeclaredConstructors();
-			for (Constructor<?> constructor : constructors) {
-				Class<?>[] params = constructor.getParameterTypes();
-				if (params.length == 2 && params[0] == Simulator.class
-						&& params[1] == Arguments.class) {
-					return (Environment) constructor.newInstance(simulator, arguments);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		throw new RuntimeException("Unknown environment: " + environmentName);
+		if (!arguments.getArgumentIsDefined("classname"))
+			throw new RuntimeException("Environment 'classname' not defined: "+ arguments.toString());
+		
+		return (Environment)Factory.getInstance(arguments.getArgumentAsString("classname"),simulator,arguments);
 	}
 	
 	public boolean isSetup() {

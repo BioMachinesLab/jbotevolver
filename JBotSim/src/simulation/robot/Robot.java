@@ -15,6 +15,7 @@ import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
+import simulation.util.Factory;
 import controllers.Controller;
 
 /**
@@ -372,25 +373,10 @@ public class Robot extends MovableObject {
 
 	private static Robot createRobot(Simulator simulator, Arguments arguments) {
 		
-		if (!arguments.getArgumentIsDefined("classname")) {
+		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Robot 'classname' not defined: "+ arguments.toString());
-		}
 
-		String robotName = arguments.getArgumentAsString("classname");
-
-		try {
-			Constructor<?>[] constructors = Class.forName(robotName).getDeclaredConstructors();
-			for (Constructor<?> constructor : constructors) {
-				Class<?>[] params = constructor.getParameterTypes();
-				if (params.length == 2 && params[0] == Simulator.class
-						&& params[1] == Arguments.class) {
-					return (Robot) constructor.newInstance(simulator,arguments);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
-		throw new RuntimeException("Unknown robot: " + robotName);
+		return (Robot)Factory.getInstance(arguments.getArgumentAsString("classname"), simulator,arguments);
 	}
 
 	private static void addSensors(Simulator simulator, Robot robot, Arguments arguments) {

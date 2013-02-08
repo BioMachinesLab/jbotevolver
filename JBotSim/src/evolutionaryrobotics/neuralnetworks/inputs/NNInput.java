@@ -4,12 +4,11 @@ import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.Iterator;
 import java.util.Vector;
-
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
-import simulation.util.ClassSearchUtils;
+import simulation.util.Factory;
 
 public abstract class NNInput implements Serializable {
 	public abstract int getNumberOfInputValues();
@@ -61,35 +60,11 @@ public abstract class NNInput implements Serializable {
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
 
-		Sensor sensor = robot.getSensorWithId(id);
-		
-		try {
-			name = ClassSearchUtils.getClassFullName(name);
-		
-			if(name.endsWith("SysoutNNInput")) {
-				Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
-				for (Constructor<?> constructor : constructors) {
-					Class<?>[] params = constructor.getParameterTypes();
-					if (params.length == 3 && params[0] == Simulator.class
-							&& params[1] == Robot.class && params[2] == Arguments.class) {
-						return (NNInput) constructor.newInstance(simulator, robot, arguments);
-					}
-				}
-			} else {
-				Constructor<?>[] constructors = Class.forName(name).getDeclaredConstructors();
-				for (Constructor<?> constructor : constructors) {
-					Class<?>[] params = constructor.getParameterTypes();
-					if (params.length == 1 && params[0] == Sensor.class) {
-						return (NNInput) constructor.newInstance(sensor);
-					}
-				}
-			}
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
+		if(name.endsWith("SysoutNNInput")) {
+			return (NNInput)Factory.getInstance(arguments.getArgumentAsString("classname"),simulator, robot, arguments);
+		} else {
+			Sensor sensor = robot.getSensorWithId(id);
+			return (NNInput)Factory.getInstance(arguments.getArgumentAsString("classname"),sensor);
 		}
-		
-		throw new RuntimeException("Unknown NNIinput: " + name);
 	}
 }

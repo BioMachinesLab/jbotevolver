@@ -9,7 +9,9 @@ import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
 import simulation.robot.Robot;
+import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
+import simulation.util.Factory;
 
 /**
  * Responsible for rendering the simulation. "Rendering" is broadly defined: a renderer may
@@ -45,23 +47,9 @@ public abstract class Renderer extends Component {
 	public abstract void resetZoom();
 	
 	public static Renderer getRenderer(Arguments arguments) {
-		if (!arguments.getArgumentIsDefined("classname")) {
+		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Renderer 'classname' not defined: "+ arguments.toString());
-		}
 
-		String rendererName = arguments.getArgumentAsString("classname");
-
-		try {
-			Constructor<?>[] constructors = Class.forName(rendererName).getDeclaredConstructors();
-			for (Constructor<?> constructor : constructors) {
-				Class<?>[] params = constructor.getParameterTypes();
-				if (params.length == 1 && params[0] == Arguments.class) {
-					return (Renderer) constructor.newInstance(arguments);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
-		throw new RuntimeException("Unknown renderer: " + rendererName);
+		return (Renderer)Factory.getInstance(arguments.getArgumentAsString("classname"),arguments);
 	}
 }

@@ -1,12 +1,11 @@
 package controllers;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
-
 import simulation.Simulator;
 import simulation.SimulatorObject;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.Factory;
 
 /**
  * Superclass for all the robot control logic. Subclasses should override at least the method {@link #controlStep(int)}
@@ -64,25 +63,7 @@ public abstract class Controller extends SimulatorObject implements Serializable
 
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Controller 'name' not defined: "+arguments.toString());
-
-		String controllerName = arguments.getArgumentAsString("classname");
 		
-		try {
-			Constructor<?>[] constructors = Class.forName(controllerName).getDeclaredConstructors();
-			for (Constructor<?> constructor : constructors) {
-				Class<?>[] params = constructor.getParameterTypes();
-				if (params.length == 3 && params[0] == Simulator.class
-						&& params[1] == Robot.class && params[2] == Arguments.class) {
-					return (Controller) constructor.newInstance(simulator,robot,arguments);
-				}
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-
-		throw new RuntimeException("Unknown controller: " + controllerName);
+		return (Controller)Factory.getInstance(arguments.getArgumentAsString("classname"),simulator,robot,arguments);
 	}
-	
 }

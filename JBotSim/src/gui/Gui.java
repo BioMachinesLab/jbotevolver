@@ -7,6 +7,7 @@ import java.lang.reflect.Constructor;
 import simulation.JBotSim;
 import simulation.Updatable;
 import simulation.util.Arguments;
+import simulation.util.Factory;
 
 /**
  * Base class for all GUIs. A GUI has control over a simulation run. A GUI need not display any windows. 
@@ -34,21 +35,7 @@ public abstract class Gui implements Updatable {
 		
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Gui 'classname' not defined: "+ arguments.toString());
-
-		String guiName = arguments.getArgumentAsString("classname");
-
-		try {
-			Constructor<?>[] constructors = Class.forName(guiName).getDeclaredConstructors();
-			for (Constructor<?> constructor : constructors) {
-				Class<?>[] params = constructor.getParameterTypes();
-				
-				if (params.length == 2 && params[0] == JBotSim.class && params[1] == Arguments.class) {
-					return (Gui) constructor.newInstance(jBotSim, arguments);
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} 
-		throw new RuntimeException("Gui with name '" + guiName + "' not found");
+		
+		return (Gui)Factory.getInstance(arguments.getArgumentAsString("classname"),jBotSim,arguments);
 	}
 }
