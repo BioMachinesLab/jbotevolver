@@ -41,8 +41,8 @@ public abstract class Environment implements KeyListener, Serializable {
 	private GeometricCalculator geometricCalculator;
 
 	public Environment(Simulator simulator, Arguments args) {
-		this.width = args.getArgumentAsDoubleOrSetDefault("width", 5);
-		this.height = args.getArgumentAsDoubleOrSetDefault("height", 5);
+		this.width = args.getArgumentAsDoubleOrSetDefault("width", 4);
+		this.height = args.getArgumentAsDoubleOrSetDefault("height", 4);
 		this.steps = args.getArgumentAsIntOrSetDefault("steps", 0);
 		collisionManager = new SimpleCollisionManager(simulator);
 		this.geometricCalculator = simulator.getGeoCalculator();

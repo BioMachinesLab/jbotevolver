@@ -12,7 +12,7 @@ public class ArtificialPheromoneObject extends PhysicalObject {
 			double orientation, double mass, double radius,
 			PhysicalObjectType type, double evaporationRatio, double pheromoneIntensity) {
 		super(simulator, name, x, y, 0, 0, PhysicalObjectType.PHEROMONE);
-		this.shape = new CircularShape(simulator, name + "CollisionObject", this, x, y, 2 * radius, radius);
+		this.shape = new CircularShape(simulator, name + "CollisionObject", this, 0, 0, 2 * radius, radius);
 		this.evaporationRatio=evaporationRatio;
 		this.pheromoneIntensity = pheromoneIntensity;
 	}

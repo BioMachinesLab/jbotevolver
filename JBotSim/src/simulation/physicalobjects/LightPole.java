@@ -11,7 +11,7 @@ public class LightPole extends PhysicalObject {
 
 	public LightPole(Simulator simulator,  String name, double x, double y, double radius) {
 		super(simulator, name, x, y, 0, 0, PhysicalObjectType.LIGHTPOLE);
-		this.shape = new CircularShape(simulator, name + "CollisionObject", this, x, y, 2 * radius, radius);
+		this.shape = new CircularShape(simulator, name + "CollisionObject", this, 0, 0, 2 * radius, radius);
 	}
 	
 	public Vector2d getPosition() {

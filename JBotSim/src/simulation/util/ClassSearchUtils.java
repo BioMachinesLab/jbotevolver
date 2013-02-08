@@ -14,8 +14,7 @@ public class ClassSearchUtils {
 
 
 	public static String getClassFullName(String className){
-		List<String> names = ClassSearchUtils
-				.searchFullNameInPath(className);
+		List<String> names = ClassSearchUtils.searchFullNameInPath(className);
 		if (names.size() == 0) {
 			throw new RuntimeException("Class not found " + className);
 		} else if (names.size() > 1) {
@@ -31,8 +30,17 @@ public class ClassSearchUtils {
 		ArrayList<String> classNames = new ArrayList<String>();
 		ClassLoader classloader = className.getClass().getClassLoader();
 		String classpath = System.getProperty("java.class.path");
-
+		
 		try {
+			Class c = Class.forName(className);
+			//found it! no exception thrown
+			classNames.add(className);
+		} catch(Exception e) {
+			//ignore
+		}
+		
+		try {
+			
 			Method method = classloader.getClass().getMethod("getClassPath",
 					(Class<?>) null);
 			if (method != null) {
@@ -76,26 +84,27 @@ public class ClassSearchUtils {
 	private static void lookForNamesInDirectory(String className, String name,
 			File dir, ArrayList<String> classNames) {
 		File[] files = dir.listFiles();
-		try {
-			// System.out.println(name+className);
-			Class.forName(name + className);
-			classNames.add(name + className);
-		} catch (ClassNotFoundException e) {
-
-		}
 
 		String fileName;
 		final int size = files.length;
 		for (int i = 0; i < size; i++) {
 			File file = files[i];
 			fileName = file.getName();
-
+			
 			if (file.isDirectory()) {
 				lookForNamesInDirectory(className, name + fileName + ".", file,
 						classNames);
+			}else{
+				try {
+					if(fileName.equals(className+".class")) {
+						Class.forName(name + className);
+						classNames.add(name + className);
+					}
+				} catch (ClassNotFoundException e) {
+
+				}
 			}
 		}
-
 	}
 
 	/**
@@ -120,7 +129,6 @@ public class ClassSearchUtils {
 			entryName = entry.getName();
 			if (entryName.toLowerCase().endsWith(".class")) {
 				try {
-
 					// convert name into java classloader notation
 					entryName = entryName.substring(0, entryName.length() - 6);
 					entryName = entryName.replace('/', '.');
@@ -130,11 +138,8 @@ public class ClassSearchUtils {
 						classNames.add(entryName);
 					}
 
-				} catch (Throwable e) {
-
-				}
+				} catch (Throwable e) {}
 			}
 		}
 	}
-
 }

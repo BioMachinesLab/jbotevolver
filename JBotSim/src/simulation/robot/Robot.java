@@ -3,6 +3,7 @@ package simulation.robot;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -67,16 +68,26 @@ public class Robot extends MovableObject {
 		
 		double relativeX = args.getArgumentAsDoubleOrSetDefault("relativex",0);
 		double relativeY = args.getArgumentAsDoubleOrSetDefault("relativey",0);
-		double diameter = args.getArgumentAsDoubleOrSetDefault("diameter",0.1);
+		double radius = args.getArgumentAsDoubleOrSetDefault("radius",0.05);
+		double diameter = args.getArgumentAsDoubleOrSetDefault("diameter",radius*2);
+		if(diameter != radius*2)
+			radius = diameter/2;
 		this.shape = new CircularShape(simulator, name + "CollisionObject", this, relativeX, relativeY, diameter, diameter/2);
 		
 		double x = args.getArgumentAsDoubleOrSetDefault("x",0);
 		double y = args.getArgumentAsDoubleOrSetDefault("y",0);
 		setPosition(x, y);
-	}
-	 public Robot(Simulator simulator, String name, double x, double y, double orientation, double mass, double radius, String color) {
-		super(simulator, name, x, y, orientation, mass, PhysicalObjectType.ROBOT);
-		this.shape = new CircularShape(simulator, name + "CollisionObject", this, x, y, 2.0 * radius, radius);
+		
+		Color color;
+		try {
+		    Field field = Color.class.getField(args.getArgumentAsStringOrSetDefault("color", "black"));
+		    color = (Color)field.get(null);
+		} catch (Exception e) {
+		    color = null; // Not defined
+		}
+		
+		if(color != null)
+			setBodyColor(color);
 	}
 	
 	/**

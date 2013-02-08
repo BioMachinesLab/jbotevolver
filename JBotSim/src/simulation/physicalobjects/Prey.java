@@ -11,7 +11,7 @@ public class Prey extends MovableObject {
 
 	public Prey(Simulator simulator,  String name, double x, double y, double angle, double mass, double radius) {
 		super(simulator,name, x, y, angle, mass, PhysicalObjectType.PREY, null);
-		this.shape = new CircularShape(simulator, name + "CollisionObject", this, x, y, 2 * radius, radius);
+		this.shape = new CircularShape(simulator, name + "CollisionObject", this, 0, 0, 2 * radius, radius);
 	}
 	
 	public Prey(Simulator simulator, String name, Vector2d position, int angle,

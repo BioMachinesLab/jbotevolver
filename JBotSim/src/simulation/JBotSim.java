@@ -28,6 +28,11 @@ public class JBotSim {
 		return simulator;
 	}
 	
+	public Simulator createSimulator() {
+		long seed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());
+		return createSimulator(new Random(seed));
+	}
+	
 	public ArrayList<Robot> createRobots(Simulator simulator, int numberOfRobots) {
 		ArrayList<Robot> result = new ArrayList<Robot>(numberOfRobots);
 		
@@ -40,8 +45,9 @@ public class JBotSim {
 	
 	public ArrayList<Robot> createRobots(Simulator simulator) {
 		ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
-		for(Robot r : robots)
+		for(Robot r : robots) {
 			r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
+		}
 		return robots;
 	}
 	
@@ -61,6 +67,10 @@ public class JBotSim {
 	
 	public void savePath(String file) {
 		parentFolder = (new File(file)).getParent();
+	}
+	
+	protected void loadFile(String fileName) throws Exception {
+		loadArguments(Arguments.readOptionsFromFile(fileName));
 	}
 	
 	protected void loadArguments(String[] args) throws IOException,ClassNotFoundException {

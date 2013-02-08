@@ -23,7 +23,7 @@ public class Wall extends PhysicalObject{
 		//this.y = y;
 		this.setPosition(new Vector2d(x,y));
 		this.shape = new RectangularShape(simulator, name, this, 
-				x, y, range, relativeRotation, width, height);
+				0, 0, range, relativeRotation, width, height);
 		initializeEdges();
 		edges = getEdges();
 	}

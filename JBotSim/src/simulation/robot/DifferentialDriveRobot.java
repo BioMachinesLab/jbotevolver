@@ -28,7 +28,7 @@ public class DifferentialDriveRobot extends Robot {
 	
 	public DifferentialDriveRobot(Simulator simulator, Arguments args) {
 		super(simulator, args);
-		this.distanceBetweenWheels = ((CircularShape)shape).getDiameter();
+		this.distanceBetweenWheels = args.getArgumentAsDoubleOrSetDefault("distancewheels", ((CircularShape)shape).getDiameter());
 	}
 	
 	public void updateActuators(Double time, double timeDelta) {	

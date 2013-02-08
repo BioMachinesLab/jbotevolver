@@ -26,8 +26,8 @@ public class PhysicalObject extends SimulatorObject implements
 		double y = args.getArgumentAsDouble("y");
 		this.position.set(x,y);
 		
-		orientation = args.getArgumentAsDouble("orientation");
-		orientation = args.getArgumentAsDouble("mass");
+		orientation = Math.toRadians(args.getArgumentAsDouble("orientation"));
+		mass = args.getArgumentAsDouble("mass");
 		type = PhysicalObjectType.valueOf(args.getArgumentAsStringOrSetDefault("type","ROBOT").toUpperCase());
 		
 		this.id = simulator.getAndIncrementNumberPhysicalObjects(type);

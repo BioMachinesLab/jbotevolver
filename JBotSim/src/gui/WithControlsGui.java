@@ -248,7 +248,7 @@ public class WithControlsGui extends Gui {
 			this.renderer = Renderer.getRenderer(args);
 	}
 	
-	public Simulator loadSimulator() {
+	private Simulator loadSimulator() {
 		HashMap<String,Arguments> args = jBotSim.getArguments();
 		
 		if(renderer != null)
@@ -257,8 +257,7 @@ public class WithControlsGui extends Gui {
 		if(args.get("--gui").getArgumentIsDefined("renderer"))
 			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
 		
-		long seed = args.get("--random-seed") != null ? Long.parseLong(args.get("--random-seed").getCompleteArgumentString()) : 0;
-		Simulator simulator = jBotSim.createSimulator(new Random(seed));
+		Simulator simulator = jBotSim.createSimulator();
 		simulator.addRobots(jBotSim.createRobots(simulator));
 		simulator.addCallback(this);
 		simulator.setupEnvironment();

@@ -59,7 +59,7 @@ public abstract class Shape implements Serializable {
 			setPosition(relativePosition.getX() + parent.getPosition().getX(), 
 					relativePosition.getY() + parent.getPosition().getY());
 			setOrientation(parent.getOrientation());
-		} 
+		}
 	}
 
 	public Vector2d getPosition() {

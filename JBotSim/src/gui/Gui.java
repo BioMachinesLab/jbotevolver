@@ -41,6 +41,7 @@ public abstract class Gui implements Updatable {
 			Constructor<?>[] constructors = Class.forName(guiName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
 				Class<?>[] params = constructor.getParameterTypes();
+				
 				if (params.length == 2 && params[0] == JBotSim.class && params[1] == Arguments.class) {
 					return (Gui) constructor.newInstance(jBotSim, arguments);
 				}

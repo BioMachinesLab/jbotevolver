@@ -180,4 +180,8 @@ public class Simulator implements Serializable {
 	public void setupEnvironment() {
 		environment.setup(this);
 	}
+	
+	public ArrayList<Updatable> getCallbacks() {
+		return callbacks;
+	}
 }

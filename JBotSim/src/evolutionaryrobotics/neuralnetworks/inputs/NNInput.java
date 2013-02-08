@@ -39,7 +39,6 @@ public abstract class NNInput implements Serializable {
 			while (i.hasNext()) {
 				Sensor sensor = i.next();
 				String inputName = sensor.getClass().getSimpleName().replace("Sensor","NNInput");
-				inputName = ClassSearchUtils.getClassFullName(inputName);
 				
 				Constructor<?>[] constructors = Class.forName(inputName).getDeclaredConstructors();
 				for (Constructor<?> constructor : constructors) {

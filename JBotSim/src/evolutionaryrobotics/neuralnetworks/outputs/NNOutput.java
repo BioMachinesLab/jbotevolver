@@ -40,16 +40,15 @@ public abstract class NNOutput implements Serializable{
 			while (i.hasNext()) {
 				Actuator actuator = i.next();
 				String inputName = actuator.getClass().getSimpleName().replace("Actuator","NNOutput");
-				inputName = ClassSearchUtils.getClassFullName(inputName);
 				
-					Constructor<?>[] constructors = Class.forName(inputName)
-							.getDeclaredConstructors();
-					for (Constructor<?> constructor : constructors) {
-						Class<?>[] params = constructor.getParameterTypes();
-						if (params.length == 1 && params[0] == Actuator.class) {
-							nnOutputs.add((NNOutput) constructor.newInstance(actuator));
-						}
+				Constructor<?>[] constructors = Class.forName(inputName)
+						.getDeclaredConstructors();
+				for (Constructor<?> constructor : constructors) {
+					Class<?>[] params = constructor.getParameterTypes();
+					if (params.length == 1 && params[0] == Actuator.class) {
+						nnOutputs.add((NNOutput) constructor.newInstance(actuator));
 					}
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,15 +1,10 @@
 package simulation.environment;
 
-import gui.renderer.Renderer;
-
-import java.awt.Color;
 import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
-
-import mathutils.Point2d;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.LightPole;
@@ -18,7 +13,6 @@ import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-
 import comm.FileProvider;
 
 public class TMazeEnvironment extends Environment {
@@ -35,29 +29,26 @@ public class TMazeEnvironment extends Environment {
 	private boolean randomize = false;
 	private LinkedList<Boolean> lightPoleEnabled = new LinkedList<Boolean>();
 	private boolean firstWall = true;
-	private boolean teleported = false;
 	private int fitnesssample = 0;
 	private boolean mirror = false;
-	private boolean mixed = false;
-	private boolean onlyMaze = false;
-	private int mixedSamples = 0;
 	private boolean teleport = false;
 	private double widthChange = 0;
 	private double randomizeOrientation = 0;
-	private double randomizeY = 0;
 	private String mazeName;
 	private FileProvider fileProvider;
 	private int numberOfMazes;
 	private int numberOfDifferentSamples;
 	protected boolean inverse = false;
 	protected Random random;
+	
+	private double randomizeX = 0;
+	private double randomizeY = 0;
 
 	public TMazeEnvironment(Simulator simulator, Arguments arguments) {
 		this(simulator,arguments,true);
 	}
 	
 	public TMazeEnvironment(Simulator simulator, Arguments arguments, boolean firstWall) {
-		
 		super(simulator, arguments);
 		
 		this.random = simulator.getRandom();
@@ -76,12 +67,12 @@ public class TMazeEnvironment extends Environment {
 		inverse = arguments.getArgumentAsInt("inverse") == 1;
 		mirror = arguments.getArgumentAsInt("mirror") == 1;
 		
-		mixed = arguments.getArgumentAsIntOrSetDefault("mixed",0) == 1;
-		mixedSamples = arguments.getArgumentAsIntOrSetDefault("mixedsamples",12);
-		
 		widthChange = arguments.getArgumentAsDoubleOrSetDefault("widthchange",0.0);
 		randomizeY = arguments.getArgumentAsDoubleOrSetDefault("randomizey",0.0);
-		randomizeOrientation = arguments.getArgumentAsDoubleOrSetDefault("randomizeorientation",0.0);
+		randomizeOrientation = Math.toRadians(arguments.getArgumentAsDoubleOrSetDefault("randomizeorientation",0.0));
+		
+		randomizeX = arguments.getArgumentAsDoubleOrSetDefault("randomizex",0.0);
+		randomizeY = arguments.getArgumentAsDoubleOrSetDefault("randomizey",0.0);
 		
 		teleport = arguments.getArgumentAsIntOrSetDefault("teleport",0) == 1;
 		
@@ -94,13 +85,6 @@ public class TMazeEnvironment extends Environment {
 			squareSize+=widthChange;
 		else if(wC > 2)
 			squareSize-=widthChange;
-		
-		if(mixed) {
-			onlyMaze = currentSample % mixedSamples < 4*2; //0-7
-			inverse = currentSample % mixedSamples < 4;//0-3
-			if(inverse && !mazeName.equals("inversetmaze"))
-				mazeName = "inversetmaze";
-		}
 	}
 	
 	public void setup(Simulator simulator) {
@@ -123,14 +107,50 @@ public class TMazeEnvironment extends Environment {
 				e.printStackTrace();
 			}
 		}
-	}
-	
-	public boolean isMixed() {
-		return mixed;
-	}
-	
-	public int getMixedSample() {
-		return currentSample % mixedSamples;
+		
+		if(teleport) {
+			double orientation = robots.get(0).getOrientation()+this.randomizeOrientation*2*random.nextDouble()-this.randomizeOrientation;
+			double randomizeX = this.randomizeX*random.nextDouble()*2-this.randomizeX;
+			double randomizeY = this.randomizeY*random.nextDouble()*2-this.randomizeY;
+			robots.get(0).moveTo(new Vector2d(getSquares().peek().getX()+randomizeX,getSquares().peek().getY()+randomizeY));
+			robots.get(0).setOrientation(orientation);
+		}
+		
+		if(robots.size() > 1) {
+			double orientation = -Math.PI/2;
+			double deltaY = -0.05;
+			
+			if(fitnesssample == 0 || fitnesssample == 2) {
+				orientation+=Math.PI;
+				deltaY*=-1;
+			}
+			
+			double deltaX = 0.2;
+			
+			for(int i = 1 ; i < robots.size() ; i++) {
+				robots.get(i).moveTo(new Vector2d(getSquares().peekLast().getX()+deltaX,getSquares().peekLast().getY()+deltaY));
+				robots.get(i).setOrientation(orientation);
+			}
+		} else if(inverse) {
+			double orientation = Math.PI/2;
+			
+			if(randomizeOrientation > 0)
+				orientation+=random.nextDouble()*randomizeOrientation;
+			
+			double randomY = 0;
+			
+			if(randomizeY > 0) {
+				randomY = random.nextDouble()*randomizeY*-1;
+			}
+			
+			if(fitnesssample == 1 || fitnesssample == 3) {
+				randomY*=-1;
+				orientation+=Math.PI;
+			}
+			
+			robots.get(0).teleportTo(new Vector2d(getSquares().peek().getX(),getSquares().peek().getY()+randomY));
+			robots.get(0).setOrientation(orientation);
+		}
 	}
 	
 	protected void applyOffset(double x, double y) {
@@ -267,61 +287,6 @@ public class TMazeEnvironment extends Environment {
 	
 	@Override
 	public void update(double time) {
-		
-		if(!teleported && robots.size() > 1) {
-			double orientation = -Math.PI/2;
-			double deltaY = -0.05;
-			
-			if(fitnesssample == 0 || fitnesssample == 2) {
-				orientation+=Math.PI;
-				deltaY*=-1;
-			}
-			
-			double deltaX = 0.2;
-			
-			for(int i = 1 ; i < robots.size() ; i++) {
-				robots.get(i).teleportTo(new Vector2d(getSquares().peekLast().getX()+deltaX,getSquares().peekLast().getY()+deltaY));
-				robots.get(i).setOrientation(orientation);
-			}
-			teleported = true;
-		}
-		
-		if(teleport && ! teleported) {
-//			double randomY = simulator.getRandom().nextDouble()*0.2-0.5;
-			robots.get(0).teleportTo(new Vector2d(getSquares().peek().getX(),getSquares().peek().getY()));
-			teleported = true;
-		}
-		
-		//jesus christ... crappy code ahoy!
-		if(onlyMaze && !inverse && mixed && !teleported) {
-			double randomY = random.nextDouble()*0.2-0.5;
-			robots.get(0).teleportTo(new Vector2d(getSquares().peek().getX(),getSquares().peek().getY()+randomY));
-			robots.get(0).setOrientation(Math.PI/2);
-			teleported = true;
-		}
-		
-		if(inverse && !teleported) {
-//			double randomY = simulator.getRandom().nextDouble()*0.2-0.2;
-			double orientation = Math.PI/2;
-			
-			if(randomizeOrientation > 0)
-				orientation+=random.nextDouble()*randomizeOrientation;
-			
-			double randomY = 0;
-			
-			if(randomizeY > 0) {
-				randomY = random.nextDouble()*randomizeY*-1;
-			}
-			
-			if(fitnesssample == 1 || fitnesssample == 3) {
-				randomY*=-1;
-				orientation+=Math.PI;
-			}
-			
-			robots.get(0).teleportTo(new Vector2d(getSquares().peek().getX(),getSquares().peek().getY()+randomY));
-			robots.get(0).setOrientation(orientation);
-			teleported = true;
-		}
 		
 		for(int i = 0 ; i < lights.size() ; i++) {
 			if(lightPoleEnabled.get(i)) {

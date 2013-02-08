@@ -42,12 +42,12 @@ public class AutoArgumentsGeneration {
 			
 			if(networkArgs.getArgumentAsString("outputs").equals("auto")) {
 				Arguments robotArgs = arguments.get("--robots");
-				Arguments actuatorArgs = new Arguments(robotArgs.getArgumentAsString("outputs"));
+				Arguments actuatorArgs = new Arguments(robotArgs.getArgumentAsString("actuators"));
 				String fullAutoOutputs = "";
 				for(int i = 0 ; i < actuatorArgs.getNumberOfArguments() ; i++) {
 					String actuatorName = actuatorArgs.getArgumentAt(i);
 					Arguments currentSensorArgs = new Arguments(actuatorArgs.getArgumentAsString(actuatorName));
-					String outputName = actuatorName.replace("Sensor","NNInput");
+					String outputName = actuatorName.replace("Actuator","NNOutput");
 					String fullOutputName = ClassSearchUtils.getClassFullName(outputName);
 					String id = currentSensorArgs.getArgumentAsString("id");
 					fullAutoOutputs+=outputName+"=(classname="+fullOutputName+",id="+id+"),";					
