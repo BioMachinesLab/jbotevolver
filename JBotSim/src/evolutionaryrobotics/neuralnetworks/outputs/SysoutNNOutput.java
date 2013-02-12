@@ -5,6 +5,7 @@ public class SysoutNNOutput extends NNOutput {
 	private NNOutput nnOutput;
 
 	public SysoutNNOutput(NNOutput nnOutput) {
+		super(null,null);
 		this.nnOutput = nnOutput;
 	}
 

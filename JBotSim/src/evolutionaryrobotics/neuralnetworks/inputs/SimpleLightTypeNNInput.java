@@ -8,18 +8,17 @@ public class SimpleLightTypeNNInput extends NNInput{
 	private SimpleLightTypeSensor lightSensor;
 
 	public SimpleLightTypeNNInput(Sensor lightSensor) {
-		super();
+		super(lightSensor);
 		this.lightSensor = (SimpleLightTypeSensor) lightSensor;
 	}
 
-	//@Override
+	@Override
 	public int getNumberOfInputValues() {
 		return lightSensor.getNumberOfSensors();
 	}
 
-	//@Override
+	@Override
 	public double getValue(int index) {
 		return lightSensor.getSensorReading(index);
 	}
-
 }

@@ -51,6 +51,10 @@ public class JBotSim {
 		return robots;
 	}
 	
+	public void createRobotsAndAddToSimulator(Simulator simulator) {
+		simulator.addRobots(createRobots(simulator));
+	}
+	
 	protected Robot createOneRobot(Simulator simulator, Arguments robotArguments, Arguments controllerArguments) {
 		Robot robot = Robot.getRobot(simulator, robotArguments);
 		robot.setController(Controller.getController(simulator,robot, controllerArguments));
@@ -79,7 +83,8 @@ public class JBotSim {
 		
 		long randomSeed = 0;
 		if(arguments.get("--random-seed") != null)
-			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());			
+			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());	
+		
 		random.setSeed(randomSeed);
 	}
 	

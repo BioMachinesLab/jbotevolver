@@ -8,6 +8,7 @@ public class PreyPickerNNOutput extends NNOutput {
 	private PreyPickerActuator preyPicker;
 	
 	public PreyPickerNNOutput(Actuator preyPicker, Arguments args) {
+		super(preyPicker,args);
 		this.preyPicker = (PreyPickerActuator)preyPicker;
 	}
 

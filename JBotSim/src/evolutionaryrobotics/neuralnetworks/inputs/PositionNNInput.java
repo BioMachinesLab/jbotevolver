@@ -7,6 +7,7 @@ public class PositionNNInput extends NNInput {
 	PositionSensor sensor;
 	
 	public PositionNNInput(Sensor sensor) {
+		super(sensor);
 		this.sensor = (PositionSensor) sensor;
 	}
 	

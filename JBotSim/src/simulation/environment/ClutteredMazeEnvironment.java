@@ -1,7 +1,11 @@
 package simulation.environment;
 
+import controllers.Controller;
+import controllers.DummyController;
 import mathutils.Vector2d;
 import simulation.Simulator;
+import simulation.robot.Epuck;
+import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class ClutteredMazeEnvironment extends TMazeEnvironment {
@@ -12,23 +16,77 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 	private int objects = 3;
 	private double objectWidth = 0.15+0.1;
 	private Vector2d exitPosition;
-	double maxWidth,maxHeight,minWidth,minHeight;
+	
+	private double maxWidth = 1;
+	private double maxHeight = 1;
+	private double minWidth = 1;
+	private double minHeight = 1;
+	
+	private boolean extraRobot = false;
 
 	public ClutteredMazeEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments, false);
-		maxWidth = arguments.getArgumentAsDoubleOrSetDefault("maxwidth",this.width-1);
-		maxHeight = arguments.getArgumentAsDoubleOrSetDefault("maxheight",this.height-1);
+		maxWidth = arguments.getArgumentAsDoubleOrSetDefault("maxwidth",maxWidth);
+		maxHeight = arguments.getArgumentAsDoubleOrSetDefault("maxheight",maxWidth);
 		
-		minWidth = arguments.getArgumentAsDoubleOrSetDefault("minwidth",maxWidth);
-		minHeight = arguments.getArgumentAsDoubleOrSetDefault("minheight",maxHeight);
+		minWidth = arguments.getArgumentAsDoubleOrSetDefault("minwidth",minWidth);
+		minHeight = arguments.getArgumentAsDoubleOrSetDefault("minheight",minWidth);
+		
 		exitWidth = arguments.getArgumentAsDoubleOrSetDefault("exitwidth",exitWidth);
 		objects = arguments.getArgumentAsIntOrSetDefault("objects",objects);
+		
+		extraRobot = arguments.getArgumentAsIntOrSetDefault("extrarobot",0) == 1;
 	}
 	
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
 		createRoom(simulator, minWidth,maxWidth,minHeight,maxHeight);
+		
+		Robot robot = robots.get(0);
+		double originalX = 0;
+		double originalY = 0;
+		int tries = 0;
+		do{
+			if(++tries % 10 == 0) {
+				randomizeX+=0.1;
+				randomizeY+=0.1;
+			}
+			
+			double x = originalX;
+			double y = originalY;
+		
+			if(randomizeX > 0) {
+				double distance = (simulator.getRandom().nextDouble()*2-1)*randomizeX;
+				x-=distance;
+			}
+			if(randomizeY > 0) {
+				double distance = (simulator.getRandom().nextDouble()*2-1)*randomizeY;
+				y+=distance;
+			}
+			
+			robot.moveTo(new Vector2d(x, y));
+			
+			updateRobotCloseObjects(0);
+			updateCollisions(0);
+		} while(robot.isInvolvedInCollison());
+
+		if(extraRobot) {
+			
+			Robot r = new Epuck(simulator, new Arguments(""));
+			r.setController(new DummyController(simulator,r,new Arguments("")));
+			
+			double deltaY = -0.05;
+			
+			if(fitnesssample == 0 || fitnesssample == 2) {
+				deltaY*=-1;
+			}
+			
+			double deltaX = 0.2;
+			
+			r.moveTo(new Vector2d(getSquares().peekLast().getX()+deltaX,getSquares().peekLast().getY()+deltaY));
+			addRobot(r);
+		} 
 	}
 	
 	protected void createRoom(Simulator simulator, double minWidth, double maxWidth, double minHeight, double maxHeight) {

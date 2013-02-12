@@ -7,15 +7,16 @@ public class SimpleRobotColorNNInput extends NNInput {
 	SimpleRobotColorSensor robotColorSensor;
 	
 	public SimpleRobotColorNNInput(Sensor robotColorSensor) {
+		super(robotColorSensor);
 		this.robotColorSensor = (SimpleRobotColorSensor) robotColorSensor;
 	}
 
-//	@Override
+	@Override
 	public int getNumberOfInputValues() {
 		return robotColorSensor.getNumberOfSensors();
 	}
 
-//	@Override
+	@Override
 	public double getValue(int index) {
 		return robotColorSensor.getSensorReading(index);
 	}

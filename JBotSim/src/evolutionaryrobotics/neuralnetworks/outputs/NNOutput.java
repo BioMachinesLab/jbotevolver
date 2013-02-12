@@ -1,7 +1,6 @@
 package evolutionaryrobotics.neuralnetworks.outputs;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.Iterator;
 import java.util.Vector;
 import simulation.Simulator;
@@ -11,6 +10,7 @@ import simulation.util.Arguments;
 import simulation.util.Factory;
 
 public abstract class NNOutput implements Serializable{
+	public NNOutput(Actuator actuator, Arguments args){}
 	public abstract int getNumberOfOutputValues();
 	public abstract void setValue(int index, double value);
 	public abstract void apply();
@@ -38,16 +38,8 @@ public abstract class NNOutput implements Serializable{
 		try {
 			while (i.hasNext()) {
 				Actuator actuator = i.next();
-				String inputName = actuator.getClass().getSimpleName().replace("Actuator","NNOutput");
-				
-				Constructor<?>[] constructors = Class.forName(inputName)
-						.getDeclaredConstructors();
-				for (Constructor<?> constructor : constructors) {
-					Class<?>[] params = constructor.getParameterTypes();
-					if (params.length == 1 && params[0] == Actuator.class) {
-						nnOutputs.add((NNOutput) constructor.newInstance(actuator));
-					}
-				}
+				String outputName = actuator.getClass().getSimpleName().replace("Actuator","NNOutput");
+				nnOutputs.add((NNOutput)Factory.getInstance(outputName, actuator, new Arguments("")));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -68,7 +60,7 @@ public abstract class NNOutput implements Serializable{
 			return (NNOutput)Factory.getInstance(arguments.getArgumentAsString("classname"),arguments);
 		else {
 			Actuator actuator = robot.getActuatorWithId(id);
-			return (NNOutput)Factory.getInstance(arguments.getArgumentAsString("classname"),actuator);
+			return (NNOutput)Factory.getInstance(arguments.getArgumentAsString("classname"),actuator,arguments);
 		}
 	}
 }

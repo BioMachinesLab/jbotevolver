@@ -69,17 +69,20 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				(int) ((-simulator.getEnvironment().getHeight() /2.0  * scale) + centerY),
 				(int) ((simulator.getEnvironment().getWidth() * scale)), 
 				(int) ((simulator.getEnvironment().getHeight() * scale)));
-
+		
 		if(simulator.getEnvironment().getMovableObjects().size()>0){
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
-				switch(m.getType()){
-				case NEST:
-					drawNest(graphics, (Nest)m);
-					break;
+				switch(m.getType()){	
+					case NEST:
+						drawNest(graphics, (Nest)m);
+						break;
+					case LIGHTPOLE:
+						drawLightPole(graphics, (LightPole)m);
+						break;
 				}
 			}
 		}
-		
+
 		if(simulator.getEnvironment().getMovableObjects().size()>0){
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
 				switch(m.getType()){
@@ -89,9 +92,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				case ROBOT:
 					drawRobot(graphics, (Robot) m);
 					break;
-				case LIGHTPOLE:
-					drawLightPole(graphics, (LightPole)m);
-					break;
 				case WALL:
 					drawWall((Wall) m);
 					break;
@@ -100,14 +100,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					break;
 				}
 			}	
-			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
-				switch(m.getType()){
-				case PREY:
-					drawPreys(graphics, (Prey)m);
-					break;
-				}
-			}		
-
 		}
 		repaint();
 	}

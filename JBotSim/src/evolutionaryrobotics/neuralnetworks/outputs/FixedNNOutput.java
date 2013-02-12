@@ -10,7 +10,7 @@ public class FixedNNOutput extends NNOutput {
 	private double value;
 
 	public FixedNNOutput(Simulator simulator, Robot robot, Arguments args) {
-		
+		super(null,args);
 		value = args.getArgumentAsDouble("value");
 		
 		String newName = args.getArgumentAt(0);

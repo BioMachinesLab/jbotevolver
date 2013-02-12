@@ -10,6 +10,7 @@ public class MultiNeuronRobotColorNNOutput extends NNOutput {
 	protected RobotColorActuator robotColorActuator;
 	
 	public MultiNeuronRobotColorNNOutput(Actuator robotColorActuator, Arguments args) {
+		super(robotColorActuator,args);
 		numberOfColors = args.getArgumentIsDefined("numberofcolors") ? args.getArgumentAsInt("numberofcolors") : 4;
 		this.activations = new double[numberOfColors];
 		this.robotColorActuator = (RobotColorActuator)robotColorActuator;

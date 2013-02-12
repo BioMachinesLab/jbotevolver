@@ -11,6 +11,9 @@ import simulation.util.Arguments;
 import simulation.util.Factory;
 
 public abstract class NNInput implements Serializable {
+	
+	public NNInput(Sensor s) {}
+	
 	public abstract int getNumberOfInputValues();
 	public abstract double getValue(int index);
 	
@@ -38,20 +41,12 @@ public abstract class NNInput implements Serializable {
 			while (i.hasNext()) {
 				Sensor sensor = i.next();
 				String inputName = sensor.getClass().getSimpleName().replace("Sensor","NNInput");
-				
-				Constructor<?>[] constructors = Class.forName(inputName).getDeclaredConstructors();
-				for (Constructor<?> constructor : constructors) {
-					Class<?>[] params = constructor.getParameterTypes();
-					if (params.length == 1 && params[0] == Sensor.class) {
-						nnInputs.add((NNInput) constructor.newInstance(sensor));
-					}
-				}
+				nnInputs.add((NNInput)Factory.getInstance(inputName, sensor));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
 		}
-		
 		return nnInputs;
 	}
 

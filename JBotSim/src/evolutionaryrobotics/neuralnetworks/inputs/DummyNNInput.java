@@ -1,8 +1,14 @@
 package evolutionaryrobotics.neuralnetworks.inputs;
 
+import simulation.robot.sensors.Sensor;
+
 public class DummyNNInput extends NNInput{
 	
 	private double value;
+	
+	public DummyNNInput(Sensor s) {
+		super(s);
+	}
 
 	@Override
 	public int getNumberOfInputValues() {

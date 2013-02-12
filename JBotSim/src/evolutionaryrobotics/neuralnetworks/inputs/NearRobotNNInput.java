@@ -8,6 +8,7 @@ public class NearRobotNNInput extends NNInput {
 	private NearRobotSensor nrs;
 	
 	public NearRobotNNInput(Sensor nrs){
+		super(nrs);
 		this.nrs = (NearRobotSensor) nrs;
 	}
 	

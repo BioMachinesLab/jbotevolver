@@ -9,6 +9,7 @@ public class OpenDoorNNOutput extends NNOutput {
 	private boolean open = false;
 	
 	public OpenDoorNNOutput(Actuator openDoorActuator, Arguments args) {
+		super(openDoorActuator,args);
 		this.openDoor = (OpenDoorActuator)openDoorActuator;
 	}
 

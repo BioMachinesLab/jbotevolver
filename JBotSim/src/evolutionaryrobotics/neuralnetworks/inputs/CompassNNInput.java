@@ -7,6 +7,7 @@ public class CompassNNInput extends NNInput {
 	CompassSensor sensor;
 	
 	public CompassNNInput(Sensor sensor) {
+		super(sensor);
 		this.sensor = (CompassSensor) sensor;
 	}
 	

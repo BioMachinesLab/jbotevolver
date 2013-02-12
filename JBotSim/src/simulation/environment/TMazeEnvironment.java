@@ -29,7 +29,6 @@ public class TMazeEnvironment extends Environment {
 	private boolean randomize = false;
 	private LinkedList<Boolean> lightPoleEnabled = new LinkedList<Boolean>();
 	private boolean firstWall = true;
-	private int fitnesssample = 0;
 	private boolean mirror = false;
 	private boolean teleport = false;
 	private double widthChange = 0;
@@ -38,11 +37,12 @@ public class TMazeEnvironment extends Environment {
 	private FileProvider fileProvider;
 	private int numberOfMazes;
 	private int numberOfDifferentSamples;
+	
 	protected boolean inverse = false;
 	protected Random random;
-	
-	private double randomizeX = 0;
-	private double randomizeY = 0;
+	protected int fitnesssample = 0;
+	protected double randomizeX = 0;
+	protected double randomizeY = 0;
 
 	public TMazeEnvironment(Simulator simulator, Arguments arguments) {
 		this(simulator,arguments,true);
@@ -116,22 +116,7 @@ public class TMazeEnvironment extends Environment {
 			robots.get(0).setOrientation(orientation);
 		}
 		
-		if(robots.size() > 1) {
-			double orientation = -Math.PI/2;
-			double deltaY = -0.05;
-			
-			if(fitnesssample == 0 || fitnesssample == 2) {
-				orientation+=Math.PI;
-				deltaY*=-1;
-			}
-			
-			double deltaX = 0.2;
-			
-			for(int i = 1 ; i < robots.size() ; i++) {
-				robots.get(i).moveTo(new Vector2d(getSquares().peekLast().getX()+deltaX,getSquares().peekLast().getY()+deltaY));
-				robots.get(i).setOrientation(orientation);
-			}
-		} else if(inverse) {
+		if(inverse) {
 			double orientation = Math.PI/2;
 			
 			if(randomizeOrientation > 0)

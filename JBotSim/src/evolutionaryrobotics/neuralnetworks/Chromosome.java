@@ -60,4 +60,13 @@ public class Chromosome implements Serializable, Cloneable {
 		newChromo.alleles = alleles.clone();
 		return newChromo;
 	}
+	
+	public String getAllelesString() {
+		String str = "";
+		
+		for(double d : alleles)
+			str+=d+",";
+		
+		return str;
+	}
 }

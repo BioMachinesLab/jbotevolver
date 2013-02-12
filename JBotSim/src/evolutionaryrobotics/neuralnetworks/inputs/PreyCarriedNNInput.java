@@ -7,20 +7,20 @@ public class PreyCarriedNNInput extends NNInput {
 	PreyCarriedSensor sensor;
 	
 	public PreyCarriedNNInput(Sensor sensor) {
+		super(sensor);
 		this.sensor = (PreyCarriedSensor) sensor;
 	}
 	
-//	@Override
+	@Override
 	public int getNumberOfInputValues() {	
 		return 1;
 	}
 
-//	@Override
+	@Override
 	public double getValue(int index) {
 		if (sensor.preyCarried())
 			return 1;
 		else
 			return 0;
 	}
-
 }

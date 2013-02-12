@@ -7,10 +7,9 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class BehaviorController extends Controller implements FixedLenghtGenomeEvolvableController {
+public class BehaviorController extends NeuralNetworkController implements FixedLenghtGenomeEvolvableController {
 	
 	private ArrayList<Controller> subControllers = new ArrayList<Controller>();
-	private NeuralNetworkController mainController;
 	int currentSubNetwork = 0;
 	boolean keepFeeding = false;
 	boolean resetChosen = true;
@@ -31,7 +30,7 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 			}
 		}
 		
-		mainController.controlStep(time);
+		neuralNetwork.controlStep(time);
 		
 		//Feed these first. The chosen network should be the first to act.
 		//This will not work correctly if some of the behavior primitive networks activate
@@ -50,7 +49,7 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 	
 	private int chooseOutput() {
 		
-		double[] outputStates = mainController.getNeuralNetwork().getOutputNeuronStates();
+		double[] outputStates = neuralNetwork.getOutputNeuronStates();
 		
 		int maxIndex = 0;
 		
@@ -63,7 +62,7 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 	
 	@Override
 	public void reset() {
-		mainController.reset();
+		neuralNetwork.reset();
 		for(Controller c : subControllers)
 			c.reset();
 	}
@@ -80,10 +79,15 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 		}
 		
 		//Setting up main Controller
-		String oldName = args.getArgumentAsString("name");
-		args.setArgument("name", args.getArgumentAsString("type"));
-		mainController = (NeuralNetworkController)Controller.getController(simulator, robot, args);
-		args.setArgument("name", oldName);
+		neuralNetwork = (NeuralNetwork)NeuralNetwork.getNeuralNetwork(simulator, robot, new Arguments(args.getArgumentAsString("network")));
+		
+		if(args.getArgumentIsDefined("weights")) {
+			String[] rawArray = args.getArgumentAsString("weights").split(",");
+			double[] weights = new double[rawArray.length];
+			for(int i = 0 ; i < weights.length ; i++)
+				weights[i] = Double.parseDouble(rawArray[i]);
+			setNNWeights(weights);
+		}
 		
 		resetChosen = args.getArgumentAsIntOrSetDefault("resetchosen", 1) == 1;
 		keepFeeding = args.getArgumentAsIntOrSetDefault("keepfeeding", 0) == 1;
@@ -95,14 +99,5 @@ public class BehaviorController extends Controller implements FixedLenghtGenomeE
 	
 	public int getCurrentSubNetwork() {
 		return currentSubNetwork;
-	}
-	
-	public int getGenomeLength() {
-		return mainController.getGenomeLength();
-	}
-	
-	@Override
-	public void setNNWeights(double[] weights) {
-		this.mainController.setNNWeights(weights);
 	}
 }

@@ -137,7 +137,7 @@ public abstract class Environment implements KeyListener, Serializable {
 		movableObjects.add(o);
 		addObject(o);
 	}
-
+	
 	protected void addObject(PhysicalObject physicalObject) {
 		allObjects.add(physicalObject);
 		teleported.add(physicalObject);

@@ -9,6 +9,7 @@ public class RobotColorNNOutput extends NNOutput {
 	private RobotColorActuator robotColor;
 	
 	public RobotColorNNOutput(Actuator robotColor, Arguments args) {
+		super(robotColor,args);
 		this.robotColor = (RobotColorActuator)robotColor;
 	}
 

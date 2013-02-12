@@ -621,7 +621,7 @@ public class Arguments implements Serializable {
 		// System.exit(0);
 		// }
 		// }
-
+		
 		if (args[0].charAt(0) != '-') {
 			optionsFilename = args[0];
 			String[] argsFromFile = readOptionsFromFile(optionsFilename);
@@ -668,15 +668,6 @@ public class Arguments implements Serializable {
 							args[currentIndex + 1],true));
 
 			currentIndex += 2;
-		}
-
-		if ((result.get("--experiment") == null || !result.get("--experiment")
-				.getArgumentIsDefined("description"))
-				&& optionsFilename != null) {
-			result.put(
-					"--experiment",
-					createOrPrependArguments(result.get("--experiment"),
-							"+description=" + optionsFilename,true));
 		}
 
 		String commandLine = "";
@@ -738,8 +729,15 @@ public class Arguments implements Serializable {
 
 		return newString.trim().split(" ");
 	}
+	
+	public static Arguments createOrPrependArguments(Arguments previous, String newArgumentString) {
+		try {
+			return createOrPrependArguments(previous, newArgumentString,false);
+		} catch(Exception e){e.printStackTrace();}
+		return null;
+	}
 
-	public static Arguments createOrPrependArguments(Arguments previous,
+	private static Arguments createOrPrependArguments(Arguments previous,
 			String newArgumentString, boolean translateArguments) throws ClassNotFoundException {
 		if (newArgumentString.charAt(0) == '+') {
 			if (previous != null) {
@@ -758,5 +756,13 @@ public class Arguments implements Serializable {
 
 	public String toString() {
 		return getCompleteArgumentString();
+	}
+	
+	public Vector<String> getArguments() {
+		return arguments;
+	}
+	
+	public Vector<String> getValues() {
+		return values;
 	}
 }

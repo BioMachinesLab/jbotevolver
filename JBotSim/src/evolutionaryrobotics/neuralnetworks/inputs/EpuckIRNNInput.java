@@ -8,6 +8,7 @@ public class EpuckIRNNInput extends NNInput{
 	EpuckIRSensor epuckSensor;
 	
 	public EpuckIRNNInput(Sensor epuckSensor) {
+		super(epuckSensor);
 		this.epuckSensor = (EpuckIRSensor) epuckSensor;
 	}
 

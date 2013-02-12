@@ -7,17 +7,17 @@ public class DoubleParameterNNInput extends NNInput {
 	DoubleParameterSensor sensor;
 	
 	public DoubleParameterNNInput(Sensor sensor) {
+		super(sensor);
 		this.sensor = (DoubleParameterSensor) sensor;
 	}
 	
-//	@Override
+	@Override
 	public int getNumberOfInputValues() {	
 		return 1;
 	}
 
-//	@Override
+	@Override
 	public double getValue(int index) {
 		return (sensor.getSensorReading(index) - sensor.getMinimumValue()) / (sensor.getMaximumValue() - sensor.getMinimumValue());
 	}
-
 }
