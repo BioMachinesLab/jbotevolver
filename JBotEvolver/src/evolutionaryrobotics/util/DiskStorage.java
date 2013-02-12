@@ -221,7 +221,6 @@ public class DiskStorage {
 				+ populationFilename
 				+ populationB.getNumberOfCurrentGeneration()
 				+ ",showbestCoevolved");
-		currentShowBestFile.println("--gui classname=ResultViewerGui,renderer=(classname=TwoDRenderer)");
 		currentShowBestFile.println("--random-seed " + randomSeed);
 		currentShowBestFile.close();
 	}
@@ -238,7 +237,6 @@ public class DiskStorage {
 				+ "/populations/" + populationFilename
 				+ population.getNumberOfCurrentGeneration()
 				+ ",showbest");
-		currentShowBestFile.println("--gui name=debug");
 		currentShowBestFile.println("--random-seed " + randomSeed);
 		currentShowBestFile.close();
 	}
@@ -293,7 +291,6 @@ public class DiskStorage {
 				+ outputDirectory + "/populations/B" + populationFilename
 				+ populationB.getNumberOfCurrentGeneration()
 				+ ",showbestCoevolved");
-		showBestFile.println("--gui name=debug");
 		showBestFile.println("--random-seed " + randomSeed);
 		showBestFile.close();
 
@@ -309,7 +306,6 @@ public class DiskStorage {
 			showBestFile.println(s);
 		
 		showBestFile.println("--population load=" + outputDirectory + "/populations/" + populationFilename + population.getNumberOfCurrentGeneration()+ ",showbest");
-		showBestFile.println("--gui name=debug");
 		showBestFile.println("--random-seed " + randomSeed);
 		showBestFile.close();
 	}

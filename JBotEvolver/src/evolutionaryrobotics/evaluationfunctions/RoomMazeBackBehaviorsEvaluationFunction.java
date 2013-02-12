@@ -3,6 +3,7 @@ package evolutionaryrobotics.evaluationfunctions;
 import evolutionaryrobotics.neuralnetworks.BehaviorController;
 import mathutils.Vector2d;
 import simulation.Simulator;
+import simulation.environment.ClutteredMazeEnvironment;
 import simulation.util.Arguments;
 
 public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvaluationFunction {
@@ -30,8 +31,12 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 
 	@Override
 	public void update(Simulator simulator) {
+		if(r == null)
+			r = simulator.getEnvironment().getRobots().get(0);
 		if(controller == null)
-			controller = (BehaviorController)simulator.getEnvironment().getRobots().get(0).getController();
+			controller = (BehaviorController)r.getController();
+		if(env == null)
+			env = (ClutteredMazeEnvironment)simulator.getEnvironment();
 
 		if(r.isInvolvedInCollison())
 			simulator.stopSimulation();
@@ -53,7 +58,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 	
 	private void stepUnfinishedRoom() {
 		
-		if(controller.getCurrentSubNetwork() == 2)
+		if(controller.getCurrentSubNetwork() == 0)
 			roomTicks++;
 		
 		roomTime++;
@@ -82,7 +87,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 	private void stepFinishedMaze(Simulator simulator) {
 		//this is to prevent the robot from going to the forbidden squares
 		
-		if(controller.getCurrentSubNetwork() == 0)
+		if(controller.getCurrentSubNetwork() == 2)
 			goBackTicks++;
 		
 		goBackTime++;
@@ -99,12 +104,9 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 		
 		fitness = 0;
 		
-//		if(finishedRoom)
-			fitness+=computeFitnessUnfinishedRoom();
-//		if(finishedMaze)
-			fitness+=computeFitnessFinishedRoom();
-//		if(wentBack)
-			fitness+=computeFitnessFinishedMaze();
+		fitness+=computeFitnessUnfinishedRoom();
+		fitness+=computeFitnessFinishedRoom();
+		fitness+=computeFitnessFinishedMaze();
 		
 		if(wentBack)
 			fitness+=(totalTime-steps)/totalTime;

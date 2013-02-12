@@ -15,11 +15,13 @@ import evolutionaryrobotics.populations.Population;
 public class GenerationalEvolution extends Evolution {
 	
 	private Population population;
+	private boolean supressMessages = false;
 
 	public GenerationalEvolution(JBotEvolver jBotEvolver, Arguments args) {
 		super(jBotEvolver, args);
 		Arguments populationArguments = jBotEvolver.getArguments().get("--population");
 		populationArguments.setArgument("genomelength", getGenomeLength());
+		supressMessages = args.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
 		
 		try {
 			population = Population.getPopulation(jBotEvolver.getArguments().get("--population"));
@@ -48,21 +50,21 @@ public class GenerationalEvolution extends Evolution {
 				int samples = population.getNumberOfSamplesPerChromosome();
 				jBotEvolver.submitTask(new GenerationalTask(jBotEvolver,samples,c,population.getGenerationRandomSeed()));
 				totalChromosomes++;
-				System.out.print(".");
+				print(".");
 			}
 			
-			System.out.println();
+			print("\n");
 			
 			while(totalChromosomes-- > 0) {
 				SimpleFitnessResult result = (SimpleFitnessResult)jBotEvolver.getResult();
 				population.setEvaluationResultForId(result.getChromosomeId(), result.getFitness());
-				System.out.print("!");
+				print("!");
 			}
 			
-			System.out.println("\nGeneration "+population.getNumberOfCurrentGeneration()+
+			print("\nGeneration "+population.getNumberOfCurrentGeneration()+
 					"\tHighest: "+population.getHighestFitness()+
 					"\tAverage: "+population.getAverageFitness()+
-					"\tLowest: "+population.getLowestFitness());
+					"\tLowest: "+population.getLowestFitness()+"\n");
 			
 			try {
 				jBotEvolver.getDiskStorage().savePopulation(population, jBotEvolver.getRandom());
@@ -70,7 +72,6 @@ public class GenerationalEvolution extends Evolution {
 			
 			population.createNextGeneration();
 		}
-		System.out.println("Evolution finished!");
 	}
 	
 	private int getGenomeLength() {
@@ -86,5 +87,10 @@ public class GenerationalEvolution extends Evolution {
 			genomeLength = controller.getGenomeLength();
 		}
 		return genomeLength;
+	}
+	
+	private void print(String s) {
+		if(!supressMessages)
+			System.out.print(s);
 	}
 }

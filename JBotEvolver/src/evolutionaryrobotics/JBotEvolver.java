@@ -3,13 +3,10 @@ package evolutionaryrobotics;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Random;
-
 import result.Result;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.robot.Robot;
-import simulation.util.ClassSearchUtils;
 import taskexecutor.TaskExecutor;
 import tasks.Task;
 import controllers.FixedLenghtGenomeEvolvableController;
@@ -46,11 +43,6 @@ public class JBotEvolver extends JBotSim {
 	}
 	
 	public Evolution getEvolution() {
-		if(arguments.get("--executor") != null) {
-			taskExecutor = TaskExecutor.getTaskExecutor(this,arguments.get("--executor"));
-			taskExecutor.setDaemon(true);
-			taskExecutor.start();
-		}
 		if(arguments.get("--output") != null) {
 			diskStorage = new DiskStorage(arguments.get("--output").getCompleteArgumentString());
 			try {
@@ -71,6 +63,13 @@ public class JBotEvolver extends JBotSim {
 	}
 	
 	public void submitTask(Task task) {
+		if(taskExecutor == null) {
+			if(arguments.get("--executor") != null) {
+				taskExecutor = TaskExecutor.getTaskExecutor(this,arguments.get("--executor"));
+				taskExecutor.setDaemon(true);
+				taskExecutor.start();
+			}
+		}
 		taskExecutor.addTask(task);
 	}
 
@@ -101,5 +100,25 @@ public class JBotEvolver extends JBotSim {
 
 	public DiskStorage getDiskStorage() {
 		return diskStorage;
+	}
+
+	public void setupBestIndividual(Simulator simulator) {
+		
+		ArrayList<Robot> robots;
+		
+		if(simulator.getRobots().isEmpty()) {
+			robots = createRobots(simulator);
+			simulator.addRobots(robots);
+		} else
+			robots = simulator.getRobots();
+		
+		Population p = getPopulation();
+		Chromosome c = p.getBestChromosome();
+		for(Robot r : robots) {
+			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
+				FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
+				fc.setNNWeights(c.getAlleles());
+			}
+		}
 	}
 }

@@ -295,5 +295,4 @@ public class MuLambdaPopulation extends Population implements Serializable {
 		else
 			return false;
 	}
-
 }

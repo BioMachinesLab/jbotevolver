@@ -13,7 +13,7 @@ public abstract class Evolution {
 	}
 	
 	public abstract void executeEvolution();
-
+	
 	public static Evolution getEvolution(JBotEvolver jBotEvolver, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Evolution 'classname' not defined: "+arguments.toString());

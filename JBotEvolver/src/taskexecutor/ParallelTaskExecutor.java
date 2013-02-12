@@ -49,6 +49,12 @@ public class ParallelTaskExecutor extends TaskExecutor {
 	@Override
 	public void run() {}
 	
+	@Override
+	public void stopTasks() {
+		super.stopTasks();
+		executor.shutdownNow();
+	}
+	
 	private class JBotCallable implements Callable<Result> {
 		
 		private Task t;

@@ -36,6 +36,7 @@ import simulation.Updatable;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.behaviors.Behavior;
+import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
@@ -68,12 +69,14 @@ public class GraphPlotter extends JFrame implements Updatable {
 	
 	private JCheckBox smoothCheckBox = new JCheckBox("Smooth lines");
 	
-	private int currentStep = 0;
+	private double currentStep = 0;
 	private int currentIndex = 0;
 	
 	private boolean saveToFile = false;
 	private Simulator simulator;
 	private NeuralNetwork network;
+	
+	private JBotEvolver jBotEvolver;
 
 	/**
 	 * Currently this only works for robots that use a NeuralNetwork as a controller.
@@ -84,16 +87,18 @@ public class GraphPlotter extends JFrame implements Updatable {
 	 * @param evaluationFunction If this parameter is null, the graph will be plotted
 	 * up to the maximum number of steps.
 	 */
-	public GraphPlotter(Simulator simulator) {
+	public GraphPlotter(JBotEvolver jBotEvolver, Simulator simulator) {
 		super("Graph Plotter");
 		try{
 			JPanel mainPanel = new JPanel();
 			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 			
 			this.simulator = simulator;
-			
+			this.jBotEvolver = jBotEvolver;
 			robots = simulator.getRobots();
 	
+			//TODO this doesn't work for BehaviorControllers. Maybe a BehaviorController should extends
+			//NeuralNetworkController. Also, the name should be different. Like HierarchicalController...
 			NeuralNetworkController controller = (NeuralNetworkController)robots.get(0).getController();
 			network = controller.getNeuralNetwork();
 			inputs = network.getInputs();
@@ -239,21 +244,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 		dispose();
 	}
 	
-	private class Plotter extends Thread {
-		
-		private JavaPlot plot;
-		
-		public Plotter(JavaPlot plot) {
-			this.plot = plot;
-		}
-		
-		@Override
-		public void run() {
-			plot.plot();
-		}
-	
-	}
-	
 	private PlotStyle getNewPlotStyle() {
 		PlotStyle myPlotStyle = new PlotStyle();
 		myPlotStyle.setStyle(Style.LINES);
@@ -277,6 +267,13 @@ public class GraphPlotter extends JFrame implements Updatable {
 	}
 	
 	private void plotGraph() {
+		
+		simulator = jBotEvolver.createSimulator();
+		simulator.addCallback(jBotEvolver.getEvaluationFunction());
+		jBotEvolver.setupBestIndividual(simulator);
+		
+		simulator.addCallback(this);
+		
 		try {
 			//Instantiate the needed arrays
 			for(int i = 0 ; i < robotCheckboxes.size() ; i++) {
@@ -337,53 +334,15 @@ public class GraphPlotter extends JFrame implements Updatable {
 				}
 			}
 			
-			simulator.addCallback(this);
-			simulator.simulate();
+			Thread worker = new Thread(new GraphSimulationRunner(simulator));
+			worker.start();
 			
-			if(saveToFile) {
-				String[] array = new String[valuesList.get(0).length];
-				
-				for(int i = 0 ; i < valuesList.size() ; i++) {
-					double[][] current = valuesList.get(i);
-					for(int j = 0 ; j < array.length ; j++) {
-						if(array[j] == null)
-							array[j]=""+j;
-						array[j]+=" "+current[j][1];
-					}
-				}
-				
-				File f = new File("data.csv");
-				PrintWriter pw = new PrintWriter(new FileOutputStream(f));
-				for(String s : array)
-					pw.write(s+"\n");
-				pw.close();
-				
-			} else {
-	
-				JavaPlot p = new JavaPlot();
-		
-				PlotStyle myPlotStyle = new PlotStyle();
-				myPlotStyle.setStyle(Style.LINES);
-				myPlotStyle.setLineWidth(1);
-				
-				boolean smooth = smoothCheckBox.isSelected();
-		
-				for(int i = 0 ; i < valuesList.size() ; i++) { 
-					DataSetPlot s = new DataSetPlot(valuesList.get(i));
-					s.setPlotStyle(myPlotStyle);
-					if(smooth)
-						s.setSmooth(Smooth.CSPLINES);
-					s.setTitle(titlesList.get(i));
-					p.addPlot(s);
-				}
-		
-				p.set("xrange", "[0:"+(currentStep-1)+"]");
-				(new Plotter(p)).start();
-			}
 		}catch(Exception e) {e.printStackTrace();}
 	}
 	
 	public void update(Simulator simulator) {
+		
+		currentStep = simulator.getTime();
 		
 		robots = simulator.getRobots();
 		
@@ -425,24 +384,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 				processLayer(hiddenCheckboxes, hiddenTextFields, hidden, numberOfHiddenInputs);
 			}
 		}
-		
-//		DecimalFormat twoDForm = new DecimalFormat("#.#####");
-		
-		for(int i = 0 ; i < valuesList.size() ; i++) {
-			double[][] currentValues = valuesList.get(i);
-			double[][] newValues = new double[currentStep][2];
-			for(int j = 0 ; j < currentStep ; j++) {
-				newValues[j][0] = currentValues[j][0];
-				newValues[j][1] = currentValues[j][1];
-//					String s = ""+Double.valueOf(twoDForm.format(newValues[j][1]));
-//					if(s.contains("E"))
-//						System.out.println(0);
-//					else
-//						System.out.println(s);
-			}
-//				System.out.println();
-			valuesList.set(i, newValues);
-		}
 	}
 	
 	private void processLayer(LinkedList<JCheckBox> checkboxes, LinkedList<JTextField> textFields, double[] states, int[] numberOfNeurons) {
@@ -463,8 +404,8 @@ public class GraphPlotter extends JFrame implements Updatable {
 					
 					for(int z = 0 ; z < numberOfNeurons[j] ; z++, currentNeuron++) {
 						if(Arrays.binarySearch(chosenInts, z) >= 0) {
-							valuesList.get(currentIndex)[currentStep][0] = currentStep;
-							valuesList.get(currentIndex++)[currentStep][1] = states[currentNeuron];
+							valuesList.get(currentIndex)[(int)currentStep][0] = currentStep;
+							valuesList.get(currentIndex++)[(int)currentStep][1] = states[currentNeuron];
 						}
 					}
 				}catch(NumberFormatException e) {
@@ -609,6 +550,83 @@ public class GraphPlotter extends JFrame implements Updatable {
 			pack();
 			setVisible(true);
 		}
+	}
+	
+	public class GraphSimulationRunner implements Runnable {
+		private Simulator sim;
+		public GraphSimulationRunner(Simulator sim) {
+			this.sim = sim;
+		}
+		@Override
+		public void run() {
+			sim.simulate();
+			
+			for(int i = 0 ; i < valuesList.size() ; i++) {
+				double[][] currentValues = valuesList.get(i);
+				double[][] newValues = new double[(int)currentStep][2];
+				for(int j = 0 ; j < currentStep ; j++) {
+					newValues[j][0] = currentValues[j][0];
+					newValues[j][1] = currentValues[j][1];
+				}
+				valuesList.set(i, newValues);
+			}
+			
+			if(saveToFile) {
+				try {
+					String[] array = new String[valuesList.get(0).length];
+					
+					for(int i = 0 ; i < valuesList.size() ; i++) {
+						double[][] current = valuesList.get(i);
+						for(int j = 0 ; j < array.length ; j++) {
+							if(array[j] == null)
+								array[j]=""+j;
+							array[j]+=" "+current[j][1];
+						}
+					}
+					
+					File f = new File("data.csv");
+					PrintWriter pw = new PrintWriter(new FileOutputStream(f));
+					for(String s : array)
+						pw.write(s+"\n");
+					pw.close();
+				} catch(Exception e) {e.printStackTrace();}
+			} else {
+	
+				JavaPlot p = new JavaPlot();
 		
+				PlotStyle myPlotStyle = new PlotStyle();
+				myPlotStyle.setStyle(Style.LINES);
+				myPlotStyle.setLineWidth(1);
+				
+				boolean smooth = smoothCheckBox.isSelected();
+		
+				for(int i = 0 ; i < valuesList.size() ; i++) { 
+					DataSetPlot s = new DataSetPlot(valuesList.get(i));
+					s.setPlotStyle(myPlotStyle);
+					if(smooth)
+						s.setSmooth(Smooth.CSPLINES);
+					s.setTitle(titlesList.get(i));
+					p.addPlot(s);
+				}
+		
+				p.set("xrange", "[0:"+(currentStep-1)+"]");
+				(new Plotter(p)).start();
+			}
+		}
+	}
+	
+	private class Plotter extends Thread {
+		
+		private JavaPlot plot;
+		
+		public Plotter(JavaPlot plot) {
+			this.plot = plot;
+		}
+		
+		@Override
+		public void run() {
+			plot.plot();
+		}
+	
 	}
 }

@@ -2,14 +2,11 @@ package gui;
 
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
-import evolutionaryrobotics.populations.Population;
 import gui.renderer.Renderer;
 import gui.util.Editor;
 import gui.util.GraphPlotter;
 import gui.util.GraphViz;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -20,11 +17,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Vector;
-
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -46,13 +41,9 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-
-import controllers.FixedLenghtGenomeEvolvableController;
-
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
-import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class ResultViewerGui extends Gui {
@@ -229,18 +220,6 @@ public class ResultViewerGui extends Gui {
 		fitnessTextField.setHorizontalAlignment(JTextField.RIGHT);
 		bottomPanel.add(fitnessTextField);
 
-		bottomPanel.add(new JLabel("CPU time/control step: "));
-		controlStepTimeTextField = new JTextField("N/A");
-		controlStepTimeTextField.setPreferredSize(new Dimension(50, 20));
-		controlStepTimeTextField.setHorizontalAlignment(JTextField.RIGHT);
-		bottomPanel.add(controlStepTimeTextField);
-
-		bottomPanel.add(new JLabel("CPU time/renderer frame: "));
-		rendererTimeTextField = new JTextField("N/A");
-		rendererTimeTextField.setPreferredSize(new Dimension(50, 20));
-		rendererTimeTextField.setHorizontalAlignment(JTextField.RIGHT);
-		bottomPanel.add(rendererTimeTextField);
-
 		bottomPanel.setBorder(BorderFactory.createTitledBorder("Status"));
 
 		return bottomPanel;
@@ -396,7 +375,7 @@ public class ResultViewerGui extends Gui {
 					try{
 						simulationState = PAUSED;
 						jBotEvolver.loadFile(currentFileTextField.getText(), extraArguments.getText());
-						new GraphPlotter(loadSimulator());
+						new GraphPlotter(jBotEvolver,loadSimulator());
 					}catch(Exception e){
 						e.printStackTrace();
 					}
@@ -487,6 +466,8 @@ public class ResultViewerGui extends Gui {
 	
 	private void startButton() {
 		simulationState = RUN;
+		simulateUntil = 0;
+		readyToSkip = true;
 		if(simulator != null && simulator.simulationFinished())
 			loadCurrentFile();
 	}
@@ -501,7 +482,7 @@ public class ResultViewerGui extends Gui {
 	private void shiftSimulationBy(int value, boolean percentage) {
 		
 		try {
-			if(readyToSkip) {
+			if(readyToSkip || (simulator != null && simulator.simulationFinished())) {
 				int maxSteps = simulator.getEnvironment().getSteps();
 				
 				if(!percentage) {
@@ -515,6 +496,7 @@ public class ResultViewerGui extends Gui {
 					int targetStep = (int)(percent*maxSteps);
 					simulateUntil = targetStep;
 				}
+				simulationState = PAUSED;
 				loadCurrentFile();
 			}
 		} catch (Exception e1) {
@@ -526,13 +508,15 @@ public class ResultViewerGui extends Gui {
 	public synchronized void update(Simulator simulator) {
 		
 		if(simulateUntil == 0) {
+			
+			readyToSkip = true;
 		
 			if(dispatcher != null)
 				KeyboardFocusManager.getCurrentKeyboardFocusManager().removeKeyEventDispatcher(dispatcher);
 			dispatcher = new EnvironmentKeyDispatcher(simulator);
 			KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(dispatcher);
 			
-			if(graphViz == null) {
+			if(showNeuralNetwork && graphViz == null) {
 				NeuralNetworkController nn = (NeuralNetworkController)simulator.getEnvironment().getRobots().get(0).getController();
 				graphViz = new GraphViz(nn.getNeuralNetwork());
 			}
@@ -595,17 +579,6 @@ public class ResultViewerGui extends Gui {
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
-		}
-	}
-
-	class SimulationRunner implements Runnable {
-		private Simulator sim;
-		public SimulationRunner(Simulator sim) {
-			this.sim = sim;
-		}
-		@Override
-		public void run() {
-			sim.simulate();
 		}
 	}
 
@@ -751,7 +724,7 @@ public class ResultViewerGui extends Gui {
 		if(renderer != null)
 			frame.getContentPane().remove(renderer);
 		
-		if(args.get("--gui").getArgumentIsDefined("renderer"))
+		if(args.get("--gui") != null && args.get("--gui").getArgumentIsDefined("renderer"))
 			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
 		
 		Simulator simulator = jBotEvolver.createSimulator();
@@ -759,18 +732,8 @@ public class ResultViewerGui extends Gui {
 		evaluationFunction = jBotEvolver.getEvaluationFunction();
 		simulator.addCallback(evaluationFunction);
 		
-		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
+		jBotEvolver.setupBestIndividual(simulator);
 		
-		Population p = jBotEvolver.getPopulation();
-		Chromosome c = p.getBestChromosome();
-		for(Robot r : robots) {
-			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
-				FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
-				fc.setNNWeights(c.getAlleles());
-			}
-		}
-		
-		simulator.addRobots(robots);
 		simulator.addCallback(this);
 		simulator.setupEnvironment();
 		
@@ -799,5 +762,16 @@ public class ResultViewerGui extends Gui {
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new EnvironmentKeyDispatcher(simulator));
 		
 		return simulator;
+	}
+	
+	public class SimulationRunner implements Runnable {
+		private Simulator sim;
+		public SimulationRunner(Simulator sim) {
+			this.sim = sim;
+		}
+		@Override
+		public void run() {
+			sim.simulate();
+		}
 	}
 }
