@@ -150,7 +150,7 @@ public class SimpleCollisionManager extends CollisionManager {
 			break;
 			//from below.
 		case 3:
-			valueY = wall.getTopLeftY() - wall.getHeight();
+			valueY = wall.getTopLeftY() - wall.getHeight() - robot.getRadius();
 			break;
 		}
 
