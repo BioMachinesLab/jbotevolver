@@ -12,7 +12,6 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 	protected ClutteredMazeEnvironment env;
 	protected Vector2d startPosition = new Vector2d();
 	protected boolean finishedRoom = false;
-	protected double fitness = 0;
 	private boolean onlyRoom = false;
 	private double closestDistance = 0;
 
@@ -34,7 +33,6 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 		if(r == null)
 			r = simulator.getEnvironment().getRobots().get(0);
 		
-		
 		if(!finishedRoom && reachedRoomFinish()) {
 			finishedRoom = true;
 			if(onlyRoom)
@@ -48,12 +46,10 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 				simulator.stopSimulation();
 		}
 		
-		steps++;
-		
-		this.fitness = computeFitness();
+		this.fitness = computeFitness(simulator);
 	}
 	
-	private double computeFitness() {
+	private double computeFitness(Simulator simulator) {
 		
 		double fitness = getDistanceToRoomFinish();
 		
@@ -67,14 +63,14 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 		
 		if(finishedRoom) {
 			
-			fitness = (5.0 + (maxSteps-steps)/maxSteps)*fitness;
+			fitness = (5.0 + (maxSteps-simulator.getTime())/maxSteps)*fitness;
 			if(closestDistance < fitness)
 				closestDistance = fitness;
 			
 			fitness = closestDistance;
 			
 			if(inFinalSquare)
-				fitness+= 1 + (maxSteps-steps)/maxSteps;
+				fitness+= 1 + (maxSteps-simulator.getTime())/maxSteps;
 			
 			if(touchedWall || inForbiddenSquare)
 				fitness+= wallCollisionFitness();

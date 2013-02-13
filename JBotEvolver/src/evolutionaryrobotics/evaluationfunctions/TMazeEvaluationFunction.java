@@ -13,7 +13,6 @@ public class TMazeEvaluationFunction  extends EvaluationFunction {
 	protected boolean inForbiddenSquare = false;
 	protected boolean inFinalSquare = false;
 	protected double startDistance = 0;
-	protected double steps = 0;
 	protected double maxSteps = 500;
 	protected double progress = 0;
 	private boolean dieOnForbidden = true;
@@ -29,7 +28,6 @@ public class TMazeEvaluationFunction  extends EvaluationFunction {
 		if(env == null)
 			env = (TMazeEnvironment)simulator.getEnvironment();
 		startDistance = env.getSquares().peek().getDistance();
-		steps++;
 		
 		if(env.killSample())
 			simulator.stopSimulation();
@@ -45,7 +43,7 @@ public class TMazeEvaluationFunction  extends EvaluationFunction {
 		progress = getProgress();
 		
 		if(inFinalSquare)
-			fitness = 1 + (maxSteps-steps)/maxSteps;
+			fitness = 1 + (maxSteps-simulator.getTime())/maxSteps;
 		else if(touchedWall || inForbiddenSquare)
 			fitness = wallCollisionFitness();
 		else

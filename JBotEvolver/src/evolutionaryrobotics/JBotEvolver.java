@@ -117,7 +117,9 @@ public class JBotEvolver extends JBotSim {
 		for(Robot r : robots) {
 			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
 				FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
-				fc.setNNWeights(c.getAlleles());
+				if(fc.getNNWeights() == null) {
+					fc.setNNWeights(c.getAlleles());
+				}
 			}
 		}
 	}

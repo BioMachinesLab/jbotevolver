@@ -9,7 +9,6 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 	private boolean finishedRoom = false;
 	private boolean finishedMaze = false;
 	private boolean wentBack = false;
-	private boolean firstStep = true;
 	private double mazePenalty = 0;
 
 	public RoomMazeBackEvaluationFunction(Arguments args) {
@@ -32,8 +31,6 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		} else { //Cleared everything
 			simulator.stopSimulation();
 		}
-		
-		steps++;
 		
 		this.fitness = computeFitness();
 	}
@@ -110,8 +107,8 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		return getDistanceToRoomFinish();
 	}
 	
-	private double computeFitnessWentBack() {
-		return (maxSteps-steps)/maxSteps;
+	private double computeFitnessWentBack(Simulator simulator) {
+		return (maxSteps-simulator.getTime())/maxSteps;
 	}
 	
 	public double getDistanceToRoomFinish() {

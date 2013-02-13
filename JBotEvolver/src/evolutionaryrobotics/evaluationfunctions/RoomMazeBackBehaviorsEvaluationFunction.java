@@ -51,9 +51,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 			simulator.stopSimulation();
 		}
 		
-		steps++;
-		
-		computeFitness();
+		computeFitness(simulator);
 	}
 	
 	private void stepUnfinishedRoom() {
@@ -100,7 +98,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 			simulator.stopSimulation();
 	}
 	
-	private void computeFitness() {
+	private void computeFitness(Simulator simulator) {
 		
 		fitness = 0;
 		
@@ -109,7 +107,7 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 		fitness+=computeFitnessFinishedMaze();
 		
 		if(wentBack)
-			fitness+=(totalTime-steps)/totalTime;
+			fitness+=(totalTime-simulator.getTime())/totalTime;
 	}
 	
 	//solving room
