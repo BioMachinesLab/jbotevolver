@@ -30,7 +30,7 @@ public class WallSensor extends ConeTypeSensor{
 		
 		Vector2d closestPoint = null;
 		for(Edge edge : edges){
-			Vector2d intersection = simulation.util.MathUtils.calculateIntersectionPoint(
+			Vector2d intersection = mathutils.MathUtils.calculateIntersectionPoint(
 					wallCenter, robotPos, edge.getP1(), edge.getP2());
 			//(robot, wall center) segment only intersects one edge
 			if(intersection != null){

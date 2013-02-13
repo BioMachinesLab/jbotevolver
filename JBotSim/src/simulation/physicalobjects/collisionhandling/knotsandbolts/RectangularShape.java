@@ -1,10 +1,10 @@
 package simulation.physicalobjects.collisionhandling.knotsandbolts;
 
+import mathutils.MathUtils;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.physicalobjects.PhysicalObject;
-import simulation.util.MathUtils;
 
 
 

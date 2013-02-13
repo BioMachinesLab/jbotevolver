@@ -28,8 +28,7 @@ import simulation.util.Arguments;
 @SuppressWarnings("serial")
 public class EpuckIRSensor extends ConeTypeSensor {
 
-	private double openingAngle;
-	private static double RANGE = 99;
+	private static double RANGE = 5;
 	private static double REAL_RANGE = 0.14;
 	private int[] chosenReferences;
 	public double last2 = 0;
@@ -73,6 +72,9 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	static double distances[] = {0,0.5,1,1.5,2,3,4,5,6,7,8,9,10,11,12};
 
 	protected Random random;
+	private Vector2d[][] cones;
+	private Vector2d[] sensorPositions;
+	private double fullOpeningAngle;
 	
 	public EpuckIRSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);
@@ -118,11 +120,20 @@ public class EpuckIRSensor extends ConeTypeSensor {
 			chosenReferences[i] = random;
 		}
 
+		this.fullOpeningAngle = openingAngle;
 		this.openingAngle = openingAngle / 2;
-
+		
 		initAngles();
 		((Epuck) robot).setIRSensor(this);
 		setAllowedObjectsChecker(new AllowWallRobotChecker(robot.getId()));
+		
+		sensorPositions = new Vector2d[numberOfSensors];
+		cones = new Vector2d[numberOfSensors][numberOfRays];
+		for(int i = 0 ; i < numberOfSensors ; i++) {
+			sensorPositions[i] = new Vector2d();
+			for(int j = 0 ; j < numberOfRays ; j++)
+				cones[i][j] = new Vector2d();
+		}
 	}
 
 	private void initAngles() {
@@ -143,6 +154,27 @@ public class EpuckIRSensor extends ConeTypeSensor {
 			angles[0] = 5.98647933;
 		}
 	}
+	
+	private void updateCones() {
+		
+		for(int sensorNumber = 0 ; sensorNumber < numberOfSensors ; sensorNumber++) {
+			double orientation = angles[sensorNumber] + robot.getOrientation();
+			
+			sensorPositions[sensorNumber].set(
+					Math.cos(orientation) * robot.getRadius() + robot.getPosition().getX(),
+					Math.sin(orientation) * robot.getRadius() + robot.getPosition().getY()
+				);
+			
+			double alpha = (this.fullOpeningAngle)/(numberOfRays-1);
+			
+			for(int i = 0 ; i < numberOfRays ; i++) {
+				cones[sensorNumber][i].set(
+						Math.cos(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPositions[sensorNumber].getX(),
+						Math.sin(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPositions[sensorNumber].getY()
+					 );
+			}
+		}
+	}
 
 	/**
 	 * Calculates the distance between the robot and a given PhisicalObject if
@@ -159,39 +191,21 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		
 		double inputValue = 0;
 		
-		double orientation = angles[sensorNumber] + robot.getOrientation();
-		
-		Vector2d sensorPosition = new Vector2d(
-				Math.cos(orientation) * robot.getRadius() + robot.getPosition().getX(),
-				Math.sin(orientation) * robot.getRadius() + robot.getPosition().getY()
-			);
-		
-		Vector2d[] cones = new Vector2d[numberOfRays];
-		
-		double alpha = (this.openingAngle*2)/(numberOfRays-1);
-		
-		for(int i = 0 ; i < numberOfRays ; i++) {
-			double openingAngle = this.openingAngle;
-			cones[i] = new Vector2d(
-					Math.cos(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPosition.getX(),
-					Math.sin(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPosition.getY()
-					);
-		}
-		
 		if(source.getObject().getType() == PhysicalObjectType.WALL) {
 		
 			Wall w = (Wall) source.getObject();
 			
-			for(int i = 0 ; i < cones.length ; i++) {
-				Vector2d cone = cones[i];
+			for(int i = 0 ; i < numberOfRays ; i++) {
+				Vector2d cone = cones[sensorNumber][i];
+//				System.out.println(cone);
 				Vector2d intersection = null;
-				intersection = w.intersectsWithLineSegment(sensorPosition, cone);
+				intersection = w.intersectsWithLineSegment(sensorPositions[sensorNumber], cone);
 				
 				if(intersection != null) {
-					double distance = intersection.distanceTo(sensorPosition);
+					
+					double distance = intersection.distanceTo(sensorPositions[sensorNumber]);
 					
 					if(distance < REAL_RANGE) {
-						
 						double sensorValue = distanceToSensor(distance, sensorNumber);
 						
 						sensorValue+=sensorValue*offsetNoises[sensorNumber];
@@ -302,13 +316,15 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	
 	@Override
 	public void update(double time, ArrayList<PhysicalObject> teleported) {
-		
 //		if(!newMode) {
 //			super.update(time, teleported);
 //		}else{
-//		
-		if(closeObjects != null)
+		
+		updateCones();
+
+		if(closeObjects != null) {
 			closeObjects.update(time, teleported);
+		}
 		try { 
 			for(int i = 0; i < numberOfSensors; i++){
 				for(int j = 0; j < numberOfRays; j++){
@@ -321,8 +337,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 				PhysicalObjectDistance source=iterator.next();
 				if (source.getObject().isEnabled()){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(
-							sensorPosition, source.getObject()));
+					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(robot.getPosition(), source.getObject()));
 				}
 			}
 			

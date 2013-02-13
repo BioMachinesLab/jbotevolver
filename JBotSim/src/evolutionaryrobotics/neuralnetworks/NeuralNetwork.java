@@ -127,6 +127,10 @@ public abstract class NeuralNetwork implements Serializable{
 		this.inputs = inputs;
 	}
 	
+	public double[] getWeights() {
+		return weights;
+	}
+	
 	public abstract void reset();
 	
 	public static NeuralNetwork getNeuralNetwork(Simulator simulator, Robot robot, Arguments arguments) {

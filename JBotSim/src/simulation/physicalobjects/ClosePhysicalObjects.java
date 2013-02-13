@@ -41,9 +41,6 @@ public class ClosePhysicalObjects implements Serializable {
 		}
 		this.time = time;
 		farTime = time + visibility;
-//if(time==1){
-//	System.out.println("AA");
-//}
 		if (teleported.size() > 0) {
 			if(closeObjects.isEmpty() && farObjects.isEmpty()){
 				updateTeleportedNoCheck(teleported);

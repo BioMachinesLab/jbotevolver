@@ -165,19 +165,19 @@ public class SimpleCollisionManager extends CollisionManager {
 		bottomRight = new Vector2d(closeWall.getTopLeftX() + closeWall.getWidth(), 
 				closeWall.getTopLeftY() - closeWall.getHeight());
 		
-		if(simulation.util.MathUtils.distanceBetween(topRight, bottomRight, robot.getPosition()) <= robot.getRadius()){
+		if(mathutils.MathUtils.distanceBetween(topRight, bottomRight, robot.getPosition()) <= robot.getRadius()){
 			//System.out.println("robot from right");
 			return 0;
 		}
-		if(simulation.util.MathUtils.distanceBetween(topLeft, bottomLeft, robot.getPosition()) <= robot.getRadius()){
+		if(mathutils.MathUtils.distanceBetween(topLeft, bottomLeft, robot.getPosition()) <= robot.getRadius()){
 			//System.out.println("robot from left");
 			return 1;
 		}
-		if(simulation.util.MathUtils.distanceBetween(topRight, topLeft, robot.getPosition()) <= robot.getRadius()){
+		if(mathutils.MathUtils.distanceBetween(topRight, topLeft, robot.getPosition()) <= robot.getRadius()){
 			//System.out.println("robot from above");
 			return 2;
 		}
-		if(simulation.util.MathUtils.distanceBetween(bottomRight, bottomLeft, robot.getPosition()) <= robot.getRadius()){
+		if(mathutils.MathUtils.distanceBetween(bottomRight, bottomLeft, robot.getPosition()) <= robot.getRadius()){
 			//System.out.println("robot from below");
 			return 3;
 		}

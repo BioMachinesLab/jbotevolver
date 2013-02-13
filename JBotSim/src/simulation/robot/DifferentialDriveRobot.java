@@ -1,10 +1,10 @@
 package simulation.robot;
 
+import mathutils.MathUtils;
 import simulation.Simulator;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
-import simulation.util.MathUtils;
 
 public class DifferentialDriveRobot extends Robot {
 	/**

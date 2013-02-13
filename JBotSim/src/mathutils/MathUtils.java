@@ -1,4 +1,4 @@
-package simulation.util;
+package mathutils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
-import mathutils.Vector2d;
 
 public class MathUtils implements Serializable {
 

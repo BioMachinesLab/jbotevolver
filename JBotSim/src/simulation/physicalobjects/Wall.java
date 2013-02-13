@@ -1,9 +1,9 @@
 package simulation.physicalobjects;
 
+import mathutils.MathUtils;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.RectangularShape;
-import simulation.util.MathUtils;
 
 public class Wall extends PhysicalObject{
 
@@ -89,7 +89,6 @@ public class Wall extends PhysicalObject{
 		public Vector2d getNormal() {
 			return normal;
 		}
-
 	}
 
 	public Vector2d intersectsWithLineSegment(Vector2d p1, Vector2d p2) {
@@ -107,8 +106,6 @@ public class Wall extends PhysicalObject{
 					break;
 			}
 		}
-
 		return closestPoint;
-	}
-	
+	}	
 }

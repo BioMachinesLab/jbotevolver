@@ -60,6 +60,11 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	public void setNNWeights(double[] weights) {
 		neuralNetwork.setWeights(weights);
 	}
+	
+	@Override
+	public double[] getNNWeights() {
+		return neuralNetwork.getWeights();
+	}
 
 	public static void setNNWeights(LinkedList<Robot> robots, double[] weights) {
 		for (Robot r : robots) {

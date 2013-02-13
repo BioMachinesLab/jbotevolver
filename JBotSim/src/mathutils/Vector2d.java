@@ -1,6 +1,6 @@
 package mathutils;
 
-public class Vector2d extends Point2d{
+public class Vector2d extends Point2d {
 
 	private double ay;
 	private double ax;
