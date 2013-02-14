@@ -1,13 +1,16 @@
 package simulation.util;
 
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Factory {
+public class Factory implements Serializable{
 
-	public final static Map<Class<?>, Class<?>> map = new HashMap<Class<?>, Class<?>>();
-	static {
+	public final static Map<Class<?>, Class<?>> map = initializeMap();
+
+	private static Map<Class<?>, Class<?>> initializeMap() {
+		Map<Class<?>, Class<?>> map = new HashMap<Class<?>, Class<?>>();
 		map.put(Boolean.class, boolean.class);
 		map.put(Byte.class, byte.class);
 		map.put(Short.class, short.class);
@@ -16,10 +19,13 @@ public class Factory {
 		map.put(Long.class, long.class);
 		map.put(Float.class, float.class);
 		map.put(Double.class, double.class);
+
+		return map;
 	}
+
 	
 	public static Object getInstance(String className, Object... objects) {
-		
+		//System.out.println("Build by reflection class "+ className); 
 		try {
 			Constructor<?>[] constructors = Class.forName(className).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {

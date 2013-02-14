@@ -4,6 +4,7 @@ import gui.Gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -12,7 +13,7 @@ import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class JBotSim {
+public class JBotSim implements Serializable{
 	
 	protected HashMap<String,Arguments> arguments;
 	protected Random random = new Random();

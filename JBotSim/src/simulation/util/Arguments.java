@@ -78,6 +78,26 @@ public class Arguments implements Serializable {
 		parseString(unparsedArgumentString);
 	}
 	
+	public static String replaceAndGetArguments(String argName, String arg ,String by,List<String> removedStrings){
+		Pattern p = Pattern.compile(argName+"=\\w*(\\.\\w*)*");
+	 	Matcher m = p.matcher(arg);
+
+		while(m.find()) {
+			String found = m.group();
+			String[] split = found.split("=");
+			removedStrings.add(split[1]);
+			arg = m.replaceFirst(by);
+			m = p.matcher(arg);
+	 	}
+		return arg;
+	}
+	
+	public static String repleceTagByStrings(String argName, String arg, String tag, List<String> newStrings){
+		for(String s : newStrings)
+			arg = arg.replaceFirst(tag, argName+"="+s);
+		return arg;
+	}
+	
 	private String translateClasses(String arg) {
 		Pattern p = Pattern.compile("classname=\\w*(\\.\\w*)*");
 	 	Matcher m = p.matcher(arg);

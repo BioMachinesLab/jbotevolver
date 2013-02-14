@@ -34,7 +34,7 @@ public class TMazeEnvironment extends Environment {
 	private double widthChange = 0;
 	private double randomizeOrientation = 0;
 	private String mazeName;
-	private FileProvider fileProvider;
+	//private FileProvider fileProvider;
 	private int numberOfMazes;
 	private int numberOfDifferentSamples;
 	
@@ -52,7 +52,7 @@ public class TMazeEnvironment extends Environment {
 		super(simulator, arguments);
 		
 		this.random = simulator.getRandom();
-		this.fileProvider = simulator.getFileProvider();
+		//this.fileProvider = simulator.getFileProvider();
 		
 		this.firstWall = firstWall;
 		
@@ -94,7 +94,7 @@ public class TMazeEnvironment extends Environment {
 			int currentMaze = currentSample % numberOfMazes;
 			
 			try {
-				Scanner s = new Scanner(fileProvider.getFile("mazes/"+mazeName+currentMaze+".txt"));
+				Scanner s = new Scanner(simulator.getFileProvider().getFile("mazes/"+mazeName+currentMaze+".txt"));
 				s.useDelimiter("\n");
 				if(!randomize || currentSample < numberOfDifferentSamples) {
 					fitnesssample = currentSample % numberOfDifferentSamples;
