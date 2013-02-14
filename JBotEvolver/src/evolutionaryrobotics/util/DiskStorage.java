@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,7 +16,7 @@ import java.util.zip.GZIPOutputStream;
 import simulation.util.Arguments;
 import evolutionaryrobotics.populations.Population;
 
-public class DiskStorage {
+public class DiskStorage implements Serializable{
 	String outputDirectory;
 	Vector<String> argumentsForShowBestIndividual = new Vector<String>();
 	Vector<String> argumentsForRestartEvolution = new Vector<String>();

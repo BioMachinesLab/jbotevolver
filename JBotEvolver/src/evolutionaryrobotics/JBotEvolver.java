@@ -19,9 +19,9 @@ import gui.Gui;
 
 public class JBotEvolver extends JBotSim {
 	
-	private DiskStorage diskStorage;
-	private TaskExecutor taskExecutor;
-	
+//	private DiskStorage diskStorage;
+//	private TaskExecutor taskExecutor;
+//	
 	public JBotEvolver(String[] args) throws Exception {
 		super(args);
 		if(arguments.get("--gui") != null)
@@ -42,16 +42,7 @@ public class JBotEvolver extends JBotSim {
 		return null;
 	}
 	
-	public Evolution getEvolution() {
-		if(arguments.get("--output") != null) {
-			diskStorage = new DiskStorage(arguments.get("--output").getCompleteArgumentString());
-			try {
-				diskStorage.start();
-				diskStorage.saveCommandlineArguments(arguments);
-			} catch(Exception e) {e.printStackTrace(); System.exit(-1);}
-		}
-		return Evolution.getEvolution(this,arguments.get("--evolution"));
-	}
+
 	
 	public void setChromosome(ArrayList<Robot> robots, Chromosome chromosome) {
 		for (Robot r : robots) {
@@ -62,24 +53,7 @@ public class JBotEvolver extends JBotSim {
 		}	
 	}
 	
-	public void submitTask(Task task) {
-		if(taskExecutor == null) {
-			if(arguments.get("--executor") != null) {
-				taskExecutor = TaskExecutor.getTaskExecutor(this,arguments.get("--executor"));
-				taskExecutor.setDaemon(true);
-				taskExecutor.start();
-			}
-		}
-		taskExecutor.addTask(task);
-	}
 
-	public Result getResult() {
-		return taskExecutor.getResult();
-	}
-	
-	public void evolutionFinished() {
-		taskExecutor.stopTasks();
-	}
 	
 	@Override
 	protected void loadArguments(String[] args) throws IOException, ClassNotFoundException {
@@ -98,9 +72,7 @@ public class JBotEvolver extends JBotSim {
 		}
 	}
 
-	public DiskStorage getDiskStorage() {
-		return diskStorage;
-	}
+	
 
 	public void setupBestIndividual(Simulator simulator) {
 		

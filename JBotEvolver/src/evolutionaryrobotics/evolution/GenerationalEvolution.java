@@ -9,6 +9,7 @@ import taskexecutor.tasks.GenerationalTask;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.MainExecutor;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
 
@@ -17,8 +18,10 @@ public class GenerationalEvolution extends Evolution {
 	private Population population;
 	private boolean supressMessages = false;
 
-	public GenerationalEvolution(JBotEvolver jBotEvolver, Arguments args) {
-		super(jBotEvolver, args);
+
+	public GenerationalEvolution(MainExecutor executor,JBotEvolver jBotEvolver, Arguments args) {
+		super(executor, jBotEvolver, args);
+		this.executor = executor;
 		Arguments populationArguments = jBotEvolver.getArguments().get("--population");
 		populationArguments.setArgument("genomelength", getGenomeLength());
 		supressMessages = args.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
@@ -38,6 +41,8 @@ public class GenerationalEvolution extends Evolution {
 		if(population.getNumberOfCurrentGeneration() == 0)
 			population.createRandomPopulation();
 		
+		executor.prepareArguments(jBotEvolver.getArguments());
+		
 		while(!population.evolutionDone()) {
 			
 			Chromosome c;
@@ -48,7 +53,7 @@ public class GenerationalEvolution extends Evolution {
 				jBotEvolver.getRandom().setSeed(population.getGenerationRandomSeed());
 				
 				int samples = population.getNumberOfSamplesPerChromosome();
-				jBotEvolver.submitTask(new GenerationalTask(jBotEvolver,samples,c,population.getGenerationRandomSeed()));
+				executor.submitTask(new GenerationalTask(jBotEvolver,samples,c,population.getGenerationRandomSeed()));
 				totalChromosomes++;
 				print(".");
 			}
@@ -56,7 +61,7 @@ public class GenerationalEvolution extends Evolution {
 			print("\n");
 			
 			while(totalChromosomes-- > 0) {
-				SimpleFitnessResult result = (SimpleFitnessResult)jBotEvolver.getResult();
+				SimpleFitnessResult result = (SimpleFitnessResult)executor.getResult();
 				population.setEvaluationResultForId(result.getChromosomeId(), result.getFitness());
 				print("!");
 			}
@@ -67,7 +72,7 @@ public class GenerationalEvolution extends Evolution {
 					"\tLowest: "+population.getLowestFitness()+"\n");
 			
 			try {
-				jBotEvolver.getDiskStorage().savePopulation(population, jBotEvolver.getRandom());
+				executor.getDiskStorage().savePopulation(population, jBotEvolver.getRandom());
 			} catch(Exception e) {e.printStackTrace();}
 			
 			population.createNextGeneration();

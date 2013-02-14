@@ -2,6 +2,9 @@ package taskexecutor.tasks;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import comm.FileProvider;
+
 import result.Result;
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -31,7 +34,7 @@ public class GenerationalTask extends JBotEvolverTask {
 		
 		for(int i = 0 ; i < samples ; i++) {
 			Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
-			
+			simulator.setFileProvider(getFileProvider());
 			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
 			
 			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
@@ -49,4 +52,5 @@ public class GenerationalTask extends JBotEvolverTask {
 		SimpleFitnessResult fr = new SimpleFitnessResult(chromosome.getID(),fitness/samples);
 		return fr;
 	}
+	
 }

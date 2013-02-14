@@ -1,53 +1,66 @@
 package taskexecutor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import result.Result;
 import simulation.util.Arguments;
-import simulation.util.ClassSearchUtils;
 import tasks.Task;
 import client.Client;
 
 import comm.ClientPriority;
 
 import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.MainExecutor;
 
 public class ConillonTaskExecutor extends TaskExecutor {
-	
+
 	private Client client;
-	
-	public ConillonTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
-		super(jBotEvolver,args);
-		
-		ClientPriority priority = getPriority(args.getArgumentAsIntOrSetDefault("priority", 10));
-		
-		int serverPort = args.getArgumentAsIntOrSetDefault("serverport",0);
-		int codePort = args.getArgumentAsIntOrSetDefault("codeport",0);
-		String serverName = args.getArgumentAsStringOrSetDefault("server","evolve.dcti.iscte.pt");
-		
-		client = new Client(priority, serverName, serverPort, serverName, codePort);
-		
-		prepareArguments(jBotEvolver.getArguments());
+
+	public ConillonTaskExecutor(MainExecutor executor, JBotEvolver jBotEvolver,
+			Arguments args) {
+		super(executor, jBotEvolver, args);
+
+		ClientPriority priority = getPriority(args
+				.getArgumentAsIntOrSetDefault("priority", 10));
+
+		int serverPort = args.getArgumentAsIntOrSetDefault("serverport", 0);
+		int codePort = args.getArgumentAsIntOrSetDefault("codeport", 0);
+		String serverName = args.getArgumentAsStringOrSetDefault("server",
+				"evolve.dcti.iscte.pt");
+
+		client = new Client(priority, serverName, serverPort, serverName,
+				codePort);
+
+		//prepareArguments(jBotEvolver.getArguments());
 	}
-	
-	private void prepareArguments(HashMap<String,Arguments> arguments) {
-		
-		String packageName = client.getPackageName();
-		
-		for(String name : arguments.keySet()) {
+
+	@Override
+	public void prepareArguments(HashMap<String, Arguments> arguments) {
+
+		for (String name : arguments.keySet()) {
 			Arguments args = arguments.get(name);
-			String completeArgs = args.getCompleteArgumentString();
-			completeArgs = completeArgs.replaceAll("classname=", "classname="+packageName+".");
-			args.setArgument(name, completeArgs);
+			ArrayList<String> classNames = new ArrayList<String>();
+			String completeArgs = Arguments.replaceAndGetArguments("classname",
+					args.getCompleteArgumentString(), "__PLACEHOLDER__",
+					classNames);
+			for (int i = 0; i < classNames.size(); i++) {
+				String packageName = client.getPackageName(classNames.get(i));
+				classNames.set(i, packageName + classNames.get(i));
+			}
+			completeArgs = Arguments.repleceTagByStrings("classname",
+					completeArgs, "__PLACEHOLDER__", classNames);
+			arguments.put(name, new Arguments(completeArgs));
+			//args.setArgument(name, completeArgs);
+			System.out.println(arguments.get(name));
 		}
 	}
-	
+
 	@Override
 	public void addTask(Task t) {
 		client.commit(t);
 	}
-	
+
 	@Override
 	public void stopTasks() {
 		client.cancelAllTasks();
@@ -58,12 +71,11 @@ public class ConillonTaskExecutor extends TaskExecutor {
 	public Result getResult() {
 		return client.getNextResult();
 	}
-	
+
 	private ClientPriority getPriority(int priority) {
-			return
-				(priority < 2) ? ClientPriority.VERY_HIGH :
-				(priority < 4) ? ClientPriority.HIGH :
-				(priority < 7) ? ClientPriority.NORMAL :
-				ClientPriority.LOW;
+		return (priority < 2) ? ClientPriority.VERY_HIGH
+				: (priority < 4) ? ClientPriority.HIGH
+						: (priority < 7) ? ClientPriority.NORMAL
+								: ClientPriority.LOW;
 	}
 }
