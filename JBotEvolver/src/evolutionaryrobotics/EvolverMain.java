@@ -1,16 +1,12 @@
 package evolutionaryrobotics;
 
 import java.util.HashMap;
-
-import result.Result;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
-import taskexecutor.tasks.GenerationalTask;
-import tasks.Task;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.util.DiskStorage;
 
-public class EvolverMain implements MainExecutor {
+public class EvolverMain {
 	private DiskStorage diskStorage;
 	private TaskExecutor taskExecutor;
 	private HashMap<String, Arguments> arguments;
@@ -20,12 +16,12 @@ public class EvolverMain implements MainExecutor {
 		jBot = new JBotEvolver(args);
 		arguments = jBot.getArguments();
 		getEvolution().executeEvolution();
+		evolutionFinished();
 	}
 
 	public Evolution getEvolution() {
 		if (arguments.get("--executor") != null) {
-			taskExecutor = TaskExecutor.getTaskExecutor(this, jBot,
-					arguments.get("--executor"));
+			taskExecutor = TaskExecutor.getTaskExecutor(jBot,arguments.get("--executor"));
 			taskExecutor.setDaemon(true);
 			taskExecutor.start();
 		}
@@ -40,34 +36,14 @@ public class EvolverMain implements MainExecutor {
 				System.exit(-1);
 			}
 		}
-		return Evolution.getEvolution(this, jBot, arguments.get("--evolution"));
-	}
-
-	@Override
-	public void submitTask(Task task) {
-		taskExecutor.addTask(task);
-	}
-
-	@Override
-	public Result getResult() {
-		return taskExecutor.getResult();
+		return Evolution.getEvolution(jBot, taskExecutor, arguments.get("--evolution"));
 	}
 
 	public void evolutionFinished() {
 		taskExecutor.stopTasks();
 	}
 
-	@Override
-	public DiskStorage getDiskStorage() {
-		return diskStorage;
-	}
-
 	public static void main(String[] args) throws Exception {
 		new EvolverMain(args);
-	}
-
-	@Override
-	public void prepareArguments(HashMap<String, Arguments> arguments) {
-		taskExecutor.prepareArguments(arguments);
 	}
 }

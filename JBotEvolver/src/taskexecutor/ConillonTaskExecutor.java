@@ -2,24 +2,19 @@ package taskexecutor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import result.Result;
 import simulation.util.Arguments;
 import tasks.Task;
 import client.Client;
-
 import comm.ClientPriority;
-
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.MainExecutor;
 
 public class ConillonTaskExecutor extends TaskExecutor {
 
 	private Client client;
 
-	public ConillonTaskExecutor(MainExecutor executor, JBotEvolver jBotEvolver,
-			Arguments args) {
-		super(executor, jBotEvolver, args);
+	public ConillonTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
+		super(jBotEvolver, args);
 
 		ClientPriority priority = getPriority(args
 				.getArgumentAsIntOrSetDefault("priority", 10));
@@ -52,7 +47,6 @@ public class ConillonTaskExecutor extends TaskExecutor {
 					completeArgs, "__PLACEHOLDER__", classNames);
 			arguments.put(name, new Arguments(completeArgs));
 			//args.setArgument(name, completeArgs);
-			System.out.println(arguments.get(name));
 		}
 	}
 

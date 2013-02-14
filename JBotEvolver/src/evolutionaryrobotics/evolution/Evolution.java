@@ -2,30 +2,27 @@ package evolutionaryrobotics.evolution;
 
 import simulation.util.Arguments;
 import simulation.util.Factory;
+import taskexecutor.TaskExecutor;
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.MainExecutor;
 
 public abstract class Evolution {
 
 	protected JBotEvolver jBotEvolver;
-	protected MainExecutor executor;
+	protected TaskExecutor taskExecutor;
 
-	public Evolution(MainExecutor executor, JBotEvolver jBotEvolver,
-			Arguments args) {
-		this.executor = executor;
+	public Evolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
+		this.taskExecutor = taskExecutor;
 		this.jBotEvolver = jBotEvolver;
 	}
 
 	public abstract void executeEvolution();
 	
-	public static Evolution getEvolution(MainExecutor executor,
-			JBotEvolver jBotEvolver, Arguments arguments) {
+	public static Evolution getEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Evolution 'classname' not defined: "
 					+ arguments.toString());
 
 		return (Evolution) Factory.getInstance(
-				arguments.getArgumentAsString("classname"), executor,
-				jBotEvolver, arguments);
+				arguments.getArgumentAsString("classname"), jBotEvolver, taskExecutor, arguments);
 	}
 }

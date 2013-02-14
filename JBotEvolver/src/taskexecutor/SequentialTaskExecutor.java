@@ -1,9 +1,7 @@
 package taskexecutor;
 
 import java.util.LinkedList;
-
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.MainExecutor;
 import result.Result;
 import simulation.util.Arguments;
 import tasks.Task;
@@ -13,9 +11,8 @@ public class SequentialTaskExecutor extends TaskExecutor {
 	private LinkedList<Task> tasksToDo = new LinkedList<Task>();
 	private LinkedList<Task> tasksDone = new LinkedList<Task>();
 
-	public SequentialTaskExecutor(MainExecutor executor,
-			JBotEvolver jBotEvolver, Arguments args) {
-		super(executor, jBotEvolver, args);
+	public SequentialTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
+		super(jBotEvolver, args);
 	}
 
 	@Override
