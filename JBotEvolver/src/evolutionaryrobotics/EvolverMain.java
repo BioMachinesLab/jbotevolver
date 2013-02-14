@@ -20,7 +20,6 @@ public class EvolverMain implements MainExecutor {
 		jBot = new JBotEvolver(args);
 		arguments = jBot.getArguments();
 		getEvolution().executeEvolution();
-
 	}
 
 	public Evolution getEvolution() {
@@ -64,15 +63,11 @@ public class EvolverMain implements MainExecutor {
 	}
 
 	public static void main(String[] args) throws Exception {
-
 		new EvolverMain(args);
-
 	}
 
 	@Override
 	public void prepareArguments(HashMap<String, Arguments> arguments) {
 		taskExecutor.prepareArguments(arguments);
-
 	}
-
 }
