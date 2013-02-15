@@ -22,7 +22,7 @@ public abstract class TaskExecutor extends Thread {
 	public void stopTasks() {
 	}
 
-	public static TaskExecutor getTaskExecutor(JBotEvolver jBotEvolver, Arguments arguments) {
+	public synchronized static TaskExecutor getTaskExecutor(JBotEvolver jBotEvolver, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Evolution 'name' not defined: "
 					+ arguments.toString());

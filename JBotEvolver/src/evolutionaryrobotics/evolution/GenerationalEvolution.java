@@ -28,10 +28,22 @@ public class GenerationalEvolution extends Evolution {
 		
 		try {
 			population = Population.getPopulation(jBotEvolver.getArguments().get("--population"));
-			population.setRandomNumberGenerator(new Random(jBotEvolver.getRandom().nextInt()));
+			population.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
 		} catch(Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
+		}
+		
+		if (jBotEvolver.getArguments().get("--output") != null) {
+			diskStorage = new DiskStorage(jBotEvolver.getArguments().get("--output")
+					.getCompleteArgumentString());
+			try {
+				diskStorage.start();
+				diskStorage.saveCommandlineArguments(jBotEvolver.getArguments());
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
 		}
 	}
 	
@@ -50,10 +62,13 @@ public class GenerationalEvolution extends Evolution {
 			int totalChromosomes = 0;
 			
 			while ((c = population.getNextChromosomeToEvaluate()) != null) {
-				jBotEvolver.getRandom().setSeed(population.getGenerationRandomSeed());
-				
 				int samples = population.getNumberOfSamplesPerChromosome();
-				taskExecutor.addTask(new GenerationalTask(jBotEvolver,samples,c,population.getGenerationRandomSeed()));
+				
+				taskExecutor.addTask(new GenerationalTask(
+						new JBotEvolver(jBotEvolver.getArgumentsCopy(), jBotEvolver.getRandomSeed()),
+						samples,c,population.getGenerationRandomSeed())
+				);
+				
 				totalChromosomes++;
 				print(".");
 			}
@@ -72,7 +87,7 @@ public class GenerationalEvolution extends Evolution {
 					"\tLowest: "+population.getLowestFitness()+"\n");
 			
 			try {
-				diskStorage.savePopulation(population, jBotEvolver.getRandom());
+				diskStorage.savePopulation(population);
 			} catch(Exception e) {e.printStackTrace();}
 			
 			population.createNextGeneration();
@@ -81,7 +96,7 @@ public class GenerationalEvolution extends Evolution {
 	
 	private int getGenomeLength() {
 		
-		Simulator sim = jBotEvolver.createSimulator(new Random(jBotEvolver.getRandom().nextLong()));
+		Simulator sim = jBotEvolver.createSimulator();
 		Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots"));
 		Controller c = Controller.getController(sim,r, jBotEvolver.getArguments().get("--controllers"));
 		

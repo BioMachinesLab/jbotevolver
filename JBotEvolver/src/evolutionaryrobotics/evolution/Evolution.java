@@ -17,7 +17,7 @@ public abstract class Evolution {
 
 	public abstract void executeEvolution();
 	
-	public static Evolution getEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arguments) {
+	public synchronized static Evolution getEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Evolution 'classname' not defined: "
 					+ arguments.toString());

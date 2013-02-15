@@ -3,25 +3,24 @@ package evolutionaryrobotics;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import result.Result;
+import java.util.HashMap;
+
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.robot.Robot;
-import taskexecutor.TaskExecutor;
-import tasks.Task;
+import simulation.util.Arguments;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
-import evolutionaryrobotics.util.DiskStorage;
 import gui.Gui;
 
 public class JBotEvolver extends JBotSim {
 	
-//	private DiskStorage diskStorage;
-//	private TaskExecutor taskExecutor;
-//	
+	public JBotEvolver(HashMap<String,Arguments> arguments, long randomSeed) {
+		super(arguments,randomSeed);
+	}
+	
 	public JBotEvolver(String[] args) throws Exception {
 		super(args);
 		if(arguments.get("--gui") != null)
@@ -42,8 +41,6 @@ public class JBotEvolver extends JBotSim {
 		return null;
 	}
 	
-
-	
 	public void setChromosome(ArrayList<Robot> robots, Chromosome chromosome) {
 		for (Robot r : robots) {
 			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
@@ -52,8 +49,6 @@ public class JBotEvolver extends JBotSim {
 			}
 		}	
 	}
-	
-
 	
 	@Override
 	protected void loadArguments(String[] args) throws IOException, ClassNotFoundException {
@@ -71,8 +66,6 @@ public class JBotEvolver extends JBotSim {
 				arguments.get("--population").setArgument("parentfolder", parentFolder);
 		}
 	}
-
-	
 
 	public void setupBestIndividual(Simulator simulator) {
 		

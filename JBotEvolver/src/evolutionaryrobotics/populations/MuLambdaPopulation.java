@@ -4,9 +4,7 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
-
 import evolutionaryrobotics.neuralnetworks.Chromosome;
-import simulation.Simulator;
 import simulation.util.Arguments;
 
 /**
@@ -31,7 +29,6 @@ public class MuLambdaPopulation extends Population implements Serializable {
 	protected int numberOfChromosomesEvaluated;
 	protected int nextChromosomeToEvaluate;
 	protected int numberOfElites = 5;
-	protected double mutationRate = 0.05;
 	protected int lambda = 5;
 	protected boolean fitnessThresholdReached = false;
 	
@@ -56,10 +53,6 @@ public class MuLambdaPopulation extends Population implements Serializable {
 					initialWeights[i] = Double.parseDouble(rawArray[i]);
 			} 
 		}
-	}
-
-	public void setMutationRate(double mutationRate) {
-		this.mutationRate = mutationRate;
 	}
 
 	@Override
@@ -221,7 +214,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 
 	@Override
 	public Chromosome getNextChromosomeToEvaluate() {
-		randomNumberGenerator.setSeed(getGenerationRandomSeed());
+//		randomNumberGenerator.setSeed(getGenerationRandomSeed());
 
 		if (nextChromosomeToEvaluate < populationSize) {
 			return chromosomes[nextChromosomeToEvaluate++];

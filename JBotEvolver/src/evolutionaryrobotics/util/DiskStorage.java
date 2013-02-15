@@ -134,7 +134,7 @@ public class DiskStorage implements Serializable{
 		}
 	}
 
-	public void savePopulation(Population populationA, Population populationB, Random simRandom) throws IOException {
+	public void savePopulation(Population populationA, Population populationB) throws IOException {
 		if (outputDirectory != null) {
 			updateFitnessLog(populationA, populationB);
 
@@ -145,22 +145,20 @@ public class DiskStorage implements Serializable{
 			// Save the generation number
 			saveGenerationNumber(populationA);
 
-			int randomSeed = simRandom.nextInt();
+			// Save the show best file
+			saveShowBestFile(populationA, populationB, populationA.getGenerationRandomSeed());
 
 			// Save the show best file
-			saveShowBestFile(populationA, populationB, randomSeed);
-
-			// Save the show best file
-			saveShowCurrentBest(populationA, populationB, randomSeed, "A","B");
-			saveShowCurrentBest(populationB, populationA, randomSeed, "B","A");
+			saveShowCurrentBest(populationA, populationB, populationA.getGenerationRandomSeed(), "A","B");
+			saveShowCurrentBest(populationB, populationA, populationB.getGenerationRandomSeed(), "B","A");
 
 			// Save the restart file
-			saveRestartFile(populationA, populationB, randomSeed);
+			saveRestartFile(populationA, populationB, populationA.getGenerationRandomSeed());
 
 		}
 	}
 
-	public void savePopulation(Population population, Random simRandom)
+	public void savePopulation(Population population)
 			throws IOException {
 		if (outputDirectory != null) {
 			updateFitnessLog(population);
@@ -171,16 +169,14 @@ public class DiskStorage implements Serializable{
 			// Save the generation number
 			saveGenerationNumber(population);
 
-			int randomSeed = simRandom.nextInt();
+			// Save the show best file
+			saveShowBestFile(population, population.getGenerationRandomSeed());
 
 			// Save the show best file
-			saveShowBestFile(population, randomSeed);
-
-			// Save the show best file
-			saveShowCurrentBest(population, randomSeed);
+			saveShowCurrentBest(population, population.getGenerationRandomSeed());
 
 			// Save the restart file
-			saveRestartFile(population, randomSeed);
+			saveRestartFile(population, population.getGenerationRandomSeed());
 		}
 	}
 
@@ -206,7 +202,7 @@ public class DiskStorage implements Serializable{
 	}
 
 	private void saveShowCurrentBest(Population populationA,
-			Population populationB, int randomSeed, String prefixA,
+			Population populationB, long randomSeed, String prefixA,
 			String prefixB) throws FileNotFoundException {
 		PrintStream currentShowBestFile = openForWriting(outputDirectory + "/_"
 				+ prefixA + showBestFilename + "_current.conf");
@@ -226,7 +222,7 @@ public class DiskStorage implements Serializable{
 		currentShowBestFile.close();
 	}
 
-	private void saveShowCurrentBest(Population population, int randomSeed)
+	private void saveShowCurrentBest(Population population, long randomSeed)
 			throws FileNotFoundException {
 		PrintStream currentShowBestFile = openForWriting(outputDirectory + "/_"
 				+ showBestFilename + "_current.conf");
@@ -243,7 +239,7 @@ public class DiskStorage implements Serializable{
 	}
 
 	private void saveRestartFile(Population populationA,
-			Population populationB, int randomSeed)
+			Population populationB, long randomSeed)
 			throws FileNotFoundException {
 		PrintStream restartFile = openForWriting(outputDirectory + "/"
 				+ restartFilename);
@@ -260,7 +256,7 @@ public class DiskStorage implements Serializable{
 		restartFile.close();
 	}
 
-	private void saveRestartFile(Population population, int randomSeed)
+	private void saveRestartFile(Population population, long randomSeed)
 			throws FileNotFoundException {
 		PrintStream restartFile = openForWriting(outputDirectory + "/"
 				+ restartFilename);
@@ -277,7 +273,7 @@ public class DiskStorage implements Serializable{
 	}
 
 	private void saveShowBestFile(Population populationA,
-			Population populationB, int randomSeed)
+			Population populationB, long randomSeed)
 			throws FileNotFoundException {
 		PrintStream showBestFile = openForWriting(outputDirectory
 				+ "/show_best/" + showBestFilename
@@ -297,7 +293,7 @@ public class DiskStorage implements Serializable{
 
 	}
 
-	private void saveShowBestFile(Population population, int randomSeed)
+	private void saveShowBestFile(Population population, long randomSeed)
 			throws FileNotFoundException {
 		PrintStream showBestFile = openForWriting(outputDirectory
 				+ "/show_best/" + showBestFilename

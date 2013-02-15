@@ -2,9 +2,6 @@ package taskexecutor.tasks;
 
 import java.util.ArrayList;
 import java.util.Random;
-
-import comm.FileProvider;
-
 import result.Result;
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -21,7 +18,7 @@ public class GenerationalTask extends JBotEvolverTask {
 	private Random random;
 	private JBotEvolver jBotEvolver;
 	
-	public GenerationalTask(JBotEvolver jBotEvolver, int samples, Chromosome chromosome, int seed) {
+	public GenerationalTask(JBotEvolver jBotEvolver, int samples, Chromosome chromosome, long seed) {
 		super(jBotEvolver);
 		this.samples = samples;
 		this.chromosome = chromosome;
@@ -35,13 +32,14 @@ public class GenerationalTask extends JBotEvolverTask {
 		for(int i = 0 ; i < samples ; i++) {
 			Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
 			simulator.setFileProvider(getFileProvider());
+			
 			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
 			
 			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 			jBotEvolver.setChromosome(robots, chromosome);
 			simulator.addRobots(robots);
 			
-			EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
+			EvaluationFunction eval = EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get("--evaluation"));
 			simulator.addCallback(eval);
 			simulator.simulate();
 			
@@ -52,5 +50,4 @@ public class GenerationalTask extends JBotEvolverTask {
 		SimpleFitnessResult fr = new SimpleFitnessResult(chromosome.getID(),fitness/samples);
 		return fr;
 	}
-	
 }

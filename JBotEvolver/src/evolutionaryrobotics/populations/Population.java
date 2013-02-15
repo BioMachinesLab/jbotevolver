@@ -4,14 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
-
-import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
-
-import simulation.Simulator;
 import simulation.util.Arguments;
 import simulation.util.Factory;
 
@@ -21,7 +16,7 @@ import simulation.util.Factory;
  * @author alc
  */
 public abstract class Population implements Serializable {
-	protected int generationRandomSeed;
+	protected long generationRandomSeed;
 	protected int numberOfSamplesPerChromosome;
 	protected int numberOfGenerations    = 100;
 
@@ -44,8 +39,7 @@ public abstract class Population implements Serializable {
 	protected Random    randomNumberGenerator;
 	
 	public Population(Arguments arguments) {
-//		this.randomNumberGenerator = simulator.getRandom();
-//		generationRandomSeed = randomNumberGenerator.nextInt();
+		this.randomNumberGenerator = new Random(0);
 		
 		if (arguments.getArgumentIsDefined("increasestepsperrun")) {
 			setIncreasingStepPerFitnessSample(arguments.getArgumentAsInt("startsteps"), 
@@ -63,7 +57,7 @@ public abstract class Population implements Serializable {
 			enableFitnessThreshold(arguments.getArgumentAsDouble("fitnessthreshold"), 
 					arguments.getArgumentAsInt("numberofgenerationsabovefitnessthresholdrequired"));
 		}
-
+		
 		if (arguments.getArgumentIsDefined("mutationrate")) { 
 			setMutationRate(arguments.getArgumentAsDouble("mutationrate"));
 		}
@@ -75,7 +69,6 @@ public abstract class Population implements Serializable {
 		if (arguments.getArgumentIsDefined("generations")) {
 			setNumberOfGenerations(arguments.getArgumentAsInt("generations"));
 		}
-//		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 	}
 
 	/** 
@@ -151,7 +144,7 @@ public abstract class Population implements Serializable {
      * 
      * @param seed the random seed for this generation.
      */
-	public void setGenerationRandomSeed(int seed) {
+	public void setGenerationRandomSeed(long seed) {
 		generationRandomSeed = seed;
 	}
         
@@ -160,7 +153,7 @@ public abstract class Population implements Serializable {
      * @return the random seed for this generation.
      */
 
-    public int getGenerationRandomSeed() {
+    public long getGenerationRandomSeed() {
 		return generationRandomSeed;
     }
     
@@ -329,11 +322,7 @@ public abstract class Population implements Serializable {
 		return currentNumberOfGenerationsAboveFitnessThreshold >= numberOfGenerationsAboveFitnessThresholdRequired;
 	}
 	
-	public void setRandomNumberGenerator(Random r) {
-		this.randomNumberGenerator = r;
-	}
-	
-	public static Population getPopulation(Arguments args) throws Exception {
+	public synchronized static Population getPopulation(Arguments args) throws Exception {
 		
 		if(args.getArgumentIsDefined("load"))
 			return loadPopulationFromFile(args);

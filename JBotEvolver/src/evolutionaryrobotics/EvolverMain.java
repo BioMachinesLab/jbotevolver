@@ -7,7 +7,6 @@ import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.util.DiskStorage;
 
 public class EvolverMain {
-	private DiskStorage diskStorage;
 	private TaskExecutor taskExecutor;
 	private HashMap<String, Arguments> arguments;
 	private JBotEvolver jBot;
@@ -24,17 +23,6 @@ public class EvolverMain {
 			taskExecutor = TaskExecutor.getTaskExecutor(jBot,arguments.get("--executor"));
 			taskExecutor.setDaemon(true);
 			taskExecutor.start();
-		}
-		if (arguments.get("--output") != null) {
-			diskStorage = new DiskStorage(arguments.get("--output")
-					.getCompleteArgumentString());
-			try {
-				diskStorage.start();
-				diskStorage.saveCommandlineArguments(arguments);
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
 		}
 		return Evolution.getEvolution(jBot, taskExecutor, arguments.get("--evolution"));
 	}
