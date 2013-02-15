@@ -12,14 +12,13 @@ public class EpuckIRNNInput extends NNInput{
 		this.epuckSensor = (EpuckIRSensor) epuckSensor;
 	}
 
-//	@Override
+	@Override
 	public int getNumberOfInputValues() {
 		return epuckSensor.getNumberOfSensors();
 	}
 
-//	@Override
+	@Override
 	public double getValue(int index) {
 		return epuckSensor.getSensorReading(index);
 	}
-
 }

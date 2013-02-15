@@ -23,9 +23,9 @@ public class Factory implements Serializable{
 		return map;
 	}
 
-	
-	public static Object getInstance(String className, Object... objects) {
+	public synchronized static Object getInstance(String className, Object... objects) {
 		//System.out.println("Build by reflection class "+ className); 
+		String s = "";
 		try {
 			Constructor<?>[] constructors = Class.forName(className).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
@@ -38,19 +38,25 @@ public class Factory implements Serializable{
 						if(params[i].isPrimitive())
 							c = map.get(objects[i].getClass());
 						
+						s+=params[i].getName()+"=="+c.getName()+"\n";
+						
 						if(!params[i].isAssignableFrom(c)) {
 							found = false;
 							break;
 						}
 					}
+					s+="\n_____\n";
 					if(found) {
 						return constructor.newInstance(objects);
 					}
 				}
 			}
+			System.out.println(s);
+			
+			System.out.println(className+" ## "+Class.forName(className).getName());
 		} catch (Exception e) {
 			e.printStackTrace();
-		} 
+		}
 		throw new RuntimeException("Unknown classname: " + className);
 	}
 }

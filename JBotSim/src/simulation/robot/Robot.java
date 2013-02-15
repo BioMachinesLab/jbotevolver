@@ -354,7 +354,7 @@ public class Robot extends MovableObject {
 		return null;
 	}
 	
-	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
+	public synchronized static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
 		int numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
 		ArrayList<Robot> robots = new ArrayList<Robot>(numberOfRobots);
 		for(int i = 0 ; i < numberOfRobots ; i++)
@@ -362,7 +362,7 @@ public class Robot extends MovableObject {
 		return robots;
 	}
 
-	public static Robot getRobot(Simulator simulator, Arguments arguments) {
+	public synchronized static Robot getRobot(Simulator simulator, Arguments arguments) {
 		Robot robot = createRobot(simulator, arguments);
 
 		addSensors(simulator, robot, arguments);

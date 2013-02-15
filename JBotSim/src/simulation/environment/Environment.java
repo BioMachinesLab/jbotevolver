@@ -190,7 +190,7 @@ public abstract class Environment implements KeyListener, Serializable {
 			addRobot(r);
 	}
 	
-	public static Environment getEnvironment(Simulator simulator, Arguments arguments) {
+	public synchronized static Environment getEnvironment(Simulator simulator, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Environment 'classname' not defined: "+ arguments.toString());
 		

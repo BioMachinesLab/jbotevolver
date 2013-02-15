@@ -1,7 +1,6 @@
 package simulation;
 
 import gui.Gui;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -9,15 +8,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import controllers.Controller;
-import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class JBotSim implements Serializable{
 	
 	protected HashMap<String,Arguments> arguments;
-	protected Random random = new Random();
 	protected String parentFolder = "";
+	protected long randomSeed;
+	
+	public JBotSim(HashMap<String,Arguments> arguments, long randomSeed) {
+		this.arguments = arguments;
+		this.randomSeed = randomSeed;
+	}
 	
 	public JBotSim(String[] commandLineArgs) throws IOException, ClassNotFoundException {
 		if (commandLineArgs != null)
@@ -66,10 +69,6 @@ public class JBotSim implements Serializable{
 		return arguments;
 	}
 	
-	public Random getRandom() {
-		return random;
-	}
-	
 	public void savePath(String file) {
 		parentFolder = (new File(file)).getParent();
 	}
@@ -82,11 +81,11 @@ public class JBotSim implements Serializable{
 		
 		arguments = Arguments.parseArgs(args);
 		
-		long randomSeed = 0;
-		if(arguments.get("--random-seed") != null)
-			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());	
+		randomSeed = 0;
 		
-		random.setSeed(randomSeed);
+		if(arguments.get("--random-seed") != null) {
+			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());
+		}
 	}
 	
 	public void loadFile(String filename, String extraArguments) throws IOException, ClassNotFoundException {
@@ -103,5 +102,19 @@ public class JBotSim implements Serializable{
 
 	public Gui getGui() {
 		return Gui.getGui(this,arguments.get("--gui"));
+	}
+	
+	public synchronized HashMap<String,Arguments> getArgumentsCopy() {
+		
+		HashMap<String,Arguments> newArgs = new HashMap<String, Arguments>();
+		
+		for(String s : arguments.keySet())
+			newArgs.put(s, new Arguments(arguments.get(s).getCompleteArgumentString(),false));
+		
+		return newArgs;
+	}
+	
+	public long getRandomSeed() {
+		return randomSeed;
 	}
 }

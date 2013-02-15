@@ -28,7 +28,7 @@ public abstract class Sensor extends SimulatorObject {
 		return id;
 	}
 	
-	public static Sensor getSensor(Robot robot, Simulator simulator, String name, Arguments arguments) {
+	public synchronized static Sensor getSensor(Robot robot, Simulator simulator, String name, Arguments arguments) {
 		int id = arguments.getArgumentAsIntOrSetDefault("id",0);
 		return (Sensor)Factory.getInstance(name, simulator,id,robot,arguments);
 	}

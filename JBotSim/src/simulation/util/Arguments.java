@@ -599,8 +599,8 @@ public class Arguments implements Serializable {
 			throws IOException, ClassNotFoundException {
 		String optionsFilename = null;
 
-		// for(String s : args)
-		// System.out.println(s);
+//		 for(String s : args)
+//			 System.out.println(s);
 
 		if (args.length == 0) {
 
@@ -639,7 +639,6 @@ public class Arguments implements Serializable {
 		// || args[currentIndex].equalsIgnoreCase("help")) {
 		// System.out.println(Util.usageToString());
 		// System.exit(0);
-		// }
 		// }
 		
 		if (args[0].charAt(0) != '-') {

@@ -133,7 +133,7 @@ public abstract class NeuralNetwork implements Serializable{
 	
 	public abstract void reset();
 	
-	public static NeuralNetwork getNeuralNetwork(Simulator simulator, Robot robot, Arguments arguments) {
+	public synchronized static NeuralNetwork getNeuralNetwork(Simulator simulator, Robot robot, Arguments arguments) {
 		
 		Vector<NNInput> inputs = NNInput.getNNInputs(simulator, robot, arguments);
 		Vector<NNOutput> outputs = NNOutput.getNNOutputs(simulator, robot, arguments);

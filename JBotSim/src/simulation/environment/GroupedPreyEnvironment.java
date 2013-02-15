@@ -1,11 +1,7 @@
 package simulation.environment;
 
-
-import gui.renderer.Renderer;
-
 import java.util.Iterator;
 import java.util.Random;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
@@ -15,7 +11,6 @@ import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.sensors.PreyCarriedSensor;
-import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 
 public class GroupedPreyEnvironment extends Environment {

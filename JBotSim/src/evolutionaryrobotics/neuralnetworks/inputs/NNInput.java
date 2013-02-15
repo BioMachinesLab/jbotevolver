@@ -50,7 +50,7 @@ public abstract class NNInput implements Serializable {
 		return nnInputs;
 	}
 
-	public static NNInput createInput(Simulator simulator, Robot robot, String name, Arguments arguments) {
+	public synchronized static NNInput createInput(Simulator simulator, Robot robot, String name, Arguments arguments) {
 		int id = 0;
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");

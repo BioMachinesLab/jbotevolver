@@ -9,6 +9,7 @@ import controllers.FixedLenghtGenomeEvolvableController;
 
 public class NeuralNetworkController extends Controller implements FixedLenghtGenomeEvolvableController {
 	protected NeuralNetwork neuralNetwork;
+	private boolean printWeights = false;
 
 	public NeuralNetworkController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
@@ -22,6 +23,8 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 				weights[i] = Double.parseDouble(rawArray[i]);
 			setNNWeights(weights);
 		}
+		
+		printWeights = args.getArgumentAsIntOrSetDefault("printweights", 0) == 1;
 	}
 
 	public boolean isAlive() {
@@ -58,6 +61,15 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 
 	@Override
 	public void setNNWeights(double[] weights) {
+		
+		if(printWeights) {
+			for(int i = 0 ; i < weights.length ; i++) {
+				System.out.print(weights[i]);
+				if(i != weights.length - 1)
+					System.out.println();
+			}
+		}
+		
 		neuralNetwork.setWeights(weights);
 	}
 	
@@ -67,6 +79,7 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	}
 
 	public static void setNNWeights(LinkedList<Robot> robots, double[] weights) {
+		
 		for (Robot r : robots) {
 			if (r.getController() instanceof FixedLenghtGenomeEvolvableController){
 				FixedLenghtGenomeEvolvableController nnController = (FixedLenghtGenomeEvolvableController) r.getController();

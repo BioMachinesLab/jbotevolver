@@ -16,7 +16,7 @@ public class TwoRoomsEnvironment extends Environment {
 	
 	private LinkedList<Wall> buttons = new LinkedList<Wall>();
 	private int numberOfPreys = 0;
-	private Random preyRandom = new Random();
+	private Random preyRandom;
 	private Random random;
 	private double splitRatio = 0.7;
 	private int timeBetweenPreys = 100;
@@ -43,7 +43,7 @@ public class TwoRoomsEnvironment extends Environment {
 		super(simulator,arguments);
 		
 		this.random = simulator.getRandom();
-		preyRandom.setSeed(random.nextLong());
+		preyRandom = new Random(random.nextLong());
 		splitRatio = arguments.getArgumentAsDoubleOrSetDefault("splitratio",splitRatio);
 		timeBetweenPreys = arguments.getArgumentAsIntOrSetDefault("timebetweenpreys",timeBetweenPreys);
 		maxPreys = arguments.getArgumentAsIntOrSetDefault("maxpreys",maxPreys);

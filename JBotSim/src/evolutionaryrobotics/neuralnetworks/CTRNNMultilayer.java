@@ -156,5 +156,4 @@ public class CTRNNMultilayer extends NeuralNetwork {
 			System.out.println(w);
 		}
 	}
-
 }

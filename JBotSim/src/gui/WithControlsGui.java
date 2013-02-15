@@ -257,7 +257,7 @@ public class WithControlsGui extends Gui {
 		if(args.get("--gui").getArgumentIsDefined("renderer"))
 			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
 		
-		Simulator simulator = jBotSim.createSimulator();
+		Simulator simulator = jBotSim.createSimulator(new Random(jBotSim.getRandomSeed()));
 		simulator.addRobots(jBotSim.createRobots(simulator));
 		simulator.addCallback(this);
 		simulator.setupEnvironment();

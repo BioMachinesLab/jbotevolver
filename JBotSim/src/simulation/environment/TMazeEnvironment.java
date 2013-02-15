@@ -109,7 +109,8 @@ public class TMazeEnvironment extends Environment {
 		}
 		
 		if(teleport) {
-			double orientation = robots.get(0).getOrientation()+this.randomizeOrientation*2*random.nextDouble()-this.randomizeOrientation;
+			
+			double orientation = robots.get(0).getOrientation()+(random.nextDouble()*2-1)*this.randomizeOrientation;
 			double randomizeX = this.randomizeX*random.nextDouble()*2-this.randomizeX;
 			double randomizeY = this.randomizeY*random.nextDouble()*2-this.randomizeY;
 			robots.get(0).moveTo(new Vector2d(getSquares().peek().getX()+randomizeX,getSquares().peek().getY()+randomizeY));

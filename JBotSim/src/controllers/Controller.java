@@ -59,7 +59,7 @@ public abstract class Controller extends SimulatorObject implements Serializable
 	 */
 	public void reset() {};
 	
-	public static Controller getController(Simulator simulator, Robot robot, Arguments arguments) {
+	public synchronized static Controller getController(Simulator simulator, Robot robot, Arguments arguments) {
 
 		if (!arguments.getArgumentIsDefined("classname"))
 			throw new RuntimeException("Controller 'name' not defined: "+arguments.toString());
