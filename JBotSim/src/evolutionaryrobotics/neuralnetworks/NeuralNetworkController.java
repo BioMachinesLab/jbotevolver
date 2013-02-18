@@ -63,11 +63,13 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	public void setNNWeights(double[] weights) {
 		
 		if(printWeights) {
+			String w = "#weights (total of "+weights.length+")\n";
 			for(int i = 0 ; i < weights.length ; i++) {
-				System.out.print(weights[i]);
-				if(i != weights.length - 1)
-					System.out.println();
+				w+=weights[i];
+				if(i != weights.length-1)
+					w+=",";
 			}
+			System.out.println(w);
 		}
 		
 		neuralNetwork.setWeights(weights);

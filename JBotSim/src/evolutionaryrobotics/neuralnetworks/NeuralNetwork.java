@@ -10,7 +10,6 @@ import simulation.util.Factory;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
-
 public abstract class NeuralNetwork implements Serializable{
 	protected Vector<NNInput> inputs;
 	protected Vector<NNOutput> outputs;
@@ -133,7 +132,7 @@ public abstract class NeuralNetwork implements Serializable{
 	
 	public abstract void reset();
 	
-	public synchronized static NeuralNetwork getNeuralNetwork(Simulator simulator, Robot robot, Arguments arguments) {
+	public static NeuralNetwork getNeuralNetwork(Simulator simulator, Robot robot, Arguments arguments) {
 		
 		Vector<NNInput> inputs = NNInput.getNNInputs(simulator, robot, arguments);
 		Vector<NNOutput> outputs = NNOutput.getNNOutputs(simulator, robot, arguments);

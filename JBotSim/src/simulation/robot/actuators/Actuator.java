@@ -20,7 +20,7 @@ public abstract class Actuator extends SimulatorObject {
 	
 	public abstract void apply(Robot robot);
 	
-	public synchronized static Actuator getActuator(Simulator simulator, String name, Arguments arguments) {
+	public static Actuator getActuator(Simulator simulator, String name, Arguments arguments) {
 		return (Actuator)Factory.getInstance(name, simulator,arguments.getArgumentAsIntOrSetDefault("id",0),arguments);
 	}	
 }

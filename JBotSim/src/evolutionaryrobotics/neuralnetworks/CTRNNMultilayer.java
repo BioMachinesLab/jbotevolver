@@ -18,12 +18,10 @@ public class CTRNNMultilayer extends NeuralNetwork {
 	protected double[]  hiddenTaus;
 	protected double[]  hiddenToOutputWeights;
 	protected double[]  outputBiases;
-	private boolean printWeights = false;
 	
 	public CTRNNMultilayer(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments) {
 		numberOfHiddenNodes = arguments.getArgumentAsIntOrSetDefault("hiddennodes",5);
 		create(inputs, outputs, numberOfHiddenNodes);
-		printWeights = arguments.getArgumentIsDefined("printweights") && arguments.getArgumentAsInt("printweights") == 1;
 	}
 			
 	@Override
@@ -145,15 +143,5 @@ public class CTRNNMultilayer extends NeuralNetwork {
 	public void setWeights(double[] weights) {
 		super.setWeights(weights);
 		reset();
-		
-		if(printWeights) {
-			String w = "#weights (total of "+weights.length+")\n";
-			for(int i = 0 ; i < weights.length ; i++) {
-				w+=weights[i];
-				if(i != weights.length-1)
-					w+=",";
-			}
-			System.out.println(w);
-		}
 	}
 }

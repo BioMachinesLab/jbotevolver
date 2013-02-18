@@ -23,7 +23,7 @@ public class Factory implements Serializable{
 		return map;
 	}
 
-	public synchronized static Object getInstance(String className, Object... objects) {
+	public static Object getInstance(String className, Object... objects) {
 		//System.out.println("Build by reflection class "+ className); 
 		String s = "";
 		try {

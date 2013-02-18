@@ -15,7 +15,7 @@ public abstract class NNOutput implements Serializable{
 	public abstract void setValue(int index, double value);
 	public abstract void apply();
 	
-	public synchronized static Vector<NNOutput> getNNOutputs(Simulator simulator, Robot robot, Arguments arguments) {
+	public static Vector<NNOutput> getNNOutputs(Simulator simulator, Robot robot, Arguments arguments) {
 		Arguments outputs = new Arguments(arguments.getArgumentAsString("outputs"));
 		
 		Vector<NNOutput> nnOutputs = new Vector<NNOutput>();
@@ -31,7 +31,7 @@ public abstract class NNOutput implements Serializable{
 		return nnOutputs;
 	}
 
-	protected synchronized static Vector<NNOutput> getOutputsAutomatically(Robot robot) {
+	protected static Vector<NNOutput> getOutputsAutomatically(Robot robot) {
 		Vector<NNOutput> nnOutputs = new Vector<NNOutput>();
 		Iterator<Actuator> i = robot.getActuators().iterator();
 
@@ -49,7 +49,7 @@ public abstract class NNOutput implements Serializable{
 		return nnOutputs;
 	}
 
-	public synchronized static NNOutput createOutput(Simulator simulator, Robot robot, String name, Arguments arguments) {
+	public static NNOutput createOutput(Simulator simulator, Robot robot, String name, Arguments arguments) {
 		int id = 0;
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");

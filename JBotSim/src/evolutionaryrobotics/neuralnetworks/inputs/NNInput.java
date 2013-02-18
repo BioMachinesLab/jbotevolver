@@ -1,7 +1,6 @@
 package evolutionaryrobotics.neuralnetworks.inputs;
 
 import java.io.Serializable;
-import java.lang.reflect.Constructor;
 import java.util.Iterator;
 import java.util.Vector;
 import simulation.Simulator;
@@ -50,7 +49,7 @@ public abstract class NNInput implements Serializable {
 		return nnInputs;
 	}
 
-	public synchronized static NNInput createInput(Simulator simulator, Robot robot, String name, Arguments arguments) {
+	public static NNInput createInput(Simulator simulator, Robot robot, String name, Arguments arguments) {
 		int id = 0;
 		if (arguments.getArgumentIsDefined("id"))
 			id = arguments.getArgumentAsInt("id");
