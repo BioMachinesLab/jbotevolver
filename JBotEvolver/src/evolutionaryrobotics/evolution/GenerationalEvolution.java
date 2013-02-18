@@ -1,6 +1,5 @@
 package evolutionaryrobotics.evolution;
 
-import java.util.Random;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
