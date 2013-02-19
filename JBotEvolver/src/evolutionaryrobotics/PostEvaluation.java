@@ -40,26 +40,29 @@ public class PostEvaluation {
 		maxTrial = --currentFolder;
 	}
 	
-	public String runPostEval() {
+	public double[][] runPostEval() {
 
-		String result = "";
+		double[][] result = new double[maxTrial][fitnesssamples];
 		
 		try {
 			for(int i = startTrial ; i <= maxTrial ; i++) {
+				
+				int index = i-startTrial;
+				
 				String file = dir+i+"/_showbest_current.conf";
 				JBotEvolver jBotEvolver = new JBotEvolver(new String[]{file});
 				
 				if (jBotEvolver.getArguments().get("--executor") != null) {
 					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
-					taskExecutor.setDaemon(true);
+					taskExecutor.prepareArguments(jBotEvolver.getArguments());
 					taskExecutor.start();
 				}
 				
-				result+=startTrial;
 				for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
 					for(int sample = 0 ; sample < samples ; sample++) {
-						SimpleSampleTask t =
-							new SimpleSampleTask(jBotEvolver,fitnesssample,jBotEvolver.getPopulation().getBestChromosome(),sample);
+						JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
+						SimpleSampleTask t = 
+							new SimpleSampleTask(newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample);
 						taskExecutor.addTask(t);
 					}
 					
@@ -73,9 +76,9 @@ public class PostEvaluation {
 						}else
 							fitness+= sfr.getFitness()/samples; 
 					}
-					result+=" "+(int)fitness;
+					result[index][fitnesssample] = fitness;
 				}
-				result+="\n";
+				taskExecutor.stopTasks();
 			}
 		} catch(Exception e) {e.printStackTrace();}
 		
