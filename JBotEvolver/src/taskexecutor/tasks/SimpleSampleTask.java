@@ -29,6 +29,7 @@ public class SimpleSampleTask extends JBotEvolverTask {
 	@Override
 	public void run() {
 		Simulator simulator = jBotEvolver.createSimulator(random);
+		simulator.setFileProvider(getFileProvider());
 		
 		jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
 		
