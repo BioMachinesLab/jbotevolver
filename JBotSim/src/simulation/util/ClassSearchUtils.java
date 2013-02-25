@@ -27,6 +27,7 @@ public class ClassSearchUtils {
 	
 	
 	public static List<String> searchFullNameInPath(String className) {
+		
 		ArrayList<String> classNames = new ArrayList<String>();
 		ClassLoader classloader = className.getClass().getClassLoader();
 		String classpath = System.getProperty("java.class.path");
@@ -40,7 +41,6 @@ public class ClassSearchUtils {
 		}
 		
 		try {
-			
 			Method method = classloader.getClass().getMethod("getClassPath",
 					(Class<?>) null);
 			if (method != null) {
@@ -64,7 +64,7 @@ public class ClassSearchUtils {
 			if (dir.isDirectory()) {
 				lookForNamesInDirectory(className, "", dir, classNames);
 			}
-			if (dir.isFile()) {
+			else if (dir.isFile()) {
 				name = dir.getName().toLowerCase();
 				if (name.endsWith(".zip") || name.endsWith(".jar")) {
 					lookForNamesInArchive(className, dir, classNames);
@@ -134,7 +134,7 @@ public class ClassSearchUtils {
 					entryName = entryName.replace('/', '.');
 
 					if (entryName.endsWith("." + className)
-							|| entryName.equals(className)) {
+							&& !entryName.equals(className)) {
 						classNames.add(entryName);
 					}
 
