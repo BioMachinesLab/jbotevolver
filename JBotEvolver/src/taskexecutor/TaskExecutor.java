@@ -24,11 +24,10 @@ public abstract class TaskExecutor extends Thread {
 
 	public static TaskExecutor getTaskExecutor(JBotEvolver jBotEvolver, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))
-			throw new RuntimeException("Evolution 'name' not defined: "
+			throw new RuntimeException("TaskExecutor 'name' not defined: "
 					+ arguments.toString());
 
-		return (TaskExecutor) Factory.getInstance(
-				arguments.getArgumentAsString("classname"), jBotEvolver, arguments);
+		return (TaskExecutor) Factory.getInstance(arguments.getArgumentAsString("classname"), jBotEvolver, arguments);
 	}
 
 	public void prepareArguments(HashMap<String, Arguments> arguments) {

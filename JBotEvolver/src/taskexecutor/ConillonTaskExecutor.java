@@ -24,8 +24,7 @@ public class ConillonTaskExecutor extends TaskExecutor {
 		String serverName = args.getArgumentAsStringOrSetDefault("server",
 				"evolve.dcti.iscte.pt");
 
-		client = new Client(priority, serverName, serverPort, serverName,
-				codePort);
+		client = new Client("desc",priority, serverName, serverPort, serverName, codePort);
 
 		//prepareArguments(jBotEvolver.getArguments());
 	}
