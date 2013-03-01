@@ -47,13 +47,14 @@ public class Factory implements Serializable{
 					}
 					s+="\n_____\n";
 					if(found) {
+						//System.out.println(s);
 						return constructor.newInstance(objects);
 					}
 				}
 			}
-			System.out.println(s);
+			//System.out.println(s);
 			
-			System.out.println(className+" ## "+Class.forName(className).getName());
+			//System.out.println(className+" ## "+Class.forName(className).getName());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
