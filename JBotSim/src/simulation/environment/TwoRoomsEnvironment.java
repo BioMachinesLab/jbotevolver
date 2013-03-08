@@ -22,7 +22,6 @@ public class TwoRoomsEnvironment extends Environment {
 	private int timeBetweenPreys = 100;
 	private int maxPreys = 10;
 	private int numberOfPicks = 0;
-	private boolean teleported = false;
 	private boolean teleport = true;
 	public boolean doorsOpen = false;
 	private int doorTime = 0;
@@ -36,6 +35,7 @@ public class TwoRoomsEnvironment extends Environment {
 	
 	private boolean teleportOpenDoor = false;
 	private boolean removeWalls = false;
+	private double randomizeOrientation = 0;
 	
 	private Prey[] preys;
 
@@ -55,6 +55,7 @@ public class TwoRoomsEnvironment extends Environment {
 		bothRooms = arguments.getArgumentAsIntOrSetDefault("bothrooms", 1) == 1;
 		teleportOpenDoor = arguments.getArgumentAsIntOrSetDefault("teleportopendoor", 0) == 1;
 		removeWalls = arguments.getArgumentAsIntOrSetDefault("removewalls", 0) == 1;
+		randomizeOrientation = Math.toRadians(arguments.getArgumentAsIntOrSetDefault("randomizeorientation", 0));
 		
 		preys = new Prey[maxPreys];
 		
@@ -66,8 +67,24 @@ public class TwoRoomsEnvironment extends Environment {
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
 		createRoom(simulator);	
-		for(int i = 0 ; i < preys.length ; i++)
+		for(int i = 0 ; i < preys.length ; i++) {
 			preys[i] = new Prey(simulator, "p", new Vector2d(0,-3), 0, 1, 0.03);
+			addMovableObject(preys[i]);
+		}
+		
+
+		if(teleport) {
+			double sign = 1;
+			if(random.nextDouble() > 0.5 && bothRooms)
+				sign*=-1;
+
+			double ySign = random.nextDouble() > 0.5 ? -1 : 1;
+			
+			robots.get(0).teleportTo(new Vector2d((random.nextDouble()*arenaWidth*0.66+corridorWidth/1.5)*sign,ySign*arenaWidth/2.0*random.nextDouble()*0.66));
+			double orientation = robots.get(0).getOrientation()+(random.nextDouble()*2-1)*this.randomizeOrientation;
+			robots.get(0).setOrientation(orientation);
+		}
+		
 	}
 	
 	public int getNumberOfPicks() {
@@ -76,17 +93,6 @@ public class TwoRoomsEnvironment extends Environment {
 	
 	@Override
 	public void update(double time) {
-		
-		if(!teleported && teleport) {
-			double sign = 1;
-			if(random.nextDouble() > 0.5 && bothRooms)
-				sign*=-1;
-
-			double ySign = random.nextDouble() > 0.5 ? -1 : 1;
-			
-			robots.get(0).teleportTo(new Vector2d((random.nextDouble()*arenaWidth*0.66+corridorWidth/1.5)*sign,ySign*arenaWidth/2.0*random.nextDouble()*0.66));
-			teleported = true;
-		}
 		
 		if(numberOfPreys < maxPreys) {
 			if(time % timeBetweenPreys == 0) {
@@ -99,10 +105,9 @@ public class TwoRoomsEnvironment extends Environment {
 		
 		Robot r = robots.get(0);
 		
-		PreyCarriedSensor sensor = (PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class);
-		if (sensor.preyCarried() && r.isInvolvedInCollison()){
+		PreyPickerActuator actuator = (PreyPickerActuator)r.getActuatorByType(PreyPickerActuator.class);
+		if (actuator.isCarryingPrey()){
 			numberOfPicks++;
-			PreyPickerActuator actuator = (PreyPickerActuator)r.getActuatorByType(PreyPickerActuator.class);
 			Prey preyToDrop = actuator.dropPrey();
 			preyToDrop.teleportTo(new Vector2d(0,-3));
 			numberOfPreys--;

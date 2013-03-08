@@ -1,6 +1,5 @@
 package simulation.environment;
 
-import controllers.Controller;
 import controllers.DummyController;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -41,6 +40,7 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
+		exitWidth = squareSize/2;
 		createRoom(simulator, minWidth,maxWidth,minHeight,maxHeight);
 		
 		Robot robot = robots.get(0);
@@ -123,8 +123,8 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		exitPosition.y = arenaHeight/2+exitWidth;
 		
 		//Exit
-		createWall(simulator,exitX-exitWidth,arenaHeight/2+0.2,0.1,0.4);
-		createWall(simulator,exitX+exitWidth,arenaHeight/2+0.2,0.1,0.4);
+		createWall(simulator,exitX-exitWidth,arenaHeight/2+0.2,0.1,0.45);
+		createWall(simulator,exitX+exitWidth,arenaHeight/2+0.2,0.1,0.45);
 		
 		double firstDistanceEdge = exitX-exitWidth-(-arenaWidth/2);
 		double firstPartX = -arenaWidth/2+firstDistanceEdge/2;

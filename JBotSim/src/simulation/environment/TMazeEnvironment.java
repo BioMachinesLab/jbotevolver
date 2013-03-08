@@ -22,7 +22,7 @@ public class TMazeEnvironment extends Environment {
 	private LinkedList<Square> squares = new LinkedList<Square>();
 	private LinkedList<Square> allSquares = new LinkedList<Square>();
 	private LinkedList<Square> forbiddenSquares = new LinkedList<Square>();
-	private double squareSize = 0.3;
+	protected double squareSize = 0.3;
 	private int imageSize = 400;
 	private LinkedList<LightPole> lights = new LinkedList<LightPole>();
 	private boolean killSample = false;
@@ -79,7 +79,7 @@ public class TMazeEnvironment extends Environment {
 		numberOfMazes = arguments.getArgumentAsIntOrSetDefault("numberofmazes", 0);
 		numberOfDifferentSamples = arguments.getArgumentAsIntOrSetDefault("numberofdifferentsamples",1);
 		
-		double wC = simulator.getRandom().nextDouble() * 3;
+		double wC = random.nextDouble() * 3;
 		
 		if(wC > 1 && wC < 2)
 			squareSize+=widthChange;

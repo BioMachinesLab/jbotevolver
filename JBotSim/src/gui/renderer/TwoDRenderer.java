@@ -173,7 +173,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	}
 
 	private void drawPreys(Graphics graphics, Prey prey) {
-
+		
 		int circleDiameter = (int) Math.round(0.5 + prey.getDiameter() * scale);
 		int x = (int) (transformX(prey.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(prey.getPosition().getY()) - circleDiameter / 2);

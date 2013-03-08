@@ -6,6 +6,7 @@ import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
@@ -74,8 +75,12 @@ public class PreyPickerActuator extends Actuator {
 					}
 
 					// Stop robot
-					if (stopRobot)
-						robot.stop();
+					if (stopRobot) {
+						if(robot instanceof DifferentialDriveRobot) {
+							DifferentialDriveRobot ddr = (DifferentialDriveRobot)robot;
+							ddr.setWheelSpeed(0,0);
+						}
+					}
 				}
 			} else { // DROP
 				if (isCarryingPrey()) {
@@ -90,8 +95,12 @@ public class PreyPickerActuator extends Actuator {
 					prey.teleportTo(newPosition);
 
 					// Stop robot
-					if (stopRobot)
-						robot.stop();
+					if (stopRobot) {
+						if(robot instanceof DifferentialDriveRobot) {
+							DifferentialDriveRobot ddr = (DifferentialDriveRobot)robot;
+							ddr.setWheelSpeed(0,0);
+						}
+					}
 				}
 			}
 		}

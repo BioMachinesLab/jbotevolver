@@ -44,8 +44,6 @@ public abstract class ConeTypeSensor extends Sensor {
 		range = (args.getArgumentIsDefined("range")) ? args.getArgumentAsDouble("range") : 1;
 		openingAngle = Math.toRadians((args.getArgumentIsDefined("angle")) ? args.getArgumentAsDouble("angle") : 90);
 		
-//		orientation = (args.getArgumentIsDefined("orientation")) ? Math.toRadians(args.getArgumentAsDouble("orientation"))	: 0;
-		
 		this.readings 		= new double[numberOfSensors];
 		this.angles 		= new double[numberOfSensors];
 		setupPositions(numberOfSensors);
