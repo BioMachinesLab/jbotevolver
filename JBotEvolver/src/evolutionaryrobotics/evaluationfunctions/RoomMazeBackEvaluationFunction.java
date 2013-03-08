@@ -115,8 +115,8 @@ public class RoomMazeBackEvaluationFunction extends ClutteredMazeEvaluationFunct
 		
 		Vector2d start = startPosition;
 		Vector2d robot = r.getPosition();
-		Vector2d exit = new Vector2d(env.getRoomExitPosition());
-		exit.y-=env.getExitWidth();
+		Vector2d exit = new Vector2d(clutteredEnv.getRoomExitPosition());
+		exit.y-=clutteredEnv.getExitWidth();
 		
 		return (start.distanceTo(exit)-robot.distanceTo(exit))/start.distanceTo(exit);
 	}

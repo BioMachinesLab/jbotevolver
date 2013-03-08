@@ -3,13 +3,14 @@ package evolutionaryrobotics.evaluationfunctions;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.ClutteredMazeEnvironment;
+import simulation.environment.TMazeEnvironment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 	
 	protected Robot r;
-	protected ClutteredMazeEnvironment env;
+	protected ClutteredMazeEnvironment clutteredEnv;
 	protected Vector2d startPosition = new Vector2d();
 	protected boolean finishedRoom = false;
 	private boolean onlyRoom = false;
@@ -29,7 +30,9 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 	@Override
 	public void update(Simulator simulator) {
 		if(env == null)
-			env = (ClutteredMazeEnvironment)simulator.getEnvironment();
+			env = (TMazeEnvironment)simulator.getEnvironment();
+		if(clutteredEnv == null)
+			clutteredEnv = (ClutteredMazeEnvironment)simulator.getEnvironment();
 		if(r == null)
 			r = simulator.getEnvironment().getRobots().get(0);
 		
@@ -86,8 +89,8 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 	public boolean inRoom() {
 		
 		Vector2d robot = r.getPosition();
-		Vector2d exit = new Vector2d(env.getRoomExitPosition());
-		exit.y+=env.getExitWidth();
+		Vector2d exit = new Vector2d(clutteredEnv.getRoomExitPosition());
+		exit.y+=clutteredEnv.getExitWidth();
 		
 		return robot.y < exit.y;
 	}
@@ -96,8 +99,8 @@ public class ClutteredMazeEvaluationFunction extends TMazeEvaluationFunction {
 		
 		Vector2d start = startPosition;
 		Vector2d robot = r.getPosition();
-		Vector2d exit = new Vector2d(env.getRoomExitPosition());
-		exit.y+=env.getExitWidth();
+		Vector2d exit = new Vector2d(clutteredEnv.getRoomExitPosition());
+		exit.y+=clutteredEnv.getExitWidth();
 		
 		return (start.distanceTo(exit)-robot.distanceTo(exit))/start.distanceTo(exit);
 	}

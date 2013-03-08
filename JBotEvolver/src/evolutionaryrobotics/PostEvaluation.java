@@ -16,6 +16,7 @@ public class PostEvaluation {
 	private String dir = "";
 	
 	private TaskExecutor taskExecutor;
+	private String args ="";
 	
 	public PostEvaluation(String[] args) {
 		

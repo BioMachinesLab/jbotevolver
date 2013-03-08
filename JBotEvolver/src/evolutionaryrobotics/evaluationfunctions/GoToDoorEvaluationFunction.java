@@ -56,7 +56,7 @@ public class GoToDoorEvaluationFunction extends EvaluationFunction {
 		double robotY = env.getRobots().get(0).getPosition().getY();
 		
 		if((openDoor && env.doorsOpen) || (!openDoor && getHorizontalDistanceToWall(r,closestWallButton) < 0.1 && Math.abs(robotY) < 0.1)) {
-			fitness = 1+ (steps-simulator.getTime()/steps);
+			fitness = 1 + ((steps-simulator.getTime())/steps);
 			simulator.stopSimulation();
 		}
 	}

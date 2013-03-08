@@ -27,6 +27,8 @@ public class GenerationalEvolution extends Evolution {
 		
 		try {
 			population = Population.getPopulation(jBotEvolver.getArguments().get("--population"));
+			if(jBotEvolver.getArguments().get("--population").getArgumentIsDefined("generations"))
+				population.setNumberOfGenerations(jBotEvolver.getArguments().get("--population").getArgumentAsInt("generations"));
 			population.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -34,8 +36,7 @@ public class GenerationalEvolution extends Evolution {
 		}
 		
 		if (jBotEvolver.getArguments().get("--output") != null) {
-			diskStorage = new DiskStorage(jBotEvolver.getArguments().get("--output")
-					.getCompleteArgumentString());
+			diskStorage = new DiskStorage(jBotEvolver.getArguments().get("--output").getCompleteArgumentString());
 			try {
 				diskStorage.start();
 				diskStorage.saveCommandlineArguments(jBotEvolver.getArguments());

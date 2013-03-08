@@ -4,9 +4,10 @@ import evolutionaryrobotics.neuralnetworks.BehaviorController;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.ClutteredMazeEnvironment;
+import simulation.robot.sensors.NearRobotSensor;
 import simulation.util.Arguments;
 
-public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvaluationFunction {
+public class RoomMazeBackBehaviors2EvaluationFunction extends ClutteredMazeEvaluationFunction {
 	
 	private boolean finishedRoom = false;
 	private boolean finishedMaze = false;
@@ -24,13 +25,18 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 	
 	private double totalTime = 2000;
 	
-	public RoomMazeBackBehaviorsEvaluationFunction(Arguments args) {
+	private int transitionSteps = 50;
+	private int currentTransitionSteps = 0;
+	
+	public RoomMazeBackBehaviors2EvaluationFunction(Arguments args) {
 		super(args);
 		totalTime = args.getArgumentAsDoubleOrSetDefault("totaltime", 2000);
+		transitionSteps = args.getArgumentAsIntOrSetDefault("disabletransition", 0) == 0 ? 50 : 0;
 	}
 
 	@Override
 	public void update(Simulator simulator) {
+		currentTransitionSteps++;
 		if(r == null)
 			r = simulator.getEnvironment().getRobots().get(0);
 		if(controller == null)
@@ -64,20 +70,26 @@ public class RoomMazeBackBehaviorsEvaluationFunction extends ClutteredMazeEvalua
 		roomTime++;
 		
 		finishedRoom = !inRoom();
+		
+		if(finishedRoom)
+			currentTransitionSteps = 0;
 	}
 	
 	private void stepFinishedRoom(Simulator simulator) {
 		checkSquares();
 		
-		if(controller.getCurrentSubNetwork() == 1)
+		NearRobotSensor s = (NearRobotSensor)simulator.getRobots().get(0).getSensorByType(NearRobotSensor.class);
+		
+		if(controller.getCurrentSubNetwork() == 1 || (controller.getCurrentSubNetwork() == 0 && currentTransitionSteps <= transitionSteps))
 			mazeTicks++;
 		
 		mazeTime++;
 
-		finishedMaze = inFinalSquare;
+//		finishedMaze = inFinalSquare;
 		
-		if(finishedMaze) {
+		if(s.getSensorReading(0) > 0) {
 			startPosition = new Vector2d(r.getPosition());
+			finishedMaze = true;
 		}
 		
 		if(inForbiddenSquare)
