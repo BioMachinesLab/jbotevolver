@@ -348,4 +348,6 @@ public abstract class Population implements Serializable {
 		in.close();
 		return population;
 	}
+
+	public abstract Chromosome getChromosome(int chromosomeId);
 }

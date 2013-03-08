@@ -288,4 +288,9 @@ public class MuLambdaPopulation extends Population implements Serializable {
 		else
 			return false;
 	}
+
+	@Override
+	public Chromosome getChromosome(int chromosomeId) {
+		return chromosomes[chromosomeId];
+	}
 }
