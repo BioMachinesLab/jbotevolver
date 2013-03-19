@@ -13,6 +13,7 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 	int currentSubNetwork = 0;
 	boolean keepFeeding = false;
 	boolean resetChosen = true;
+	boolean debugMax = false;
 	
 	public BehaviorController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
@@ -54,7 +55,7 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 		int maxIndex = 0;
 		
 		for(int i = 1 ; i < outputStates.length ; i++)
-			if(outputStates[i] > outputStates[maxIndex])
+			if(outputStates[i] > outputStates[maxIndex] || (debugMax && outputStates[i] >= outputStates[maxIndex]))
 				maxIndex = i;
 		
 		return maxIndex;
@@ -91,6 +92,7 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 		
 		resetChosen = args.getArgumentAsIntOrSetDefault("resetchosen", 1) == 1;
 		keepFeeding = args.getArgumentAsIntOrSetDefault("keepfeeding", 0) == 1;
+		debugMax = args.getArgumentAsIntOrSetDefault("debugmax", 0) == 1;
 	}
 	
 	public ArrayList<Controller> getSubControllers() {

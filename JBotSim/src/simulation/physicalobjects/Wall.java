@@ -90,7 +90,7 @@ public class Wall extends PhysicalObject{
 			return normal;
 		}
 	}
-
+	
 	public Vector2d intersectsWithLineSegment(Vector2d p1, Vector2d p2) {
 		Vector2d closestPoint      = null;
 		Vector2d lineSegmentVector = new Vector2d(p2);
@@ -102,8 +102,57 @@ public class Wall extends PhysicalObject{
 				Vector2d e1 = e.getP1();
 				Vector2d e2 = e.getP2();
 				closestPoint = MathUtils.intersectLines(p1, p2, e1, e2);
-				if(closestPoint != null)
+				if(closestPoint != null) {
 					break;
+				}
+			}
+		}
+		return closestPoint;
+	}
+	
+	public Vector2d intersectsWithLineSegmentPrint(Vector2d p1, Vector2d p2, double maxReflectionAngle) {
+		Vector2d closestPoint      = null;
+		Vector2d lineSegmentVector = new Vector2d(p2);
+		lineSegmentVector.sub(p1);
+		
+		for (Edge e : edges) {
+			double dot = e.getNormal().dot(lineSegmentVector);
+			if (dot < 0) {
+				Vector2d e1 = e.getP1();
+				Vector2d e2 = e.getP2();
+				closestPoint = MathUtils.intersectLines(p1, p2, e1, e2);
+				if(closestPoint != null) {
+					double a = lineSegmentVector.angle(e.getNormal()) - Math.PI;
+					
+					System.out.println(Math.toDegrees(a));
+					
+					if(Math.abs(a) >= maxReflectionAngle)
+						closestPoint = null;
+					break;
+				}
+			}
+		}
+		return closestPoint;
+	}	
+
+	public Vector2d intersectsWithLineSegment(Vector2d p1, Vector2d p2, double maxReflectionAngle) {
+		Vector2d closestPoint      = null;
+		Vector2d lineSegmentVector = new Vector2d(p2);
+		lineSegmentVector.sub(p1);
+		
+		for (Edge e : edges) {
+			double dot = e.getNormal().dot(lineSegmentVector);
+			if (dot < 0) {
+				Vector2d e1 = e.getP1();
+				Vector2d e2 = e.getP2();
+				closestPoint = MathUtils.intersectLines(p1, p2, e1, e2);
+				if(closestPoint != null) {
+					double a = lineSegmentVector.angle(e.getNormal()) -Math.PI;
+					
+					if(Math.abs(a) >= maxReflectionAngle)
+						closestPoint = null;
+					break;
+				}
 			}
 		}
 		return closestPoint;

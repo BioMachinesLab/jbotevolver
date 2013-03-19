@@ -14,7 +14,11 @@ import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
+import simulation.robot.DifferentialDriveRobot;
+import simulation.robot.Epuck;
 import simulation.robot.Robot;
+import simulation.robot.sensors.EpuckIRSensor;
+import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 
 public class TwoDRenderer extends Renderer implements ComponentListener {
@@ -25,6 +29,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	protected double        scale;
 	protected double        centerX;
 	protected double        centerY;
+	protected double  horizontalMovement = 0;
+	protected double  verticalMovement = 0;
 
 	private double zoomFactor = 1.0;
 	
@@ -79,6 +85,9 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					case LIGHTPOLE:
 						drawLightPole(graphics, (LightPole)m);
 						break;
+					case WALL:
+						drawWall((Wall) m);
+						break;
 				}
 			}
 		}
@@ -91,9 +100,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					break;
 				case ROBOT:
 					drawRobot(graphics, (Robot) m);
-					break;
-				case WALL:
-					drawWall((Wall) m);
 					break;
 				case WALLBUTTON:
 					drawWallButton((Wall) m);
@@ -191,7 +197,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
 			createImage();
 		
-		int circleDiameter = (int) Math.round(0.5 + robot.getDiameter() * scale);
+		int circleDiameter = (int) Math.round(robot.getDiameter() * scale);
 		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
 
@@ -233,7 +239,39 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		yp[2] = transformY(p2.getY() + robot.getPosition().getY());
 
 		graphics.fillPolygon(xp, yp, 3);
-		graphics.setColor(Color.BLACK);
+		
+		//DEBUG
+		if(robot instanceof Epuck) {
+			Sensor s = robot.getSensorByType(EpuckIRSensor.class);
+			if(s != null) {
+				EpuckIRSensor ir = (EpuckIRSensor)s;
+				Vector2d[][][] positions = ir.rayPositions;
+				if(positions != null) {
+					for(int i = 0 ; i < positions.length ; i++) {
+						for(int j = 0 ; j < positions[i].length ; j++) {
+							if(i % 2 == 0) {
+								graphics.setColor(Color.RED);
+							}else {
+								graphics.setColor(Color.BLACK);
+							}
+							
+							if(i == 3 && j == 1) {
+								graphics.setColor(Color.GREEN);
+							}
+							if(positions[i][j][0] != null) {
+								int x1 = transformX(positions[i][j][0].x);
+								int y1 = transformY(positions[i][j][0].y);
+								int x2 = transformX(positions[i][j][1].x);
+								int y2 = transformY(positions[i][j][1].y);
+								graphics.drawLine(x1, y1, x2, y2);
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		graphics.setColor(Color.BLACK);		
 	}
 	
 
@@ -250,11 +288,11 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	}
 
 	protected int transformX(double x) {
-		return (int) (x * scale + centerX);
+		return (int) ((x+horizontalMovement) * scale + centerX);
 	}
 
 	protected int transformY(double y) {
-		return (int) (-y * scale + centerY);
+		return (int) ((-y-verticalMovement) * scale + centerY);
 	}
 
 //	@Override
@@ -291,5 +329,25 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	public int getSelectedRobot() {
 		return -1;
+	}
+	
+	public void moveLeft() {
+		horizontalMovement-=0.1;
+		componentResized(null);
+	}
+	
+	public void moveRight() {
+		horizontalMovement+=0.1;
+		componentResized(null);
+	}
+	
+	public void moveUp() {
+		verticalMovement+=0.1;
+		componentResized(null);
+	}
+	
+	public void moveDown() {
+		verticalMovement-=0.1;
+		componentResized(null);
 	}
 }

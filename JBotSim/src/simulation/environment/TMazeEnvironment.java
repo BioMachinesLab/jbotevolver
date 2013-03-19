@@ -43,6 +43,9 @@ public class TMazeEnvironment extends Environment {
 	protected int fitnesssample = 0;
 	protected double randomizeX = 0;
 	protected double randomizeY = 0;
+	
+	protected double positionX = 0;
+	protected double positionY = 0;
 
 	public TMazeEnvironment(Simulator simulator, Arguments arguments) {
 		this(simulator,arguments,true);
@@ -73,6 +76,9 @@ public class TMazeEnvironment extends Environment {
 		
 		randomizeX = arguments.getArgumentAsDoubleOrSetDefault("randomizex",0.0);
 		randomizeY = arguments.getArgumentAsDoubleOrSetDefault("randomizey",0.0);
+		
+		positionX = arguments.getArgumentAsDoubleOrSetDefault("positionx",0.0);
+		positionY = arguments.getArgumentAsDoubleOrSetDefault("positiony",0.0);
 		
 		teleport = arguments.getArgumentAsIntOrSetDefault("teleport",0) == 1;
 		
@@ -113,7 +119,13 @@ public class TMazeEnvironment extends Environment {
 			double orientation = robots.get(0).getOrientation()+(random.nextDouble()*2-1)*this.randomizeOrientation;
 			double randomizeX = this.randomizeX*random.nextDouble()*2-this.randomizeX;
 			double randomizeY = this.randomizeY*random.nextDouble()*2-this.randomizeY;
-			robots.get(0).moveTo(new Vector2d(getSquares().peek().getX()+randomizeX,getSquares().peek().getY()+randomizeY));
+			double x = getSquares().peek().getX();
+			double y = getSquares().peek().getY();
+			
+			x+=positionX;
+			y+=positionY;
+			
+			robots.get(0).moveTo(new Vector2d(x+randomizeX,y+randomizeY));
 			robots.get(0).setOrientation(orientation);
 		}
 		

@@ -45,6 +45,10 @@ public abstract class Renderer extends Component {
 	public abstract void zoomIn();
 	public abstract void zoomOut();
 	public abstract void resetZoom();
+	public void moveLeft() {}
+	public void moveRight() {}
+	public void moveUp() {}
+	public void moveDown() {}
 	
 	public static Renderer getRenderer(Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))

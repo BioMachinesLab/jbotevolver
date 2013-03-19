@@ -10,11 +10,14 @@ public class NearRobotSensor extends Sensor {
 
 	private double range; 
 	private Environment env;
+	private int maxSteps = 0;
+	private int currentSteps = 0;
 	
 	public NearRobotSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator,id,robot, args);
-		range = (args.getArgumentIsDefined("range")) ? args.getArgumentAsDouble("range") : DEFAULT_RANGE;
+		range = args.getArgumentAsDoubleOrSetDefault("range",DEFAULT_RANGE);
 		this.env = simulator.getEnvironment();
+		this.maxSteps = args.getArgumentAsIntOrSetDefault("maxsteps", 0);
 	}
 	
 	@Override
@@ -23,14 +26,18 @@ public class NearRobotSensor extends Sensor {
 		
 		double value = 0;
 		
+		if(maxSteps > 0 && currentSteps > maxSteps)
+			return value;
+		
 		for(Robot r : robots) {
 			if(r.getPosition().distanceTo(this.robot.getPosition()) < 
 					range && this.robot.getId() != r.getId()) {
 				value = 1;
+				if(maxSteps > 0)
+					currentSteps++;
 				break;
 			}
 		}
-		
 		return value;
 	}
 }

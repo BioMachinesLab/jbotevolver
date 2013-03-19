@@ -75,6 +75,11 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	private Vector2d[][] cones;
 	private Vector2d[] sensorPositions;
 	private double fullOpeningAngle;
+	private double minimumDistances[][];
+	private double cutoffAngle;
+	
+	//Debug
+	public Vector2d[][][] rayPositions;
 	
 	public EpuckIRSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);
@@ -82,7 +87,8 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		numberOfSensors = 4;
 		this.readings = new double[numberOfSensors];
 		range = RANGE;
-		
+
+		cutoffAngle = args.getArgumentAsDoubleOrSetDefault("cutoffangle", 45);
 		boolean fixedSensor = args.getArgumentAsIntOrSetDefault("fixedsensor", 0) == 1;
 		noiseEnabled = args.getArgumentAsIntOrSetDefault("noiseenabled", 1) ==  1;
 		numberOfRays = args.getArgumentAsIntOrSetDefault("numberofrays", 7);
@@ -105,19 +111,21 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		
 		chosenReferences = new int[numberOfSensors];
 		
-		for(int i = 0 ; i < numberOfSensors ; i++) {
-			int random = simulator.getRandom().nextInt(sensorReferenceValues.length);
-			
-			if(fixedSensor) {
+		if(fixedSensor) {
+			int index = 0;
+			for(int i = 0 ; i < numberOfSensors ; i++) {
 				if(args.getArgumentIsDefined("fixedsensornumber"))
-					random = args.getArgumentAsInt("fixedsensornumber");
-				else if(args.getArgumentIsDefined("references"))
-					random = (random % 4) + 4*args.getArgumentAsInt("references");
-				else
-					random = i+4;
+					index = args.getArgumentAsInt("fixedsensornumber");
+				else if(args.getArgumentIsDefined("references")) {
+					index = i+args.getArgumentAsInt("references")*4;
+				}
+				chosenReferences[i] = index;
 			}
-			
-			chosenReferences[i] = random;
+		}else {
+			for(int i = 0 ; i < numberOfSensors ; i++) {
+				int random = simulator.getRandom().nextInt(sensorReferenceValues.length);
+				chosenReferences[i] = random;
+			}
 		}
 
 		this.fullOpeningAngle = openingAngle;
@@ -134,6 +142,8 @@ public class EpuckIRSensor extends ConeTypeSensor {
 			for(int j = 0 ; j < numberOfRays ; j++)
 				cones[i][j] = new Vector2d();
 		}
+		
+		minimumDistances = new double[numberOfSensors][numberOfRays];
 	}
 
 	private void initAngles() {
@@ -157,6 +167,9 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	
 	private void updateCones() {
 		
+		rayPositions = new Vector2d[numberOfSensors][numberOfRays][2];
+		minimumDistances = new double[numberOfSensors][numberOfRays];
+		
 		for(int sensorNumber = 0 ; sensorNumber < numberOfSensors ; sensorNumber++) {
 			double orientation = angles[sensorNumber] + robot.getOrientation();
 			
@@ -168,6 +181,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 			double alpha = (this.fullOpeningAngle)/(numberOfRays-1);
 			
 			for(int i = 0 ; i < numberOfRays ; i++) {
+				
 				cones[sensorNumber][i].set(
 						Math.cos(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPositions[sensorNumber].getX(),
 						Math.sin(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPositions[sensorNumber].getY()
@@ -197,13 +211,23 @@ public class EpuckIRSensor extends ConeTypeSensor {
 			
 			for(int i = 0 ; i < numberOfRays ; i++) {
 				Vector2d cone = cones[sensorNumber][i];
-//				System.out.println(cone);
+				
+				rayPositions[sensorNumber][i][0] = sensorPositions[sensorNumber];
+				if(rayPositions[sensorNumber][i][1] == null)
+					rayPositions[sensorNumber][i][1] = cone;
+				
 				Vector2d intersection = null;
-				intersection = w.intersectsWithLineSegment(sensorPositions[sensorNumber], cone);
+				intersection = w.intersectsWithLineSegment(sensorPositions[sensorNumber], cone, Math.toRadians(cutoffAngle));
+				
+//				if(sensorNumber == 3 && i == 1) {
+//					System.out.println(source.getObject().getId());
+//					w.intersectsWithLineSegmentPrint(sensorPositions[sensorNumber], cone, Math.toRadians(cutoffAngle));
+//				}
 				
 				if(intersection != null) {
 					
 					double distance = intersection.distanceTo(sensorPositions[sensorNumber]);
+					cone.angle(intersection);
 					
 					if(distance < REAL_RANGE) {
 						double sensorValue = distanceToSensor(distance, sensorNumber);
@@ -212,7 +236,10 @@ public class EpuckIRSensor extends ConeTypeSensor {
 						
 						inputValue = sensorToInput(sensorValue, sensorNumber);
 						
-						rayReadings[sensorNumber][i] = Math.max(inputValue, rayReadings[sensorNumber][i]);
+						if((minimumDistances[sensorNumber][i] == 0 || distance < minimumDistances[sensorNumber][i]) && inputValue > rayReadings[sensorNumber][i]) {
+							rayPositions[sensorNumber][i][1] = intersection;
+							rayReadings[sensorNumber][i] = Math.max(inputValue, rayReadings[sensorNumber][i]);
+						}
 					}
 				}
 			}
@@ -243,82 +270,8 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		return inputValue;
 	}
 	
-//	protected double oldCalculateContributionToSensor(int sensorNumber,
-//			PhysicalObjectDistance source) {
-//		
-//		double inputValue = 0;
-//		
-//		if(source.getObject().getType() == PhysicalObjectType.WALL) {
-//		
-//			Wall w = (Wall) source.getObject();
-//			
-//			double orientation = angles[sensorNumber] + robot.getOrientation();
-//			
-//			Vector2d sensorPosition = new Vector2d(
-//					Math.cos(orientation) * robot.getRadius() + robot.getPosition().getX(),
-//					Math.sin(orientation) * robot.getRadius() + robot.getPosition().getY()
-//				);
-//			
-//			Vector2d[] cones = new Vector2d[3];
-//			
-//			cones[0] = new Vector2d( // center cone
-//					Math.cos(orientation) * REAL_RANGE + sensorPosition.getX(),
-//					Math.sin(orientation) * REAL_RANGE + sensorPosition.getY()
-//					);
-//			cones[1] = new Vector2d( // left cone
-//					Math.cos(orientation-openingAngle) * REAL_RANGE + sensorPosition.getX(),
-//					Math.sin(orientation-openingAngle) * REAL_RANGE + sensorPosition.getY()
-//					);
-//			cones[2] = new Vector2d( // right cone
-//					Math.cos(orientation+openingAngle) * REAL_RANGE + sensorPosition.getX(),
-//					Math.sin(orientation+openingAngle) * REAL_RANGE + sensorPosition.getY()
-//					);
-//			
-//			Vector2d intersection = null;
-//			
-//			for(Vector2d cone : cones) {
-//				if(intersection == null)
-//					intersection = w.intersectsWithLineSegment(sensorPosition, cone);
-//			}
-//			
-//			if(intersection != null) {
-//				
-//				double distance = intersection.distanceTo(sensorPosition);
-//				
-//				if(distance < REAL_RANGE) {
-//					double sensorValue = distanceToSensor(distance, sensorNumber);
-//					inputValue = sensorToInput(sensorValue, sensorNumber);
-//					if(sensorNumber == 1) last2 = inputValue;
-//					if(sensorNumber == 2) last5 = inputValue;
-//				}
-//			}
-//		} else if(source.getObject().getType() == PhysicalObjectType.ROBOT) {
-//			
-//			GeometricInfo sensorInfo = getSensorGeometricInfo(sensorNumber, source.getObject().getPosition());
-//			
-//			double distance = sensorInfo.getDistance();
-//			
-//			Robot robot = ((Robot)source.getObject());
-//			
-//			distance-=robot.getRadius()+robot.getExtraRadius();
-//			
-//			if(distance < REAL_RANGE && (sensorInfo.getAngle()< (openingAngle)) &&
-//					(sensorInfo.getAngle()>(-openingAngle))){
-//				
-//				double sensorValue = distanceToSensor(distance, sensorNumber);
-//				inputValue = sensorToInput(sensorValue, sensorNumber);
-//				if(sensorNumber == 1) last2 = inputValue;
-//				if(sensorNumber == 2) last5 = inputValue;
-//			}
-//		}
-//		return inputValue;
-//	}
-	
 	@Override
 	public void update(double time, ArrayList<PhysicalObject> teleported) {
-//		if(!newMode) {
-//			super.update(time, teleported);
-//		}else{
 		
 		updateCones();
 
@@ -343,21 +296,49 @@ public class EpuckIRSensor extends ConeTypeSensor {
 			
 			for(int i = 0; i < numberOfSensors; i++){
 				int aboveZero = 0;
-				for(int j = 0; j < numberOfRays; j++){
+				double copy[] = new double[numberOfRays];
+//				for(int j = 0; j < numberOfRays; j++){
 //					System.out.println(i+" "+j+" "+rayReadings[i][j]);
-					readings[i]+=(rayReadings[i][j]/(double)numberOfRays);
-					if(rayReadings[i][j] > 0)
-						aboveZero++;
+					
+//					double distanceToCenter = Math.abs(j-numberOfRays/2);
+//					if(distanceToCenter == 0)
+//						distanceToCenter++;
+					
+				for(int ray = 0 ; ray < copy.length ; ray++){
+					copy[ray] = rayReadings[i][ray];
 				}
-				if(aboveZero < numberOfRays/2 || rayReadings[i][numberOfRays/2] == 0)
-					readings[i] = 0;
-				else
+				
+				double avg = 0;
+				double maxRays = 4;
+				
+				for(int m = 0 ; m < maxRays ; m++) {
+					int currentMaxIndex = 0;
+					for(int z = 1 ; z < copy.length ; z++) {
+						if(copy[z] > copy[currentMaxIndex]) {
+							currentMaxIndex = z;
+						}
+					}
+					avg+=copy[currentMaxIndex]/maxRays;
+					copy[currentMaxIndex] = 0;
+				}
+					
+				readings[i]=avg;//(rayReadings[i][j]/(double)numberOfRays/*/distanceToCenter*/);
+				
+//				if(rayReadings[i][j] > 0)
+//					aboveZero++;
+//				}
+//				if(/*aboveZero <= 2 || */rayReadings[i][numberOfRays/2] == 0)
+//					readings[i] = 0;
+//				else
 					readings[i] = Math.min(readings[i],1);
+					
+//					if(i == 0) {
+//						readings[i] = Math.min(1, readings[i]*1.5);
+//					}
 				
 //				System.out.print(readings[i]+" ");
 			}
 //			System.out.println();
-			
 			if(((Epuck) robot).getLightSensor() != null) {
                 if(((Epuck) robot).getLightSensor().last1 > 0)
                 	readings[2] = (readings[2]  + (1.0-readings[2] )*0.5*0.7)*(1+0.1*random.nextGaussian());
@@ -374,18 +355,13 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		} catch (Exception e) {
 			e.printStackTrace(); 
 		}
-//	}
 	}
 	
 	@Override
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
-//		if(!newMode)
-//			oldCalculateSourceContributions(source);
-//		else {
 		for(int j=0; j<numberOfSensors; j++){
 			calculateContributionToSensor(j, source);
 		}
-//		}
 	}
 	
 	protected void oldCalculateSourceContributions(PhysicalObjectDistance source) {
@@ -451,19 +427,6 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	                double currentDistance = (distanceBefore-distanceAfter)*(linearization)+distanceAfter;
 	                
 	                double currentValue = 1.0-currentDistance/distances[sensorAverages.length-1];
-	                
-//	                if(!newMode) {
-//	                
-//		                if(robot.getLightSensor() != null) {
-//			                if(sensorNumber == 2)
-//			                	if(robot.getLightSensor().last1 > 0)
-//			                		currentValue = (currentValue + (1.0-currentValue)*0.5*0.7)*(1+0.1*simulator.getRandom().nextGaussian());
-//			                if(sensorNumber == 1)
-//			                	if(robot.getLightSensor().last0 > 0)
-//			                		currentValue = (currentValue + (1.0-currentValue)*0.5*0.7)*(1+0.1*simulator.getRandom().nextGaussian());
-//		        		}
-//	                }
-	                
 	                currentValue = Math.min(currentValue,1);
 
 	                return currentValue;
