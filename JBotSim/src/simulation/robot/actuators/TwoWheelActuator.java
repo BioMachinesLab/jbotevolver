@@ -48,8 +48,8 @@ public class TwoWheelActuator extends Actuator {
 			rightSpeed = -Robot.MAXIMUMSPEED;
 		else if (rightSpeed > Robot.MAXIMUMSPEED)
 			rightSpeed = Robot.MAXIMUMSPEED;
-//		((DifferentialDriveRobot) robot).setWheelSpeed(leftSpeed, rightSpeed);
-		((DifferentialDriveRobot) robot).setWheelSpeed(maxSpeed/4, -maxSpeed/4);
+		((DifferentialDriveRobot) robot).setWheelSpeed(leftSpeed, rightSpeed);
+//		((DifferentialDriveRobot) robot).setWheelSpeed(maxSpeed/4, -maxSpeed/4);
 	}
 
 	@Override
