@@ -28,10 +28,13 @@ public class RoomMazeBackBehaviors2EvaluationFunction extends ClutteredMazeEvalu
 	private int transitionSteps = 50;
 	private int currentTransitionSteps = 0;
 	
+	private boolean penalize = false;
+	
 	public RoomMazeBackBehaviors2EvaluationFunction(Arguments args) {
 		super(args);
 		totalTime = args.getArgumentAsDoubleOrSetDefault("totaltime", 2000);
 		transitionSteps = args.getArgumentAsIntOrSetDefault("disabletransition", 0) == 0 ? 50 : 0;
+		penalize = args.getArgumentAsIntOrSetDefault("disabletransition", 0) == 1;
 	}
 
 	@Override
@@ -66,6 +69,8 @@ public class RoomMazeBackBehaviors2EvaluationFunction extends ClutteredMazeEvalu
 		
 		if(controller.getCurrentSubNetwork() == 0)
 			roomTicks++;
+		else if(penalize)
+			roomTicks--;
 		
 		roomTime++;
 		
@@ -82,6 +87,8 @@ public class RoomMazeBackBehaviors2EvaluationFunction extends ClutteredMazeEvalu
 		
 		if(controller.getCurrentSubNetwork() == 1 || (controller.getCurrentSubNetwork() == 0 && currentTransitionSteps <= transitionSteps))
 			mazeTicks++;
+		else if(penalize)
+			mazeTicks--;
 		
 		mazeTime++;
 
@@ -101,6 +108,8 @@ public class RoomMazeBackBehaviors2EvaluationFunction extends ClutteredMazeEvalu
 		
 		if(controller.getCurrentSubNetwork() == 2)
 			goBackTicks++;
+		else if(penalize)
+			goBackTicks--;
 		
 		goBackTime++;
 		

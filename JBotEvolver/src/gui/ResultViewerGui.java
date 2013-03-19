@@ -7,6 +7,8 @@ import gui.renderer.Renderer;
 import gui.util.Editor;
 import gui.util.GraphPlotter;
 import gui.util.GraphViz;
+import gui.util.NetworkViewer;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -54,7 +56,9 @@ public class ResultViewerGui extends Gui {
 	private JTextField  shiftTextField;
 
 	private JTextField  controlStepTimeTextField;
-	private JTextField  rendererTimeTextField;	
+	private JTextField  rendererTimeTextField;
+	
+	private NetworkViewer networkViewer = new NetworkViewer();
 
 	private int         sleepBetweenControlSteps = 10;
 	
@@ -99,6 +103,7 @@ public class ResultViewerGui extends Gui {
 	private GraphViz graphViz = null;
 	private boolean showNeuralNetwork = false;
 	private JCheckBox neuralNetworkCheckbox;
+	private JCheckBox neuralNetworkViewerCheckbox;
 	
 	private EnvironmentKeyDispatcher dispatcher;
 
@@ -111,7 +116,7 @@ public class ResultViewerGui extends Gui {
 		
 		frame = new JFrame("Result Viewer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1200, 700);
+		frame.setSize(1200, 750);
 	
 		frame.getContentPane().add(initBottomPanel(), BorderLayout.SOUTH);	
 		frame.getContentPane().add(initRightWrapperPanel(), BorderLayout.EAST);
@@ -154,7 +159,7 @@ public class ResultViewerGui extends Gui {
 	private JPanel initRightWrapperPanel() {
 
 		JPanel sideTopPanel = new JPanel();
-		sideTopPanel.setLayout(new GridLayout(11,1));
+		sideTopPanel.setLayout(new GridLayout(12,1));
 		sideTopPanel.add(startButton);
 		sideTopPanel.add(pauseButton);
 		sideTopPanel.add(quitButton);
@@ -188,7 +193,10 @@ public class ResultViewerGui extends Gui {
 		
 		neuralNetworkCheckbox = new JCheckBox("Show Neural Network");
 		sideTopPanel.add(neuralNetworkCheckbox);
-
+		
+		neuralNetworkViewerCheckbox = new JCheckBox("Show Neural Network #2");
+		sideTopPanel.add(neuralNetworkViewerCheckbox);
+		
 		JPanel sideWrapperPanel = new JPanel();
 		sideWrapperPanel.setLayout(new BorderLayout());
 		sideWrapperPanel.add(sideTopPanel, BorderLayout.NORTH);
@@ -265,6 +273,35 @@ public class ResultViewerGui extends Gui {
 			private static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				shiftSimulationBy(-position_shift,false);
+			}
+		});
+		
+		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt LEFT"), "alt LEFT");
+		((JComponent) frame.getContentPane()).getActionMap().put("alt LEFT", new AbstractAction(){  
+			private static final long serialVersionUID = 1L;
+			public void actionPerformed(ActionEvent evt) {  
+				renderer.moveLeft();
+			}
+		});
+		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt RIGHT"), "alt RIGHT");
+		((JComponent) frame.getContentPane()).getActionMap().put("alt RIGHT", new AbstractAction(){  
+			private static final long serialVersionUID = 1L;
+			public void actionPerformed(ActionEvent evt) {  
+				renderer.moveRight();
+			}
+		});
+		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt UP"), "alt UP");
+		((JComponent) frame.getContentPane()).getActionMap().put("alt UP", new AbstractAction(){  
+			private static final long serialVersionUID = 1L;
+			public void actionPerformed(ActionEvent evt) {  
+				renderer.moveUp();
+			}
+		});
+		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt DOWN"), "alt DOWN");
+		((JComponent) frame.getContentPane()).getActionMap().put("alt DOWN", new AbstractAction(){  
+			private static final long serialVersionUID = 1L;
+			public void actionPerformed(ActionEvent evt) {  
+				renderer.moveDown();
 			}
 		});
 		
@@ -414,6 +451,13 @@ public class ResultViewerGui extends Gui {
 			public void stateChanged(ChangeEvent arg0) {
 				JCheckBox check = (JCheckBox)arg0.getSource();
 				showNeuralNetwork = check.isSelected();
+			}
+		});
+		
+		neuralNetworkViewerCheckbox.addChangeListener(new ChangeListener() {
+			public void stateChanged(ChangeEvent arg0) {
+				JCheckBox check = (JCheckBox)arg0.getSource();
+				networkViewer.setVisible(check.isSelected());
 			}
 		});
 	}
@@ -731,6 +775,9 @@ public class ResultViewerGui extends Gui {
 		
 		evaluationFunction = jBotEvolver.getEvaluationFunction();
 		simulator.addCallback(evaluationFunction);
+		
+		if(networkViewer.isVisible())
+			simulator.addCallback(networkViewer);
 		
 		jBotEvolver.setupBestIndividual(simulator);
 		
