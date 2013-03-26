@@ -88,7 +88,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		this.readings = new double[numberOfSensors];
 		range = RANGE;
 
-		cutoffAngle = args.getArgumentAsDoubleOrSetDefault("cutoffangle", 45);
+		cutoffAngle = args.getArgumentAsDoubleOrSetDefault("cutoffangle", 0);
 		boolean fixedSensor = args.getArgumentAsIntOrSetDefault("fixedsensor", 0) == 1;
 		noiseEnabled = args.getArgumentAsIntOrSetDefault("noiseenabled", 1) ==  1;
 		numberOfRays = args.getArgumentAsIntOrSetDefault("numberofrays", 7);
@@ -118,6 +118,8 @@ public class EpuckIRSensor extends ConeTypeSensor {
 					index = args.getArgumentAsInt("fixedsensornumber");
 				else if(args.getArgumentIsDefined("references")) {
 					index = i+args.getArgumentAsInt("references")*4;
+				}else if(args.getArgumentIsDefined("randomizedreferences")) {
+					index = 4*args.getArgumentAsInt("randomizedreferences")+simulator.getRandom().nextInt(4);
 				}
 				chosenReferences[i] = index;
 			}
@@ -324,13 +326,13 @@ public class EpuckIRSensor extends ConeTypeSensor {
 					
 				readings[i]=avg;//(rayReadings[i][j]/(double)numberOfRays/*/distanceToCenter*/);
 				
-//				if(rayReadings[i][j] > 0)
-//					aboveZero++;
-//				}
-//				if(/*aboveZero <= 2 || */rayReadings[i][numberOfRays/2] == 0)
+				for(int j = 0; j < rayReadings[i].length ; j++) {
+					if(rayReadings[i][j] > 0)
+						aboveZero++;
+				}
+				
+//				if(aboveZero <= 2 /*|| rayReadings[i][numberOfRays/2] == 0*/)
 //					readings[i] = 0;
-//				else
-					readings[i] = Math.min(readings[i],1);
 					
 //					if(i == 0) {
 //						readings[i] = Math.min(1, readings[i]*1.5);
