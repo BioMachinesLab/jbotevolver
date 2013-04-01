@@ -5,6 +5,7 @@ import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import simulation.Simulator;
 import simulation.robot.Robot;
+import simulation.robot.behaviors.Behavior;
 import simulation.util.Arguments;
 
 public class BehaviorController extends NeuralNetworkController implements FixedLenghtGenomeEvolvableController {
@@ -24,7 +25,14 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 	public void controlStep(double time) {
 		int output = chooseOutput();
 		
-		if(output != currentSubNetwork) {
+		boolean skip = false;
+		
+		if(subControllers.get(currentSubNetwork) instanceof Behavior) {
+			Behavior b = (Behavior)subControllers.get(currentSubNetwork);
+			skip = b.isLocked();
+		}
+		
+		if(output != currentSubNetwork && !skip) {
 			currentSubNetwork = output;
 			if(resetChosen) {
 				subControllers.get(currentSubNetwork).reset();

@@ -255,9 +255,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 								graphics.setColor(Color.BLACK);
 							}
 							
-							if(i == 3 && j == 1) {
-								graphics.setColor(Color.GREEN);
-							}
 							if(positions[i][j][0] != null) {
 								int x1 = transformX(positions[i][j][0].x);
 								int y1 = transformY(positions[i][j][0].y);
@@ -288,11 +285,11 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	}
 
 	protected int transformX(double x) {
-		return (int) ((x+horizontalMovement) * scale + centerX);
+		return (int) ((x-horizontalMovement) * scale + centerX);
 	}
 
 	protected int transformY(double y) {
-		return (int) ((-y-verticalMovement) * scale + centerY);
+		return (int) ((-y+verticalMovement) * scale + centerY);
 	}
 
 //	@Override
