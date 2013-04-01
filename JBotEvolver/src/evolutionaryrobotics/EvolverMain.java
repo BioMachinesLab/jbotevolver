@@ -16,6 +16,6 @@ public class EvolverMain {
 	}
 
 	public static void main(String[] args) throws Exception {
-		new EvolverMain(new String[]{"main_arbitrator.conf"});
+		new EvolverMain(new String[]{"test.conf"});
 	}
 }

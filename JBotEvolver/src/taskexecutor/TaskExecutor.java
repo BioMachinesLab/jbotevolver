@@ -15,6 +15,10 @@ public abstract class TaskExecutor extends Thread {
 	public abstract void addTask(Task t);
 
 	public abstract Result getResult();
+	
+	public void setTotalNumberOfTasks(int nTasks) {}
+	
+	public void setDescription(String desc) {}
 
 	public void run() {
 	}

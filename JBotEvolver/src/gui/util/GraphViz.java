@@ -100,7 +100,7 @@ public class GraphViz
 	
 	private ImageShower imageShower = null;
 	
-    private String type = "jpeg";
+    private String type = "png";
 
    /**
     * Constructor: creates a new GraphViz object that will contain
@@ -151,7 +151,6 @@ public class GraphViz
 			   this.hidden = multilayer.getHiddenStates().length;
 		   }
 	   }
-	   
 	   addln(start_graph());
 	   createNodes();
 	   connectNetwork();
@@ -244,14 +243,14 @@ public class GraphViz
    public void changeNeuralNetwork(NeuralNetwork n) {
 	   this.network = n;
 	   setupNetwork();
-	   if(imageShower != null)
+	   if(imageShower != null) {
 		   imageShower.changeImage(this.getGraph(this.getDotSource()));
+	   }
    }
    
    public void show() {
-	   if(imageShower != null)
-		   imageShower.dispose();
-	   imageShower = new ImageShower(this.getGraph(this.getDotSource()));
+	   if(imageShower == null)
+		   imageShower = new ImageShower(this.getGraph(this.getDotSource()));
    }
 
    /**
@@ -295,7 +294,9 @@ public class GraphViz
       byte[] img_stream = null;
    
       try {
+    	 long time = System.currentTimeMillis();
          dot = writeDotSourceToFile(dot_source);
+         System.out.println("time "+(System.currentTimeMillis()-time));
          if (dot != null)
          {
             img_stream = get_img_stream(dot, type);
@@ -346,7 +347,8 @@ public class GraphViz
    {
       File img;
       byte[] img_stream = null;
-
+	  long time = System.currentTimeMillis();
+	  
       try {
          img = File.createTempFile("graph_", "."+type, new File(GraphViz.TEMP_DIR));
          img.deleteOnExit();
@@ -357,15 +359,21 @@ public class GraphViz
          Process p = rt.exec(args);
          
          p.waitFor();
+         
+         System.out.println("wait "+(System.currentTimeMillis()-time));
 
          FileInputStream in = new FileInputStream(img.getAbsolutePath());
          img_stream = new byte[in.available()];
          in.read(img_stream);
          // Close it if we need to
          if( in != null ) in.close();
+         
+         System.out.println("read "+(System.currentTimeMillis()-time));
 
-         if (img.delete() == false) 
-            System.err.println("Warning: " + img.getAbsolutePath() + " could not be deleted!");
+//         if (img.delete() == false) 
+//            System.err.println("Warning: " + img.getAbsolutePath() + " could not be deleted!");
+         
+         System.out.println("delete "+(System.currentTimeMillis()-time));
       }
       catch (IOException ioe) {
          System.err.println("Error:    in I/O processing of tempfile in dir " + GraphViz.TEMP_DIR+"\n");
@@ -376,7 +384,9 @@ public class GraphViz
          System.err.println("Error: the execution of the external program was interrupted");
          ie.printStackTrace();
       }
-
+      
+      System.out.println();
+      
       return img_stream;
    }
 
@@ -441,7 +451,7 @@ public class GraphViz
 	   
 	   public void changeImage(BufferedImage img) {
 		   panel.setImage(img);
-		   setSize(panel.getSize());
+//		   setSize(panel.getSize());
 		   this.repaint();
 	   }
    }

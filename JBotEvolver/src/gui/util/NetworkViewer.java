@@ -1,5 +1,6 @@
 package gui.util;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -10,6 +11,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+
+import evolutionaryrobotics.neuralnetworks.BehaviorController;
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -78,6 +81,20 @@ public class NetworkViewer extends JFrame implements Updatable{
 			((JProgressBar)inputsPanel.getComponent(i)).setValue((int)(inputValues[i]*100));
 		for(int i = 0 ; i < outputs ; i++) {
 			((JProgressBar)outputsPanel.getComponent(i)).setValue((int)(outputValues[i]*100));
+		}
+		
+		if(controller instanceof BehaviorController) {
+			
+			int maxIndex = 0;
+			
+			for(int i = 0 ; i < outputValues.length ; i++) {
+				((JProgressBar)outputsPanel.getComponent(i)).setStringPainted(false);
+//				((JProgressBar)outputsPanel.getComponent(i)).setBackground(Color.blue);
+				if(outputValues[i] > outputValues[maxIndex]) {
+					maxIndex =i;
+				}
+			}
+			((JProgressBar)outputsPanel.getComponent(maxIndex)).setStringPainted(true);
 		}
 	}
 }

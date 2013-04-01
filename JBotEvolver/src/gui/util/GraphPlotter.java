@@ -268,6 +268,9 @@ public class GraphPlotter extends JFrame implements Updatable {
 	
 	private void plotGraph() {
 		
+		valuesList = new ArrayList<double[][]>();
+		titlesList = new ArrayList<String>();
+		
 		simulator = jBotEvolver.createSimulator();
 		simulator.addCallback(jBotEvolver.getEvaluationFunction());
 		jBotEvolver.setupBestIndividual(simulator);
@@ -610,6 +613,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 				}
 		
 				p.set("xrange", "[0:"+(currentStep-1)+"]");
+				p.set("border", "3");
 				(new Plotter(p)).start();
 			}
 		}

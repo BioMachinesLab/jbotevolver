@@ -18,6 +18,7 @@ public class GenerationalEvolution extends Evolution {
 	private Population population;
 	private boolean supressMessages = false;
 	private DiskStorage diskStorage;
+	private String output = "";
 
 	public GenerationalEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
@@ -36,6 +37,7 @@ public class GenerationalEvolution extends Evolution {
 		}
 		
 		if (jBotEvolver.getArguments().get("--output") != null) {
+			output = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
 			diskStorage = new DiskStorage(jBotEvolver.getArguments().get("--output").getCompleteArgumentString());
 			try {
 				diskStorage.start();
@@ -53,9 +55,14 @@ public class GenerationalEvolution extends Evolution {
 		if(population.getNumberOfCurrentGeneration() == 0)
 			population.createRandomPopulation();
 		
-		taskExecutor.prepareArguments(jBotEvolver.getArguments());
+		if(!population.evolutionDone())
+			taskExecutor.prepareArguments(jBotEvolver.getArguments());
+		
+		taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
 		
 		while(!population.evolutionDone()) {
+			
+			taskExecutor.setDescription(output+" "+population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations());
 			
 			Chromosome c;
 			
@@ -91,6 +98,7 @@ public class GenerationalEvolution extends Evolution {
 			} catch(Exception e) {e.printStackTrace();}
 			
 			population.createNextGeneration();
+			
 		}
 	}
 	

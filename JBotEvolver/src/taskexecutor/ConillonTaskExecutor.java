@@ -53,10 +53,20 @@ public class ConillonTaskExecutor extends TaskExecutor {
 			//args.setArgument(name, completeArgs);
 		}
 	}
-
+	
 	@Override
 	public void addTask(Task t) {
 		client.commit(t);
+	}
+	
+	@Override
+	public void setTotalNumberOfTasks(int nTasks) {
+		client.setTotalNumberOfTasks(nTasks);
+	}
+	
+	@Override
+	public void setDescription(String desc) {
+		client.setDesc(desc);
 	}
 
 	@Override
