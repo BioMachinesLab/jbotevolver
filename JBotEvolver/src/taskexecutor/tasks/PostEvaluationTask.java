@@ -47,8 +47,11 @@ public class PostEvaluationTask extends JBotEvolverTask {
 			EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
 			simulator.addCallback(eval);
 			simulator.simulate();
+			System.out.println(i+" "+eval.getFitness());
 			if(threshold > 0)
 				fitness+= eval.getFitness() > threshold ? 1 : 0;
+			else
+				fitness+= eval.getFitness();	
 		}
 	}
 	public Result getResult() {

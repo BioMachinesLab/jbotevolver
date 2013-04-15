@@ -283,7 +283,9 @@ public class MuLambdaPopulation extends Population implements Serializable {
 
 	// @Override
 	public boolean evolutionDone() {
-		if (currentGeneration == numberOfGenerations || fitnessThresholdReached)
+		if (currentGeneration == numberOfGenerations ||
+				(currentGeneration == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == populationSize) ||
+				fitnessThresholdReached)
 			return true;
 		else
 			return false;

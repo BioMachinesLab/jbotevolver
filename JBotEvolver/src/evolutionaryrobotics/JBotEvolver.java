@@ -60,10 +60,11 @@ public class JBotEvolver extends JBotSim {
 			absolutePath = (new File("./"+arguments.get("--output").getCompleteArgumentString())).getCanonicalPath();
 		
 		if(arguments.get("--population") != null) {
-			if(parentFolder.isEmpty())
+			if(parentFolder.isEmpty()) {
 				arguments.get("--population").setArgument("parentfolder", absolutePath);
-			else
+			}else{
 				arguments.get("--population").setArgument("parentfolder", parentFolder);
+			}
 		}
 	}
 
