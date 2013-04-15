@@ -207,7 +207,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		
 		double inputValue = 0;
 		
-		if(source.getObject().getType() == PhysicalObjectType.WALL) {
+		if(source.getObject().getType() != PhysicalObjectType.ROBOT) {
 		
 			Wall w = (Wall) source.getObject();
 			

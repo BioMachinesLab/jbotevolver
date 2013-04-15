@@ -9,7 +9,7 @@ import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;
-import simulation.robot.sensors.PreyCarriedSensor;
+import simulation.robot.sensors.EpuckIRSensor;
 import simulation.util.Arguments;
 
 public class TwoRoomsEnvironment extends Environment {
@@ -25,23 +25,34 @@ public class TwoRoomsEnvironment extends Environment {
 	private boolean teleport = true;
 	public boolean doorsOpen = false;
 	private int doorTime = 0;
-	private int doorOpenTime = 200;
+	private int doorOpenTime = 400;
 	private boolean useDoors = true;
 	private boolean bothRooms = true;
 	
 	private double exitWidth = 0.15;
 	private double arenaWidth = 0;
-	private double corridorWidth = 1;
+	private double arenaHeight = 0;
+	private double corridorWidth = 0.4;
 	
 	private boolean teleportOpenDoor = false;
 	private boolean removeWalls = false;
 	private double randomizeOrientation = 0;
 	
+	private boolean postEval = false;
+	private int extraPostEvalTime = 0;
+	private int postEvalTime = 1;
+	
+	private int[] postEvalPreyRate = new int[2];
+	private boolean postEvalLeftRoom = true;
+	private int postEvalPreyCount = 0;
+	
+	private Simulator simulator;
+	
 	private Prey[] preys;
 
 	public TwoRoomsEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator,arguments);
-		
+		this.simulator = simulator;
 		this.random = simulator.getRandom();
 		preyRandom = new Random(random.nextLong());
 		splitRatio = arguments.getArgumentAsDoubleOrSetDefault("splitratio",splitRatio);
@@ -52,10 +63,18 @@ public class TwoRoomsEnvironment extends Environment {
 		useDoors = arguments.getArgumentAsIntOrSetDefault("usedoors",1) == 1;
 		exitWidth = arguments.getArgumentAsDoubleOrSetDefault("exitwidth",exitWidth);
 		arenaWidth = arguments.getArgumentAsDoubleOrSetDefault("arenawidth",arenaWidth);
+		arenaHeight = arguments.getArgumentAsDoubleOrSetDefault("arenaheight",arenaWidth);
 		bothRooms = arguments.getArgumentAsIntOrSetDefault("bothrooms", 1) == 1;
 		teleportOpenDoor = arguments.getArgumentAsIntOrSetDefault("teleportopendoor", 0) == 1;
 		removeWalls = arguments.getArgumentAsIntOrSetDefault("removewalls", 0) == 1;
 		randomizeOrientation = Math.toRadians(arguments.getArgumentAsIntOrSetDefault("randomizeorientation", 0));
+		corridorWidth = arguments.getArgumentAsDoubleOrSetDefault("corridorwidth",corridorWidth+random.nextDouble()*0.2);
+		
+		postEval = arguments.getArgumentAsIntOrSetDefault("posteval", 0) == 1;
+		postEvalTime = arguments.getArgumentAsIntOrSetDefault("postevaltime", 0);
+		
+		if(postEval)
+			calculateDropRate(arguments.getArgumentAsDoubleOrSetDefault("postevaldroprate", 0));
 		
 		preys = new Prey[maxPreys];
 		
@@ -72,15 +91,13 @@ public class TwoRoomsEnvironment extends Environment {
 			addMovableObject(preys[i]);
 		}
 		
-
 		if(teleport) {
 			double sign = 1;
 			if(random.nextDouble() > 0.5 && bothRooms)
 				sign*=-1;
 
-			double ySign = random.nextDouble() > 0.5 ? -1 : 1;
+			robots.get(0).teleportTo(new Vector2d((random.nextDouble()*(arenaWidth-0.2-0.2)+corridorWidth/2+0.2)*sign,random.nextDouble()*(arenaHeight-0.2-0.2)-arenaHeight/2+0.2));
 			
-			robots.get(0).teleportTo(new Vector2d((random.nextDouble()*arenaWidth*0.66+corridorWidth/1.5)*sign,ySign*arenaWidth/2.0*random.nextDouble()*0.66));
 			double orientation = robots.get(0).getOrientation()+(random.nextDouble()*2-1)*this.randomizeOrientation;
 			robots.get(0).setOrientation(orientation);
 		}
@@ -94,12 +111,24 @@ public class TwoRoomsEnvironment extends Environment {
 	@Override
 	public void update(double time) {
 		
+		if(postEval) {
+			if(simulator.getTime()+extraPostEvalTime > postEvalTime)
+				simulator.stopSimulation();
+		}
+		
 		if(numberOfPreys < maxPreys) {
 			if(time % timeBetweenPreys == 0) {
-				double sign = 1;
-				if(preyRandom.nextDouble() > splitRatio)
-					sign*=-1;
-				addPrey((preyRandom.nextDouble()*arenaWidth*0.66+corridorWidth/1.5)*sign,(preyRandom.nextDouble()*arenaWidth*0.66-arenaWidth/3));
+				double sign;
+				
+				if(postEval) {
+					sign = calculatePostEvalPreyDropRoom();
+				} else {
+					sign = 1;
+					if(preyRandom.nextDouble() > splitRatio)
+						sign*=-1;
+				}
+				
+				addPrey((preyRandom.nextDouble()*(arenaWidth-0.2-0.2)+corridorWidth/2+0.2)*sign,(preyRandom.nextDouble()*(arenaHeight-0.2-0.2)-arenaHeight/2+0.2));
 			}
 		}
 		
@@ -133,6 +162,20 @@ public class TwoRoomsEnvironment extends Environment {
 	
 	public void openDoor() {
 		if(!doorsOpen) {
+			
+			Robot r = robots.get(0);
+			
+			if(postEval) {
+				EpuckIRSensor sensor = (EpuckIRSensor)r.getSensorByType(EpuckIRSensor.class);
+				if(sensor.getSensorReading(1) > 0) {
+					extraPostEvalTime+=277;
+				}else if(sensor.getSensorReading(2) > 0) {
+					extraPostEvalTime+=401;
+				}else {
+					extraPostEvalTime+=284;
+				}
+			}
+			
 			doorTime = 0;
 			doorsOpen = true;
 			for(Wall w : buttons) {
@@ -141,16 +184,24 @@ public class TwoRoomsEnvironment extends Environment {
 			}
 			
 			if(teleportOpenDoor) {
-				Robot r = robots.get(0);
+				r = robots.get(0);
 				double orientation = r.getOrientation();
 				double oldX = r.getPosition().getX();
+				
+				if(Math.abs(oldX)-Math.abs(corridorWidth/2+0.1) < 0) {
+					if(oldX < 0)
+						oldX-=0.1;
+					else
+						oldX+=0.1;
+				}
+				
 				double oldY = r.getPosition().getY();
 				
 				if(oldX < 0) {
-					oldY = 0.2;
+					oldY = -0.2;
 					orientation = 0;
 				} else {
-					oldY = -0.2;
+					oldY = 0.2;
 					orientation = Math.PI;
 				}
 				
@@ -184,34 +235,82 @@ public class TwoRoomsEnvironment extends Environment {
 	protected void createRoom(Simulator simulator) {
 		
 		if(arenaWidth == 0)
-			arenaWidth = random.nextDouble()/2 + 1;
+			arenaWidth = random.nextDouble()*0.4 + 0.8;
+		if(arenaHeight == 0)
+			arenaHeight = random.nextDouble()*0.4 + 0.8;
 		
 		double centerX = -corridorWidth/2 - arenaWidth/2;
 		
 		//left
-		createWall(simulator,centerX-arenaWidth/2,0,0.1,arenaWidth+0.1,PhysicalObjectType.WALL);
-		createWall(simulator,centerX,arenaWidth/2,arenaWidth,0.1,PhysicalObjectType.WALL);
-		createWall(simulator,centerX,-arenaWidth/2,arenaWidth+0.1,0.1,PhysicalObjectType.WALL);
+		createWall(simulator,centerX-arenaWidth/2,0,0.1,arenaHeight+0.1,PhysicalObjectType.WALL);
+		createWall(simulator,centerX,arenaHeight/2,arenaWidth,0.1,PhysicalObjectType.WALL);
+		createWall(simulator,centerX,-arenaHeight/2,arenaWidth+0.1,0.1,PhysicalObjectType.WALL);
 		
-		createWall(simulator,centerX+arenaWidth/2,-arenaWidth/3,0.1,arenaWidth/3+0.1,PhysicalObjectType.WALL);
-		createWall(simulator,centerX+arenaWidth/2,arenaWidth/3,0.1,arenaWidth/3+0.1,PhysicalObjectType.WALL);
+		createWall(simulator,centerX+arenaWidth/2,-arenaHeight/3,0.1,(arenaHeight-exitWidth-0.2)/2+0.1,PhysicalObjectType.WALL);
+		createWall(simulator,centerX+arenaWidth/2,arenaHeight/3,0.1,(arenaHeight-exitWidth-0.2)/2+0.1,PhysicalObjectType.WALL);
 		
 		//right
-		createWall(simulator,-centerX+arenaWidth/2,0,0.1,arenaWidth+0.1,PhysicalObjectType.WALL);
-		createWall(simulator,-centerX,arenaWidth/2,arenaWidth,0.1,PhysicalObjectType.WALL);
-		createWall(simulator,-centerX,-arenaWidth/2,arenaWidth+0.1,0.1,PhysicalObjectType.WALL);
+		createWall(simulator,-centerX+arenaWidth/2,0,0.1,arenaHeight+0.1,PhysicalObjectType.WALL);
+		createWall(simulator,-centerX,arenaHeight/2,arenaWidth,0.1,PhysicalObjectType.WALL);
+		createWall(simulator,-centerX,-arenaHeight/2,arenaWidth+0.1,0.1,PhysicalObjectType.WALL);
 		
-		createWall(simulator,-centerX-arenaWidth/2,-arenaWidth/3,0.1,arenaWidth/3+0.1,PhysicalObjectType.WALL);
-		createWall(simulator,-centerX-arenaWidth/2,arenaWidth/3,0.1,arenaWidth/3+0.1,PhysicalObjectType.WALL);
+		createWall(simulator,-centerX-arenaWidth/2,-arenaHeight/3,0.1,(arenaHeight-exitWidth-0.2)/2+0.1,PhysicalObjectType.WALL);
+		createWall(simulator,-centerX-arenaWidth/2,arenaHeight/3,0.1,(arenaHeight-exitWidth-0.2)/2+0.1,PhysicalObjectType.WALL);
 		
 		//center
-		createWall(simulator,0,exitWidth,1.1,0.1,PhysicalObjectType.WALL);
-		createWall(simulator,0,-exitWidth,1.1,0.1,PhysicalObjectType.WALL);
-		
+		createWall(simulator,0,exitWidth,corridorWidth+0.1,0.1,PhysicalObjectType.WALL);
+		createWall(simulator,0,-exitWidth,corridorWidth+0.1,0.1,PhysicalObjectType.WALL);
+	
 		if(useDoors) {
 			//buttons
 			buttons.add(createWall(simulator,-corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALLBUTTON));
 			buttons.add(createWall(simulator,corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALLBUTTON));
 		}
+	}
+	
+	private void  calculateDropRate(double percentage) {
+		
+		boolean switched = false;
+		
+		if(percentage > 0.5) {
+			switched = true;
+			percentage = Math.round((1-percentage)*100.0)/100.0;
+		}
+		
+		double temp = 1.0/percentage;
+		
+		int first = 0;
+		int second = 0;
+		
+		if(temp != (double)((int)temp)) {
+			if(percentage != 0 && percentage != 1)
+				throw new NullPointerException();
+			first = switched ? 1 : 0;
+			second = switched ? 0 : 1;
+		}else {
+			first = (int)(temp*percentage);
+			second = (int)(temp-first);
+			if(switched) {
+				int t = first;
+				first = second;
+				second = t;
+			}
+		}
+		postEvalPreyRate =  new int[]{first,second};
+	}
+	
+	private int calculatePostEvalPreyDropRoom() {
+		
+		if(postEvalPreyCount == 0) {
+			postEvalLeftRoom = !postEvalLeftRoom;
+			postEvalPreyCount = postEvalPreyRate[postEvalLeftRoom ? 0 : 1];
+		}
+		
+		if(postEvalPreyCount == 0)
+			return calculatePostEvalPreyDropRoom();
+		
+		postEvalPreyCount--;
+		
+		return postEvalLeftRoom ? -1 : 1;
 	}
 }

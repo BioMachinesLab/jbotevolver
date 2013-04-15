@@ -15,7 +15,6 @@ public class TurnLeftBehavior extends Behavior {
 	
 	public TurnLeftBehavior(Simulator simulator, Robot r, Arguments args) {
 		super(simulator, r, args);
-		System.out.println(lock);
 	}
 	
 	@Override

@@ -4,6 +4,7 @@ import gui.StartupGui;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -57,6 +58,8 @@ public class Arguments implements Serializable {
 	 * Vector of the values for the arguments in "arguments".
 	 */
 	protected Vector<String> values = new Vector<String>();
+	
+	protected String loadedFile = "";
 
 	/**
 	 * Initializes a new arguments instance and sets all arguments to
@@ -700,6 +703,22 @@ public class Arguments implements Serializable {
 //		Arguments commandLineArguments = new Arguments(commandLine.trim(),true);
 //		result.put("commandline",result);
 		AutoArgumentsGeneration.getAuto(result);
+		
+		if(optionsFilename != null && result.get("--output") != null) {
+			
+			String pop = result.get("--population").getCompleteArgumentString();
+			
+			if(pop != null && pop.contains("load")) {
+				String output = result.get("--output").getCompleteArgumentString();
+				
+				String parent = new File(optionsFilename).getParent();
+				
+				if(!parent.equals(output)) {
+					result.put("--output", new Arguments(parent));
+				}
+			}
+		}
+		
 		return result;
 	}
 
@@ -714,7 +733,7 @@ public class Arguments implements Serializable {
 		BufferedReader bufferedReader;
 		StringBuffer sb = new StringBuffer();
 		String nextLine;
-
+		
 		bufferedReader = new BufferedReader(new InputStreamReader(
 				new DataInputStream(new FileInputStream(filename))));
 

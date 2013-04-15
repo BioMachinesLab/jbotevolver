@@ -21,6 +21,7 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 	private double minWidth = 1;
 	private double minHeight = 1;
 	
+	private boolean randomizeMazeY = false;
 	private boolean extraRobot = false;
 
 	public ClutteredMazeEnvironment(Simulator simulator, Arguments arguments) {
@@ -35,6 +36,7 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		objects = arguments.getArgumentAsIntOrSetDefault("objects",objects);
 		
 		extraRobot = arguments.getArgumentAsIntOrSetDefault("extrarobot",0) == 1;
+		randomizeMazeY = arguments.getArgumentAsIntOrSetDefault("randomizemazey",0) == 1;
 	}
 	
 	@Override
@@ -106,7 +108,11 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 			Square sq = getSquares().peek();
 			if(inverse)
 				sq = getSquares().peekLast();
-			offsetY = sq.getY()-arenaHeight/2-exitWidth*4;
+			double rand = 0;
+			if(randomizeMazeY)
+				rand = simulator.getRandom().nextDouble()*0.25;
+			
+			offsetY = sq.getY()-arenaHeight/2-exitWidth*4+rand;
 		}
 		
 		double exitX = -arenaWidth/2;
