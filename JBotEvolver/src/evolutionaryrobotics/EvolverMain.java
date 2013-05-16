@@ -14,8 +14,4 @@ public class EvolverMain {
 		evo.executeEvolution();
 		taskExecutor.stopTasks();
 	}
-
-	public static void main(String[] args) throws Exception {
-		new EvolverMain(new String[]{"main_arbitrator.conf"});
-	}
 }

@@ -16,6 +16,9 @@ import simulation.util.Factory;
  * @author alc
  */
 public abstract class Population implements Serializable {
+	//the UID is important for backwards compatibility
+	private static final long serialVersionUID = 5558128741655037815L;
+	
 	protected long generationRandomSeed;
 	protected int numberOfSamplesPerChromosome;
 	protected int numberOfGenerations    = 100;

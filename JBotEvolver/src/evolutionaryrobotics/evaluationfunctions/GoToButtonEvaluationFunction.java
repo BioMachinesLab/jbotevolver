@@ -7,7 +7,7 @@ import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class GoToDoorEvaluationFunction extends EvaluationFunction {
+public class GoToButtonEvaluationFunction extends EvaluationFunction {
 	
 	private double targetX = 0;
 	private double steps = 0;
@@ -17,7 +17,7 @@ public class GoToDoorEvaluationFunction extends EvaluationFunction {
 	private TwoRoomsEnvironment env;
 	private Wall closestWallButton;
 
-	public GoToDoorEvaluationFunction(Arguments arguments) {
+	public GoToButtonEvaluationFunction(Arguments arguments) {
 		super(arguments);
 //		targetX = arguments.getArgumentAsDoubleOrSetDefault("targetx", targetX);
 		steps = arguments.getArgumentAsDoubleOrSetDefault("steps", steps);
@@ -55,7 +55,7 @@ public class GoToDoorEvaluationFunction extends EvaluationFunction {
 		
 		double robotY = env.getRobots().get(0).getPosition().getY();
 		
-		if((openDoor && env.doorsOpen) || (!openDoor && getHorizontalDistanceToWall(r,closestWallButton) < 0.15 && Math.abs(robotY) < 0.1)) {
+		if((openDoor && env.doorsOpen) || (!openDoor && getHorizontalDistanceToWall(r,closestWallButton) < 0.15 && Math.abs(closestWallButton.getPosition().getY()-robotY) < 0.1)) {
 			fitness = 1 + ((steps-simulator.getTime())/steps);
 			simulator.stopSimulation();
 		}

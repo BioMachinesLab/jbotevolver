@@ -3,7 +3,6 @@ package evolutionaryrobotics;
 import java.io.File;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.PostEvaluationResult;
-import taskexecutor.results.SimpleFitnessResult;
 import taskexecutor.tasks.PostEvaluationTask;
 
 public class PostEvaluation {
