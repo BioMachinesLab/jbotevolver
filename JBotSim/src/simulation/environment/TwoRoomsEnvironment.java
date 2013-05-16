@@ -15,6 +15,7 @@ import simulation.util.Arguments;
 public class TwoRoomsEnvironment extends Environment {
 	
 	private LinkedList<Wall> buttons = new LinkedList<Wall>();
+	private LinkedList<Wall> doors = new LinkedList<Wall>();
 	private int numberOfPreys = 0;
 	private Random preyRandom;
 	private Random random;
@@ -45,10 +46,13 @@ public class TwoRoomsEnvironment extends Environment {
 	private int[] postEvalPreyRate = new int[2];
 	private boolean postEvalLeftRoom = true;
 	private int postEvalPreyCount = 0;
+	private int startingRoom = 0;
 	
 	private Simulator simulator;
 	
 	private Prey[] preys;
+	
+	private boolean realButton = false;
 
 	public TwoRoomsEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator,arguments);
@@ -64,6 +68,7 @@ public class TwoRoomsEnvironment extends Environment {
 		exitWidth = arguments.getArgumentAsDoubleOrSetDefault("exitwidth",exitWidth);
 		arenaWidth = arguments.getArgumentAsDoubleOrSetDefault("arenawidth",arenaWidth);
 		arenaHeight = arguments.getArgumentAsDoubleOrSetDefault("arenaheight",arenaWidth);
+		startingRoom = arguments.getArgumentAsIntOrSetDefault("startingroom",startingRoom);
 		bothRooms = arguments.getArgumentAsIntOrSetDefault("bothrooms", 1) == 1;
 		teleportOpenDoor = arguments.getArgumentAsIntOrSetDefault("teleportopendoor", 0) == 1;
 		removeWalls = arguments.getArgumentAsIntOrSetDefault("removewalls", 0) == 1;
@@ -72,6 +77,8 @@ public class TwoRoomsEnvironment extends Environment {
 		
 		postEval = arguments.getArgumentAsIntOrSetDefault("posteval", 0) == 1;
 		postEvalTime = arguments.getArgumentAsIntOrSetDefault("postevaltime", 0);
+		
+		realButton = arguments.getArgumentAsIntOrSetDefault("realbutton", 0) == 1;
 		
 		if(postEval)
 			calculateDropRate(arguments.getArgumentAsDoubleOrSetDefault("postevaldroprate", 0));
@@ -95,13 +102,15 @@ public class TwoRoomsEnvironment extends Environment {
 			double sign = 1;
 			if(random.nextDouble() > 0.5 && bothRooms)
 				sign*=-1;
+			
+			if(startingRoom != 0)
+				sign = startingRoom;
 
 			robots.get(0).teleportTo(new Vector2d((random.nextDouble()*(arenaWidth-0.2-0.2)+corridorWidth/2+0.2)*sign,random.nextDouble()*(arenaHeight-0.2-0.2)-arenaHeight/2+0.2));
 			
 			double orientation = robots.get(0).getOrientation()+(random.nextDouble()*2-1)*this.randomizeOrientation;
 			robots.get(0).setOrientation(orientation);
-		}
-		
+		}	
 	}
 	
 	public int getNumberOfPicks() {
@@ -135,7 +144,7 @@ public class TwoRoomsEnvironment extends Environment {
 		Robot r = robots.get(0);
 		
 		PreyPickerActuator actuator = (PreyPickerActuator)r.getActuatorByType(PreyPickerActuator.class);
-		if (actuator.isCarryingPrey()){
+		if (actuator != null && actuator.isCarryingPrey()){
 			numberOfPicks++;
 			Prey preyToDrop = actuator.dropPrey();
 			preyToDrop.teleportTo(new Vector2d(0,-3));
@@ -167,10 +176,9 @@ public class TwoRoomsEnvironment extends Environment {
 			
 			if(postEval) {
 				EpuckIRSensor sensor = (EpuckIRSensor)r.getSensorByType(EpuckIRSensor.class);
-				if(sensor.getSensorReading(1) > 0) {
-					extraPostEvalTime+=277;
-				}else if(sensor.getSensorReading(2) > 0) {
-					extraPostEvalTime+=401;
+
+				if(sensor.getSensorReading(2) > 0 || sensor.getSensorReading(1) > 0) {
+					extraPostEvalTime+=325;
 				}else {
 					extraPostEvalTime+=284;
 				}
@@ -178,7 +186,7 @@ public class TwoRoomsEnvironment extends Environment {
 			
 			doorTime = 0;
 			doorsOpen = true;
-			for(Wall w : buttons) {
+			for(Wall w : doors) {
 				w.setPosition(w.getPosition().x-20, w.getPosition().y-20);
 				w.moveWall();
 			}
@@ -186,25 +194,18 @@ public class TwoRoomsEnvironment extends Environment {
 			if(teleportOpenDoor) {
 				r = robots.get(0);
 				double orientation = r.getOrientation();
-				double oldX = r.getPosition().getX();
-				
-				if(Math.abs(oldX)-Math.abs(corridorWidth/2+0.1) < 0) {
-					if(oldX < 0)
-						oldX-=0.1;
-					else
-						oldX+=0.1;
-				}
-				
-				double oldY = r.getPosition().getY();
+			
+				Wall w = findClosestWallButton(buttons,r);
+				double oldY = w.getPosition().getY();
+				double oldX = w.getPosition().getX();
 				
 				if(oldX < 0) {
-					oldY = -0.2;
-					orientation = 0;
+					oldX-=0.1;
+					orientation = Math.PI/2;
 				} else {
-					oldY = 0.2;
-					orientation = Math.PI;
+					oldX+=0.1;
+					orientation = -Math.PI/2;
 				}
-				
 				r.teleportTo(new Vector2d(oldX,oldY));
 				r.setOrientation(orientation);
 			}
@@ -214,7 +215,7 @@ public class TwoRoomsEnvironment extends Environment {
 	public void closeDoor() {
 		if(doorsOpen) {
 			doorsOpen = false;
-			for(Wall w : buttons) {
+			for(Wall w : doors) {
 				w.setPosition(w.getPosition().x+20, w.getPosition().y+20);
 				w.moveWall();
 			}
@@ -260,11 +261,13 @@ public class TwoRoomsEnvironment extends Environment {
 		//center
 		createWall(simulator,0,exitWidth,corridorWidth+0.1,0.1,PhysicalObjectType.WALL);
 		createWall(simulator,0,-exitWidth,corridorWidth+0.1,0.1,PhysicalObjectType.WALL);
-	
+		
+		//buttons
 		if(useDoors) {
-			//buttons
-			buttons.add(createWall(simulator,-corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALLBUTTON));
-			buttons.add(createWall(simulator,corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALLBUTTON));
+			doors.add(createWall(simulator,-corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALL));
+			doors.add(createWall(simulator,corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALL));
+			buttons.add(createWall(simulator,-corridorWidth/2,-0.25,0.1,0.1,PhysicalObjectType.WALLBUTTON));
+			buttons.add(createWall(simulator,corridorWidth/2,0.25,0.1,0.1,PhysicalObjectType.WALLBUTTON));
 		}
 	}
 	
@@ -312,5 +315,19 @@ public class TwoRoomsEnvironment extends Environment {
 		postEvalPreyCount--;
 		
 		return postEvalLeftRoom ? -1 : 1;
+	}
+	
+	private Wall findClosestWallButton(LinkedList<Wall> buttons, Robot robot) {
+		
+		int minIndex = 0;
+		double x = robot.getPosition().getX();
+		
+		for(int i = 1 ; i < buttons.size() ; i++) {
+			Wall w = buttons.get(i);
+			double wx = w.getPosition().getX();
+			if(Math.abs(x-wx) < Math.abs(x-buttons.get(minIndex).getPosition().getX()))
+				minIndex = i;
+		}
+		return buttons.get(minIndex);
 	}
 }

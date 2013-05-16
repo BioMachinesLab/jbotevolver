@@ -54,7 +54,7 @@ public class Factory implements Serializable{
 			}
 			//System.out.println(s);
 			
-			//System.out.println(className+" ## "+Class.forName(className).getName());
+			System.out.println(className+" ## "+Class.forName(className).getName());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
