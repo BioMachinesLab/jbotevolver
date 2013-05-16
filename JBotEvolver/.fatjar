@@ -1,5 +1,5 @@
 #Fat Jar Configuration File
-#Wed Feb 06 18:42:36 WET 2013
+#Thu Feb 21 17:29:44 WET 2013
 onejar.license.required=true
 manifest.classpath=
 manifest.removesigners=true
@@ -10,5 +10,5 @@ manifest.mainclass=evolutionaryrobotics.JBotEvolver
 manifest.file=<createnew>
 jarname.isextern=false
 onejar.expand=
-excludes=
+excludes=<po|JBotEvolver>~.DS_Store;<po|JBotSim>;<jar|Paralleler.jar>;<jar|JavaPlot.jar>;<jar|commons-io-2.2.jar>;<jar|asm-all-4.0.jar>
 includes=
