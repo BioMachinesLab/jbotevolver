@@ -16,8 +16,46 @@ public class RobotRGBColorActuator extends Actuator {
 	protected double green = 0.0f;
 	protected double blue  = 0.0f;
 	
+	boolean controlRed   = true;
+	boolean controlGreen = true;
+	boolean controlBlue  = true;
+	
 	public RobotRGBColorActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
+		if (args.getArgumentIsDefined("mode")) {
+			String modeStr = args.getArgumentAsString("mode");
+
+			if (modeStr.contains("r") || modeStr.contains("R"))
+				controlRed = true;
+
+			if (modeStr.contains("g") || modeStr.contains("G"))
+				controlGreen = true;
+
+			if (modeStr.contains("b") || modeStr.contains("B"))
+				controlBlue = true;
+
+			if (!controlRed && !controlGreen && !controlBlue) {
+				throw new RuntimeException(
+						"RobotRGBColorActuator specified, but no correct colors are listed in the mode=... part (mode='"
+								+ modeStr + "')");
+			}
+		} else {
+			controlRed = true;
+			controlGreen = true;
+			controlBlue = true;
+		}
+	}
+	
+	public boolean controlRed() {
+		return controlRed;
+	}
+	
+	public boolean controlBlue() {
+		return controlBlue;
+	}
+	
+	public boolean controlGreen() {
+		return controlGreen;
 	}
 
 	public void setRed(double red) {

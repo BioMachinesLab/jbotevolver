@@ -13,34 +13,15 @@ public class RobotRGBColorNNOutput extends NNOutput {
 	double  green = 0.0f;
 	double  blue  = 0.0f;
 	
-	RobotRGBColorActuator robotRGBColorActuator;
+	private RobotRGBColorActuator robotRGBColorActuator;
 	
 	public RobotRGBColorNNOutput(Actuator robotRGBColorActuator, Arguments args) {
 		super(robotRGBColorActuator,args);
 		this.robotRGBColorActuator = (RobotRGBColorActuator)robotRGBColorActuator;
 
-		if (args.getArgumentIsDefined("mode")) {
-			String modeStr = args.getArgumentAsString("mode");
-
-			if (modeStr.contains("r") || modeStr.contains("R"))
-				controlRed = true;
-
-			if (modeStr.contains("g") || modeStr.contains("G"))
-				controlGreen = true;
-
-			if (modeStr.contains("b") || modeStr.contains("B"))
-				controlBlue = true;
-
-			if (!controlRed && !controlGreen && !controlBlue) {
-				throw new RuntimeException(
-						"RobotRGBColorNNOutput specified, but no correct colors are listed in the mode=... part (mode='"
-								+ modeStr + "')");
-			}
-		} else {
-			controlRed = true;
-			controlGreen = true;
-			controlBlue = true;
-		}
+		controlRed = this.robotRGBColorActuator.controlRed();
+		controlGreen = this.robotRGBColorActuator.controlGreen();
+		controlBlue = this.robotRGBColorActuator.controlBlue();
 	}
 	
 	public void setRed(double value) {
