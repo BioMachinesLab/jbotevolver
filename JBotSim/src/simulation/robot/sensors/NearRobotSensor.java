@@ -18,6 +18,8 @@ public class NearRobotSensor extends Sensor {
 	public NearRobotSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator,id,robot, args);
 		range = args.getArgumentAsDoubleOrSetDefault("range",DEFAULT_RANGE);
+		//default it as true to enable backwards compatibility
+		turnOff = args.getArgumentAsIntOrSetDefault("turnoff", 1) == 1;
 		this.env = simulator.getEnvironment();
 	}
 	

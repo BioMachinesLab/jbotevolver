@@ -39,6 +39,8 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	private double offsetNoise = 0;
 	private double[] offsetNoises;
 	
+	private boolean senseRobot = false;
+	
 	//Epuck 2019, moving wheels, wood, sensors 0,2,5,7
 	
 	static double sensorAverages[] = {3817.45625,3293.9575,1741.14,897.92,556.1275,215.16375,107.09875,60.41125,39.54625,25.67875,19.43125,14.98,11.05375,8.74625,9.405};
@@ -87,6 +89,8 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		numberOfSensors = 4;
 		this.readings = new double[numberOfSensors];
 		range = RANGE;
+		
+		senseRobot = args.getArgumentAsIntOrSetDefault("senserobot", 0) == 1;
 
 		cutoffAngle = args.getArgumentAsDoubleOrSetDefault("cutoffangle", 0);
 		boolean fixedSensor = args.getArgumentAsIntOrSetDefault("fixedsensor", 0) == 1;
@@ -246,7 +250,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 				}
 			}
 
-		} else if(source.getObject().getType() == PhysicalObjectType.ROBOT) {
+		} else if(source.getObject().getType() == PhysicalObjectType.ROBOT && senseRobot) {
 			
 			//TODO This isn't really accurate
 			

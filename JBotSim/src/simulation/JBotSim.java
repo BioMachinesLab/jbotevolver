@@ -33,6 +33,10 @@ public class JBotSim implements Serializable{
 	}
 	
 	public Simulator createSimulator() {
+		
+		if(arguments.get("--random-seed").getCompleteArgumentString() == null)
+			throw new RuntimeException("Random seed is null!");
+		
 		long seed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());
 		return createSimulator(new Random(seed));
 	}

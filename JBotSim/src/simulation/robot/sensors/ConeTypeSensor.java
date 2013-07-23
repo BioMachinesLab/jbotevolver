@@ -87,7 +87,7 @@ public abstract class ConeTypeSensor extends Sensor {
 		if(closeObjects != null)
 			closeObjects.update(time, teleported);
 		try { 
-			for(int j = 0; j < numberOfSensors; j++){
+			for(int j = 0; j < getNumberOfSensors(); j++){
 				readings[j] = 0.0;
 			}
 			CloseObjectIterator iterator = getCloseObjects().iterator();
@@ -110,7 +110,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	}
 
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
-		for(int j=0; j<numberOfSensors; j++){
+		for(int j=0; j<getNumberOfSensors(); j++){
 			readings[j] = Math.max(calculateContributionToSensor(j, source)*(1 + 
 					random.nextGaussian()* NOISESTDEV), readings[j]);
 		}

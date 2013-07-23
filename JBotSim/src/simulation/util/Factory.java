@@ -5,6 +5,8 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
+import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
+
 public class Factory implements Serializable{
 
 	public final static Map<Class<?>, Class<?>> map = initializeMap();
@@ -24,7 +26,7 @@ public class Factory implements Serializable{
 	}
 
 	public static Object getInstance(String className, Object... objects) {
-		//System.out.println("Build by reflection class "+ className); 
+//		System.out.println("Build by reflection class "+ className); 
 		String s = "";
 		try {
 			Constructor<?>[] constructors = Class.forName(className).getDeclaredConstructors();
@@ -42,20 +44,22 @@ public class Factory implements Serializable{
 						
 						if(!params[i].isAssignableFrom(c)) {
 							found = false;
+//							System.out.println(className +" not assignable with "+params[i].getCanonicalName());
 							break;
 						}
 					}
 					s+="\n_____\n";
 					if(found) {
-						//System.out.println(s);
+//						System.out.println("found: "+s);
 						return constructor.newInstance(objects);
 					}
 				}
 			}
-			//System.out.println(s);
+//			System.out.println(s);
 			
-			System.out.println(className+" ## "+Class.forName(className).getName());
+//			System.out.println(className+" ## "+Class.forName(className).getName());
 		} catch (Exception e) {
+			System.out.println("Problem with class "+className);
 			e.printStackTrace();
 		}
 		throw new RuntimeException("Unknown classname: " + className);
