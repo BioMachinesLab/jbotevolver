@@ -8,6 +8,7 @@ import simulation.Simulator;
 public class EnvironmentKeyDispatcher implements KeyEventDispatcher {
 	protected Simulator simulator;
 	
+	
 	public EnvironmentKeyDispatcher(Simulator simulator) {
 		super();
 		this.simulator = simulator;
