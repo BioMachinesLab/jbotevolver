@@ -48,6 +48,8 @@ public class Robot extends MovableObject {
 	 * The color is defined as an array of three floats for speed.
 	 */
 	protected double[]      bodyColor  = new double[3];
+	
+	protected String description = "";
 
 	public static final int REDINDEX   = 0;
 	public static final int GREENINDEX = 1;
@@ -74,6 +76,8 @@ public class Robot extends MovableObject {
 		if(diameter != radius*2)
 			radius = diameter/2;
 		this.shape = new CircularShape(simulator, name + "CollisionObject", this, relativeX, relativeY, diameter, diameter/2);
+		
+		this.description = args.getArgumentAsStringOrSetDefault("description", "robot");
 		
 		double x = args.getArgumentAsDoubleOrSetDefault("x",0);
 		double y = args.getArgumentAsDoubleOrSetDefault("y",0);
@@ -337,6 +341,10 @@ public class Robot extends MovableObject {
 	public double[] getBodyColorAsDoubles() {
 		return this.bodyColor;
 	}
+	
+	public String getDescription() {
+		return description;
+	}
 
 	public Sensor getSensorByType(Class sensorClass){
 		for(Sensor s : sensors){
@@ -356,12 +364,6 @@ public class Robot extends MovableObject {
 	
 	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
 		int numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
-		
-		if(arguments.getArgumentIsDefined("randomizenumber")) {
-			String[] rawArray = arguments.getArgumentAsString("randomizenumber").split(",");
-			numberOfRobots = Integer.parseInt(rawArray[simulator.getRandom().nextInt(rawArray.length)]);
-		}
-		
 		ArrayList<Robot> robots = new ArrayList<Robot>(numberOfRobots);
 		for(int i = 0 ; i < numberOfRobots ; i++)
 			robots.add(getRobot(simulator, arguments));

@@ -18,7 +18,6 @@ public class RobotRGBColorNNOutput extends NNOutput {
 	public RobotRGBColorNNOutput(Actuator robotRGBColorActuator, Arguments args) {
 		super(robotRGBColorActuator,args);
 		this.robotRGBColorActuator = (RobotRGBColorActuator)robotRGBColorActuator;
-
 		controlRed = this.robotRGBColorActuator.controlRed();
 		controlGreen = this.robotRGBColorActuator.controlGreen();
 		controlBlue = this.robotRGBColorActuator.controlBlue();

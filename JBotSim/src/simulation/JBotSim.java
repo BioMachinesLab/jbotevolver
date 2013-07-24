@@ -59,6 +59,22 @@ public class JBotSim implements Serializable{
 		return robots;
 	}
 	
+	public ArrayList<Robot> createCoEvolutionRobots(Simulator simulator) {
+		ArrayList<Robot> robots = new ArrayList<Robot>();
+		
+		ArrayList<Robot> preys = Robot.getRobots(simulator, arguments.get("--robots"));
+		for(Robot r : preys) {
+			r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
+			robots.add(r);
+		}
+		ArrayList<Robot> predators = Robot.getRobots(simulator, arguments.get("--robots2"));
+		for(Robot r : predators) {
+			r.setController(Controller.getController(simulator, r, arguments.get("--controllers2")));
+			robots.add(r);
+		}
+		return robots;
+	}
+	
 	public void createRobotsAndAddToSimulator(Simulator simulator) {
 		simulator.addRobots(createRobots(simulator));
 	}

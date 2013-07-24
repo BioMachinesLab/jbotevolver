@@ -16,15 +16,15 @@ public class RobotRGBColorActuator extends Actuator {
 	protected double green = 0.0f;
 	protected double blue  = 0.0f;
 	
-	boolean controlRed   = true;
-	boolean controlGreen = true;
-	boolean controlBlue  = true;
+	boolean controlRed   = false;
+	boolean controlGreen = false;
+	boolean controlBlue  = false;
 	
 	public RobotRGBColorActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
 		if (args.getArgumentIsDefined("mode")) {
 			String modeStr = args.getArgumentAsString("mode");
-
+			
 			if (modeStr.contains("r") || modeStr.contains("R"))
 				controlRed = true;
 

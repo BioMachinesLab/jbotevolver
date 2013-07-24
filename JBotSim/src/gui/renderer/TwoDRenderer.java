@@ -208,7 +208,10 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 //		}
 		graphics.setColor(robot.getBodyColor());
 		graphics.fillOval(x, y, circleDiameter, circleDiameter);
-		if (!robot.getBodyColor().equals(Color.BLACK)) {
+		
+		int avgColor = (robot.getBodyColor().getRed()+robot.getBodyColor().getGreen()+robot.getBodyColor().getBlue())/3;
+		
+		if (avgColor > 255/2) {
 			graphics.setColor(Color.BLACK);
 		} else {
 			graphics.setColor(Color.WHITE);

@@ -705,8 +705,13 @@ public class Arguments implements Serializable {
 		AutoArgumentsGeneration.getAuto(result);
 		
 		if(optionsFilename != null && result.get("--output") != null) {
+			String pop = null;
 			
-			String pop = result.get("--population").getCompleteArgumentString();
+			if(result.containsKey("--population")){
+				pop = result.get("--population").getCompleteArgumentString();
+			}else{
+				pop = result.get("--populationa").getCompleteArgumentString();
+			}
 			
 			if(pop != null && pop.contains("load")) {
 				String output = result.get("--output").getCompleteArgumentString();

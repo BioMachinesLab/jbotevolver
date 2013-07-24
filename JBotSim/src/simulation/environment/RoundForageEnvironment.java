@@ -59,6 +59,7 @@ public class RoundForageEnvironment extends Environment {
 		double angle = random.nextDouble()*2*Math.PI;
 		return new Vector2d(radius*Math.cos(angle),radius*Math.sin(angle));
 	}
+	
 	@Override
 	public void update(double time) {
 		nest.shape.getClosePrey().update(time, teleported);
