@@ -356,6 +356,12 @@ public class Robot extends MovableObject {
 	
 	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
 		int numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+		
+		if(arguments.getArgumentIsDefined("randomizenumber")) {
+			String[] rawArray = arguments.getArgumentAsString("randomizenumber").split(",");
+			numberOfRobots = Integer.parseInt(rawArray[simulator.getRandom().nextInt(rawArray.length)]);
+		}
+		
 		ArrayList<Robot> robots = new ArrayList<Robot>(numberOfRobots);
 		for(int i = 0 ; i < numberOfRobots ; i++)
 			robots.add(getRobot(simulator, arguments));
