@@ -49,63 +49,63 @@ import simulation.Updatable;
 import simulation.util.Arguments;
 
 public class ResultViewerGui extends Gui {
-	private JFrame      frame;
-	private JTextField  simulationTimeTextField;
-	private JTextField  controlStepTextField;	
-	private JTextField  fitnessTextField;
-	private JTextField  shiftTextField;
+	protected JFrame      frame;
+	protected JTextField  simulationTimeTextField;
+	protected JTextField  controlStepTextField;	
+	protected JTextField  fitnessTextField;
+	protected JTextField  shiftTextField;
 
-	private JTextField  controlStepTimeTextField;
-	private JTextField  rendererTimeTextField;
+	protected JTextField  controlStepTimeTextField;
+	protected JTextField  rendererTimeTextField;
 	
-	private NetworkViewer networkViewer = new NetworkViewer();
+	protected NetworkViewer networkViewer = new NetworkViewer();
 
-	private int         sleepBetweenControlSteps = 10;
+	protected int         sleepBetweenControlSteps = 10;
 	
 	JPanel treeWrapper;
 
-	private JButton     startButton = new JButton("Start");
-	private JButton     quitButton  = new JButton("Quit");
-	private JButton     pauseButton = new JButton("Pause");
-	private JButton		plotButton = new JButton("Plot Graph");
-	private JButton		shiftButton = new JButton("Set");
+	protected JButton     startButton = new JButton("Start");
+	protected JButton     quitButton  = new JButton("Quit");
+	protected JButton     pauseButton = new JButton("Pause");
+	protected JButton		plotButton = new JButton("Plot Graph");
+	protected JButton		shiftButton = new JButton("Set");
 
-	private JSlider playPosition = new JSlider(0,100);
-	private JSlider sleepSlider = new JSlider(0,100);
+	protected JSlider playPosition = new JSlider(0,100);
+	protected JSlider sleepSlider = new JSlider(0,100);
 
-	private JEditorPane extraArguments = new JEditorPane();
+	protected JEditorPane extraArguments = new JEditorPane();
 
-	private FileTree fileTree;
-	private JTextField currentFileTextField = new JTextField(18);
-	private JButton	loadButton	= new JButton("Load");
-	private JButton editButton = new JButton("Edit");
-	private JButton plotFitnessButton = new JButton("Plot Fitness");
+	protected FileTree fileTree;
+	protected JTextField currentFileTextField = new JTextField(18);
+	protected JButton	loadButton	= new JButton("Load");
+	protected JButton editButton = new JButton("Edit");
+	protected JButton plotFitnessButton = new JButton("Plot Fitness");
 
 	static final int RUN         = 2;
 	static final int PAUSED      = 3;
 	static final int STOPPED     = 4;	
 	static final int ENDED       = 5;
 	
-	private int position_shift = 10;
-	private int simulateUntil = 0;
+	protected int position_shift = 10;
+	protected int simulateUntil = 0;
 
-	private int simulationState = STOPPED;
+	protected int simulationState = STOPPED;
 
-	private Renderer renderer;
+	protected Renderer renderer;
 	protected Simulator simulator;
-	private JBotEvolver jBotEvolver;
-	private EvaluationFunction evaluationFunction;
+	protected JBotEvolver jBotEvolver;
+	protected EvaluationFunction evaluationFunction;
 	
-	private boolean readyToSkip = true;
+	protected boolean readyToSkip = true;
 	
-	private Thread worker;
+	protected Thread worker;
 	
-	private GraphViz graphViz = null;
-	private boolean showNeuralNetwork = false;
-	private JCheckBox neuralNetworkCheckbox;
-	private JCheckBox neuralNetworkViewerCheckbox;
+	protected GraphViz graphViz = null;
+	protected boolean showNeuralNetwork = false;
+	protected JCheckBox neuralNetworkCheckbox;
+	protected JCheckBox neuralNetworkViewerCheckbox;
 	
-	private EnvironmentKeyDispatcher dispatcher;
+	protected EnvironmentKeyDispatcher dispatcher;
 
 	public ResultViewerGui(JBotSim jBotEvolver, Arguments args) {
 		super(jBotEvolver,args);
@@ -129,7 +129,7 @@ public class ResultViewerGui extends Gui {
 		frame.setVisible(true);
 	}
 
-	private JPanel initLeftWrapperPanel() {
+	protected JPanel initLeftWrapperPanel() {
 
 		treeWrapper = new JPanel();
 		treeWrapper.setPreferredSize(new Dimension(250,100));
@@ -156,7 +156,7 @@ public class ResultViewerGui extends Gui {
 		return treeWrapper;
 	}
 
-	private JPanel initRightWrapperPanel() {
+	protected JPanel initRightWrapperPanel() {
 
 		JPanel sideTopPanel = new JPanel();
 		sideTopPanel.setLayout(new GridLayout(12,1));
@@ -206,7 +206,7 @@ public class ResultViewerGui extends Gui {
 		return sideWrapperPanel;
 	}
 
-	private JPanel initBottomPanel() {
+	protected JPanel initBottomPanel() {
 
 		JPanel bottomPanel   = new JPanel();
 
@@ -233,7 +233,7 @@ public class ResultViewerGui extends Gui {
 		return bottomPanel;
 	}
 
-	private void initActions() {
+	protected void initActions() {
 		
 		shiftTextField.getInputMap().put(KeyStroke.getKeyStroke("control LEFT"), "none");
 		shiftTextField.getInputMap().put(KeyStroke.getKeyStroke("control RIGHT"), "none");
@@ -243,7 +243,7 @@ public class ResultViewerGui extends Gui {
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control ENTER"), "control ENTER");
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta ENTER"), "control ENTER");
 		((JComponent) frame.getContentPane()).getActionMap().put("control ENTER", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				loadCurrentFile();
 			}
@@ -252,7 +252,7 @@ public class ResultViewerGui extends Gui {
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control P"), "control P");
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta P"), "control P");
 		((JComponent) frame.getContentPane()).getActionMap().put("control P", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				pauseButton();
 			}
@@ -261,7 +261,7 @@ public class ResultViewerGui extends Gui {
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "control S");  
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta S"), "control S");
 		((JComponent) frame.getContentPane()).getActionMap().put("control S", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				startButton();
 			}
@@ -270,7 +270,7 @@ public class ResultViewerGui extends Gui {
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control LEFT"), "control LEFT");
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta LEFT"), "control LEFT");
 		((JComponent) frame.getContentPane()).getActionMap().put("control LEFT", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				shiftSimulationBy(-position_shift,false);
 			}
@@ -278,28 +278,28 @@ public class ResultViewerGui extends Gui {
 		
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt LEFT"), "alt LEFT");
 		((JComponent) frame.getContentPane()).getActionMap().put("alt LEFT", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveLeft();
 			}
 		});
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt RIGHT"), "alt RIGHT");
 		((JComponent) frame.getContentPane()).getActionMap().put("alt RIGHT", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveRight();
 			}
 		});
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt UP"), "alt UP");
 		((JComponent) frame.getContentPane()).getActionMap().put("alt UP", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveUp();
 			}
 		});
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt DOWN"), "alt DOWN");
 		((JComponent) frame.getContentPane()).getActionMap().put("alt DOWN", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveDown();
 			}
@@ -308,7 +308,7 @@ public class ResultViewerGui extends Gui {
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control RIGHT"), "control RIGHT");
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta RIGHT"), "control RIGHT");
 		((JComponent) frame.getContentPane()).getActionMap().put("control RIGHT", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				shiftSimulationBy(position_shift,false);
 			}
@@ -316,7 +316,7 @@ public class ResultViewerGui extends Gui {
 		
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('+'), "+");  
 		((JComponent) frame.getContentPane()).getActionMap().put("+", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.zoomIn();
 				renderer.drawFrame();
@@ -325,7 +325,7 @@ public class ResultViewerGui extends Gui {
 
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('-'), "-");  
 		((JComponent) frame.getContentPane()).getActionMap().put("-", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.zoomOut();
 				renderer.drawFrame();
@@ -334,7 +334,7 @@ public class ResultViewerGui extends Gui {
 
 		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('*'), "*");  
 		((JComponent) frame.getContentPane()).getActionMap().put("*", new AbstractAction(){  
-			private static final long serialVersionUID = 1L;
+			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.resetZoom();
 				renderer.drawFrame();
@@ -342,7 +342,7 @@ public class ResultViewerGui extends Gui {
 		});  
 	}
 
-	private void initListeners() {
+	protected void initListeners() {
 
 		sleepSlider.addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent arg0) {
@@ -462,7 +462,7 @@ public class ResultViewerGui extends Gui {
 		});
 	}
 	
-	private void plotFitness() {
+	protected void plotFitness() {
 		File f = new File(currentFileTextField.getText().trim());
 		final String mainFolder = f.isDirectory() ? f.getAbsolutePath() : f.getParent();
 
@@ -474,7 +474,7 @@ public class ResultViewerGui extends Gui {
 		t.start();
 	}
 	
-	private String getFitnessFiles(String folder) {
+	protected String getFitnessFiles(String folder) {
 		
 		File f = new File(folder+"/_fitness.log");
 		
@@ -508,7 +508,7 @@ public class ResultViewerGui extends Gui {
 		frame.setVisible(false);
 	}
 	
-	private void startButton() {
+	protected void startButton() {
 		simulationState = RUN;
 		simulateUntil = 0;
 		readyToSkip = true;
@@ -516,14 +516,14 @@ public class ResultViewerGui extends Gui {
 			loadCurrentFile();
 	}
 	
-	private void pauseButton() {
+	protected void pauseButton() {
 		if (simulationState == RUN)
 			simulationState = PAUSED;
 		else
 			simulationState = RUN;
 	}
 
-	private void shiftSimulationBy(int value, boolean percentage) {
+	protected void shiftSimulationBy(int value, boolean percentage) {
 		
 		try {
 			if(readyToSkip || (simulator != null && simulator.simulationFinished())) {
@@ -590,7 +590,7 @@ public class ResultViewerGui extends Gui {
 			readyToSkip = false;
 	}
 	
-	private void updateStatus() {
+	protected void updateStatus() {
 		simulationTimeTextField.setText(String.format("%6.2fs", simulator.getTime() * simulator.getTimeDelta()));
 		controlStepTextField.setText("" + simulator.getTime().intValue());
 		fitnessTextField.setText(String.format("%12.6f", evaluationFunction.getFitness()));
@@ -598,17 +598,17 @@ public class ResultViewerGui extends Gui {
 		renderer.drawFrame();
 	}
 
-	private void updatePlaySlider(double step, double maxSteps) {
+	protected void updatePlaySlider(double step, double maxSteps) {
 		int value = (int)(step/maxSteps*100);
 		playPosition.setValue(value);
 	}
 
-	private boolean validFile(String filename) {
+	protected boolean validFile(String filename) {
 		File f = new File(filename);
 		return f.exists() && !f.isDirectory();
 	}
 
-	private void loadCurrentFile() {
+	protected void loadCurrentFile() {
 		String filename = currentFileTextField.getText();
 
 		try{
@@ -628,10 +628,10 @@ public class ResultViewerGui extends Gui {
 
 	public class FileTree extends JPanel {
 
-		private static final long serialVersionUID = 1L;
-		private String currentFilename = "";
-		private JTree tree;
-		private DefaultTreeModel model;
+		protected static final long serialVersionUID = 1L;
+		protected String currentFilename = "";
+		protected JTree tree;
+		protected DefaultTreeModel model;
 
 		public FileTree(File dir) {
 			setLayout(new BorderLayout());
@@ -644,7 +644,7 @@ public class ResultViewerGui extends Gui {
 			addTree();
 		}
 		
-		private void addTree() {
+		protected void addTree() {
 			
 			tree.getInputMap().put(KeyStroke.getKeyStroke("control LEFT"), "none");
 			tree.getInputMap().put(KeyStroke.getKeyStroke("control RIGHT"), "none");
@@ -712,7 +712,7 @@ public class ResultViewerGui extends Gui {
 			return currentFilename;
 		}
 
-		private DefaultMutableTreeNode addNodes(DefaultMutableTreeNode curTop, File dir) {
+		protected DefaultMutableTreeNode addNodes(DefaultMutableTreeNode curTop, File dir) {
 			
 			String curPath = dir.getAbsolutePath();
 			DefaultMutableTreeNode curDir = new DefaultMutableTreeNode(dir.getAbsolutePath());
@@ -744,7 +744,7 @@ public class ResultViewerGui extends Gui {
 		}
 	}
 	
-	private void launchSimulation() {
+	protected void launchSimulation() {
 		
 		if(worker != null)
 			worker.interrupt();
@@ -753,7 +753,7 @@ public class ResultViewerGui extends Gui {
 		worker.start();
 	}
 	
-	private void createRenderer(Arguments args) {
+	protected void createRenderer(Arguments args) {
 		if(args.getArgumentIsDefined("classname"))
 			this.renderer = Renderer.getRenderer(args);
 	}
@@ -812,7 +812,7 @@ public class ResultViewerGui extends Gui {
 	}
 	
 	public class SimulationRunner implements Runnable {
-		private Simulator sim;
+		protected Simulator sim;
 		public SimulationRunner(Simulator sim) {
 			this.sim = sim;
 		}

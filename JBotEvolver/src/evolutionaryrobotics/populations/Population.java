@@ -335,9 +335,35 @@ public abstract class Population implements Serializable {
 		
 		return (Population)Factory.getInstance(args.getArgumentAsString("classname"),args);
 	}
+	
+	public synchronized static Population getCoEvolutionPopulations(Arguments args, String name) throws Exception {
+		if(args.getArgumentIsDefined("load" + name))
+			return loadSpecificPopulationFromFile(args, name);
+		
+		if (!args.getArgumentIsDefined("classname"))
+			throw new RuntimeException("Population 'classname' not defined: "+args.toString());
+		
+		return (Population)Factory.getInstance(args.getArgumentAsString("classname"),args);
+	}
 
 	private static Population loadPopulationFromFile(Arguments args) throws Exception{
 		File f = new File(args.getArgumentAsString("load"));
+		
+		File populationFile = new File(args.getArgumentAsString("parentfolder")+"/populations/"+f.getName());
+		
+		if(!populationFile.exists())
+			populationFile = new File(args.getArgumentAsString("parentfolder")+"/../populations/"+f.getName());
+		
+		FileInputStream fis = new FileInputStream(populationFile);
+		GZIPInputStream gzipIn = new GZIPInputStream(fis);
+		ObjectInputStream in = new ObjectInputStream(gzipIn);
+		Population population = (Population) in.readObject();
+		in.close();
+		return population;
+	}
+	
+	private static Population loadSpecificPopulationFromFile(Arguments args, String name) throws Exception{
+		File f = new File(args.getArgumentAsString("load" + name.toLowerCase()));
 		
 		File populationFile = new File(args.getArgumentAsString("parentfolder")+"/populations/"+f.getName());
 		

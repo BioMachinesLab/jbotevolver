@@ -38,13 +38,14 @@ import simulation.robot.actuators.Actuator;
 import simulation.robot.behaviors.Behavior;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.evolution.CoEvolution;
 import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
-public class GraphPlotter extends JFrame implements Updatable {
+public class GraphPlotterCoEvolution extends JFrame implements Updatable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -59,7 +60,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 	
 	private JEditorPane console = new JEditorPane();
 	
-	private ArrayList<Robot> robots;
+	private ArrayList<Robot> robots = new ArrayList<Robot>();
 	private Vector<NNInput> inputs;
 	private double[] hidden;
 	private Vector<NNOutput> outputs;
@@ -77,6 +78,8 @@ public class GraphPlotter extends JFrame implements Updatable {
 	private NeuralNetwork network;
 	
 	private JBotEvolver jBotEvolver;
+	
+	private String desc = "";
 
 	/**
 	 * Currently this only works for robots that use a NeuralNetwork as a controller.
@@ -84,19 +87,30 @@ public class GraphPlotter extends JFrame implements Updatable {
 	 * intpu/output activations to plot 
 	 * 
 	 * @param simulator The simulator should be initialized, not in the middle of a simulation.
+	 * @param controller 
+	 * @param robot 
 	 * @param evaluationFunction If this parameter is null, the graph will be plotted
 	 * up to the maximum number of steps.
 	 */
-	public GraphPlotter(JBotEvolver jBotEvolver, Simulator simulator) {
-		super("Graph Plotter");
+	public GraphPlotterCoEvolution(JBotEvolver jBotEvolver, Simulator simulator, String robot) {
+		super("Graph Plotter "+robot);
 		try{
 			JPanel mainPanel = new JPanel();
 			mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 			
 			this.simulator = simulator;
 			this.jBotEvolver = jBotEvolver;
-			robots = simulator.getRobots();
-	
+
+			desc = jBotEvolver.getArguments().get(robot).getArgumentAsString("description");
+			
+			if(desc == null)
+				desc = simulator.getRobots().get(0).getDescription();
+			
+			for(Robot r : simulator.getRobots()) {
+				if(r.getDescription().equals(desc))
+					robots.add(r);
+			}
+			
 			//TODO this doesn't work for BehaviorControllers. Maybe a BehaviorController should extends
 			//NeuralNetworkController. Also, the name should be different. Like HierarchicalController...
 			NeuralNetworkController controller = (NeuralNetworkController)robots.get(0).getController();
@@ -174,10 +188,9 @@ public class GraphPlotter extends JFrame implements Updatable {
 	 * This constructor receives a list of fitness.log files
 	 * @param files list of file names of the fitness.log files to plot
 	 */
-	public GraphPlotter(String[] files) {
+	public GraphPlotterCoEvolution(String[] files) {
 		JavaPlot plot = new JavaPlot();
 		FileDataSet fileDataSet;
-		
 		int subStringIndex = 0;
 		int amountOfGoodPlots = 0;
 		
@@ -273,7 +286,16 @@ public class GraphPlotter extends JFrame implements Updatable {
 		
 		simulator = jBotEvolver.createSimulator();
 		simulator.addCallback(jBotEvolver.getEvaluationFunction());
-		jBotEvolver.setupBestIndividual(simulator);
+		jBotEvolver.setupBestCoIndividual(simulator);
+		
+		robots.clear();
+		
+		for(Robot r : simulator.getRobots()) {
+			if(r.getDescription().equals(desc))
+				robots.add(r);
+		}
+		
+		System.out.println(robots.size());
 		
 		simulator.addCallback(this);
 		
@@ -346,8 +368,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 	public void update(Simulator simulator) {
 		
 		currentStep = simulator.getTime();
-		
-		robots = simulator.getRobots();
 		
 		NeuralNetworkController controller = (NeuralNetworkController)robots.get(0).getController();
 		NeuralNetwork network = controller.getNeuralNetwork();

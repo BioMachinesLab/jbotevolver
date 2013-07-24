@@ -28,12 +28,31 @@ public class JBotEvolver extends JBotSim {
 	}
 	
 	public EvaluationFunction getEvaluationFunction() {
-		return EvaluationFunction.getEvaluationFunction(arguments.get("--evaluation"));
+		EvaluationFunction eval;
+		if(arguments.get("--evaluation") != null)
+			eval = EvaluationFunction.getEvaluationFunction(arguments.get("--evaluation"));
+		else
+			eval = EvaluationFunction.getEvaluationFunction(arguments.get("--evaluationa"));
+		return eval;
+	}
+	
+	public EvaluationFunction getSpecificEvaluationFunction(String name) {
+		return EvaluationFunction.getEvaluationFunction(arguments.get("--evaluation" + name.toLowerCase()));
 	}
 	
 	public Population getPopulation() {
 		try {
 			return Population.getPopulation(getArguments().get("--population"));
+		} catch(Exception e) {
+			e.printStackTrace();
+			System.exit(-1);
+		}
+		return null;
+	}
+	
+	public Population getSpecificPopulation(String name) {
+		try {
+			return Population.getCoEvolutionPopulations(getArguments().get("--population"),name);
 		} catch(Exception e) {
 			e.printStackTrace();
 			System.exit(-1);
@@ -88,5 +107,72 @@ public class JBotEvolver extends JBotSim {
 				}
 			}
 		}
+	}
+	
+	public void setupBestCoIndividual(Simulator simulator) {
+		
+		// Obter o numero de presas
+		Arguments numbRobotsPreys= getArguments().get("--robots");
+		int nPreys = numbRobotsPreys.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+		
+		ArrayList<Robot> robots;
+		
+		if(simulator.getRobots().isEmpty()) {
+			robots = createCoEvolutionRobots(simulator);
+			simulator.addRobots(robots);
+		} else
+			robots = simulator.getRobots();
+		
+		ArrayList<Robot> preys = new ArrayList<Robot>();
+		ArrayList<Robot> predators = new ArrayList<Robot>();
+		for (int j = 0; j < robots.size(); j++) {
+			if (j < nPreys) {
+				preys.add(robots.get(j));
+			} else {
+				predators.add(robots.get(j));
+			}
+		}
+		
+		Population pa = getSpecificPopulation("a");
+		Arguments popArgs = getArguments().get("--population");
+		
+		Chromosome ca;
+		
+		if(popArgs.getArgumentIsDefined("chromosomea"))
+			ca = pa.getChromosome(popArgs.getArgumentAsInt("chromosomea"));
+		else
+			ca = pa.getBestChromosome();
+		
+		for(Robot r : preys) {
+			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
+				FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
+				if(fc.getNNWeights() == null) {
+					fc.setNNWeights(ca.getAlleles());
+				}
+			}
+		}
+		
+		Population pb = getSpecificPopulation("b");
+		
+		popArgs = getArguments().get("--population");
+		
+		Chromosome cb;
+		
+		if(popArgs.getArgumentIsDefined("chromosomeb"))
+			cb = pb.getChromosome(popArgs.getArgumentAsInt("chromosomeb"));
+		else
+			cb = pb.getBestChromosome();
+		
+		System.out.println(ca.getID()+" "+cb.getID());
+		
+		for(Robot r : predators) {
+			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
+				FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
+				if(fc.getNNWeights() == null) {
+					fc.setNNWeights(cb.getAlleles());
+				}
+			}
+		}
+		
 	}
 }

@@ -79,7 +79,9 @@ public class DiskStorage implements Serializable{
 				String save = name+"\n"+beautifiedArgument;
 				
 				argumentsFile.println(save);
-				if (!name.equalsIgnoreCase("--population")) {
+				//------REVER--------
+				if (!name.equalsIgnoreCase("--population") && !name.equalsIgnoreCase("--populationa") 
+						&& !name.equalsIgnoreCase("--populationb")) {
 					argumentsForShowBestIndividual.add(save);
 					argumentsForRestartEvolution.add(save);
 				}
@@ -143,14 +145,38 @@ public class DiskStorage implements Serializable{
 			savePopulationToFile(populationB, "B");
 
 			// Save the generation number
-			saveGenerationNumber(populationA);
+			saveGenerationNumber(populationA, "A");
 
 			// Save the show best file
-			saveShowBestFile(populationA, populationB, populationA.getGenerationRandomSeed());
+			saveShowBestFile(populationA, populationB, populationA.getGenerationRandomSeed(),"A","B");
 
 			// Save the show best file
 			saveShowCurrentBest(populationA, populationB, populationA.getGenerationRandomSeed(), "A","B");
 			saveShowCurrentBest(populationB, populationA, populationB.getGenerationRandomSeed(), "B","A");
+
+			// Save the restart file
+			saveRestartFile(populationA, populationB, populationA.getGenerationRandomSeed());
+
+		}
+	}
+	
+	public void savePopulations(Population populationA, Population populationB) throws IOException {
+		if (outputDirectory != null) {
+			updateFitnessLog(populationA, populationB);
+
+			// Save population:
+			savePopulationToFile(populationA, "a");
+			savePopulationToFile(populationB, "b");
+
+			// Save the generation number
+			saveGenerationNumber(populationA, "a");
+			saveGenerationNumber(populationB, "b");
+
+			// Save the show best file
+			saveShowBestFile(populationA, populationB, populationA.getGenerationRandomSeed(),"a","b");
+
+			// Save the show best file
+			saveShowCurrentBest(populationA, populationB, populationA.getGenerationRandomSeed(), "a","b");
 
 			// Save the restart file
 			saveRestartFile(populationA, populationB, populationA.getGenerationRandomSeed());
@@ -167,7 +193,7 @@ public class DiskStorage implements Serializable{
 			savePopulationToFile(population, "");
 
 			// Save the generation number
-			saveGenerationNumber(population);
+			saveGenerationNumber(population, "");
 
 			// Save the show best file
 			saveShowBestFile(population, population.getGenerationRandomSeed());
@@ -182,7 +208,7 @@ public class DiskStorage implements Serializable{
 
 	private void updateFitnessLog(Population populationA, Population populationB) {
 		fitnessLog
-				.printf("\t%3d\t\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\n",
+				.printf("\t%3d\t\t%18.10f\t%18.10f\t%18.10f\t%18.10f\t%18.10f\t%18.10f\n",
 						populationA.getNumberOfCurrentGeneration(),
 						populationA.getHighestFitness(),
 						populationA.getAverageFitness(),
@@ -210,16 +236,16 @@ public class DiskStorage implements Serializable{
 		
 		for(String s : argumentsForShowBestIndividual)
 			currentShowBestFile.println(s);
-		
-		currentShowBestFile.println("--population loadA=" + outputDirectory
-				+ "/populations/" + prefixA + populationFilename
-				+ populationA.getNumberOfCurrentGeneration() + ",loadB="
-				+ outputDirectory + "/populations/" + prefixB
-				+ populationFilename
-				+ populationB.getNumberOfCurrentGeneration()
-				+ ",showbestCoevolved");
-		currentShowBestFile.println("--random-seed " + randomSeed);
-		currentShowBestFile.close();
+
+			currentShowBestFile.println("--population loada=" + outputDirectory
+					+ "/populations/" + prefixA + populationFilename
+					+ populationA.getNumberOfCurrentGeneration() + ",loadb="
+					+ outputDirectory + "/populations/" + prefixB
+					+ populationFilename
+					+ populationB.getNumberOfCurrentGeneration()
+					+ ",showbestCoevolved");
+			currentShowBestFile.println("--random-seed " + randomSeed);
+			currentShowBestFile.close();
 	}
 
 	private void saveShowCurrentBest(Population population, long randomSeed)
@@ -247,10 +273,10 @@ public class DiskStorage implements Serializable{
 		for(String s : argumentsForRestartEvolution)
 			restartFile.println(s);
 		
-		restartFile.println("--population loadA=" + outputDirectory
-				+ "/populations/A" + populationFilename
-				+ populationA.getNumberOfCurrentGeneration() + ",loadB="
-				+ outputDirectory + "/populations/B" + populationFilename
+		restartFile.println("--population loada=" + outputDirectory
+				+ "/populations/a" + populationFilename
+				+ populationA.getNumberOfCurrentGeneration() + ",loadb="
+				+ outputDirectory + "/populations/b" + populationFilename
 				+ populationB.getNumberOfCurrentGeneration());
 		restartFile.println("--random-seed " + randomSeed);
 		restartFile.close();
@@ -273,19 +299,20 @@ public class DiskStorage implements Serializable{
 	}
 
 	private void saveShowBestFile(Population populationA,
-			Population populationB, long randomSeed)
+			Population populationB, long randomSeed, String prefixA,
+			String prefixB)
 			throws FileNotFoundException {
 		PrintStream showBestFile = openForWriting(outputDirectory
-				+ "/show_best/" + showBestFilename
+				+ "/show_best/"+ prefixA + showBestFilename
 				+ populationA.getNumberOfCurrentGeneration() + ".conf");
 
 		for(String s : argumentsForShowBestIndividual)
 			showBestFile.println(s);
 
-		showBestFile.println("--population loadA=" + outputDirectory
-				+ "/populations/A" + populationFilename
-				+ populationB.getNumberOfCurrentGeneration() + ",loadB="
-				+ outputDirectory + "/populations/B" + populationFilename
+		showBestFile.println("--population load" + prefixA + "=" + outputDirectory
+				+ "/populations/"+ prefixA + populationFilename
+				+ populationB.getNumberOfCurrentGeneration() + ",load" + prefixB + "="
+				+ outputDirectory + "/populations/" + prefixB + populationFilename
 				+ populationB.getNumberOfCurrentGeneration()
 				+ ",showbestCoevolved");
 		showBestFile.println("--random-seed " + randomSeed);
@@ -318,10 +345,10 @@ public class DiskStorage implements Serializable{
 		out.close();
 	}
 
-	private void saveGenerationNumber(Population population)
+	private void saveGenerationNumber(Population population, String prefix)
 			throws FileNotFoundException {
 		PrintStream generation = openForWriting(outputDirectory + "/"
-				+ generationNumberFilename);
+				+ prefix + generationNumberFilename);
 		generation.println(population.getNumberOfCurrentGeneration());
 		generation.close();
 	}
