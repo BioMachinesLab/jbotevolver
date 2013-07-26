@@ -2,15 +2,12 @@ package simulation.robot;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import simulation.Simulator;
 import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;
-import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.Sensor;
@@ -364,6 +361,17 @@ public class Robot extends MovableObject {
 	
 	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
 		int numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+		
+		if(arguments.getArgumentIsDefined("randomizenumber")) {		
+			String[] rawArray = arguments.getArgumentAsString("randomizenumber").split(",");		
+			numberOfRobots = Integer.parseInt(rawArray[simulator.getRandom().nextInt(rawArray.length)]);		
+		}
+		
+		if(arguments.getArgumentIsDefined("randomize")) {
+			int extra = simulator.getRandom().nextInt(arguments.getArgumentAsInt("randomize")*2)-arguments.getArgumentAsInt("randomize");
+			numberOfRobots+=extra;
+		}
+		
 		ArrayList<Robot> robots = new ArrayList<Robot>(numberOfRobots);
 		for(int i = 0 ; i < numberOfRobots ; i++)
 			robots.add(getRobot(simulator, arguments));

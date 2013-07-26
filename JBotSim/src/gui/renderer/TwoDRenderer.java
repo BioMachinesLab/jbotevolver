@@ -19,6 +19,7 @@ import simulation.robot.Epuck;
 import simulation.robot.Robot;
 import simulation.robot.sensors.EpuckIRSensor;
 import simulation.robot.sensors.Sensor;
+import simulation.robot.sensors.WallRaySensor;
 import simulation.util.Arguments;
 
 public class TwoDRenderer extends Renderer implements ComponentListener {
@@ -248,32 +249,39 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 			Sensor s = robot.getSensorByType(EpuckIRSensor.class);
 			if(s != null) {
 				EpuckIRSensor ir = (EpuckIRSensor)s;
-				Vector2d[][][] positions = ir.rayPositions;
-				if(positions != null) {
-					for(int i = 0 ; i < positions.length ; i++) {
-						for(int j = 0 ; j < positions[i].length ; j++) {
-							if(i % 2 == 0) {
-								graphics.setColor(Color.RED);
-							}else {
-								graphics.setColor(Color.BLACK);
-							}
-							
-							if(positions[i][j][0] != null) {
-								int x1 = transformX(positions[i][j][0].x);
-								int y1 = transformY(positions[i][j][0].y);
-								int x2 = transformX(positions[i][j][1].x);
-								int y2 = transformY(positions[i][j][1].y);
-								graphics.drawLine(x1, y1, x2, y2);
-							}
-						}
+				drawLines(ir.rayPositions, graphics);
+			}
+		} else {
+			Sensor s = robot.getSensorByType(WallRaySensor.class);
+			if(s != null) {
+				WallRaySensor wall = (WallRaySensor)s;
+				drawLines(wall.rayPositions, graphics);
+			}
+		}
+		graphics.setColor(Color.BLACK);		
+	}
+	
+	private void drawLines(Vector2d[][][] positions, Graphics graphics) {
+		if(positions != null) {
+			for(int i = 0 ; i < positions.length ; i++) {
+				for(int j = 0 ; j < positions[i].length ; j++) {
+					if(i % 2 == 0) {
+						graphics.setColor(Color.RED);
+					}else {
+						graphics.setColor(Color.BLACK);
+					}
+					
+					if(positions[i][j][0] != null) {
+						int x1 = transformX(positions[i][j][0].x);
+						int y1 = transformY(positions[i][j][0].y);
+						int x2 = transformX(positions[i][j][1].x);
+						int y2 = transformY(positions[i][j][1].y);
+						graphics.drawLine(x1, y1, x2, y2);
 					}
 				}
 			}
 		}
-		
-		graphics.setColor(Color.BLACK);		
 	}
-	
 
 	private void drawWallButton(Wall m) {
 		graphics.setColor(Color.RED);
