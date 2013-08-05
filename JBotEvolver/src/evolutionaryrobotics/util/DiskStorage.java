@@ -57,13 +57,7 @@ public class DiskStorage implements Serializable{
 							"Cannot create output directory: "
 									+ outputDirectory + "/populations");
 				}
-
-			fitnessLog = openForWriting(outputDirectory + "/"
-					+ fitnessLogFilename, true);
-			fitnessLog.println("# Evoluation started on "
-					+ new SimpleDateFormat("yyyy/MM/dd HH:mm:ss")
-							.format(new Date()));
-			fitnessLog.println("# Generation\t   Best \t   Average \t   Worst");
+			openFitnessLog(true);
 		}
 
 	}
@@ -205,8 +199,23 @@ public class DiskStorage implements Serializable{
 			saveRestartFile(population, population.getGenerationRandomSeed());
 		}
 	}
+	
+	private void openFitnessLog(boolean append) {
+		try {
+			fitnessLog = openForWriting(outputDirectory + "/" + fitnessLogFilename, append);
+			fitnessLog.println("# Evoluation started on " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
+			fitnessLog.println("# Generation\t   Best \t   Average \t   Worst");
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
 
 	private void updateFitnessLog(Population populationA, Population populationB) {
+		
+		if(populationA.getNumberOfCurrentGeneration() == 0) {
+			openFitnessLog(false);
+		}
+	
 		fitnessLog
 				.printf("\t%3d\t\t%18.10f\t%18.10f\t%18.10f\t%18.10f\t%18.10f\t%18.10f\n",
 						populationA.getNumberOfCurrentGeneration(),
@@ -220,6 +229,9 @@ public class DiskStorage implements Serializable{
 	}
 
 	private void updateFitnessLog(Population population) {
+		if(population.getNumberOfCurrentGeneration() == 0) {
+			openFitnessLog(false);
+		}
 		fitnessLog.printf("\t%3d\t\t%8.3f\t%8.3f\t%8.3f\n",
 				population.getNumberOfCurrentGeneration(),
 				population.getHighestFitness(), population.getAverageFitness(),
