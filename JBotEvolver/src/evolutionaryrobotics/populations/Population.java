@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
@@ -41,6 +42,8 @@ public abstract class Population implements Serializable {
 	
 	protected Random    randomNumberGenerator;
 	
+	private LinkedList<Serializable> serializableObjects;
+	
 	public Population(Arguments arguments) {
 		this.randomNumberGenerator = new Random(0);
 		
@@ -72,6 +75,8 @@ public abstract class Population implements Serializable {
 		if (arguments.getArgumentIsDefined("generations")) {
 			setNumberOfGenerations(arguments.getArgumentAsInt("generations"));
 		}
+		
+		serializableObjects = new LinkedList<Serializable>();
 	}
 
 	/** 
@@ -379,4 +384,8 @@ public abstract class Population implements Serializable {
 	}
 
 	public abstract Chromosome getChromosome(int chromosomeId);
+	
+	public LinkedList<Serializable> getSerializableObjects() {
+		return serializableObjects;
+	}
 }

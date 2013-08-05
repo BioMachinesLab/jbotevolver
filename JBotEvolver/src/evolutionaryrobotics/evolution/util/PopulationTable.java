@@ -1,11 +1,12 @@
 package evolutionaryrobotics.evolution.util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 
-public class PopulationTable {
+public class PopulationTable implements Serializable {
 
 	private int size;
 	private List<Chromosome> table;
@@ -27,12 +28,10 @@ public class PopulationTable {
 			}
 			table.set(pointer, c);
 			pointer++;
-
 		}
 	}
 
 	public List<Chromosome> getTable() {
 		return table;
 	}
-
 }

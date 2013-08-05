@@ -7,7 +7,6 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.SimpleCoEvolutionFitnessResult;
-import taskexecutor.results.SimpleFitnessResult;
 import taskexecutor.tasks.CoEvolutionTask;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
@@ -31,48 +30,72 @@ public class CoEvolution extends Evolution {
 	private int gA;
 	private int gB;
 	private int preys;
+	private boolean resume = false;
 
 	public CoEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 			super(jBotEvolver, taskExecutor, args);
 			//Arguments population A
 			Arguments populationAArguments = jBotEvolver.getArguments().get("--populationa");
-			populationAArguments.setArgument("genomelength", getGenomeLength());
-			//Arguments population B
 			Arguments populationBArguments = jBotEvolver.getArguments().get("--populationb");
-			populationBArguments.setArgument("genomelength", getGenomePredatorLength());
+			
+			if(populationAArguments == null){
+				//resume
+				Arguments tempArgs = jBotEvolver.getArguments().get("--population");
+				try {
+					resume = true;
+					
+					populationA = Population.getCoEvolutionPopulations(tempArgs, "a");
+					populationB = Population.getCoEvolutionPopulations(tempArgs, "b");
+					
+					tA = (PopulationTable)populationA.getSerializableObjects().getFirst();
+					tB = (PopulationTable)populationB.getSerializableObjects().getFirst();
+					
+					gA = populationA.getPopulationSize();
+					gB = populationB.getPopulationSize();
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}else {
+				populationAArguments.setArgument("genomelength", getGenomeLength());
+				populationBArguments.setArgument("genomelength", getGenomePredatorLength());
+				
+				//Obter valor do tamanho da tabela
+				tablesize = args.getArgumentAsIntOrSetDefault("tablesize", 10);
+				// Obter o numero de gerações da população A
+				Arguments ppA = jBotEvolver.getArguments().get("--populationa");
+				gA = ppA.getArgumentAsIntOrSetDefault("size", 100);
+				// Obter o numero de gerações da população B 
+				Arguments ppB = jBotEvolver.getArguments().get("--populationb");
+				gB = ppB.getArgumentAsIntOrSetDefault("size", 100);
+				
+				try {
+					//populationA
+					populationA = Population.getPopulation(jBotEvolver.getArguments().get("--populationa"));
+					if(jBotEvolver.getArguments().get("--populationa").getArgumentIsDefined("generations"))
+						populationA.setNumberOfGenerations(jBotEvolver.getArguments().get("--populationa").getArgumentAsInt("generations"));
+					populationA.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
+					tA = new PopulationTable(tablesize);
+					populationA.getSerializableObjects().add(tA);
+					
+					//populationB
+					populationB = Population.getPopulation(jBotEvolver.getArguments().get("--populationb"));
+					if(jBotEvolver.getArguments().get("--populationb").getArgumentIsDefined("generations"))
+						populationB.setNumberOfGenerations(jBotEvolver.getArguments().get("--populationb").getArgumentAsInt("generations"));
+					populationB.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
+					tB = new PopulationTable(tablesize);
+					populationB.getSerializableObjects().add(tB);
+						
+				} catch(Exception e){
+					e.printStackTrace();
+				}
+			}
+			
 			supressMessages = args.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
-			//Obter valor do tamanho da tabela
-			tablesize = args.getArgumentAsIntOrSetDefault("tablesize", 10);
-			// Obter o numero de gerações da população A
-			Arguments ppA = jBotEvolver.getArguments().get("--populationa");
-			gA = ppA.getArgumentAsIntOrSetDefault("size", 100);
-			// Obter o numero de gerações da população B 
-			Arguments ppB = jBotEvolver.getArguments().get("--populationb");
-			gB = ppB.getArgumentAsIntOrSetDefault("size", 100);
+			
 			// Obter o numero de presas
 			Arguments numbPreys= jBotEvolver.getArguments().get("--robots");
 			preys = numbPreys.getArgumentAsIntOrSetDefault("numberofrobots", 1);
-			
-		
-			try {
-				//populationA
-				populationA = Population.getPopulation(jBotEvolver.getArguments().get("--populationa"));
-				if(jBotEvolver.getArguments().get("--populationa").getArgumentIsDefined("generations"))
-					populationA.setNumberOfGenerations(jBotEvolver.getArguments().get("--populationa").getArgumentAsInt("generations"));
-				populationA.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
-				tA = new PopulationTable(tablesize);
-				
-				//populationB
-				populationB = Population.getPopulation(jBotEvolver.getArguments().get("--populationb"));
-				if(jBotEvolver.getArguments().get("--populationb").getArgumentIsDefined("generations"))
-					populationB.setNumberOfGenerations(jBotEvolver.getArguments().get("--populationb").getArgumentAsInt("generations"));
-				populationB.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
-				tB = new PopulationTable(tablesize);
-				
-			} catch(Exception e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
 			
 			if (jBotEvolver.getArguments().get("--output") != null) {
 				output = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
@@ -142,18 +165,18 @@ public class CoEvolution extends Evolution {
 					totalChromosomes--;
 				}
 				
-				System.out.println();
-				
-				//Atribui a cada geração a sua fitness
-				for (int i = 0; i < fitnessA.length; i++) {
-//					System.out.println("Individuo Ai " + i+" : "+(fitnessA[i]/tB.getTable().size()));
-					populationA.setEvaluationResultForId(i, (fitnessA[i]/tB.getTable().size()));
+				if(!resume){
+					//Atribui a cada geração a sua fitness
+					for (int i = 0; i < fitnessA.length; i++) {
+//						System.out.println("Individuo Ai " + i+" : "+(fitnessA[i]/tB.getTable().size()));
+						populationA.setEvaluationResultForId(i, (fitnessA[i]/tB.getTable().size()));
+					}
+					
+					//Adiciona o melhor chormosoma a tabela de A
+					tA.add(populationA.getBestChromosome());
 				}
 				
-				//Adiciona o melhor chormosoma a tabela de A
-				tA.add(populationA.getBestChromosome());
-				
-				print("\n Population A: " + 
+				print("\nPopulation A: " + 
 						"\nGeneration "+populationA.getNumberOfCurrentGeneration()+
 						"\tHighest: "+populationA.getHighestFitness()+
 						"\tAverage: "+populationA.getAverageFitness()+
@@ -185,42 +208,40 @@ public class CoEvolution extends Evolution {
 					print("!");
 					totalChromosomes--;
 				}
-				System.out.println();
-				//Atribui a cada geração a sua fitness
-				for (int i = 0; i < fitnessB.length; i++) {
-//					System.out.println("Individuo Bi " + i+" : "+(fitnessB[i]/tA.getTable().size()));
-					populationB.setEvaluationResultForId(i, (fitnessB[i]/tA.getTable().size()));
-				}
 
-				//Adiciona o melhor chormosoma a tabela de B
-				tB.add(populationB.getBestChromosome());
+				if(!resume){
+					//Atribui a cada geração a sua fitness
+					for (int i = 0; i < fitnessB.length; i++) {
+//						System.out.println("Individuo Bi " + i+" : "+(fitnessB[i]/tA.getTable().size()));
+						populationB.setEvaluationResultForId(i, (fitnessB[i]/tA.getTable().size()));
+					}
+
+					//Adiciona o melhor chormosoma a tabela de B
+					tB.add(populationB.getBestChromosome());
+				}
 				
-				print("\n Population B: " + 
+				print("\nPopulation B: " + 
 						"\nGeneration "+populationB.getNumberOfCurrentGeneration()+
 						"\tHighest: "+populationB.getHighestFitness()+
 						"\tAverage: "+populationB.getAverageFitness()+
 						"\tLowest: "+populationB.getLowestFitness()+"\n");
 				
-				//Imprimir a tabela de A e B:
-//				System.out.println("A Table");
-//				for(int i = 0 ; i < tA.getTable().size() ; i++)
-//					System.out.print(tA.getTable().get(i).getID()+" ");
-//				System.out.println();
-//				System.out.println("B Table");
-//				for(int i = 0 ; i < tB.getTable().size() ; i++)
-//					System.out.print(tB.getTable().get(i).getID()+" ");
+//				Imprimir a tabela de A e B:
+//				printTables(tA, tB);
 				
-				try {
-					diskStorage.savePopulations(populationA, populationB);
-//					diskStorage.savePopulationsTables(tA,tB);
-				} catch(Exception e) {e.printStackTrace();}
+				if(!resume){
+					try {
+						diskStorage.savePopulations(populationA, populationB);
+					} catch(Exception e) {e.printStackTrace();}
+				}else{
+					resume = false;
+				}
 				
 				populationA.createNextGeneration();
 				populationB.createNextGeneration();
-				
 			}
 		}
-		
+
 		private int getGenomeLength() {
 			
 			Simulator sim = jBotEvolver.createSimulator();
@@ -254,6 +275,16 @@ public class CoEvolution extends Evolution {
 		private void print(String s) {
 			if(!supressMessages)
 				System.out.print(s);
+		}
+		
+		private void printTables(PopulationTable tableA, PopulationTable tableB) {
+			System.out.println("A Table");
+			for(int i = 0 ; i < tableA.getTable().size() ; i++)
+				System.out.print(tableA.getTable().get(i).getID()+" ");
+			System.out.println();
+			System.out.println("B Table");
+			for(int i = 0 ; i < tableB.getTable().size() ; i++)
+				System.out.print(tableB.getTable().get(i).getID()+" ");
 		}
 		
 		private void addFitness(SimpleCoEvolutionFitnessResult result, double[] vector, int index){
