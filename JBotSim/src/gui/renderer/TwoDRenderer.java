@@ -35,6 +35,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	private double zoomFactor = 1.0;
 	
+	private boolean debug = false;
+	
 	public TwoDRenderer(Arguments args) {
 		super(args);
 		this.addComponentListener(this);
@@ -243,25 +245,11 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		yp[2] = transformY(p2.getY() + robot.getPosition().getY());
 
 		graphics.fillPolygon(xp, yp, 3);
-		
-		//DEBUG
-		if(robot instanceof Epuck) {
-			Sensor s = robot.getSensorByType(EpuckIRSensor.class);
-			if(s != null) {
-				EpuckIRSensor ir = (EpuckIRSensor)s;
-				drawLines(ir.rayPositions, graphics);
-			}
-		} else {
-			Sensor s = robot.getSensorByType(WallRaySensor.class);
-			if(s != null) {
-				WallRaySensor wall = (WallRaySensor)s;
-				drawLines(wall.rayPositions, graphics);
-			}
-		}
+			
 		graphics.setColor(Color.BLACK);		
 	}
 	
-	private void drawLines(Vector2d[][][] positions, Graphics graphics) {
+	protected void drawLines(Vector2d[][][] positions, Graphics graphics) {
 		if(positions != null) {
 			for(int i = 0 ; i < positions.length ; i++) {
 				for(int j = 0 ; j < positions[i].length ; j++) {

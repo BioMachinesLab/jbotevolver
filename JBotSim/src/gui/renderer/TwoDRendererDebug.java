@@ -5,10 +5,13 @@ import java.awt.Graphics;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import mathutils.Vector2d;
+import simulation.robot.Epuck;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.ConeTypeSensor;
+import simulation.robot.sensors.EpuckIRSensor;
 import simulation.robot.sensors.Sensor;
+import simulation.robot.sensors.WallRaySensor;
 import simulation.util.Arguments;
 
 public class TwoDRendererDebug extends TwoDRenderer {
@@ -19,50 +22,82 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		super(args);
 		this.addMouseListener(new MouseListenerSentinel());
 	}
-
+	
 	protected void drawRobot(Graphics graphics, Robot robot) {
-		if(robot.getId() == selectedRobot) {
-			int circleDiameter = (int) Math.round(0.5 + robot.getDiameter() * scale);
-			int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
-			int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
+		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
+			createImage();
+		int circleDiameter = (int) Math.round(robot.getDiameter() * scale);
+		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
+		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
 
-			graphics.setColor(Color.yellow);
-			graphics.fillOval(x-2, y-2, circleDiameter + 4, circleDiameter + 4);
-			int cx = transformX( robot.getPosition().getX());
-			int cy = transformY(robot.getPosition().getY());
-			double orientation  = robot.getOrientation();
-			Vector2d p0 = new Vector2d();
-			for(Sensor sensor : robot.getSensors()){ 
-				if (sensor.getClass().isInstance(ConeTypeSensor.class)) {
-					ConeTypeSensor coneSensor = (ConeTypeSensor) sensor;
-					if(coneSensor.getId() < 3){
-						if (sensor.getId() == 2)
-							graphics.setColor(Color.black);
-
-						double[] angles = coneSensor.getAngles();
-						for(int i=0; i < coneSensor.getNumberOfSensors(); i++){
-							p0.set(sensor.getSensorReading(i) + robot.getRadius(), 0);
-							p0.rotate(orientation+angles[i]);
-							x=transformX(p0.getX() + robot.getPosition().getX());
-							y=transformY(p0.getY() + robot.getPosition().getY());
-							graphics.drawLine(cx, cy, x, y);
-						}
-					}
-				}
-			}
-			System.out.println("Robot ID: "+robot.getId());
-			System.out.println("\n Actuators:");
-			for(Actuator act:robot.getActuators()){
-				System.out.println(act);
-			}
-			System.out.println("\n Sensors:");
-			for(Sensor sensor:robot.getSensors()){
-				System.out.println(sensor);
-			}
-			System.out.println("\n\n");
-
+//		if(robot.getId() == selectedRobot) {
+//			graphics.setColor(Color.yellow);
+//			graphics.fillOval(x-2, y-2, circleDiameter + 4, circleDiameter + 4);
+//			
+//		}
+		graphics.setColor(robot.getBodyColor());
+		graphics.fillOval(x, y, circleDiameter, circleDiameter);
+		
+		int avgColor = (robot.getBodyColor().getRed()+robot.getBodyColor().getGreen()+robot.getBodyColor().getBlue())/3;
+		
+		if (avgColor > 255/2) {
+			graphics.setColor(Color.BLACK);
+		} else {
+			graphics.setColor(Color.WHITE);
 		}
-		super.drawRobot(graphics, robot);
+
+		double orientation  = robot.getOrientation();
+		Vector2d p0 = new Vector2d();
+		Vector2d p1 = new Vector2d();
+		Vector2d p2 = new Vector2d();
+		p0.set( 0, -robot.getRadius() / 3);
+		p1.set( 0, robot.getRadius() / 3);
+		p2.set( 6 * robot.getRadius() / 7, 0);
+
+		p0.rotate(orientation);
+		p1.rotate(orientation);
+		p2.rotate(orientation);
+
+		int[] xp = new int[3];
+		int[] yp = new int[3];
+
+		xp[0] = transformX(p0.getX() + robot.getPosition().getX());
+		yp[0] = transformY(p0.getY() + robot.getPosition().getY());
+
+		xp[1] = transformX(p1.getX() + robot.getPosition().getX());
+		yp[1] = transformY(p1.getY() + robot.getPosition().getY());
+
+		xp[2] = transformX(p2.getX() + robot.getPosition().getX());
+		yp[2] = transformY(p2.getY() + robot.getPosition().getY());
+
+		graphics.fillPolygon(xp, yp, 3);
+			
+		graphics.setColor(Color.BLACK);
+		
+		System.out.println("Robot ID: "+robot.getId());
+		System.out.println("\n Actuators:");
+		for(Actuator act:robot.getActuators()){
+			System.out.println(act);
+		}
+		System.out.println("\n Sensors:");
+		for(Sensor sensor:robot.getSensors()){
+			System.out.println(sensor);
+		}
+		System.out.println("\n\n");
+		
+		if(robot instanceof Epuck) {
+			Sensor s = robot.getSensorByType(EpuckIRSensor.class);
+			if(s != null) {
+				EpuckIRSensor ir = (EpuckIRSensor)s;
+				drawLines(ir.rayPositions, graphics);
+			}
+		}
+		
+		Sensor s = robot.getSensorByType(WallRaySensor.class);
+		if(s != null) {
+			WallRaySensor wall = (WallRaySensor)s;
+			drawLines(wall.rayPositions, graphics);
+		}
 	}
 
 	public int getSelectedRobot() {
