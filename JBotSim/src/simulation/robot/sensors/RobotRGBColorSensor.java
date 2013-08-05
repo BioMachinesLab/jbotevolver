@@ -80,7 +80,6 @@ public class RobotRGBColorSensor extends ConeTypeSensor {
 		}
 
 		super.update(time, teleported);
-
 	}
 
 	@Override

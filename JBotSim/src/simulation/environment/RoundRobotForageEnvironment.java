@@ -45,15 +45,15 @@ public class RoundRobotForageEnvironment extends Environment {
 		super.setup(simulator);
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
 		addObject(nest);
-		//Parede do mapa
-//		topWall = new Wall(simulator, "topWall", 0, forageLimit, Math.PI, 1, 1, 0, 4, 0.05, PhysicalObjectType.WALL);
-//		addObject(topWall);
-//		bottomWall = new Wall(simulator, "bottomWall", 0, -forageLimit, Math.PI, 1, 1, 0, 4, 0.05, PhysicalObjectType.WALL);
-//		addObject(bottomWall);
-//		leftWall = new Wall(simulator, "leftWall", -forageLimit, 0, Math.PI, 1, 1, 0, 0.05, 4.05, PhysicalObjectType.WALL);
-//		addObject(leftWall);
-//		rightWall = new Wall(simulator, "rightWall", forageLimit, 0, Math.PI, 1, 1, 0, 0.05, 4.05, PhysicalObjectType.WALL);
-//		addObject(rightWall);
+//		Parede do mapa
+		topWall = new Wall(simulator, "topWall", 0, forageLimit, Math.PI, 1, 1, 0, 4, 0.05, PhysicalObjectType.WALL);
+		addObject(topWall);
+		bottomWall = new Wall(simulator, "bottomWall", 0, -forageLimit, Math.PI, 1, 1, 0, 4, 0.05, PhysicalObjectType.WALL);
+		addObject(bottomWall);
+		leftWall = new Wall(simulator, "leftWall", -forageLimit, 0, Math.PI, 1, 1, 0, 0.05, 4.05, PhysicalObjectType.WALL);
+		addObject(leftWall);
+		rightWall = new Wall(simulator, "rightWall", forageLimit, 0, Math.PI, 1, 1, 0, 0.05, 4.05, PhysicalObjectType.WALL);
+		addObject(rightWall);
 		
 		/*Pre-programados
 		Arguments programmedRobotArguments = simulator.getArguments().get("--programmedrobots");

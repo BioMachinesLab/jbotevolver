@@ -87,7 +87,7 @@ public abstract class ConeTypeSensor extends Sensor {
 		if(closeObjects != null)
 			closeObjects.update(time, teleported);
 		try { 
-			for(int j = 0; j < getNumberOfSensors(); j++){
+			for(int j = 0; j < readings.length; j++){
 				readings[j] = 0.0;
 			}
 			CloseObjectIterator iterator = getCloseObjects().iterator();
