@@ -16,7 +16,6 @@ public class RobotRGBColorSensor extends ConeTypeSensor {
 	protected boolean detectGreen;
 	protected boolean detectBlue;
 
-	protected double openingAngle;
 	protected double r;
 
 	protected double[] redReadings;

@@ -110,7 +110,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	}
 
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
-		for(int j=0; j<getNumberOfSensors(); j++){
+		for(int j=0; j<readings.length; j++){
 			readings[j] = Math.max(calculateContributionToSensor(j, source)*(1 + 
 					random.nextGaussian()* NOISESTDEV), readings[j]);
 		}

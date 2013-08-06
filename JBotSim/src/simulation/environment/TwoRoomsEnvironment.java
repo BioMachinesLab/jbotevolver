@@ -14,43 +14,43 @@ import simulation.util.Arguments;
 
 public class TwoRoomsEnvironment extends Environment {
 	
-	private LinkedList<Wall> buttons = new LinkedList<Wall>();
-	private LinkedList<Wall> doors = new LinkedList<Wall>();
-	private int numberOfPreys = 0;
-	private Random preyRandom;
-	private Random random;
-	private double splitRatio = 0.7;
-	private int timeBetweenPreys = 100;
-	private int maxPreys = 10;
-	private int numberOfPicks = 0;
-	private boolean teleport = true;
+	protected LinkedList<Wall> buttons = new LinkedList<Wall>();
+	protected LinkedList<Wall> doors = new LinkedList<Wall>();
+	protected int numberOfPreys = 0;
+	protected Random preyRandom;
+	protected Random random;
+	protected double splitRatio = 0.7;
+	protected int timeBetweenPreys = 100;
+	protected int maxPreys = 10;
+	protected int numberOfPicks = 0;
+	protected boolean teleport = true;
 	public boolean doorsOpen = false;
-	private int doorTime = 0;
-	private int doorOpenTime = 400;
-	private boolean useDoors = true;
-	private boolean bothRooms = true;
+	protected int doorTime = 0;
+	protected int doorOpenTime = 400;
+	protected boolean useDoors = true;
+	protected boolean bothRooms = true;
 	
-	private double exitWidth = 0.15;
-	private double arenaWidth = 0;
-	private double arenaHeight = 0;
-	private double corridorWidth = 0.4;
+	protected double exitWidth = 0.15;
+	protected double arenaWidth = 0;
+	protected double arenaHeight = 0;
+	protected double corridorWidth = 0.4;
 	
-	private boolean teleportOpenDoor = false;
-	private boolean removeWalls = false;
-	private double randomizeOrientation = 0;
+	protected boolean teleportOpenDoor = false;
+	protected boolean removeWalls = false;
+	protected double randomizeOrientation = 0;
 	
-	private boolean postEval = false;
-	private int extraPostEvalTime = 0;
-	private int postEvalTime = 1;
+	protected boolean postEval = false;
+	protected int extraPostEvalTime = 0;
+	protected int postEvalTime = 1;
 	
-	private int[] postEvalPreyRate = new int[2];
-	private boolean postEvalLeftRoom = true;
-	private int postEvalPreyCount = 0;
-	private int startingRoom = 0;
+	protected int[] postEvalPreyRate = new int[2];
+	protected boolean postEvalLeftRoom = true;
+	protected int postEvalPreyCount = 0;
+	protected int startingRoom = 0;
 	
-	private Simulator simulator;
+	protected Simulator simulator;
 	
-	private Prey[] preys;
+	protected Prey[] preys;
 	
 	private boolean realButton = false;
 
@@ -317,7 +317,7 @@ public class TwoRoomsEnvironment extends Environment {
 		return postEvalLeftRoom ? -1 : 1;
 	}
 	
-	private Wall findClosestWallButton(LinkedList<Wall> buttons, Robot robot) {
+	protected Wall findClosestWallButton(LinkedList<Wall> buttons, Robot robot) {
 		
 		int minIndex = 0;
 		double x = robot.getPosition().getX();
