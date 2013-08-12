@@ -128,6 +128,8 @@ public class CoEvolution extends Evolution {
 			
 			if(!populationA.evolutionDone() && !populationB.evolutionDone())
 				taskExecutor.prepareArguments(jBotEvolver.getArguments());
+
+			taskExecutor.setTotalNumberOfTasks((populationA.getNumberOfGenerations()-populationA.getNumberOfCurrentGeneration())*populationA.getPopulationSize()*tablesize*2);
 			
 			while(!populationA.evolutionDone()) {
 				double[] fitnessA = new double[gA];
@@ -140,8 +142,6 @@ public class CoEvolution extends Evolution {
 				
 				//populationA
 				
-				//rever com o professor
-				taskExecutor.setTotalNumberOfTasks((populationA.getNumberOfGenerations()-populationA.getNumberOfCurrentGeneration())*populationA.getPopulationSize());
 				
 				while ((c = populationA.getNextChromosomeToEvaluate()) != null) {
 					int samples = populationA.getNumberOfSamplesPerChromosome();
@@ -183,9 +183,6 @@ public class CoEvolution extends Evolution {
 						"\tLowest: "+populationA.getLowestFitness()+"\n");
 				
 				//populationB
-				
-				//rever com o professor
-				taskExecutor.setTotalNumberOfTasks((populationB.getNumberOfGenerations()-populationB.getNumberOfCurrentGeneration())*populationB.getPopulationSize());
 				
 				while ((c = populationB.getNextChromosomeToEvaluate()) != null) {
 					int samples = populationB.getNumberOfSamplesPerChromosome();
