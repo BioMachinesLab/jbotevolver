@@ -1,6 +1,8 @@
 package evolutionaryrobotics;
 
 import java.io.File;
+
+import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.PostEvaluationResult;
 import taskexecutor.tasks.PostEvaluationTask;
@@ -82,5 +84,15 @@ public class PostEvaluation {
 		} catch(Exception e) {e.printStackTrace();}
 		
 		return result;
+	}
+	
+	public double getAverageFitness(double[][] vals) {
+		double avg = 0;
+		
+		for(int i = 0 ; i < vals.length ; i++) {
+			avg+=vals[i][0];
+		}
+		
+		return avg/vals.length;
 	}
 }
