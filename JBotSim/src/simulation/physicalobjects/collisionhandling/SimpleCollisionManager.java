@@ -5,6 +5,7 @@ import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.physicalobjects.ClosePhysicalObjects;
 import simulation.physicalobjects.MovableObject;
+import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
@@ -57,6 +58,7 @@ public class SimpleCollisionManager extends CollisionManager {
 			}
 		}
 
+		//robot - wall
 		for (Robot robot : environment.getRobots()) {
 
 			ClosePhysicalObjects closeWalls = robot.shape.getCloseWalls();
@@ -70,6 +72,23 @@ public class SimpleCollisionManager extends CollisionManager {
 							status);
 					robot.moveTo(newPosition);
 					robot.setInvolvedInCollison(true);
+				}
+			}
+		}
+		
+		for (Prey prey : environment.getPrey()) {
+
+			ClosePhysicalObjects closeWalls = prey.shape.getCloseWalls();
+			CloseObjectIterator iterator = closeWalls.iterator();
+			while (iterator.hasNext()) {
+
+				Wall closeWall = (Wall) (iterator.next().getObject());
+				int status = checkIfCollided(closeWall, prey);
+				if (status != -1) {
+					Vector2d newPosition = handleCollision(prey, closeWall,
+							status);
+					prey.moveTo(newPosition);
+					prey.setInvolvedInCollison(true);
 				}
 			}
 		}
@@ -143,33 +162,33 @@ public class SimpleCollisionManager extends CollisionManager {
 		vector.setLength(length);
 	}
 
-	private Vector2d handleCollision(Robot robot, Wall wall, int collisionStatus) {
+	private Vector2d handleCollision(PhysicalObject obj, Wall wall, int collisionStatus) {
 
-		double valueX = robot.getPosition().getX(), valueY = robot
+		double valueX = obj.getPosition().getX(), valueY = obj
 				.getPosition().getY();
 		switch (collisionStatus) {
 		// robot comes from the right
 		case 0:
-			valueX = wall.getTopLeftX() + wall.getWidth() + robot.getRadius();
+			valueX = wall.getTopLeftX() + wall.getWidth() + obj.getRadius();
 			break;
 		// from the left
 		case 1:
-			valueX = wall.getTopLeftX() - robot.getRadius();
+			valueX = wall.getTopLeftX() - obj.getRadius();
 			break;
 		// from above
 		case 2:
-			valueY = wall.getTopLeftY() + robot.getRadius();
+			valueY = wall.getTopLeftY() + obj.getRadius();
 			break;
 		// from below.
 		case 3:
-			valueY = wall.getTopLeftY() - wall.getHeight() - robot.getRadius();
+			valueY = wall.getTopLeftY() - wall.getHeight() - obj.getRadius();
 			break;
 		}
 
 		return new Vector2d(valueX, valueY);
 	}
 
-	private int checkIfCollided(Wall closeWall, Robot robot) {
+	private int checkIfCollided(Wall closeWall, PhysicalObject obj) {
 
 		Vector2d topLeft = new Vector2d(closeWall.getTopLeftX(),
 				closeWall.getTopLeftY()), topRight = new Vector2d(
@@ -181,30 +200,30 @@ public class SimpleCollisionManager extends CollisionManager {
 				closeWall.getTopLeftY() - closeWall.getHeight());
 
 		if (mathutils.MathUtils.distanceBetween(topRight, bottomRight,
-				robot.getPosition()) <= robot.getRadius()) {
+				obj.getPosition()) <= obj.getRadius()) {
 			// System.out.println("robot from right");
 			return 0;
 		}
 		if (mathutils.MathUtils.distanceBetween(topLeft, bottomLeft,
-				robot.getPosition()) <= robot.getRadius()) {
+				obj.getPosition()) <= obj.getRadius()) {
 			// System.out.println("robot from left");
 			return 1;
 		}
 		if (mathutils.MathUtils.distanceBetween(topRight, topLeft,
-				robot.getPosition()) <= robot.getRadius()) {
+				obj.getPosition()) <= obj.getRadius()) {
 			// System.out.println("robot from above");
 			return 2;
 		}
 		if (mathutils.MathUtils.distanceBetween(bottomRight, bottomLeft,
-				robot.getPosition()) <= robot.getRadius()) {
+				obj.getPosition()) <= obj.getRadius()) {
 			// System.out.println("robot from below");
 			return 3;
 		}
 
-		if (robot.getPosition().x > topLeft.x
-				&& robot.getPosition().x < topRight.x) {
-			if (robot.getPosition().y < topLeft.y
-					&& robot.getPosition().y > bottomLeft.y) {
+		if (obj.getPosition().x > topLeft.x
+				&& obj.getPosition().x < topRight.x) {
+			if (obj.getPosition().y < topLeft.y
+					&& obj.getPosition().y > bottomLeft.y) {
 				return 4;
 			}
 		}

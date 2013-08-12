@@ -40,11 +40,6 @@ public abstract class Controller extends SimulatorObject implements Serializable
 	public void begin() {};
 
 	/**
-	 *  Called just before the simulation starts (at time = 0)
-	 */
-	public abstract void controlStep(double time);
-
-	/**
 	 *  Called after the simulation has ended
 	 */
 	public void end() {};
@@ -66,4 +61,10 @@ public abstract class Controller extends SimulatorObject implements Serializable
 		
 		return (Controller)Factory.getInstance(arguments.getArgumentAsString("classname"),simulator,robot,arguments);
 	}
+
+	public void controlStep(double time, double d) {
+		controlStep(time);
+	}
+	
+	public void controlStep(double time) {}
 }

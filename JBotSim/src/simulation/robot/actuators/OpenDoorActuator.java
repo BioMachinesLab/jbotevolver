@@ -11,10 +11,11 @@ import simulation.util.Arguments;
 
 public class OpenDoorActuator extends Actuator {
 	
-	private TwoRoomsEnvironment env;
-	private double distanceToDoor = 0.2;
-	private boolean open = false;
-	private Simulator simulator;
+	protected TwoRoomsEnvironment env;
+	protected double distanceToDoor = 0.2;
+	protected boolean open = false;
+	protected Simulator simulator;
+	protected boolean openedDoor = false;
 
 	public OpenDoorActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
@@ -24,6 +25,7 @@ public class OpenDoorActuator extends Actuator {
 
 	@Override
 	public void apply(Robot robot) {
+		openedDoor = false;
 		if(open) {
 			if(env == null)
 				env = (TwoRoomsEnvironment)simulator.getEnvironment();
@@ -35,7 +37,10 @@ public class OpenDoorActuator extends Actuator {
 			for(Wall b : buttons) {
 				Vector2d bPos = b.getPosition();
 				if(bPos.distanceTo(r) < distanceToDoor) {
+					boolean doorAlreadyOpen = env.doorsOpen;
 					env.openDoor();
+					if(!doorAlreadyOpen)
+						openedDoor = true;
 					break;
 				}
 			}

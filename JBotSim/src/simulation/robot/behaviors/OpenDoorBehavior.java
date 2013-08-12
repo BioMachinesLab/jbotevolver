@@ -11,25 +11,28 @@ import simulation.util.Arguments;
 
 public class OpenDoorBehavior extends Behavior{
 	
-	private TwoRoomsEnvironment env;
-	private double distanceToDoor = 0.2;
+	protected TwoRoomsEnvironment env;
+	protected double distanceToDoor = 0.2;
+	protected boolean openedDoor = false;
+	protected Robot robot;
 
 	public OpenDoorBehavior(Simulator simulator, Robot r, Arguments args) {
 		super(simulator, r, args);
 		env = (TwoRoomsEnvironment)simulator.getEnvironment();
 		distanceToDoor = args.getArgumentAsDoubleOrSetDefault("distancetodoor", distanceToDoor);
+		this.robot = r;
 	}
 
 	@Override
 	public void controlStep(double time) {
+		openedDoor = false;
 		LinkedList<Wall> buttons = env.getButtons();
-		Robot robot = env.getRobots().get(0);
 		Vector2d r = robot.getPosition(); 
 		
 		for(Wall b : buttons) {
 			Vector2d bPos = b.getPosition();
 			if(bPos.distanceTo(r) < distanceToDoor) {
-				env.openDoor();
+				openedDoor = env.openDoor();
 				break;
 			}
 		}

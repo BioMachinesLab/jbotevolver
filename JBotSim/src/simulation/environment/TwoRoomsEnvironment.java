@@ -98,6 +98,10 @@ public class TwoRoomsEnvironment extends Environment {
 			addMovableObject(preys[i]);
 		}
 		
+		placeRobots();
+	}
+	
+	protected void placeRobots() {
 		if(teleport) {
 			double sign = 1;
 			if(random.nextDouble() > 0.5 && bothRooms)
@@ -159,7 +163,7 @@ public class TwoRoomsEnvironment extends Environment {
 		
 	}
 	
-	private void addPrey(double x, double y) {
+	protected void addPrey(double x, double y) {
 		for(Prey p : preys) {
 			if(p.getPosition().getX() == 0 && p.getPosition().getY() == -3) {
 				p.setPosition(x,y);
@@ -169,7 +173,7 @@ public class TwoRoomsEnvironment extends Environment {
 		numberOfPreys++;
 	}
 	
-	public void openDoor() {
+	public boolean openDoor() {
 		if(!doorsOpen) {
 			
 			Robot r = robots.get(0);
@@ -209,6 +213,9 @@ public class TwoRoomsEnvironment extends Environment {
 				r.teleportTo(new Vector2d(oldX,oldY));
 				r.setOrientation(orientation);
 			}
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
@@ -302,7 +309,7 @@ public class TwoRoomsEnvironment extends Environment {
 		postEvalPreyRate =  new int[]{first,second};
 	}
 	
-	private int calculatePostEvalPreyDropRoom() {
+	protected int calculatePostEvalPreyDropRoom() {
 		
 		if(postEvalPreyCount == 0) {
 			postEvalLeftRoom = !postEvalLeftRoom;

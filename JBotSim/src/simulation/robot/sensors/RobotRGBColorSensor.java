@@ -60,6 +60,9 @@ public class RobotRGBColorSensor extends ConeTypeSensor {
 	}
 
 	public void update(int time, ArrayList<PhysicalObject> teleported) {
+		
+		readings = new double[slices];
+		
 		if (detectRed) {
 			for (int j = 0; j < slices; j++) {
 				redReadings[j] = 0.0;
