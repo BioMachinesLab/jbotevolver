@@ -15,6 +15,7 @@ public class PostEvaluation {
 	private int fitnesssamples = 1;
 	private double targetfitness = 0;
 	private String dir = "";
+	private boolean singleEvaluation = false;
 	
 	private TaskExecutor taskExecutor;
 	private String args ="";
@@ -27,6 +28,7 @@ public class PostEvaluation {
 			if(a[0].equals("samples")) samples = Integer.parseInt(a[1]);
 			if(a[0].equals("fitnesssamples")) fitnesssamples = Integer.parseInt(a[1]);
 			if(a[0].equals("targetfitness")) targetfitness = Double.parseDouble(a[1]);
+			if(a[0].equals("singleevaluation")) singleEvaluation = Integer.parseInt(a[1]) == 1;
 		}
 		
 		if(!dir.endsWith("/"))
@@ -41,6 +43,9 @@ public class PostEvaluation {
 		
 		startTrial = 1;
 		maxTrial = --currentFolder;
+		
+		if(singleEvaluation)
+			maxTrial = 1;
 	}
 	
 	public double[][] runPostEval() {
@@ -49,7 +54,13 @@ public class PostEvaluation {
 		
 		try {
 		
-			String file = dir+startTrial+"/_showbest_current.conf";
+			String file = "";
+			
+			if(singleEvaluation)
+				file=dir+"/_showbest_current.conf";
+			else
+				file=dir+startTrial+"/_showbest_current.conf";
+				
 			JBotEvolver jBotEvolver = new JBotEvolver(new String[]{file});
 			
 			if (jBotEvolver.getArguments().get("--executor") != null) {
@@ -59,8 +70,10 @@ public class PostEvaluation {
 			}
 		
 			for(int i = startTrial ; i <= maxTrial ; i++) {
-				
-				file = dir+i+"/_showbest_current.conf";
+				if(singleEvaluation)
+					file = dir+"_showbest_current.conf";
+				else
+					file = dir+i+"/_showbest_current.conf";
 				jBotEvolver = new JBotEvolver(new String[]{file});
 				
 				taskExecutor.prepareArguments(jBotEvolver.getArguments());
