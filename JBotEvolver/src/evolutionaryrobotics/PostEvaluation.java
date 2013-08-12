@@ -15,7 +15,9 @@ public class PostEvaluation {
 	private int fitnesssamples = 1;
 	private double targetfitness = 0;
 	private String dir = "";
+	
 	private boolean singleEvaluation = false;
+	private boolean localEvaluation = false;
 	
 	private TaskExecutor taskExecutor;
 	private String args ="";
@@ -29,6 +31,7 @@ public class PostEvaluation {
 			if(a[0].equals("fitnesssamples")) fitnesssamples = Integer.parseInt(a[1]);
 			if(a[0].equals("targetfitness")) targetfitness = Double.parseDouble(a[1]);
 			if(a[0].equals("singleevaluation")) singleEvaluation = Integer.parseInt(a[1]) == 1;
+			if(a[0].equals("localevaluation")) localEvaluation = Integer.parseInt(a[1]) == 1;
 		}
 		
 		if(!dir.endsWith("/"))
@@ -64,7 +67,10 @@ public class PostEvaluation {
 			JBotEvolver jBotEvolver = new JBotEvolver(new String[]{file});
 			
 			if (jBotEvolver.getArguments().get("--executor") != null) {
-				taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
+				if(localEvaluation)
+					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, new Arguments("classname=ParallelTaskExecutor",true));
+				else
+					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
 				taskExecutor.prepareArguments(jBotEvolver.getArguments());
 				taskExecutor.start();
 			}
