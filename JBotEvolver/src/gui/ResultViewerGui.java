@@ -111,8 +111,9 @@ public class ResultViewerGui extends Gui {
 		super(jBotEvolver,args);
 		this.jBotEvolver = (JBotEvolver)jBotEvolver;
 		
-		if(args.getArgumentIsDefined("renderer"))
+		if(args.getArgumentIsDefined("renderer")) {
 			createRenderer(new Arguments(args.getArgumentAsString("renderer")));
+		}
 		
 		frame = new JFrame("Result Viewer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
