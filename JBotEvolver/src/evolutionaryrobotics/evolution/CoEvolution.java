@@ -1,5 +1,6 @@
 package evolutionaryrobotics.evolution;
 
+import java.text.DecimalFormat;
 import java.util.Random;
 
 import simulation.Simulator;
@@ -31,6 +32,7 @@ public class CoEvolution extends Evolution {
 	private int gB;
 	private int preys;
 	private boolean resume = false;
+	private DecimalFormat df = new DecimalFormat("#.##");
 
 	public CoEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 			super(jBotEvolver, taskExecutor, args);
@@ -134,7 +136,7 @@ public class CoEvolution extends Evolution {
 			while(!populationA.evolutionDone()) {
 				double[] fitnessA = new double[gA];
 				double[] fitnessB = new double[gB];
-				taskExecutor.setDescription(output+" "+populationA.getNumberOfCurrentGeneration()+"/"+populationA.getNumberOfGenerations());
+				taskExecutor.setDescription(output+" "+populationA.getNumberOfCurrentGeneration()+"/"+populationA.getNumberOfGenerations() + " " + Double.valueOf(df.format(populationA.getHighestFitness())) + " " + Double.valueOf(df.format(populationB.getHighestFitness())));
 				
 				Chromosome c;
 				

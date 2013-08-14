@@ -1,5 +1,7 @@
 package evolutionaryrobotics.evolution;
 
+import java.text.DecimalFormat;
+
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -19,6 +21,7 @@ public class GenerationalEvolution extends Evolution {
 	private boolean supressMessages = false;
 	private DiskStorage diskStorage;
 	private String output = "";
+	private DecimalFormat df = new DecimalFormat("#.##");
 
 	public GenerationalEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
@@ -62,7 +65,7 @@ public class GenerationalEvolution extends Evolution {
 		
 		while(!population.evolutionDone()) {
 			
-			taskExecutor.setDescription(output+" "+population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations());
+			taskExecutor.setDescription(output+" "+population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations() + " " + Double.valueOf(df.format(population.getHighestFitness())));
 			
 			Chromosome c;
 			
