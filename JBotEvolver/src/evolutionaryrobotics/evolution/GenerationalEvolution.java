@@ -62,10 +62,11 @@ public class GenerationalEvolution extends Evolution {
 			taskExecutor.prepareArguments(jBotEvolver.getArguments());
 		
 		taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
-		
+		double highestFitness = 0;
 		while(!population.evolutionDone()) {
 			
-			taskExecutor.setDescription(output+" "+population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations() + " " + Double.valueOf(df.format(population.getHighestFitness())));
+			double d = Double.valueOf(df.format(highestFitness));
+			taskExecutor.setDescription(output+" "+population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations() + " " + d);
 			
 			Chromosome c;
 			
@@ -100,6 +101,7 @@ public class GenerationalEvolution extends Evolution {
 				diskStorage.savePopulation(population);
 			} catch(Exception e) {e.printStackTrace();}
 			
+			highestFitness = population.getHighestFitness();
 			population.createNextGeneration();
 			
 		}

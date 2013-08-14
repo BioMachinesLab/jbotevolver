@@ -133,10 +133,17 @@ public class CoEvolution extends Evolution {
 
 			taskExecutor.setTotalNumberOfTasks((populationA.getNumberOfGenerations()-populationA.getNumberOfCurrentGeneration())*populationA.getPopulationSize()*tablesize*2);
 			
+			double highestFitnessA = 0;
+			double highestFitnessB = 0;
+			
 			while(!populationA.evolutionDone()) {
 				double[] fitnessA = new double[gA];
 				double[] fitnessB = new double[gB];
-				taskExecutor.setDescription(output+" "+populationA.getNumberOfCurrentGeneration()+"/"+populationA.getNumberOfGenerations() + " " + Double.valueOf(df.format(populationA.getHighestFitness())) + " " + Double.valueOf(df.format(populationB.getHighestFitness())));
+				
+				double fA = Double.valueOf(df.format(highestFitnessA));
+				double fB = Double.valueOf(df.format(highestFitnessB));
+				
+				taskExecutor.setDescription(output+" "+populationA.getNumberOfCurrentGeneration()+"/"+populationA.getNumberOfGenerations() + " " + Double.valueOf(df.format(fA)) + " " + Double.valueOf(df.format(fB)));
 				
 				Chromosome c;
 				
@@ -177,6 +184,9 @@ public class CoEvolution extends Evolution {
 					//Adiciona o melhor chormosoma a tabela de A
 					tA.add(populationA.getBestChromosome());
 				}
+				
+				highestFitnessA = populationA.getHighestFitness();
+				highestFitnessB = populationB.getHighestFitness();
 				
 				print("\nPopulation A: " + 
 						"\nGeneration "+populationA.getNumberOfCurrentGeneration()+
