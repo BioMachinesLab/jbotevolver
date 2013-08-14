@@ -79,4 +79,8 @@ public class DifferentialDriveRobot extends Robot {
 	public double getLeftWheelSpeed() {
 		return leftWheelSpeed;
 	}
+	
+	public double getWheelDiameter(){
+		return this.wheelDiameter;
+	}
 }
