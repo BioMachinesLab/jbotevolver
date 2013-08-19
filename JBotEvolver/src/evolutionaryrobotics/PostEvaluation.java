@@ -6,6 +6,7 @@ import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.PostEvaluationResult;
 import taskexecutor.tasks.PostEvaluationTask;
+import taskexecutor.tasks.SingleSamplePostEvaluationTask;
 
 public class PostEvaluation {
 	
@@ -20,7 +21,12 @@ public class PostEvaluation {
 	private boolean localEvaluation = false;
 	
 	private TaskExecutor taskExecutor;
-	private String args ="";
+	private String[] args;
+	
+	public PostEvaluation(String[] args, String[] extraArgs) {
+		this(args);
+		this.args = extraArgs;
+	}
 	
 	public PostEvaluation(String[] args) {
 		
@@ -63,8 +69,15 @@ public class PostEvaluation {
 				file=dir+"/_showbest_current.conf";
 			else
 				file=dir+startTrial+"/_showbest_current.conf";
+			
+			String[] newArgs = args != null ? new String[args.length+1] : new String[1];
+			
+			newArgs[0] = file;
+			
+			for(int i = 1 ; i < newArgs.length ; i++)
+				newArgs[i] = args[i-1];
 				
-			JBotEvolver jBotEvolver = new JBotEvolver(new String[]{file});
+			JBotEvolver jBotEvolver = new JBotEvolver(newArgs);
 			
 			if (jBotEvolver.getArguments().get("--executor") != null) {
 				if(localEvaluation)
@@ -80,21 +93,26 @@ public class PostEvaluation {
 					file = dir+"_showbest_current.conf";
 				else
 					file = dir+i+"/_showbest_current.conf";
-				jBotEvolver = new JBotEvolver(new String[]{file});
+				newArgs[0] = file;
+				jBotEvolver = new JBotEvolver(newArgs);
 				
 				taskExecutor.prepareArguments(jBotEvolver.getArguments());
 				
 				for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
-					JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
-					PostEvaluationTask t = new PostEvaluationTask(i,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),samples,targetfitness);
-					taskExecutor.addTask(t);
+					for(int sample = 0 ; sample < samples ; sample++) {
+						JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
+						SingleSamplePostEvaluationTask t = new SingleSamplePostEvaluationTask(i,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,targetfitness);
+						taskExecutor.addTask(t);
+					}
 				}
 			}
 			
 			for(int i = startTrial ; i <= maxTrial ; i++) {
 				for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
-					PostEvaluationResult sfr = (PostEvaluationResult)taskExecutor.getResult();
-					result[sfr.getRun()-1][sfr.getFitnesssample()] = sfr.getFitness();
+					for(int sample = 0 ; sample < samples ; sample++) {
+						PostEvaluationResult sfr = (PostEvaluationResult)taskExecutor.getResult();
+						result[sfr.getRun()-1][sfr.getFitnesssample()]+= sfr.getFitness()/samples;
+					}
 				}
 			}
 				
