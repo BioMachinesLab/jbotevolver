@@ -19,9 +19,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Vector;
+
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -43,6 +46,7 @@ import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -725,7 +729,16 @@ public class ResultViewerGui extends Gui {
 			String[] tmp = dir.list();
 			for (int i = 0; i < tmp.length; i++)
 				ol.addElement(tmp[i]);
-			Collections.sort(ol, String.CASE_INSENSITIVE_ORDER);
+			Collections.sort(ol, new Comparator<String>() {
+			    @Override
+			    public int compare(String o1, String o2) {
+			       if(!o1.startsWith("showbest"))
+			    	   return o1.compareTo(o2);
+			       String oo1 = o1.substring(8, o1.indexOf("."));
+			       String oo2 = o2.substring(8, o2.indexOf("."));
+			       return Integer.parseInt(oo1)-Integer.parseInt(oo2);
+			    }
+			});
 			
 			curDir.add(new DefaultMutableTreeNode(".."));
 			
