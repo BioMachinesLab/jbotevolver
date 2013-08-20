@@ -6,6 +6,7 @@ import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.PostEvaluationResult;
 import taskexecutor.tasks.SingleSamplePostEvaluationTask;
+import tests.Cronometer;
 
 public class PostEvaluation {
 	
@@ -80,7 +81,7 @@ public class PostEvaluation {
 			
 			if (jBotEvolver.getArguments().get("--executor") != null) {
 				if(localEvaluation)
-					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, new Arguments("classname=ParallelTaskExecutor",true));
+					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, new Arguments("classname=SequentialTaskExecutor",true));
 				else
 					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
 				taskExecutor.prepareArguments(jBotEvolver.getArguments());
@@ -94,9 +95,8 @@ public class PostEvaluation {
 					file = dir+i+"/_showbest_current.conf";
 				newArgs[0] = file;
 				jBotEvolver = new JBotEvolver(newArgs);
-				
 				taskExecutor.prepareArguments(jBotEvolver.getArguments());
-				
+
 				for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
 					for(int sample = 0 ; sample < samples ; sample++) {
 						JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());

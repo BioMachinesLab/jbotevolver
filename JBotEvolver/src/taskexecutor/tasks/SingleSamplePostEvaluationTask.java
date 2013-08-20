@@ -7,6 +7,7 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import taskexecutor.results.PostEvaluationResult;
 import taskexecutor.results.SimpleFitnessResult;
+import tests.Cronometer;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
@@ -42,7 +43,6 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 		jBotEvolver.setChromosome(robots, chromosome);
 		simulator.addRobots(robots);
-		
 		EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
 		simulator.addCallback(eval);
 		simulator.simulate();
@@ -50,7 +50,7 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 		if(threshold > 0)
 			fitness= eval.getFitness() > threshold ? 1 : 0;
 		else
-			fitness= eval.getFitness();	
+			fitness= eval.getFitness();
 	}
 	public Result getResult() {
 		PostEvaluationResult fr = new PostEvaluationResult(run,fitnesssample,fitness);
