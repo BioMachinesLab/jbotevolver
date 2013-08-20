@@ -82,6 +82,10 @@ public abstract class ConeTypeSensor extends Sensor {
 	public double getRange() {
 		return range;
 	}
+	
+	public double getOpeningAngle() {
+		return openingAngle;
+	}
 
 	public void update(double time, ArrayList<PhysicalObject> teleported) {
 		if(closeObjects != null)
@@ -139,5 +143,13 @@ public abstract class ConeTypeSensor extends Sensor {
 
 	public int getNumberOfSensors() {
 		return numberOfSensors;
+	}
+	
+	public void setRange(double range) {
+		this.range = range;
+	}
+	
+	public void setOpeningAngle(double openingAngle) {
+		this.openingAngle = openingAngle;
 	}
 }

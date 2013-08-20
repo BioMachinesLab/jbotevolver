@@ -13,11 +13,8 @@ import simulation.util.Arguments;
 
 public class SimpleLightTypeSensor extends ConeTypeSensor {
 	
-	private double halfOpeningAngle;
-
 	public SimpleLightTypeSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);
-		this.halfOpeningAngle = openingAngle / 2.0;
 		setAllowedObjectsChecker(new AllowLightChecker());
 	}
 
@@ -27,8 +24,8 @@ public class SimpleLightTypeSensor extends ConeTypeSensor {
 		GeometricInfo sensorInfo = getSensorGeometricInfo(sensorNumber, source);
 	
 		if((sensorInfo.getDistance() < getRange()) && 
-		   (sensorInfo.getAngle() < (halfOpeningAngle)) && 
-		   (sensorInfo.getAngle() > (-halfOpeningAngle))) {
+		   (sensorInfo.getAngle() < (openingAngle / 2.0)) && 
+		   (sensorInfo.getAngle() > (-openingAngle / 2.0))) {
 
 			return (getRange() - sensorInfo.getDistance()) / getRange();
 //			if (val > 1.0)
