@@ -296,7 +296,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 				PhysicalObjectDistance source=iterator.next();
 				if (source.getObject().isEnabled()){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(robot.getPosition(), source.getObject()));
+					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(robot.getPosition(), source.getObject(),time));
 				}
 			}
 			

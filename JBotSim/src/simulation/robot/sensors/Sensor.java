@@ -13,6 +13,7 @@ public abstract class Sensor extends SimulatorObject {
 	protected Robot robot;
 	protected static final int DEFAULT_RANGE = 1;
 	protected static final double DEFAULT_OPENING_ANGLE = Math.PI / 2;
+	protected boolean enabled = false;
 
 	public Sensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super();
@@ -31,5 +32,13 @@ public abstract class Sensor extends SimulatorObject {
 	public static Sensor getSensor(Robot robot, Simulator simulator, String name, Arguments arguments) {
 		int id = arguments.getArgumentAsIntOrSetDefault("id",0);
 		return (Sensor)Factory.getInstance(name, simulator,id,robot,arguments);
+	}
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
 	}
 }

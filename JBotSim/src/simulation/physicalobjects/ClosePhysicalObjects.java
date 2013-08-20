@@ -1,13 +1,13 @@
 package simulation.physicalobjects;
 
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
-
-import simulation.Simulator;
 import simulation.environment.Environment;
+import simulation.physicalobjects.checkers.AllowWallChecker;
 import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 
 public class ClosePhysicalObjects implements Serializable {
@@ -41,6 +41,7 @@ public class ClosePhysicalObjects implements Serializable {
 		}
 		this.time = time;
 		farTime = time + visibility;
+		
 		if (teleported.size() > 0) {
 			if(closeObjects.isEmpty() && farObjects.isEmpty()){
 				updateTeleportedNoCheck(teleported);
@@ -115,7 +116,7 @@ public class ClosePhysicalObjects implements Serializable {
 	}
 
 	public void debugInfo(){
-		System.out.println(time + " CO: " + closeObjects + " FO: " + farObjects);
+		System.out.println(time + " CO " +closeObjects.size() + " FO: " + farObjects.size());
 	}
 	public class CloseObjectIterator{
 		private ListIterator<PhysicalObjectDistance> iterador;

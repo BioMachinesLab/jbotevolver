@@ -105,7 +105,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					drawRobot(graphics, (Robot) m);
 					break;
 				case WALLBUTTON:
-					drawWallButton((Wall) m);
+					drawWall((Wall) m);
 					break;
 				}
 			}	
@@ -127,7 +127,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
     public void drawWall(Wall m) {
     	
-		graphics.setColor(Color.blue);
+		graphics.setColor(m.color);
 		
     	int wallWidth = (int) (m.getWidth() * scale);
 		int wallHeight = (int) (m.getHeight()* scale);
@@ -269,18 +269,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				}
 			}
 		}
-	}
-
-	private void drawWallButton(Wall m) {
-		graphics.setColor(Color.RED);
-		
-    	int wallWidth = (int) (m.getWidth() * scale);
-		int wallHeight = (int) (m.getHeight()* scale);
-		int x = (int) transformX(m.getTopLeftX());
-		int y = (int) transformY(m.getTopLeftY());
-		
-		graphics.fillRect(x, y, wallWidth, wallHeight);
-		graphics.setColor(Color.BLACK);
 	}
 
 	protected int transformX(double x) {

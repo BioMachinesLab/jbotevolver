@@ -1,6 +1,8 @@
 package simulation.robot.sensors;
 
 import simulation.Simulator;
+import simulation.physicalobjects.GeometricInfo;
+import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowOrderedPreyChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -48,5 +50,13 @@ public class PreySensor extends LightTypeSensor {
 			currentValue = lagValue;
 		}
 		return currentValue;
+	}
+	
+	@Override
+	protected double calculateContributionToSensor(int sensorNumber,
+			PhysicalObjectDistance source) {
+		GeometricInfo sensorInfo = getSensorGeometricInfo(sensorNumber, source);
+//		System.out.println(sensorInfo.getDistance());
+		return super.calculateContributionToSensor(sensorNumber, source);
 	}
 }

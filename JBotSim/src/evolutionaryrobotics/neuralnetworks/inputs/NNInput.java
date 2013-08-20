@@ -39,6 +39,7 @@ public abstract class NNInput implements Serializable {
 		try {
 			while (i.hasNext()) {
 				Sensor sensor = i.next();
+				sensor.setEnabled(true);
 				String inputName = sensor.getClass().getSimpleName().replace("Sensor","NNInput");
 				nnInputs.add((NNInput)Factory.getInstance(inputName, sensor));
 			}
@@ -58,6 +59,7 @@ public abstract class NNInput implements Serializable {
 			return (NNInput)Factory.getInstance(arguments.getArgumentAsString("classname"),simulator, robot, arguments);
 		} else {
 			Sensor sensor = robot.getSensorWithId(id);
+			sensor.setEnabled(true);
 			return (NNInput)Factory.getInstance(arguments.getArgumentAsString("classname"),sensor);
 		}
 	}

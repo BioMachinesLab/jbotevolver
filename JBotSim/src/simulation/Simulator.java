@@ -12,6 +12,7 @@ import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import tests.Cronometer;
 import comm.FileProvider;
 
 public class Simulator implements Serializable {
@@ -75,15 +76,25 @@ public class Simulator implements Serializable {
 		this.time = time;
 		
 		// Update the readings for all the sensors:
+		Cronometer.setupLap(1);
 		updateAllRobotSensors(time);
+		Cronometer.lap(1);
 		// Call the controllers:
+		Cronometer.setupLap(2);
 		updateAllControllers(time);
+		Cronometer.lap(2);
 		// Compute the actions of the robot's actuators on the environment and on itself
+		Cronometer.setupLap(3);
 		updateAllRobotActuators(time);
+		Cronometer.lap(3);
 		// Update non-robot objects in the environment
+		Cronometer.setupLap(4);
 		updateEnvironment(time);
+		Cronometer.lap(4);
 		// Update the positions of everything
+		Cronometer.setupLap(5);
 		updatePositions(time);
+		Cronometer.lap(5);
 		
 		for (Updatable r : callbacks) {
 			r.update(this);

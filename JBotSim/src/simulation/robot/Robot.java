@@ -52,6 +52,8 @@ public class Robot extends MovableObject {
 	public static final int GREENINDEX = 1;
 	public static final int BLUEINDEX  = 2;
 	
+	protected boolean ignoreDisabledSensors = false;
+	
 	/**
 	 * Initialize a new robot.
 	 * 
@@ -70,6 +72,7 @@ public class Robot extends MovableObject {
 		double relativeY = args.getArgumentAsDoubleOrSetDefault("relativey",0);
 		double radius = args.getArgumentAsDoubleOrSetDefault("radius",0.05);
 		double diameter = args.getArgumentAsDoubleOrSetDefault("diameter",radius*2);
+		ignoreDisabledSensors = args.getArgumentAsIntOrSetDefault("ignoredisabledsensors",0) == 1; 
 		if(diameter != radius*2)
 			radius = diameter/2;
 		this.shape = new CircularShape(simulator, name + "CollisionObject", this, relativeX, relativeY, diameter, diameter/2);
@@ -217,7 +220,8 @@ public class Robot extends MovableObject {
 	 */
 	public void updateSensors(double simulationStep, ArrayList<PhysicalObject> teleported) {
 		for(Sensor sensor : sensors){
-			sensor.update(simulationStep,teleported);
+			if(!ignoreDisabledSensors || sensor.isEnabled())
+				sensor.update(simulationStep,teleported);
 		}
 	}
 	

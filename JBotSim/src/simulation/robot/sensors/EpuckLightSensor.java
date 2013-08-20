@@ -188,8 +188,7 @@ public class EpuckLightSensor extends LightTypeSensor {
 				PhysicalObjectDistance source=iterator.next();
 				if (source.getObject().isEnabled()){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(
-							sensorPosition, source.getObject()));
+					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(sensorPosition, source.getObject(),time));
 				}
 			}
 			

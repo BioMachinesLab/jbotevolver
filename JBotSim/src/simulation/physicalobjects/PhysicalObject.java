@@ -19,6 +19,7 @@ public class PhysicalObject extends SimulatorObject implements
 	public Shape shape = null;
 
 	private boolean enabled = true;
+	protected Vector2d lightDirection = new Vector2d();
 
 	public PhysicalObject(Simulator simulator, Arguments args) {
 		super(args.getArgumentAsStringOrSetDefault("name", "defaultName"));
@@ -125,5 +126,10 @@ public class PhysicalObject extends SimulatorObject implements
 
 	public void setEnabled(boolean enabled) {
 		this.enabled = enabled;
+	}
+
+	public double getDistanceBetween(Vector2d fromPoint) {
+		lightDirection.set(position.getX()-fromPoint.getX(),position.getY()-fromPoint.getY());
+		return lightDirection.length();
 	}
 }

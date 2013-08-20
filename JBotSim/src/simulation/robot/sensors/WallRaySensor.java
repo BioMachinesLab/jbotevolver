@@ -1,8 +1,11 @@
 package simulation.robot.sensors;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+
+import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
@@ -136,6 +139,7 @@ public class WallRaySensor extends ConeTypeSensor {
 		if(closeObjects != null) {
 			closeObjects.update(time, teleported);
 		}
+	
 		try { 
 			for(int i = 0; i < numberOfSensors; i++){
 				for(int j = 0; j < numberOfRays; j++){
@@ -148,7 +152,7 @@ public class WallRaySensor extends ConeTypeSensor {
 				PhysicalObjectDistance source=iterator.next();
 				if (source.getObject().isEnabled()){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(robot.getPosition(), source.getObject()));
+					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(robot.getPosition(), source.getObject(),time));
 				}
 			}
 			

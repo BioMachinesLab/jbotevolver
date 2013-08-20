@@ -1,5 +1,7 @@
 package simulation.physicalobjects;
 
+import java.awt.Color;
+
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -11,6 +13,7 @@ public class Wall extends PhysicalObject{
 
 	private Edge left, right, top, bottom;
 	private Edge[] edges;
+	public Color color = Color.BLUE;
 	
 	public Wall(Simulator simulator, String name, double x, double y,
 			double orientation, double mass, 
@@ -26,6 +29,8 @@ public class Wall extends PhysicalObject{
 				0, 0, range, relativeRotation, width, height);
 		initializeEdges();
 		edges = getEdges();
+		if(type == PhysicalObjectType.WALLBUTTON)
+			color = Color.RED;
 	}
 	
 	public void moveWall() {
@@ -110,31 +115,6 @@ public class Wall extends PhysicalObject{
 		return closestPoint;
 	}
 	
-	public Vector2d intersectsWithLineSegmentPrint(Vector2d p1, Vector2d p2, double maxReflectionAngle) {
-		Vector2d closestPoint      = null;
-		Vector2d lineSegmentVector = new Vector2d(p2);
-		lineSegmentVector.sub(p1);
-		
-		for (Edge e : edges) {
-			double dot = e.getNormal().dot(lineSegmentVector);
-			if (dot < 0) {
-				Vector2d e1 = e.getP1();
-				Vector2d e2 = e.getP2();
-				closestPoint = MathUtils.intersectLines(p1, p2, e1, e2);
-				if(closestPoint != null) {
-					double a = lineSegmentVector.angle(e.getNormal()) - Math.PI;
-					
-					System.out.println(Math.toDegrees(a));
-					
-					if(Math.abs(a) >= maxReflectionAngle)
-						closestPoint = null;
-					break;
-				}
-			}
-		}
-		return closestPoint;
-	}	
-
 	public Vector2d intersectsWithLineSegment(Vector2d p1, Vector2d p2, double maxReflectionAngle) {
 		Vector2d closestPoint      = null;
 		Vector2d lineSegmentVector = new Vector2d(p2);
@@ -156,5 +136,18 @@ public class Wall extends PhysicalObject{
 			}
 		}
 		return closestPoint;
-	}	
+	}
+	
+	@Override
+	public double getDistanceBetween(Vector2d fromPoint) {
+		
+		Vector2d light = new Vector2d(position);
+		lightDirection.set(light.getX()-fromPoint.getX(),light.getY()-fromPoint.getY());
+
+		Vector2d intersection = intersectsWithLineSegment(lightDirection,fromPoint);
+		if(intersection != null) {
+			return intersection.length();
+		}
+		return fromPoint.distanceTo(position);
+	}
 }

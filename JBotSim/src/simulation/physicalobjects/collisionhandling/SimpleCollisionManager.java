@@ -76,6 +76,7 @@ public class SimpleCollisionManager extends CollisionManager {
 			}
 		}
 		
+		//prey - wall
 		for (Prey prey : environment.getPrey()) {
 
 			ClosePhysicalObjects closeWalls = prey.shape.getCloseWalls();

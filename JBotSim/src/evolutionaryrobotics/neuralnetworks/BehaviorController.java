@@ -1,8 +1,6 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
-
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import simulation.Simulator;

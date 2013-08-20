@@ -53,6 +53,7 @@ public class TwoRoomsEnvironment extends Environment {
 	protected Prey[] preys;
 	
 	private boolean realButton = false;
+	private boolean allowMultipleOpening = false;
 
 	public TwoRoomsEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator,arguments);
@@ -79,6 +80,8 @@ public class TwoRoomsEnvironment extends Environment {
 		postEvalTime = arguments.getArgumentAsIntOrSetDefault("postevaltime", 0);
 		
 		realButton = arguments.getArgumentAsIntOrSetDefault("realbutton", 0) == 1;
+		
+		allowMultipleOpening = arguments.getArgumentAsIntOrSetDefault("allowmultipleopening", 0) == 1; 
 		
 		if(postEval)
 			calculateDropRate(arguments.getArgumentAsDoubleOrSetDefault("postevaldroprate", 0));
@@ -174,7 +177,7 @@ public class TwoRoomsEnvironment extends Environment {
 	}
 	
 	public boolean openDoor() {
-		if(!doorsOpen) {
+		if(!doorsOpen || allowMultipleOpening) {
 			
 			Robot r = robots.get(0);
 			

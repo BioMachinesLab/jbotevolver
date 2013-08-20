@@ -10,6 +10,7 @@ import java.util.Random;
 import controllers.Controller;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import tests.Cronometer;
 
 public class JBotSim implements Serializable{
 	
@@ -100,7 +101,6 @@ public class JBotSim implements Serializable{
 	protected void loadArguments(String[] args) throws IOException,ClassNotFoundException {
 		
 		arguments = Arguments.parseArgs(args);
-		
 		randomSeed = 0;
 		
 		if(arguments.get("--random-seed") != null) {

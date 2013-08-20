@@ -1,5 +1,7 @@
 package simulation.robot.actuators;
 
+import java.awt.Color;
+
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;

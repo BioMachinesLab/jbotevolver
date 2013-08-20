@@ -35,8 +35,7 @@ public class XRayPreySensor extends SimpleLightTypeSensor {
 				Prey prey = (Prey)source.getObject();
 				if (prey.isEnabled() || prey.getHolder()!=null && prey.getHolder()!=robot){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(calc.getDistanceBetween(
-							sensorPosition, source.getObject()));
+					iterator.updateCurrentDistance(calc.getDistanceBetween(sensorPosition, source.getObject(),time));
 				}
 			}
 

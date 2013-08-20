@@ -52,17 +52,7 @@ public class GeometricCalculator implements Serializable {
 		return new GeometricInfo(lightAngle, lightDirection.length());
 	}
 
-	public double getDistanceBetween(Vector2d fromPoint,
-			PhysicalObject toObject, double time) {
-		Vector2d light = toObject.getPosition();
-		lightDirection.set(light.getX()-fromPoint.getX(),light.getY()-fromPoint.getY());
-
-		return lightDirection.length();
-	}
-
-	public double getDistanceBetween(Vector2d pos,
-			PhysicalObject object) {
-		// TODO Auto-generated method stub
-		return 0;
+	public double getDistanceBetween(Vector2d fromPoint, PhysicalObject toObject, double time) {
+		return toObject.getDistanceBetween(fromPoint);
 	}
 }
