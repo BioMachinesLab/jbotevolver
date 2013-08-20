@@ -5,7 +5,6 @@ import java.io.File;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.PostEvaluationResult;
-import taskexecutor.tasks.PostEvaluationTask;
 import taskexecutor.tasks.SingleSamplePostEvaluationTask;
 
 public class PostEvaluation {
