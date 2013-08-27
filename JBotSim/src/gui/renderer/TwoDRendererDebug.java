@@ -17,10 +17,15 @@ import simulation.util.Arguments;
 public class TwoDRendererDebug extends TwoDRenderer {
 
 	protected int selectedRobot=-1;
+	private boolean wallRay;
+	private int coneSensorId;
 
 	public TwoDRendererDebug(Arguments args) {
 		super(args);
 		this.addMouseListener(new MouseListenerSentinel());
+		wallRay = args.getArgumentAsIntOrSetDefault("wallray", 0)==1;
+		coneSensorId = args.getArgumentAsIntOrSetDefault("conesensorid",-1);
+		
 	}
 	
 	protected void drawRobot(Graphics graphics, Robot robot) {
@@ -93,11 +98,35 @@ public class TwoDRendererDebug extends TwoDRenderer {
 			}
 		}
 		
-		Sensor s = robot.getSensorByType(WallRaySensor.class);
-		if(s != null) {
-			WallRaySensor wall = (WallRaySensor)s;
-			drawLines(wall.rayPositions, graphics);
+		if(wallRay){
+			Sensor s = robot.getSensorByType(WallRaySensor.class);
+			if(s != null) {
+				WallRaySensor wall = (WallRaySensor)s;
+				drawLines(wall.rayPositions, graphics);
+			}
+		}	
+		
+		if(coneSensorId >= 0){
+			Sensor s = robot.getSensorWithId(coneSensorId);
+			if(s != null){
+				ConeTypeSensor preySensor = (ConeTypeSensor)s;
+				for (Double angle : preySensor.getAngles()) {
+					
+					double xi = robot.getPosition().getX()+robot.getRadius()*Math.cos(angle + robot.getOrientation());
+					double yi = robot.getPosition().getY()+robot.getRadius()*Math.sin(angle + robot.getOrientation());
+					
+					double range = preySensor.getRange();
+					double openingAngle = preySensor.getOpeningAngle();
+					
+					int x1 = transformX(xi-range);
+					int y1 = transformY(yi+range);
+					
+					int a1 = (int)(Math.toDegrees(angle + robot.getOrientation() - openingAngle/2));
+					graphics.fillArc(x1, y1, (int)(range*2*scale), (int)(range*2*scale), a1, (int)Math.toDegrees(openingAngle));
+				}
+			}
 		}
+		
 	}
 
 	public int getSelectedRobot() {
