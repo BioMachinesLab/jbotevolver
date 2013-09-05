@@ -668,17 +668,15 @@ public class Arguments implements Serializable {
 
 		while (currentIndex < args.length) {
 			if (currentIndex + 1 == args.length) {
-				System.err.println("Error: " + args[currentIndex]
-						+ " misses an argument");
-				System.exit(-1);
+				throw new RuntimeException(("Error: " + args[currentIndex]
+						+ " misses an argument"));
 			}
 
 			if (!args[currentIndex].equalsIgnoreCase("--random-seed")
 					&& args[currentIndex + 1].charAt(0) == '-') {
-				System.err.println("Error: Argument for " + args[currentIndex]
-						+ " cannot start with a '-' (and therefore cannot be "
-						+ args[currentIndex + 1] + ")");
-				System.exit(-1);
+				throw new RuntimeException("Error: Argument for " + args[currentIndex]
+				                                 						+ " cannot start with a '-' (and therefore cannot be "
+				                                						+ args[currentIndex + 1] + ")");
 			}
 
 			String key = args[currentIndex].toLowerCase();

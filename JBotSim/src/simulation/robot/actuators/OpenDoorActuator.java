@@ -38,7 +38,7 @@ public class OpenDoorActuator extends Actuator {
 				Vector2d bPos = b.getPosition();
 				if(bPos.distanceTo(r) < distanceToDoor) {
 					boolean doorAlreadyOpen = env.doorsOpen;
-					env.openDoor();
+					env.openDoor(bPos.getX());
 					if(!doorAlreadyOpen)
 						openedDoor = true;
 					break;

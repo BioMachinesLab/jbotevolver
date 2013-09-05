@@ -11,9 +11,9 @@ import simulation.util.Arguments;
 public class BehaviorController extends NeuralNetworkController implements FixedLenghtGenomeEvolvableController {
 	
 	private boolean[] parallelController;
-	private ArrayList<Controller> subControllers = new ArrayList<Controller>();
-	private ArrayList<Controller> parallelSubControllers = new ArrayList<Controller>();
-	int currentSubNetwork = 0;
+	protected ArrayList<Controller> subControllers = new ArrayList<Controller>();
+	protected ArrayList<Controller> parallelSubControllers = new ArrayList<Controller>();
+	protected int currentSubNetwork = 0;
 	boolean keepFeeding = false;
 	boolean resetChosen = true;
 	boolean debugMax = false;

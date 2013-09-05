@@ -11,6 +11,7 @@ import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
+import simulation.physicalobjects.checkers.AllowObstacleChecker;
 import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -33,6 +34,10 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected GeometricCalculator geoCalc;
 	protected Random random;
 	
+	protected ClosePhysicalObjects closeObstacles;
+	protected boolean checkObstacles = false;
+	protected double[] obstacleReadings;
+	
 	public ConeTypeSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id, robot, args);
 		this.geoCalc = simulator.getGeoCalculator();
@@ -44,9 +49,21 @@ public abstract class ConeTypeSensor extends Sensor {
 		range = (args.getArgumentIsDefined("range")) ? args.getArgumentAsDouble("range") : 1;
 		openingAngle = Math.toRadians((args.getArgumentIsDefined("angle")) ? args.getArgumentAsDouble("angle") : 90);
 		
+		checkObstacles = args.getArgumentAsIntOrSetDefault("checkobstacles",0) == 1;
+		
 		this.readings 		= new double[numberOfSensors];
 		this.angles 		= new double[numberOfSensors];
 		setupPositions(numberOfSensors);
+		
+		if(checkObstacles) {
+			setAllowedObstaclesChecker(new AllowObstacleChecker(robot.getId()*100));
+			this.obstacleReadings = new double[numberOfSensors];
+		}
+	}
+	
+	public void setAllowedObstaclesChecker(AllowedObjectsChecker aoc) {
+		if(aoc != null)
+			this.closeObstacles = new ClosePhysicalObjects(env, time, range,aoc);
 	}
 	
 	public void setAllowedObjectsChecker(AllowedObjectsChecker aoc) {
@@ -103,18 +120,44 @@ public abstract class ConeTypeSensor extends Sensor {
 							sensorPosition, source.getObject(), time));
 				}
 			}
+			
+			if(checkObstacles)
+				checkObstacles(time, teleported);
 
 		} catch (Exception e) {
 			e.printStackTrace(); 
+		}
+	}
+	
+	protected void checkObstacles(double time, ArrayList<PhysicalObject> teleported) {
+		for(int j = 0; j < obstacleReadings.length; j++){
+			obstacleReadings[j] = 0.0;
+		}
+		
+		if(closeObstacles != null)
+			closeObstacles.update(time, teleported);
+		CloseObjectIterator iterator = closeObstacles.iterator();
+		while(iterator.hasNext()){
+			PhysicalObjectDistance source=iterator.next();
+			if (source.getObject().isEnabled()){
+				calculatedObstacleContributions(source);
+				iterator.updateCurrentDistance(this.geoCalc.getDistanceBetween(sensorPosition, source.getObject(), time));
+			}
 		}
 	}
 
 	public double getSensorReading(int sensorNumber){
 		return readings[sensorNumber];
 	}
+	
+	protected void calculatedObstacleContributions(PhysicalObjectDistance source) {
+		for(int j = 0; j < obstacleReadings.length; j++){
+			obstacleReadings[j] = Math.max(calculateContributionToSensor(j, source)*(1 + random.nextGaussian()* NOISESTDEV), readings[j]);
+		}
+	}
 
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
-		for(int j=0; j<readings.length; j++){
+		for(int j = 0; j < readings.length; j++){
 			readings[j] = Math.max(calculateContributionToSensor(j, source)*(1 + 
 					random.nextGaussian()* NOISESTDEV), readings[j]);
 		}

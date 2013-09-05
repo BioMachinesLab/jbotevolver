@@ -176,7 +176,7 @@ public class TwoRoomsEnvironment extends Environment {
 		numberOfPreys++;
 	}
 	
-	public boolean openDoor() {
+	public boolean openDoor(double x) {
 		if(!doorsOpen || allowMultipleOpening) {
 			
 			Robot r = robots.get(0);

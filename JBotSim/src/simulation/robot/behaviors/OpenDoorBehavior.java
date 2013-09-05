@@ -32,7 +32,7 @@ public class OpenDoorBehavior extends Behavior{
 		for(Wall b : buttons) {
 			Vector2d bPos = b.getPosition();
 			if(bPos.distanceTo(r) < distanceToDoor) {
-				openedDoor = env.openDoor();
+				openedDoor = env.openDoor(bPos.getX());
 				break;
 			}
 		}

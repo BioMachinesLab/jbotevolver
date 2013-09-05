@@ -53,31 +53,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	@Override
 	public synchronized void drawFrame() {
-		int width  = image.getWidth();
-		int height = image.getHeight();
 		
-		double envWidth  = simulator.getEnvironment().getWidth();
-		double envHeight = simulator.getEnvironment().getHeight();
-
-		double scaleX = width  / envWidth    * zoomFactor;
-		double scaleY = height / envHeight   * zoomFactor ; 
-		scale  = scaleX;
-		if (scaleX > scaleY)
-			scale = scaleY;
-
-		scale *= 0.9;
-
-		centerX = width / 2.0;
-		centerY = height / 2.0;
-
-		graphics.setColor(Color.GRAY);
-		graphics.fillRect(0, 0, width, height);		
-		graphics.setColor(Color.WHITE);
-		graphics.fillRect(
-				(int) ((-simulator.getEnvironment().getWidth() / 2.0 * scale) + centerX), 
-				(int) ((-simulator.getEnvironment().getHeight() /2.0  * scale) + centerY),
-				(int) ((simulator.getEnvironment().getWidth() * scale)), 
-				(int) ((simulator.getEnvironment().getHeight() * scale)));
+		drawBackground();
 		
 		if(simulator.getEnvironment().getMovableObjects().size()>0){
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
@@ -123,6 +100,39 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	
 	public void resetZoom() {
 		zoomFactor = 1.0;
+	}
+	
+	public void drawBackground() {
+		int width  = image.getWidth();
+		int height = image.getHeight();
+//		
+		double envWidth  = simulator.getEnvironment().getWidth();
+		double envHeight = simulator.getEnvironment().getHeight();
+//
+		double scaleX = width  / envWidth    * zoomFactor;
+		double scaleY = height / envHeight   * zoomFactor ; 
+		scale  = scaleX;
+		if (scaleX > scaleY)
+			scale = scaleY;
+
+		scale *= 0.9;
+
+		centerX = width / 2.0;
+		centerY = height / 2.0;
+
+		graphics.setColor(Color.GRAY);
+		graphics.fillRect(0, 0, image.getWidth(), image.getHeight());		
+		graphics.setColor(Color.WHITE);
+		
+		double w = (simulator.getEnvironment().getWidth());
+		double h = (simulator.getEnvironment().getHeight());
+		
+		graphics.fillRect(
+			(int) transformX(-w/2.0), 
+			(int) transformY(h/2.0),
+			(int) (w*scale), 
+			(int) (h*scale)
+		);
 	}
 
     public void drawWall(Wall m) {
