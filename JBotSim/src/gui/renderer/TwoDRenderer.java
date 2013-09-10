@@ -65,9 +65,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					case LIGHTPOLE:
 						drawLightPole(graphics, (LightPole)m);
 						break;
-					case WALL:
-						drawWall((Wall) m);
-						break;
 				}
 			}
 		}
@@ -82,6 +79,9 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					drawRobot(graphics, (Robot) m);
 					break;
 				case WALLBUTTON:
+					drawWall((Wall) m);
+					break;
+				case WALL:
 					drawWall((Wall) m);
 					break;
 				}
@@ -282,11 +282,11 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	}
 
 	protected int transformX(double x) {
-		return (int) ((x-horizontalMovement) * scale + centerX);
+		return (int) Math.round((x-horizontalMovement) * scale + centerX);
 	}
 
 	protected int transformY(double y) {
-		return (int) ((-y+verticalMovement) * scale + centerY);
+		return (int) Math.round((-y+verticalMovement) * scale + centerY);
 	}
 
 //	@Override

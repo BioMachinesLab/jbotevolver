@@ -1,9 +1,12 @@
 package gui.renderer;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+
 import mathutils.Vector2d;
 import simulation.robot.Epuck;
 import simulation.robot.Robot;
@@ -111,18 +114,30 @@ public class TwoDRendererDebug extends TwoDRenderer {
 			if(s != null){
 				ConeTypeSensor preySensor = (ConeTypeSensor)s;
 				for (Double angle : preySensor.getAngles()) {
-					
+				
 					double xi = robot.getPosition().getX()+robot.getRadius()*Math.cos(angle + robot.getOrientation());
 					double yi = robot.getPosition().getY()+robot.getRadius()*Math.sin(angle + robot.getOrientation());
 					
 					double range = preySensor.getRange();
 					double openingAngle = preySensor.getOpeningAngle();
+
+					int x1 = transformX(xi);
+					int y1 = transformY(yi);
 					
-					int x1 = transformX(xi-range);
-					int y1 = transformY(yi+range);
+					int x2 = transformX(xi-range);
+					int y2 = transformY(yi+range);
 					
-					int a1 = (int)(Math.toDegrees(angle + robot.getOrientation() - openingAngle/2));
-					graphics.fillArc(x1, y1, (int)(range*2*scale), (int)(range*2*scale), a1, (int)Math.toDegrees(openingAngle));
+					int gx1 = transformX(robot.getPosition().getX()+(robot.getRadius()+range)*Math.cos(angle + robot.getOrientation()));
+					int gy1 = transformY(robot.getPosition().getY()+(robot.getRadius()+range)*Math.sin(angle + robot.getOrientation()));
+					
+					int a1 = (int)(Math.round(Math.toDegrees(angle + robot.getOrientation() - openingAngle/2)));
+					
+					Graphics2D graphics2D = (Graphics2D) graphics.create();
+
+					GradientPaint gp = new GradientPaint(x1, y1,Color.darkGray , gx1, gy1, Color.lightGray, false);
+					graphics2D.setPaint(gp);
+					graphics2D.fillArc(x2, y2, (int)Math.round(range*2*scale), (int)(Math.round(range*2*scale)), a1, (int)Math.round(Math.toDegrees(openingAngle)));   
+		
 				}
 			}
 		}
