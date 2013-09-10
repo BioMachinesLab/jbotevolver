@@ -142,7 +142,7 @@ public class ResultViewerGui extends Gui {
 		fileTree = new FileTree(new File("."));
 
 		JPanel argumentsPanel = new JPanel(new BorderLayout());
-		argumentsPanel.setPreferredSize(new Dimension(230,100));
+		argumentsPanel.setPreferredSize(new Dimension(230,240));
 		argumentsPanel.add(new JLabel("Extra arguments"),BorderLayout.NORTH);
 		argumentsPanel.add(new JScrollPane(extraArguments),BorderLayout.CENTER);
 		
@@ -153,8 +153,8 @@ public class ResultViewerGui extends Gui {
 		treeWrapper.add(fileTree);
 		treeWrapper.add(editButton);
 		treeWrapper.add(loadButton);
-		treeWrapper.add(argumentsPanel);
 		treeWrapper.add(plotFitnessButton);
+		treeWrapper.add(argumentsPanel);
 
 		treeWrapper.setBorder(BorderFactory.createTitledBorder("Experiments"));
 
