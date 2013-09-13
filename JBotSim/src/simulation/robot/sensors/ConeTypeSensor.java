@@ -23,6 +23,7 @@ public abstract class ConeTypeSensor extends Sensor {
 
 	protected   ClosePhysicalObjects closeObjects;
 	protected double 			   range;
+	protected double			   cutOff;
 	protected double[]             readings;
 	protected double[] 			   angles;
 	protected int 				   numberOfSensors;
@@ -50,6 +51,8 @@ public abstract class ConeTypeSensor extends Sensor {
 		openingAngle = Math.toRadians((args.getArgumentIsDefined("angle")) ? args.getArgumentAsDouble("angle") : 90);
 		
 		checkObstacles = args.getArgumentAsIntOrSetDefault("checkobstacles",0) == 1;
+
+		cutOff = range;
 		
 		this.readings 		= new double[numberOfSensors];
 		this.angles 		= new double[numberOfSensors];
@@ -102,6 +105,14 @@ public abstract class ConeTypeSensor extends Sensor {
 	
 	public double getOpeningAngle() {
 		return openingAngle;
+	}
+	
+	public double getCutOff() {
+		return cutOff;
+	}
+	
+	public void setCutOff(double cutOff) {
+		this.cutOff = cutOff;
 	}
 
 	public void update(double time, ArrayList<PhysicalObject> teleported) {
@@ -195,4 +206,5 @@ public abstract class ConeTypeSensor extends Sensor {
 	public void setOpeningAngle(double openingAngle) {
 		this.openingAngle = openingAngle;
 	}
+
 }

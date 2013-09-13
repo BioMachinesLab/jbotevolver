@@ -2,12 +2,10 @@ package simulation.robot.sensors;
 
 import java.util.Arrays;
 
-import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowLightChecker;
-import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
@@ -23,7 +21,7 @@ public class SimpleLightTypeSensor extends ConeTypeSensor {
 	
 		GeometricInfo sensorInfo = getSensorGeometricInfo(sensorNumber, source);
 	
-		if((sensorInfo.getDistance() < getRange()) && 
+		if((sensorInfo.getDistance() < getCutOff()) && 
 		   (sensorInfo.getAngle() < (openingAngle / 2.0)) && 
 		   (sensorInfo.getAngle() > (-openingAngle / 2.0))) {
 
