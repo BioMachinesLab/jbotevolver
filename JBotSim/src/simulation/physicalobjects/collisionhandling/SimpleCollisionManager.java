@@ -11,6 +11,7 @@ import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CollisionManager;
 import simulation.physicalobjects.Wall;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 
 public class SimpleCollisionManager extends CollisionManager {
@@ -48,8 +49,10 @@ public class SimpleCollisionManager extends CollisionManager {
 					robot.move(temp);
 					temp.negate();
 					((MovableObject) closeRobot.getObject()).move(temp);
-					robot.setInvolvedInCollison(true);
-					closeRobot.getObject().setInvolvedInCollison(true);
+					if(!robot.ignoreRobotToRobotCollisions()) {
+						robot.setInvolvedInCollison(true);
+						closeRobot.getObject().setInvolvedInCollison(true);
+					}
 
 				} else {
 
@@ -72,6 +75,12 @@ public class SimpleCollisionManager extends CollisionManager {
 							status);
 					robot.moveTo(newPosition);
 					robot.setInvolvedInCollison(true);
+					
+					if(robot.specialWallCollisions()) {
+						DifferentialDriveRobot rr = (DifferentialDriveRobot)robot;
+						rr.setWheelSpeed(rr.getLeftWheelSpeed()*0.5,rr.getRightWheelSpeed()*0.5);
+//						robot.setOrientation(this.simulator.getRandom().nextDouble()*Math.PI*2);
+					}
 				}
 			}
 		}

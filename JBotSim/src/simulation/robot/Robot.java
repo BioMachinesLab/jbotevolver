@@ -54,6 +54,9 @@ public class Robot extends MovableObject {
 	
 	protected boolean ignoreDisabledSensors = false;
 	
+	protected boolean specialWallCollisions = false;
+	protected boolean ignoreRobotToRobotCollisions = false;
+	
 	/**
 	 * Initialize a new robot.
 	 * 
@@ -73,6 +76,7 @@ public class Robot extends MovableObject {
 		double radius = args.getArgumentAsDoubleOrSetDefault("radius",0.05);
 		double diameter = args.getArgumentAsDoubleOrSetDefault("diameter",radius*2);
 		ignoreDisabledSensors = args.getArgumentAsIntOrSetDefault("ignoredisabledsensors",0) == 1; 
+		ignoreRobotToRobotCollisions = args.getArgumentAsIntOrSetDefault("ignorerobottorobotcollisions",0) == 1; 
 		if(diameter != radius*2)
 			radius = diameter/2;
 		this.shape = new CircularShape(simulator, name + "CollisionObject", this, relativeX, relativeY, diameter, diameter/2);
@@ -93,6 +97,8 @@ public class Robot extends MovableObject {
 		
 		if(color != null)
 			setBodyColor(color);
+		
+		specialWallCollisions = args.getArgumentAsIntOrSetDefault("specialwallcollisions",0) == 1; 
 	}
 	
 	/**
@@ -423,5 +429,13 @@ public class Robot extends MovableObject {
 			Actuator actuator = Actuator.getActuator(simulator, actuatorArgs.getArgumentAsString("classname"), actuatorArgs);
 			robot.addActuator(actuator);
 		}
+	}
+	
+	public boolean specialWallCollisions() {
+		return specialWallCollisions;
+	}
+	
+	public boolean ignoreRobotToRobotCollisions() {
+		return ignoreRobotToRobotCollisions;
 	}
 }

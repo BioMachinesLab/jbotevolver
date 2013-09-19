@@ -53,7 +53,7 @@ public class TwoRoomsEnvironment extends Environment {
 	protected Prey[] preys;
 	
 	private boolean realButton = false;
-	private boolean allowMultipleOpening = false;
+	protected boolean allowMultipleOpening = false;
 
 	public TwoRoomsEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator,arguments);

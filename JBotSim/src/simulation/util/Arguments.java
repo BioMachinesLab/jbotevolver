@@ -117,7 +117,11 @@ public class Arguments implements Serializable {
 		for(int i = 0 ; i < strings.size() ; i++) {
 			List<String> names = ClassSearchUtils.searchFullNameInPath(strings.get(i));
 			if (names.size() == 0) {
-				throw new RuntimeException("Class not found "+ strings.get(i));
+				String[] split = strings.get(i).split("\\.");
+				names = ClassSearchUtils.searchFullNameInPath(split[split.length-1]);
+				
+				if (names.size() == 0)
+					throw new RuntimeException("Class not found "+ strings.get(i));
 			} else if (names.size() > 1) {
 				throw new RuntimeException("Multiple implementations of class: "+ strings.get(i) + " - " + names);
 			}
