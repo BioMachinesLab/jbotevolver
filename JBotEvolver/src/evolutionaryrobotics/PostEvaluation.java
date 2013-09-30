@@ -6,7 +6,6 @@ import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.PostEvaluationResult;
 import taskexecutor.tasks.SingleSamplePostEvaluationTask;
-import tests.Cronometer;
 
 public class PostEvaluation {
 	
@@ -14,6 +13,7 @@ public class PostEvaluation {
 	private int maxTrial = 0;
 	private int samples = 100;
 	private int fitnesssamples = 1;
+	private int steps = 0;
 	private double targetfitness = 0;
 	private String dir = "";
 	
@@ -38,6 +38,11 @@ public class PostEvaluation {
 			if(a[0].equals("targetfitness")) targetfitness = Double.parseDouble(a[1]);
 			if(a[0].equals("singleevaluation")) singleEvaluation = Integer.parseInt(a[1]) == 1;
 			if(a[0].equals("localevaluation")) localEvaluation = Integer.parseInt(a[1]) == 1;
+			if(a[0].equals("steps")) steps = Integer.parseInt(a[1]);
+		}
+		
+		if(steps != 0) {
+			this.args = new String[]{"--environment","+steps="+steps};
 		}
 		
 		if(!dir.endsWith("/"))

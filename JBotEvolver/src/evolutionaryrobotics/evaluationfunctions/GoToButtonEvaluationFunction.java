@@ -16,6 +16,7 @@ public class GoToButtonEvaluationFunction extends EvaluationFunction {
 	private double startingX = 0;
 	private TwoRoomsEnvironment env;
 	private Wall closestWallButton;
+	private double penalty = 0;
 
 	public GoToButtonEvaluationFunction(Arguments arguments) {
 		super(arguments);
@@ -36,27 +37,33 @@ public class GoToButtonEvaluationFunction extends EvaluationFunction {
 			targetX = closestWallButton.getPosition().getX();
 		}
 		
-		Robot r = env.getRobots().get(0);
+		Robot closestRobot = simulator.getEnvironment().getRobots().get(0);
+		double bestPercentage = -1000;
 		
-		double robotPos = env.getRobots().get(0).getPosition().getX();
-		double totalDistance = Math.abs(startingX - targetX);
-		double currentDistance = Math.abs(targetX-robotPos);
-				
-		double percentage = (totalDistance-currentDistance)/totalDistance;
+		for(Robot r : simulator.getEnvironment().getRobots()) {
 		
-		fitness = percentage;
-		
-		if(env.getRobots().get(0).isInvolvedInCollison()) {
-			if(punishCollision){
-				fitness=-1;
+			double robotPos = r.getPosition().getX();
+			double totalDistance = Math.abs(startingX - targetX);
+			double currentDistance = Math.abs(targetX-robotPos);
+					
+			double percentage = (totalDistance-currentDistance)/totalDistance;
+			
+			if(bestPercentage < percentage) {
+				bestPercentage = percentage;
+				closestRobot = r;
+				fitness = percentage;
 			}
-			simulator.stopSimulation();
+			
+			if(r.isInvolvedInCollison()) {
+				if(punishCollision){
+					penalty-=0.0005;
+				}
+//				simulator.stopSimulation();
+			}
 		}
 		
-		double robotY = env.getRobots().get(0).getPosition().getY();
-		
-		if((openDoor && env.doorsOpen) || (!openDoor && getHorizontalDistanceToWall(r,closestWallButton) < 0.15 && Math.abs(closestWallButton.getPosition().getY()-robotY) < 0.1)) {
-			fitness = 1 + ((steps-simulator.getTime())/steps);
+		if((openDoor && env.doorsOpen) || (!openDoor && getHorizontalDistanceToWall(closestRobot,closestWallButton) < 0.15 && Math.abs(closestWallButton.getPosition().getY()-closestRobot.getPosition().getY()) < 0.1)) {
+			fitness = 1 + ((steps-simulator.getTime())/steps) - penalty;
 			simulator.stopSimulation();
 		}
 	}

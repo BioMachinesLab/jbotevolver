@@ -12,10 +12,17 @@ import evolutionaryrobotics.JBotEvolver;
 public class ConillonTaskExecutor extends TaskExecutor {
 
 	private Client client;
+	private JBotEvolver jBotEvolver;
+	private Arguments args;
+	private boolean connected = false;
 
 	public ConillonTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
 		super(jBotEvolver, args);
+		this.jBotEvolver = jBotEvolver;
+		this.args = args;
+	}
 
+	private void connect() {
 		ClientPriority priority = getPriority(args
 				.getArgumentAsIntOrSetDefault("priority", 10));
 
@@ -31,11 +38,15 @@ public class ConillonTaskExecutor extends TaskExecutor {
 			client = new Client(desc,priority, serverName, serverPort, serverName, codePort, totalTasks);
 		else
 			client = new Client(desc,priority, serverName, serverPort, serverName, codePort);
+		connected = true;
 		//prepareArguments(jBotEvolver.getArguments());
 	}
 
 	@Override
 	public void prepareArguments(HashMap<String, Arguments> arguments) {
+		
+		if(!connected)
+			connect();
 
 		for (String name : arguments.keySet()) {
 			Arguments args = arguments.get(name);
@@ -56,28 +67,38 @@ public class ConillonTaskExecutor extends TaskExecutor {
 	
 	@Override
 	public void addTask(Task t) {
+		if(!connected)
+			connect();
 		client.commit(t);
 	}
 	
 	@Override
 	public void setTotalNumberOfTasks(int nTasks) {
+		if(!connected)
+			connect();
 		client.setTotalNumberOfTasks(nTasks);
 	}
 	
 	@Override
 	public void setDescription(String desc) {
+		if(!connected)
+			connect();
 		client.setDesc(desc);
 	}
 
 	@Override
 	public void stopTasks() {
-		client.cancelAllTasks();
-		client.disconnect();
+		if(connected) {
+			client.cancelAllTasks();
+			client.disconnect();
+		}
 	}
 
 	@Override
 	public Result getResult() {
-		return client.getNextResult();
+		if(connected)
+			return client.getNextResult();
+		return null;
 	}
 
 	private ClientPriority getPriority(int priority) {

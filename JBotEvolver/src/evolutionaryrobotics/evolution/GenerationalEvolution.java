@@ -58,11 +58,14 @@ public class GenerationalEvolution extends Evolution {
 		if(population.getNumberOfCurrentGeneration() == 0)
 			population.createRandomPopulation();
 		
-		if(!population.evolutionDone())
+		if(!population.evolutionDone()) {
 			taskExecutor.prepareArguments(jBotEvolver.getArguments());
+			
+			taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
+		}
 		
-		taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
 		double highestFitness = 0;
+		
 		while(!population.evolutionDone()) {
 			
 			double d = Double.valueOf(df.format(highestFitness));
