@@ -10,7 +10,6 @@ import java.util.Random;
 import controllers.Controller;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import tests.Cronometer;
 
 public class JBotSim implements Serializable{
 	
