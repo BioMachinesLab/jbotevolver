@@ -1,6 +1,7 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.LinkedList;
+import java.util.Random;
 
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -95,6 +96,7 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 				for(int i = 0 ; i < params.length ; i++,currentIndex--) {
 					params[i] = weights[currentIndex];
 				}
+				s.setExtraParameters(params);
 			}
 		}
 		
@@ -104,6 +106,7 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 				for(int i = 0 ; i < params.length ; i++,currentIndex--) {
 					params[i] = weights[currentIndex];
 				}
+				a.setExtraParameters(params);
 			}
 		}
 	}
