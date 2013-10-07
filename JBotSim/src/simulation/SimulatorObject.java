@@ -51,4 +51,11 @@ public class SimulatorObject implements KeyListener, Serializable {
 
 	public void keyTyped(KeyEvent e) {
 	}
+	
+	public int getNumberExtraParameters() {
+		return 0;
+	}
+	
+	public void setExtraParameters(double[] parameters) {
+	}
 }

@@ -39,6 +39,8 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected boolean checkObstacles = false;
 	protected double[] obstacleReadings;
 	
+	protected boolean evolvable = false;
+	
 	public ConeTypeSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id, robot, args);
 		this.geoCalc = simulator.getGeoCalculator();
@@ -51,6 +53,7 @@ public abstract class ConeTypeSensor extends Sensor {
 		openingAngle = Math.toRadians((args.getArgumentIsDefined("angle")) ? args.getArgumentAsDouble("angle") : 90);
 		
 		checkObstacles = args.getArgumentAsIntOrSetDefault("checkobstacles",0) == 1;
+		evolvable = args.getArgumentAsIntOrSetDefault("evolvable",0) == 1;
 
 		cutOff = range;
 		
@@ -205,6 +208,27 @@ public abstract class ConeTypeSensor extends Sensor {
 	
 	public void setOpeningAngle(double openingAngle) {
 		this.openingAngle = openingAngle;
+	}
+	
+	@Override
+	public int getNumberExtraParameters() {
+		if(evolvable)
+			return 2;
+		else
+			return 0;
+	}
+	
+	@Override
+	public void setExtraParameters(double[] parameters) {
+		if(evolvable) {
+			setRange(normalize(parameters[0]));
+			setOpeningAngle(normalize(parameters[1]));
+		}
+	}
+	
+	public double normalize(double parameter) {
+		//from [-10;10] to [0;1]
+		return (parameter+10.0)/20.0;
 	}
 
 }

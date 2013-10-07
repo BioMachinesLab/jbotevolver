@@ -1,8 +1,11 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.LinkedList;
+
 import simulation.Simulator;
 import simulation.robot.Robot;
+import simulation.robot.actuators.Actuator;
+import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
@@ -15,6 +18,16 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 		super(simulator, robot, args);
 		
 		neuralNetwork = NeuralNetwork.getNeuralNetwork(simulator, robot, new Arguments(args.getArgumentAsString("network")));
+		
+		for(Sensor s : robot.getSensors()) {
+			if(s.getNumberExtraParameters() > 0)
+				neuralNetwork.setRequiredNumberOfWeights(neuralNetwork.getGenomeLength() + s.getNumberExtraParameters());
+		}
+		
+		for(Actuator a : robot.getActuators()) {
+			if(a.getNumberExtraParameters() > 0)
+				neuralNetwork.setRequiredNumberOfWeights(neuralNetwork.getGenomeLength() + a.getNumberExtraParameters());
+		}
 		
 		if(args.getArgumentIsDefined("weights")) {
 			String[] rawArray = args.getArgumentAsString("weights").split(",");
@@ -73,6 +86,26 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 		}
 		
 		neuralNetwork.setWeights(weights);
+		
+		int currentIndex = weights.length - 1;
+		
+		for(Sensor s : robot.getSensors()) {
+			if(s.getNumberExtraParameters() > 0) {
+				double[] params = new double[s.getNumberExtraParameters()];
+				for(int i = 0 ; i < params.length ; i++,currentIndex--) {
+					params[i] = weights[currentIndex];
+				}
+			}
+		}
+		
+		for(Actuator a : robot.getActuators()) {
+			if(a.getNumberExtraParameters() > 0) {
+				double[] params = new double[a.getNumberExtraParameters()];
+				for(int i = 0 ; i < params.length ; i++,currentIndex--) {
+					params[i] = weights[currentIndex];
+				}
+			}
+		}
 	}
 	
 	@Override
