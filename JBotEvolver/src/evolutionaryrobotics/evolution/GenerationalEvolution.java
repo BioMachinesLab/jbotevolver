@@ -35,6 +35,7 @@ public class GenerationalEvolution extends Evolution {
 				population.setNumberOfGenerations(jBotEvolver.getArguments().get("--population").getArgumentAsInt("generations"));
 			population.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
 		} catch(Exception e) {
+			System.out.println("Problem loading population "+populationArguments.getCompleteArgumentString());
 			e.printStackTrace();
 			System.exit(-1);
 		}
