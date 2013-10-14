@@ -1,0 +1,8 @@
+*.jar
+bin
+.DS_STORE
+.svn
+.fatjar
+.project
+.settings
+.classpath

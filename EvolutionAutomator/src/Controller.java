@@ -80,7 +80,7 @@ public class Controller {
 	}
 	
 	public boolean needsSubController(String subControllerName) {
-		return configuration.contains("#"+subControllerName);
+		return configuration.contains("(#"+subControllerName+")");
 	}
 
 	public String getControllerConfiguration() {
