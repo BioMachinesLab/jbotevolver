@@ -119,7 +119,8 @@ public class SimpleCollisionManager extends CollisionManager {
 						setLength(temp, length/2);
 						robot.move(temp);
 						temp.negate();
-						closePrey.move(temp);
+						if(closePrey.getMass() != Integer.MAX_VALUE)
+							closePrey.move(temp);
 						// robot.setInvolvedInCollison(true);
 						// closePrey.setInvolvedInCollison(true);
 					} else {
