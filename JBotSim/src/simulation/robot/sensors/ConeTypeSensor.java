@@ -229,8 +229,9 @@ public abstract class ConeTypeSensor extends Sensor {
 		if(evolvable) {
 			setRange(normalize(parameters[0])*initialRange);
 			setCutOff(normalize(parameters[0])*initialRange);
-			System.out.println("RANGE "+range);
+//			System.out.println("RANGE: "+ range);
 			setOpeningAngle(normalize(parameters[1])*initialAngle);
+//			System.out.println("ANGLE: "+ Math.toDegrees(openingAngle));
 		}
 	}
 	
