@@ -79,10 +79,14 @@ public class ChangeSensorActuator extends Actuator {
 				sensor.setRange(range * maxRange);
 
 			sensor.setCutOff(range * maxRange);
+			
+			System.out.print(sensor.getRange() + " ");
 		}
 		
-		if(changeAngle)
+		if(changeAngle){
 			sensor.setOpeningAngle(openingAngle * maxOpeningAngle);
+			System.out.print(Math.toDegrees(sensor.getOpeningAngle()) + " ");
+		}
 		
 		if(changeOrientation){
 			double delta = 2 * Math.PI / sensor.getNumberOfSensors();
