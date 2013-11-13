@@ -212,8 +212,10 @@ public class Evolution extends Thread {
 				if(controller.getArguments("--random-seed") != null) 
 					seed+= Long.parseLong(controller.getArguments("--random-seed").getCompleteArgumentString());
 				
+				int generations = controller.getArguments("--population").getArgumentAsInt("generations");
+				
 				String runEvolution = outputFolder+"/"+controller.getName()+".conf --output "+outputFolder+"/"+run+" --random-seed "+seed;
-				String resumeEvolution = outputFolder+"/"+run+"/_restartevolution.conf";
+				String resumeEvolution = outputFolder+"/"+run+"/_restartevolution.conf --population +generations="+generations;
 				
 				String execute = f.exists() ? resumeEvolution : runEvolution;
 				System.out.println(execute);
