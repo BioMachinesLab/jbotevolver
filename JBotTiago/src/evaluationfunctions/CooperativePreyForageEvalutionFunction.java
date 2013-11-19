@@ -29,7 +29,7 @@ public class CooperativePreyForageEvalutionFunction  extends EvaluationFunction 
 				}
 			}
 			
-			System.out.print(closestPreyDistance + " " + simulator.getTime() + "\n");
+//			System.out.print(closestPreyDistance + " " + simulator.getTime() + "\n");
 			
 			if(closestPreyDistance < Double.MAX_VALUE) {
 				fitness += (environment.getForageRadius() - closestPreyDistance) / environment.getForageRadius() * .00005;

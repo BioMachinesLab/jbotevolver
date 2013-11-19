@@ -5,7 +5,7 @@ public class EMain {
 	
 	public static void main(String[] args) throws Exception {
 //		new EvolverMain(args);
-		new EvolverMain(new String[]{"EvolutionArgs.conf"});
+		new EvolverMain(new String[]{"Individual_Sensors.conf"});
 //		new EvolverMain(new String[]{"Evolution/Cooperative_Foraging/Evo1/_restartevolution.conf"});
 //		new EvolverMain(new String[]{"EvolutionArgs.conf","--random-seed","1","--output","coEvo1"});
 //		new EvolverMain(new String[]{"EvolutionArgs.conf","--random-seed","1","--output","coEvo2"});

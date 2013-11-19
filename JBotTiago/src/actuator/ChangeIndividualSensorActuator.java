@@ -1,33 +1,33 @@
 package actuator;
 
+import sensors.ChangeablePreySensor;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
 
-public class ChangeSensorActuator extends Actuator {
+public class ChangeIndividualSensorActuator  extends Actuator {
 	
 	private double range;
 	private double openingAngle;
 	private double orientation;
 	private double maxRange;
 	private double maxOpeningAngle;
-	private ConeTypeSensor sensor;
+	private ChangeablePreySensor sensor;
 	private int idSensor;
 	private boolean changeRange;
 	private boolean changeAngle;
 	private boolean changeOrientation;
 	private int numberOfOutputs;
-	private boolean cutOff;
+	private int numberOfSensors;
 
-	public ChangeSensorActuator(Simulator simulator, int id, Arguments args) {
+	public ChangeIndividualSensorActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
 		idSensor = args.getArgumentAsIntOrSetDefault("idsensor", -1);
 		changeRange = args.getArgumentAsIntOrSetDefault("changerange", 0)==1;
 		changeAngle = args.getArgumentAsIntOrSetDefault("changeangle", 0)==1;
 		changeOrientation = args.getArgumentAsIntOrSetDefault("changeorientation", 0)==1;
-		cutOff = args.getArgumentAsIntOrSetDefault("cutoff", 0)==1;
+		numberOfSensors = args.getArgumentAsIntOrSetDefault("numberofsensors", 8);
 		
 		if(changeAngle)
 			numberOfOutputs++;
@@ -35,9 +35,11 @@ public class ChangeSensorActuator extends Actuator {
 			numberOfOutputs++;
 		if(changeOrientation)
 			numberOfOutputs++;
-			
+
+		numberOfOutputs *= numberOfSensors;
+		
 	}
-	
+
 	public int getNumberOfOutputs() {
 		return numberOfOutputs;
 	}
@@ -65,27 +67,23 @@ public class ChangeSensorActuator extends Actuator {
 	public void setOrientation(double orientation) {
 		this.orientation = orientation;
 	}
-
+	
 	@Override
 	public void apply(Robot robot) {
 		if(sensor == null){
-			sensor = (ConeTypeSensor)robot.getSensorWithId(idSensor);
-			maxRange = sensor.getRange();
-			maxOpeningAngle = sensor.getOpeningAngle();
+			sensor = (ChangeablePreySensor)robot.getSensorWithId(idSensor);
+			maxRange = sensor.getRangeAtIndex(idSensor);
+			maxOpeningAngle = sensor.getOpeningAngleAtIndex(idSensor);
 		}
 		
 		if(changeRange){
-			if(!cutOff)
-				sensor.setRange(range * maxRange);
-
-			sensor.setCutOff(range * maxRange);
-			
-//			System.out.print(sensor.getRange() + " ");
+			sensor.setRangeAtIndex(idSensor, range * maxRange);
+//			System.out.print(sensor.getRangeAtIndex(idSensor) + " ");
 		}
 		
 		if(changeAngle){
-			sensor.setOpeningAngle(openingAngle * maxOpeningAngle);
-//			System.out.print(Math.toDegrees(sensor.getOpeningAngle()) + " ");
+			sensor.setOpeningAngleAtIndex(idSensor, openingAngle * maxOpeningAngle);
+//			System.out.print(Math.toDegrees(sensor.getOpeningAngleAtIndex(idSensor)) + " ");
 		}
 		
 		if(changeOrientation){
@@ -97,7 +95,6 @@ public class ChangeSensorActuator extends Actuator {
 				angle+=delta;
 			}
 		}
-		
 	}
 
 }
