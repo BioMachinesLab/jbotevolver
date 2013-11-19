@@ -26,9 +26,10 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected double			   cutOff;
 	protected double[]             readings;
 	protected double[] 			   angles;
+	protected double               angleposition;
 	protected int 				   numberOfSensors;
 	protected Vector2d 			   sensorPosition 	= new Vector2d();
-	protected double openingAngle = 90;
+	protected double 			   openingAngle = 90;
 
 	protected Environment env;
 	protected Double time;
@@ -42,7 +43,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected boolean evolvable = false;
 	
 	protected double initialRange = 0;
-	protected double initialAngle = 0;
+	protected double initialOpeningAngle = 0;
 	
 	public ConeTypeSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id, robot, args);
@@ -57,12 +58,17 @@ public abstract class ConeTypeSensor extends Sensor {
 		
 		checkObstacles = args.getArgumentAsIntOrSetDefault("checkobstacles",0) == 1;
 		evolvable = args.getArgumentAsIntOrSetDefault("evolvable",0) == 1;
+		angleposition = args.getArgumentAsDoubleOrSetDefault("forcesensorposition", -1);
 
 		cutOff = range;
 		
 		this.readings 		= new double[numberOfSensors];
 		this.angles 		= new double[numberOfSensors];
-		setupPositions(numberOfSensors);
+		
+		if(angleposition < 0)
+			setupPositions(numberOfSensors);
+		else
+			angles[0] = Math.toRadians(angleposition);
 		
 		if(checkObstacles) {
 			setAllowedObstaclesChecker(new AllowObstacleChecker(robot.getId()*100));
@@ -70,7 +76,7 @@ public abstract class ConeTypeSensor extends Sensor {
 		}
 		
 		initialRange = range;
-		initialAngle = openingAngle;
+		initialOpeningAngle = openingAngle;
 	}
 	
 	public void setAllowedObstaclesChecker(AllowedObjectsChecker aoc) {
@@ -230,7 +236,7 @@ public abstract class ConeTypeSensor extends Sensor {
 			setRange(normalize(parameters[0])*initialRange);
 			setCutOff(normalize(parameters[0])*initialRange);
 //			System.out.println("RANGE: "+ range);
-			setOpeningAngle(normalize(parameters[1])*initialAngle);
+			setOpeningAngle(normalize(parameters[1])*initialOpeningAngle);
 //			System.out.println("ANGLE: "+ Math.toDegrees(openingAngle));
 		}
 	}

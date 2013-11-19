@@ -22,12 +22,15 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	protected int selectedRobot=-1;
 	private boolean wallRay;
 	private int coneSensorId;
+	private String coneClass = "";
 
 	public TwoDRendererDebug(Arguments args) {
 		super(args);
 		this.addMouseListener(new MouseListenerSentinel());
 		wallRay = args.getArgumentAsIntOrSetDefault("wallray", 0)==1;
 		coneSensorId = args.getArgumentAsIntOrSetDefault("conesensorid",-1);
+		coneClass = args.getArgumentAsStringOrSetDefault("coneclass","");
+		
 		
 	}
 	
@@ -109,45 +112,50 @@ public class TwoDRendererDebug extends TwoDRenderer {
 			}
 		}	
 		
-		if(coneSensorId >= 0){
-			Sensor s = robot.getSensorWithId(coneSensorId);
-			if(s != null){
-				ConeTypeSensor preySensor = (ConeTypeSensor)s;
-				for (Double angle : preySensor.getAngles()) {
-				
-					double xi = robot.getPosition().getX()+robot.getRadius()*Math.cos(angle + robot.getOrientation());
-					double yi = robot.getPosition().getY()+robot.getRadius()*Math.sin(angle + robot.getOrientation());
-					
-					double range = preySensor.getRange();
-					double cutOff = preySensor.getCutOff();
-					double openingAngle = preySensor.getOpeningAngle();
+		if(coneSensorId >= 0 || !coneClass.isEmpty()){
+			
+			for(Sensor s : robot.getSensors())
+				if(s.getClass().getSimpleName().equals(coneClass) || s.getId() == coneSensorId){
+					if(s != null){
+						ConeTypeSensor preySensor = (ConeTypeSensor)s;
+						for (Double angle : preySensor.getAngles()) {
+						
+							double xi = robot.getPosition().getX()+robot.getRadius()*Math.cos(angle + robot.getOrientation());
+							double yi = robot.getPosition().getY()+robot.getRadius()*Math.sin(angle + robot.getOrientation());
+							
+							double range = preySensor.getRange();
+							double cutOff = preySensor.getCutOff();
+							double openingAngle = preySensor.getOpeningAngle();
 
-					int x1 = transformX(xi);
-					int y1 = transformY(yi);
-					
-					int x2 = transformX(xi-range);
-					int y2 = transformY(yi+range);
-					
-					int x3 = transformX(xi-cutOff);
-					int y3 = transformY(yi+cutOff);
-					
-					int gx1 = transformX(robot.getPosition().getX()+(robot.getRadius()+range)*Math.cos(angle + robot.getOrientation()));
-					int gy1 = transformY(robot.getPosition().getY()+(robot.getRadius()+range)*Math.sin(angle + robot.getOrientation()));
-					
-					int a1 = (int)(Math.round(Math.toDegrees(angle + robot.getOrientation() - openingAngle/2)));
-					
-					Graphics2D graphics2D = (Graphics2D) graphics.create();
+							int x1 = transformX(xi);
+							int y1 = transformY(yi);
+							
+							int x2 = transformX(xi-range);
+							int y2 = transformY(yi+range);
+							
+							int x3 = transformX(xi-cutOff);
+							int y3 = transformY(yi+cutOff);
+							
+							int gx1 = transformX(robot.getPosition().getX()+(robot.getRadius()+range)*Math.cos(angle + robot.getOrientation()));
+							int gy1 = transformY(robot.getPosition().getY()+(robot.getRadius()+range)*Math.sin(angle + robot.getOrientation()));
+							
+							int a1 = (int)(Math.round(Math.toDegrees(angle + robot.getOrientation() - openingAngle/2)));
+							
+							Graphics2D graphics2D = (Graphics2D) graphics.create();
 
-					GradientPaint gp = new GradientPaint(x1, y1,Color.darkGray , gx1, gy1, Color.lightGray, false);
-					graphics2D.setColor(Color.BLACK);
-					graphics2D.fillArc(x2, y2, (int)Math.round(range*2*scale), (int)(Math.round(range*2*scale)), a1, (int)Math.round(Math.toDegrees(openingAngle)));   
-					
-					graphics2D.setPaint(gp);
-					graphics2D.fillArc(x3, y3, (int)Math.round(cutOff*2*scale), (int)(Math.round(cutOff*2*scale)), a1, (int)Math.round(Math.toDegrees(openingAngle)));
-					
+							GradientPaint gp = new GradientPaint(x1, y1,Color.darkGray , gx1, gy1, Color.lightGray, false);
+							graphics2D.setColor(Color.BLACK);
+							graphics2D.fillArc(x2, y2, (int)Math.round(range*2*scale), (int)(Math.round(range*2*scale)), a1, (int)Math.round(Math.toDegrees(openingAngle)));   
+							
+							graphics2D.setPaint(gp);
+							graphics2D.fillArc(x3, y3, (int)Math.round(cutOff*2*scale), (int)(Math.round(cutOff*2*scale)), a1, (int)Math.round(Math.toDegrees(openingAngle)));
+							
+						}
+					}
 				}
-			}
 		}
+			
+			
 		
 	}
 
