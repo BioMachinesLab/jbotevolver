@@ -35,10 +35,10 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 	@Override
 	public void run() {
 		
+		jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
+		
 		Simulator simulator = jBotEvolver.createSimulator(new Random(sample));
 		simulator.setFileProvider(getFileProvider());
-		
-		jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
 		
 		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 		jBotEvolver.setChromosome(robots, chromosome);
@@ -46,14 +46,13 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 		EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
 		simulator.addCallback(eval);
 		simulator.simulate();
-		System.out.println(sample+" "+eval.getFitness());
 		if(threshold > 0)
-			fitness= eval.getFitness() > threshold ? 1 : 0;
+			fitness= eval.getFitness() >= threshold ? 1 : 0;
 		else
 			fitness= eval.getFitness();
 	}
 	public Result getResult() {
-		PostEvaluationResult fr = new PostEvaluationResult(run,fitnesssample,fitness);
+		PostEvaluationResult fr = new PostEvaluationResult(run,fitnesssample,fitness,sample);
 		return fr;
 	}
 }

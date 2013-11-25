@@ -29,6 +29,16 @@ public abstract class EvaluationFunction implements Serializable, Updatable {
 				}
 			}
 		} catch (Exception e) {
+			
+			// NEAT needs to instantiate EvalFunctions locally, so it is necessary to check this
+			// if we are using Conillon...
+			if(evaluationName.startsWith("__")) {
+				System.out.println(evaluationName);
+				evaluationName = evaluationName.substring(evaluationName.indexOf('.')+1,evaluationName.length());
+				arguments.setArgument("classname", evaluationName);
+				return getEvaluationFunction(arguments);
+			}
+						
 			e.printStackTrace();
 			System.exit(-1);
 		}

@@ -786,8 +786,14 @@ public class ResultViewerGui extends Gui {
 			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
 		
 		Simulator simulator = jBotEvolver.createSimulator();
-		
-		evaluationFunction = jBotEvolver.getEvaluationFunction();
+
+		if(args.get("--objective1") == null){
+			evaluationFunction = jBotEvolver.getEvaluationFunction();
+		}
+		else {
+			evaluationFunction = EvaluationFunction.getEvaluationFunction(args.get("--objective1"));
+		}
+
 		simulator.addCallback(evaluationFunction);
 		
 		if(networkViewer.isVisible())

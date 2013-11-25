@@ -42,7 +42,9 @@ public class PostEvaluation {
 		}
 		
 		if(steps != 0) {
-			this.args = new String[]{"--environment","+steps="+steps};
+			this.args = new String[]{"--environment","+steps="+steps,"--evaluation","+posteval=1"};
+		}else {
+			this.args = new String[]{"--evaluation","+posteval=1"};
 		}
 		
 		if(!dir.endsWith("/"))
@@ -115,6 +117,7 @@ public class PostEvaluation {
 				for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
 					for(int sample = 0 ; sample < samples ; sample++) {
 						PostEvaluationResult sfr = (PostEvaluationResult)taskExecutor.getResult();
+						System.out.println(sfr.getRun()+" "+sfr.getFitnesssample()+" "+sfr.getSample()+" "+sfr.getFitness());
 						result[sfr.getRun()-1][sfr.getFitnesssample()]+= sfr.getFitness()/samples;
 					}
 				}
