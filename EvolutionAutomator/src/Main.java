@@ -73,7 +73,7 @@ public class Main {
 		}
 	}
 	
-	private synchronized void execute() {
+	public synchronized void execute() {
 		boolean allEvolved = false;
 		
 		while(!allEvolved) {
