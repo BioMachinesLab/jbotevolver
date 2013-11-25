@@ -7,9 +7,9 @@ public class PMain {
 		//new String[]{"--controllers","+classname=CrossForageArbitrator"}
 		//new String[]{"--controllers","+classname=CrossForageArbitrator","--evaluation","classname=PreyAggregationExponentialEvaluationFunction,robotpercentage=0.5,preypercentage=0.5,robotdistance=0.5,preydistance=0.2"}
 		double[][] values = new PostEvaluation(
-				new String[]{"dir=bigdisk/september2013/cross_forage_size_variable/forage_with_closed_doors_derived","localevaluation=0","steps=15000"}).runPostEval();
+				new String[]{"dir=bigdisk/november2013/room_maze_single_an/single_network_10hn_1_3","localevaluation=0","targetfitness=3","fitnesssamples=4"}).runPostEval();
 		
-		int nRuns = 10;
+		int nRuns = 3;
 		
 		double[] results = new double[nRuns];
 		double[] averages = new double[nRuns];

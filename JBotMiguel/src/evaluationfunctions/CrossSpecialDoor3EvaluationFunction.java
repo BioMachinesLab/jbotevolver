@@ -88,13 +88,13 @@ public class CrossSpecialDoor3EvaluationFunction extends EvaluationFunction {
 		if(bestMinX < -0.3) {
 			fitness+=1;
 		}
+		System.out.println(fitness);
 		
 		if(allCrossed) {
 			fitness+=1;
 			fitness+=(steps-simulator.getTime())/steps;
 			simulator.stopSimulation();
 		}
-		
 		fitness+=penalty+stayPutBonus;
 	}
 }
