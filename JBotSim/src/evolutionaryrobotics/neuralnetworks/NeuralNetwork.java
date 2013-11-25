@@ -26,6 +26,8 @@ public abstract class NeuralNetwork implements Serializable{
 	protected int numberOfInputNeurons    = 0;
 	protected int numberOfOutputNeurons   = 0;
 	protected int genomeLength = -1;
+	
+	protected boolean printValues = false;
 
 	public void create(Vector<NNInput> inputs, Vector<NNOutput> outputs) {
 		this.inputs = inputs;

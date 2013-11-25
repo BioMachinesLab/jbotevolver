@@ -1,6 +1,11 @@
 package evolutionaryrobotics.neuralnetworks;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.Vector;
+
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
@@ -18,7 +23,7 @@ public class CTRNNMultilayer extends NeuralNetwork {
 	protected double[]  hiddenTaus;
 	protected double[]  hiddenToOutputWeights;
 	protected double[]  outputBiases;
-	
+
 	public CTRNNMultilayer(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments) {
 		numberOfHiddenNodes = arguments.getArgumentAsIntOrSetDefault("hiddennodes",5);
 		create(inputs, outputs, numberOfHiddenNodes);
@@ -64,6 +69,25 @@ public class CTRNNMultilayer extends NeuralNetwork {
 	        outputNeuronStates[i] = ((1.0)/(Math.exp(-(outputNeuronStates[i] + outputBiases[i])) + 1.0 ));
 	    }
 	    
+	    if(printValues) {
+	    	PrintWriter out;
+			try {
+				out = new PrintWriter(new BufferedWriter(new FileWriter("out.txt", true)));
+			
+		        String s = "";
+		        
+		    	for(double d : inputValues)
+		    		s+=d+" ";
+		    	for(double d : outputNeuronStates)
+		    		s+=d+" ";
+		    	
+		    	out.println(s);
+		    	out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
+	    
 	    return outputNeuronStates;
 	}
 
@@ -80,6 +104,17 @@ public class CTRNNMultilayer extends NeuralNetwork {
 		
 	@Override
 	public void reset() {
+		
+		if(printValues) {
+	    	PrintWriter out;
+			try {
+				out = new PrintWriter(new BufferedWriter(new FileWriter("out.txt", true)));
+		    	out.println("");
+		    	out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	    }
 		
 		if (weights != null) {
 	    	int A = numberOfInputNeurons;

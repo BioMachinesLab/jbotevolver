@@ -20,6 +20,10 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 		
 		neuralNetwork = NeuralNetwork.getNeuralNetwork(simulator, robot, new Arguments(args.getArgumentAsString("network")));
 		
+		boolean printValues = args.getArgumentAsIntOrSetDefault("printvalues",0) == 1;
+		if(printValues)
+			neuralNetwork.printValues = true;
+		
 		for(Sensor s : robot.getSensors()) {
 			if(s.getNumberExtraParameters() > 0)
 				neuralNetwork.setRequiredNumberOfWeights(neuralNetwork.getGenomeLength() + s.getNumberExtraParameters());
