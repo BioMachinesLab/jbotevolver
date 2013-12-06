@@ -28,7 +28,6 @@ public class WallRaySensor extends ConeTypeSensor {
 	protected Random random;
 	private Vector2d[][] cones;
 	private Vector2d[] sensorPositions;
-	private double fullOpeningAngle;
 	private double minimumDistances[][];
 	private double cutoffAngle = 90;
 	
@@ -45,9 +44,6 @@ public class WallRaySensor extends ConeTypeSensor {
 			numberOfRays++;
 		
 		rayReadings = new double[numberOfSensors][numberOfRays];
-		
-		this.fullOpeningAngle = openingAngle;
-		this.openingAngle = openingAngle / 2;
 		
 		setAllowedObjectsChecker(new AllowWallChecker());
 		
@@ -74,13 +70,15 @@ public class WallRaySensor extends ConeTypeSensor {
 					Math.sin(orientation) * robot.getRadius() + robot.getPosition().getY()
 				);
 			
-			double alpha = (this.fullOpeningAngle)/(numberOfRays-1);
+			double alpha = (this.openingAngle)/(numberOfRays-1);
+			
+			double halfOpening = openingAngle/2.0;
 			
 			for(int i = 0 ; i < numberOfRays ; i++) {
 				
 				cones[sensorNumber][i].set(
-						Math.cos(orientation - openingAngle + alpha*i)* range + sensorPositions[sensorNumber].getX(),
-						Math.sin(orientation - openingAngle + alpha*i)* range + sensorPositions[sensorNumber].getY()
+						Math.cos(orientation - halfOpening + alpha*i)* range + sensorPositions[sensorNumber].getX(),
+						Math.sin(orientation - halfOpening + alpha*i)* range + sensorPositions[sensorNumber].getY()
 					 );
 			}
 		}
@@ -170,7 +168,9 @@ public class WallRaySensor extends ConeTypeSensor {
 	@Override
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
 		for(int j=0; j<numberOfSensors; j++){
-			calculateContributionToSensor(j, source);
+			if(openingAngle > 0.018){ //1degree
+				calculateContributionToSensor(j, source);
+			}
 		}
 	}
 	

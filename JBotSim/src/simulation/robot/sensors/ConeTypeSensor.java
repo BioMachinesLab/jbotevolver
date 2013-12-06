@@ -26,6 +26,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected double			   cutOff;
 	protected double[]             readings;
 	protected double[] 			   angles;
+	protected double[] 			   originalAngles;
 	protected double               angleposition;
 	protected int 				   numberOfSensors;
 	protected Vector2d 			   sensorPosition 	= new Vector2d();
@@ -41,6 +42,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected double[] obstacleReadings;
 	
 	protected boolean evolvable = false;
+	protected boolean eyes = false;
 	
 	protected double initialRange = 0;
 	protected double initialOpeningAngle = 0;
@@ -59,13 +61,17 @@ public abstract class ConeTypeSensor extends Sensor {
 		checkObstacles = args.getArgumentAsIntOrSetDefault("checkobstacles",0) == 1;
 		evolvable = args.getArgumentAsIntOrSetDefault("evolvable",0) == 1;
 		angleposition = args.getArgumentAsDoubleOrSetDefault("forcesensorposition", -1);
+		eyes = args.getArgumentAsIntOrSetDefault("eyes", 0) == 1;
 
 		cutOff = range;
 		
 		this.readings 		= new double[numberOfSensors];
 		this.angles 		= new double[numberOfSensors];
 		
-		if(angleposition < 0)
+		if(eyes){
+			angles[0]= Math.toRadians(17);
+			angles[1]= Math.toRadians(343);
+		}else if(angleposition < 0)
 			setupPositions(numberOfSensors);
 		else
 			angles[0] = Math.toRadians(angleposition);
@@ -74,6 +80,8 @@ public abstract class ConeTypeSensor extends Sensor {
 			setAllowedObstaclesChecker(new AllowObstacleChecker(robot.getId()*100));
 			this.obstacleReadings = new double[numberOfSensors];
 		}
+		
+		this.originalAngles = angles.clone();
 		
 		initialRange = range;
 		initialOpeningAngle = openingAngle;
@@ -108,6 +116,10 @@ public abstract class ConeTypeSensor extends Sensor {
 
 	public double[] getAngles() {
 		return angles;
+	}
+	
+	public double[] getOriginalAngles() {
+		return originalAngles;
 	}
 	
 	public ClosePhysicalObjects getCloseObjects() {
@@ -184,8 +196,10 @@ public abstract class ConeTypeSensor extends Sensor {
 
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
 		for(int j = 0; j < readings.length; j++){
-			readings[j] = Math.max(calculateContributionToSensor(j, source)*(1 + 
-					random.nextGaussian()* NOISESTDEV), readings[j]);
+			if(openingAngle > 0.018){ //1degree
+				readings[j] = Math.max(calculateContributionToSensor(j, source)*(1 + 
+						random.nextGaussian()* NOISESTDEV), readings[j]);
+			}
 		}
 	}
 
