@@ -89,12 +89,9 @@ public class ChangeSensorActuator extends Actuator {
 		}
 		
 		if(changeOrientation){
-			double delta = 2 * Math.PI / sensor.getNumberOfSensors();
-			double angle = 0;
 			double deviation = (orientation * Math.PI)-(Math.PI/2);
 			for (int i=0;i< sensor.getNumberOfSensors();i++){
-				sensor.getAngles()[i] = angle + deviation;
-				angle+=delta;
+				sensor.getAngles()[i] = sensor.getOriginalAngles()[i] + deviation;
 			}
 		}
 		
