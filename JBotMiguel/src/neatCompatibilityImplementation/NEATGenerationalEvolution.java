@@ -77,7 +77,7 @@ public class NEATGenerationalEvolution extends Evolution {
 					population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations());
 
 			population.evolvePopulation(jBotEvolver, taskExecutor);
-						
+			
 			population.updateStatistics();
 
 			//print("\nSpecies " + population.getNumberOfSpecies() + "\n");

@@ -37,6 +37,7 @@ public class SingleANNClutteredMaze extends EvaluationFunction {
 	private double bestReturnProgress = 0;
 	
 	private boolean postEval = false;
+	private boolean dieOnCollision = false;
 	
 	public SingleANNClutteredMaze(Arguments arguments) {
 		super(arguments);
@@ -45,6 +46,7 @@ public class SingleANNClutteredMaze extends EvaluationFunction {
 		returnWeight = arguments.getArgumentAsDoubleOrSetDefault("return",1);
 		dieOnForbidden = arguments.getArgumentAsIntOrSetDefault("dieonforbidden",1) == 1;
 		postEval = arguments.getArgumentAsIntOrSetDefault("posteval",0) == 1;
+		dieOnCollision = arguments.getArgumentAsIntOrSetDefault("die",0) == 1;
 	}
 
 	@Override
@@ -67,13 +69,16 @@ public class SingleANNClutteredMaze extends EvaluationFunction {
 			simulator.stopSimulation();
 		}
 		
+		if(dieOnCollision && r.isInvolvedInCollison())
+			simulator.stopSimulation();
+		
 		//if(simulator.simulationFinished())
 			computeFitness(simulator);
 	}
 	
 	private void computeFitness(Simulator simulator) {
 		
-		fitness = 0;
+		fitness = 1;
 		
 		fitness+=computeFitnessRoom();
 		fitness+=computeFitnessMaze();

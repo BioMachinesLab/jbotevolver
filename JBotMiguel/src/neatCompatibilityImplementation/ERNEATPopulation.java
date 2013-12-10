@@ -2,23 +2,20 @@ package neatCompatibilityImplementation;
 
 import java.io.Serializable;
 import java.util.Map;
-
 import org.encog.ml.ea.opp.CompoundOperator;
 import org.encog.ml.ea.opp.selection.TruncationSelection;
 import org.encog.ml.ea.train.basic.TrainEA;
 import org.encog.neural.neat.NEATCODEC;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.neural.neat.training.NEATGenome;
+import org.encog.neural.neat.training.opp.NEATCrossover;
 import org.encog.neural.neat.training.opp.NEATMutateAddLink;
 import org.encog.neural.neat.training.opp.NEATMutateAddNode;
-import org.encog.neural.neat.training.opp.NEATMutateRemoveLink;
 import org.encog.neural.neat.training.opp.NEATMutateWeights;
 import org.encog.neural.neat.training.opp.links.MutatePerturbLinkWeight;
 import org.encog.neural.neat.training.opp.links.MutateResetLinkWeight;
-import org.encog.neural.neat.training.opp.links.SelectFixed;
 import org.encog.neural.neat.training.opp.links.SelectProportion;
 import org.encog.neural.neat.training.species.OriginalNEATSpeciation;
-
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import evolutionaryrobotics.JBotEvolver;
@@ -36,13 +33,16 @@ public class ERNEATPopulation extends Population implements Serializable{
 
 	protected int generationsElapsed = 0;
 
-	protected transient TrainEA trainer;
+	protected TrainEA trainer;
 
-	protected transient MOEvaluation<NEATNetwork> evaluator;
+	protected MOEvaluation<NEATNetwork> evaluator;
 
 	protected Map<NEATNetwork, TaskStatistics> stats;
 
 	protected double bestFitness, worstFitness, avgFitness;
+	
+	protected double addNodeRate = 0.02;
+	protected double mutateLinkRate = 0.1;
 
 	public ERNEATPopulation(Arguments arguments) {
 		super(arguments);
@@ -56,6 +56,9 @@ public class ERNEATPopulation extends Population implements Serializable{
 
 		numberInputs = arguments.getArgumentAsIntOrSetDefault("inputs", 1);
 		numberOutputs = arguments.getArgumentAsIntOrSetDefault("outputs", 1);
+		
+		addNodeRate = arguments.getArgumentAsDoubleOrSetDefault("addnoderate", addNodeRate);
+		mutateLinkRate = arguments.getArgumentAsDoubleOrSetDefault("mutatelinkrate", mutateLinkRate);
 	}
 
 	public void createRandomPopulation(JBotEvolver jBotEvolver) {
@@ -71,7 +74,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 		evaluator.setupObjectives(jBotEvolver.getArguments());
 
 		trainer = constructPopulationTrainer();
-
+		
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 		//System.out.println(population.getSpecies().size());
 	}
@@ -81,13 +84,19 @@ public class ERNEATPopulation extends Population implements Serializable{
 	 */
 	public TrainEA constructPopulationTrainer() {
 		final TrainEA result = new TrainEA(population, this.evaluator);
+		
 		OriginalNEATSpeciation speciation = new OriginalNEATSpeciation();
-		speciation.setMaxNumberOfSpecies(5);
+		//coefficient 3
+		speciation.setConstMatched(3.0);
+		//C_t
+		speciation.setCompatibilityThreshold(3.0);
 		result.setSpeciation(speciation);
+		
 
 		result.setSelection(new TruncationSelection(result, 0.2));
 		final CompoundOperator weightMutation = new CompoundOperator();
-		weightMutation.getComponents().add(
+		
+		/*weightMutation.getComponents().add(
 				0.1125,
 				new NEATMutateWeights(new SelectFixed(1),
 						new MutatePerturbLinkWeight(0.02)));
@@ -134,15 +143,20 @@ public class ERNEATPopulation extends Population implements Serializable{
 		weightMutation.getComponents().add(
 				0.01,
 				new NEATMutateWeights(new SelectProportion(0.02),
-						new MutateResetLinkWeight()));
+						new MutateResetLinkWeight()));*/
+		
+		
+		weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
+		weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
 		weightMutation.getComponents().finalizeStructure();
-
 		result.setChampMutation(weightMutation);
-		//result.addOperation(0.5, new NEATCrossover());
-		result.addOperation(0.5, weightMutation);
-		result.addOperation(0.03, new NEATMutateAddNode());
-		result.addOperation(0.05, new NEATMutateAddLink());
-		result.addOperation(0.05, new NEATMutateRemoveLink());
+		
+		result.addOperation(0.2, new NEATCrossover());
+		result.addOperation(0.8, weightMutation);
+		result.addOperation(addNodeRate, new NEATMutateAddNode());
+		result.addOperation(mutateLinkRate, new NEATMutateAddLink());
+		
+		//result.addOperation(0.05, new NEATMutateRemoveLink());
 		result.getOperators().finalizeStructure();
 
 		result.setCODEC(new NEATCODEC());
@@ -170,15 +184,25 @@ public class ERNEATPopulation extends Population implements Serializable{
 	}
 
 	public void evolvePopulation(JBotEvolver jBotEvolver, TaskExecutor taskExecutor) {
+//		if(evaluator == null) {
+//			//resuming
+//			this.evaluator = MOEvaluation.getEvaluationFunction(
+//					jBotEvolver.getArguments().get("--evaluation"));
+//			evaluator.setupObjectives(jBotEvolver.getArguments());
+//			trainer.setEvaluator(evaluator);
+//		}
+		
+//		if(trainer == null) {
+//			trainer = constructPopulationTrainer();
+//		}
+		
 		generationsElapsed++;
 		//System.out.println("GENERATION " + generationsElapsed);
-
 		randomNumberGenerator.setSeed(getGenerationRandomSeed());
-		evaluator.setupEvolution(jBotEvolver, taskExecutor, this.numberOfSamplesPerChromosome);
-
+		evaluator.setupEvolution(jBotEvolver, taskExecutor, this.numberOfSamplesPerChromosome,this.generationRandomSeed);
 		trainer.iteration();
-
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
+		
 	}
 
 	public void updateStatistics() {

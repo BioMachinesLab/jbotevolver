@@ -31,10 +31,12 @@ public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 	protected int numberOfSamples;
 	protected double[] objectivesWeights;
 
+	protected long generationalSeed;
+	
 	protected MultiObjectiveFitness objectivesFunction;
 	protected SingleObjective[] objectives;
-	protected JBotEvolver evolver;
-	protected TaskExecutor taskExecutor;
+	protected transient JBotEvolver evolver;
+	protected transient TaskExecutor taskExecutor;
 	
 	protected MOControllersStatistics<NEATNetwork> statsManager;
 
@@ -200,10 +202,9 @@ public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 			SingleObjective taskObjective = createTaskObjective(objective);
 			
 			this.taskExecutor.addTask(new GenericSimulationGenerationalTask(
-					new ExtendedJBotEvolver(evolver.getArgumentsCopy(), 
-							evolver.getRandomSeed()), 
+					new ExtendedJBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), 
 					i, taskObjective, taskNet, 
-					evolver.getRandomSeed()));
+					generationalSeed+i));
 		}
 		
 		return this.numberOfSamples;
@@ -211,10 +212,11 @@ public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 	}
 
 	public void setupEvolution(JBotEvolver jBotEvolver,
-			TaskExecutor taskExecutor, int numberOfSamples) {
+			TaskExecutor taskExecutor, int numberOfSamples, long generationalSeed) {
 		this.evolver = jBotEvolver;
 		this.taskExecutor = taskExecutor;
 		this.numberOfSamples = numberOfSamples;
+		this.generationalSeed = generationalSeed;
 	}
 
 	@Override

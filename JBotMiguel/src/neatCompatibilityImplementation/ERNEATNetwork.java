@@ -46,7 +46,6 @@ public class ERNEATNetwork extends NeuralNetwork {
 		preActivation[0] = 1.0;
 		double[] postActivation = network.getPostActivation();
 		NEATLink[] links = network.getLinks();
-
 		// copy input
 		EngineArray.arrayCopy(input, 0, postActivation, 1, network.getInputCount());
 

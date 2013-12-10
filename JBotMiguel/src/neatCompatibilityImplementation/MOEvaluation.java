@@ -20,7 +20,7 @@ public abstract class MOEvaluation<E> implements CalculateScore, Serializable, M
 	public abstract void setupObjectives(HashMap<String, Arguments> arguments);
 	
 	public abstract void setupEvolution(JBotEvolver jBotEvolver, 
-			TaskExecutor taskExecutor, int numberOfSamples);
+			TaskExecutor taskExecutor, int numberOfSamples, long generationalSeed);
 
 	public int getNumberOfObjectives() {
 		return numberOfObjectives;
