@@ -92,7 +92,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 		
 		senseRobot = args.getArgumentAsIntOrSetDefault("senserobot", 0) == 1;
 
-		cutoffAngle = args.getArgumentAsDoubleOrSetDefault("cutoffangle", 0);
+		cutoffAngle = args.getArgumentAsDoubleOrSetDefault("cutoffangle", 45);
 		boolean fixedSensor = args.getArgumentAsIntOrSetDefault("fixedsensor", 0) == 1;
 		noiseEnabled = args.getArgumentAsIntOrSetDefault("noiseenabled", 1) ==  1;
 		numberOfRays = args.getArgumentAsIntOrSetDefault("numberofrays", 7);
@@ -278,7 +278,6 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	
 	@Override
 	public void update(double time, ArrayList<PhysicalObject> teleported) {
-		
 		updateCones();
 
 		if(closeObjects != null) {

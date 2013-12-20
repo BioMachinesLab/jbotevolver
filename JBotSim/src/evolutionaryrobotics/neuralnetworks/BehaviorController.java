@@ -1,10 +1,14 @@
 package evolutionaryrobotics.neuralnetworks;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
+
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import simulation.Simulator;
+import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
+import simulation.robot.actuators.TwoWheelActuator;
 import simulation.robot.behaviors.Behavior;
 import simulation.util.Arguments;
 
@@ -18,11 +22,13 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 	boolean resetChosen = true;
 	boolean debugMax = false;
 	private int fixedOutput = -1;
+	private boolean printValues = false;
 	
 	public BehaviorController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
 		setupControllers(simulator, args);
 		fixedOutput = args.getArgumentAsIntOrSetDefault("fixedoutput", fixedOutput);
+		printValues = args.getArgumentAsIntOrSetDefault("printvalues", 0) == 1;
 	}
 	
 	@Override
@@ -67,6 +73,20 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 		
 		if(!parallelSubControllers.isEmpty())
 			executeParallelNetworks(time);
+		
+		if(printValues) {
+			for(int i = 0 ; i < neuralNetwork.getInputNeuronStates().length ; i++) {
+				System.out.print(neuralNetwork.getInputNeuronStates()[i]+" ");
+			}
+			DifferentialDriveRobot r = (DifferentialDriveRobot)robot;
+			double lw = r.getLeftWheelSpeed();
+			double rw = r.getRightWheelSpeed();
+			lw/=0.1;
+			rw/=0.1;
+			lw = Math.min(1,(lw+1.0)/2.0);
+			rw = Math.min(1,(rw+1.0)/2.0);
+			System.out.println(lw+" "+rw);
+		}
 	}
 	
 	private void executeParallelNetworks(double time) {
