@@ -22,6 +22,10 @@ public class SimpleCollisionManager extends CollisionManager {
 
 	@Override
 	public void handleCollisions(Environment environment, double time) {
+		
+		for(Robot r : environment.getRobots()) {
+			r.getCollidingObjects().clear();
+		}
 
 		for (MovableObject mo : environment.getMovableObjects()) {
 			mo.setInvolvedInCollison(false);
@@ -51,6 +55,8 @@ public class SimpleCollisionManager extends CollisionManager {
 					((MovableObject) closeRobot.getObject()).move(temp);
 					if(!robot.ignoreRobotToRobotCollisions()) {
 						robot.setInvolvedInCollison(true);
+						robot.getCollidingObjects().add(closeRobot.getObject());
+						((Robot)closeRobot.getObject()).getCollidingObjects().add(robot);
 						closeRobot.getObject().setInvolvedInCollison(true);
 					}
 
@@ -75,6 +81,8 @@ public class SimpleCollisionManager extends CollisionManager {
 							status);
 					robot.moveTo(newPosition);
 					robot.setInvolvedInCollison(true);
+					
+					robot.getCollidingObjects().add(closeWall);
 					
 					if(robot.specialWallCollisions()) {
 						DifferentialDriveRobot rr = (DifferentialDriveRobot)robot;
@@ -102,7 +110,61 @@ public class SimpleCollisionManager extends CollisionManager {
 				}
 			}
 		}
-
+		
+		// robot - prey collisions
+		for(Prey p : environment.getPrey()) {
+			if (p.isEnabled()) {
+				ClosePhysicalObjects closeRobots = p.shape.getCloseRobot();
+				CloseObjectIterator iterator = closeRobots.iterator();
+				
+				//if the number of robots touching the prey is less than the mass, make it stay in the same place
+				//first, count the robots that are touching
+				//then, move the prey
+				boolean heavy = false;
+				if(p.getMass() > 1) {
+					int number = 0;
+					while(iterator.hasNext()) {
+						Robot r = (Robot) (iterator.next().getObject());
+						temp.set(p.getPosition());
+						temp.sub(r.getPosition());
+						
+						double length = temp.length() - r.getRadius()
+								- p.getRadius();
+						if (length < 0) {
+							number++;
+						}
+					}
+					if (number < p.getMass()) {
+						heavy = true;
+					}
+				}
+				
+				iterator = closeRobots.iterator();
+				while (iterator.hasNext()) {
+					Robot r = (Robot) (iterator.next().getObject());
+					
+					temp.set(p.getPosition());
+					temp.sub(r.getPosition());
+					
+					double length = temp.length() - r.getRadius()
+							- p.getRadius();
+					if (length < 0) {
+						
+						setLength(temp, length/2);
+						
+						r.move(temp);
+						temp.negate();
+						if(!heavy)
+							p.move(temp);
+						// robot.setInvolvedInCollison(true);
+						// closePrey.setInvolvedInCollison(true);
+					} else {
+						iterator.updateCurrentDistance(length);
+					}
+				}
+			}
+		}
+	/*
 		// robot - prey collisions
 		for (Robot robot : environment.getRobots()) {
 			ClosePhysicalObjects closePreys = robot.shape.getClosePrey();
@@ -113,14 +175,21 @@ public class SimpleCollisionManager extends CollisionManager {
 				if (closePrey.isEnabled()) {
 					temp.set(closePrey.getPosition());
 					temp.sub(robot.getPosition());
+					Vector2d temp2 = new Vector2d(temp);
+					
 					double length = temp.length() - robot.getRadius()
 							- closePrey.getRadius();
 					if (length < 0) {
+						
+						double div = 2;
+						double mult = 1;
+						
 						setLength(temp, length/2);
+						setLength(temp2, length/2);
 						robot.move(temp);
-						temp.negate();
-						if(closePrey.getMass() != Integer.MAX_VALUE)
-							closePrey.move(temp);
+						temp2.negate();
+//						if(closePrey.getMass() != Double.MAX_VALUE)
+							closePrey.move(temp2);
 						// robot.setInvolvedInCollison(true);
 						// closePrey.setInvolvedInCollison(true);
 					} else {
@@ -128,7 +197,7 @@ public class SimpleCollisionManager extends CollisionManager {
 					}
 				}
 			}
-		}
+		}*/
 
 		// prey - prey collisions
 		for (Prey prey : environment.getPrey()) {
@@ -172,7 +241,7 @@ public class SimpleCollisionManager extends CollisionManager {
 		}
 		vector.setLength(length);
 	}
-
+	
 	private Vector2d handleCollision(PhysicalObject obj, Wall wall, int collisionStatus) {
 
 		double valueX = obj.getPosition().getX(), valueY = obj
