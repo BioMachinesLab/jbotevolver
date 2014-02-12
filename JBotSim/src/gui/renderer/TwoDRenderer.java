@@ -10,16 +10,12 @@ import java.awt.image.BufferedImage;
 import mathutils.Point2d;
 import mathutils.Vector2d;
 import simulation.physicalobjects.LightPole;
+import simulation.physicalobjects.Line;
 import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
-import simulation.robot.DifferentialDriveRobot;
-import simulation.robot.Epuck;
 import simulation.robot.Robot;
-import simulation.robot.sensors.EpuckIRSensor;
-import simulation.robot.sensors.Sensor;
-import simulation.robot.sensors.WallRaySensor;
 import simulation.util.Arguments;
 
 public class TwoDRenderer extends Renderer implements ComponentListener {
@@ -35,12 +31,15 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	private double zoomFactor = 1.0;
 	
+	private boolean bigRobots = false;
+	
 	private boolean debug = false;
 	
 	public TwoDRenderer(Arguments args) {
 		super(args);
 		this.addComponentListener(this);
 		createImage();
+		bigRobots = args.getArgumentAsIntOrSetDefault("bigrobots", 0) == 1;
 	}
 	
 	public void paint(Graphics g) {
@@ -83,6 +82,9 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					break;
 				case WALL:
 					drawWall((Wall) m);
+					break;
+				case LINE:
+					drawLine((Line) m);
 					break;
 				}
 			}	
@@ -163,6 +165,18 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		
 	}
 	
+	private void drawLine(Line l) {
+		int x0 = transformX(l.getPointA().getX());
+		int x1 = transformX(l.getPointB().getX());
+		
+		int y0 = transformY(l.getPointA().getY());
+		int y1 = transformY(l.getPointB().getY());
+		
+		graphics.setColor(Color.BLUE);
+		graphics.drawLine(x0, y0, x1, y1);
+		graphics.setColor(Color.BLACK);
+	}
+	
 	private void drawNest(Graphics graphics2, Nest nest) {
 		int circleDiameter = (int) Math.round(0.5 + nest.getDiameter() * scale);
 		int x = (int) (transformX(nest.getPosition().getX()) - circleDiameter / 2);
@@ -180,9 +194,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		int y = (int) (transformY(lightPole.getPosition().getY()) - circleDiameter / 2);
 		
 		if(lightPole.isTurnedOn()) {
-			graphics.setColor(Color.YELLOW);
+			graphics.setColor(lightPole.getColor());
 			graphics.fillOval(x, y, circleDiameter, circleDiameter);
-			graphics.setColor(Color.YELLOW);
 		}
 		
 		graphics.setColor(Color.BLACK);
@@ -210,7 +223,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
 			createImage();
 		
-		int circleDiameter = (int) Math.round(robot.getDiameter() * scale);
+		int circleDiameter = bigRobots ? (int)Math.max(10,Math.round(robot.getDiameter() * scale)) : (int) Math.round(robot.getDiameter() * scale);
 		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
 
@@ -259,28 +272,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		graphics.setColor(Color.BLACK);		
 	}
 	
-	protected void drawLines(Vector2d[][][] positions, Graphics graphics) {
-		if(positions != null) {
-			for(int i = 0 ; i < positions.length ; i++) {
-				for(int j = 0 ; j < positions[i].length ; j++) {
-					if(i % 2 == 0) {
-						graphics.setColor(Color.RED);
-					}else {
-						graphics.setColor(Color.BLACK);
-					}
-					
-					if(positions[i][j][0] != null) {
-						int x1 = transformX(positions[i][j][0].x);
-						int y1 = transformY(positions[i][j][0].y);
-						int x2 = transformX(positions[i][j][1].x);
-						int y2 = transformY(positions[i][j][1].y);
-						graphics.drawLine(x1, y1, x2, y2);
-					}
-				}
-			}
-		}
-	}
-
 	protected int transformX(double x) {
 		return (int) Math.round((x-horizontalMovement) * scale + centerX);
 	}

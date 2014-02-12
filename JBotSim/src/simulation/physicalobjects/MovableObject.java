@@ -8,7 +8,7 @@ import simulation.util.Arguments;
 
 public class MovableObject extends PhysicalObject {
 	private static final double NUMBER_OF_CYCLES_PER_SECOND = 10;
-	public static final double  MAXIMUMSPEED      = 0.50;
+	public static final double  MAXIMUMSPEED      = 1000;
 	public static final double  TWICEMAXIMUMSPEEDPERTIMESTEP = 2.0 * MAXIMUMSPEED / NUMBER_OF_CYCLES_PER_SECOND;
 	protected Environment env;
 	

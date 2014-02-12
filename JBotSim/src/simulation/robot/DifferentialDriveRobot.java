@@ -26,19 +26,27 @@ public class DifferentialDriveRobot extends Robot {
 	 */
 	protected double distanceBetweenWheels = 0.05;
 	
+	protected int stopTimestep = 0;
+	
 	public DifferentialDriveRobot(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		this.distanceBetweenWheels = args.getArgumentAsDoubleOrSetDefault("distancewheels", ((CircularShape)shape).getDiameter());
 	}
 	
 	public void updateActuators(Double time, double timeDelta) {	
-		position.set(
-				position.getX() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.cos(orientation),
-				position.getY() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.sin(orientation));
 		
-		orientation += timeDelta * 0.5/(distanceBetweenWheels/2.0) * (rightWheelSpeed - leftWheelSpeed); 
-
-		orientation = MathUtils.modPI2(orientation);
+		if(stopTimestep <= 0) {
+			
+			position.set(
+					position.getX() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.cos(orientation),
+					position.getY() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.sin(orientation));
+			
+			orientation += timeDelta * 0.5/(distanceBetweenWheels/2.0) * (rightWheelSpeed - leftWheelSpeed); 
+	
+			orientation = MathUtils.modPI2(orientation);
+		}
+		
+		stopTimestep--;
 		
 		for(Actuator actuator: actuators){
 			actuator.apply(this);
@@ -82,5 +90,13 @@ public class DifferentialDriveRobot extends Robot {
 	
 	public double getWheelDiameter(){
 		return this.wheelDiameter;
+	}
+	
+	public void stopTimestep(int time) {
+		this.stopTimestep = time;
+	}
+	
+	public int getStopTimestep() {
+		return stopTimestep;
 	}
 }

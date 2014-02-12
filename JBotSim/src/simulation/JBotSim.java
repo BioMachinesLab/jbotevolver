@@ -1,12 +1,15 @@
 package simulation;
 
 import gui.Gui;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Random;
+
 import controllers.Controller;
 import simulation.robot.Robot;
 import simulation.util.Arguments;

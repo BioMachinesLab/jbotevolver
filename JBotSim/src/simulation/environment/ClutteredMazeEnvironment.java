@@ -37,6 +37,8 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		
 		extraRobot = arguments.getArgumentAsIntOrSetDefault("extrarobot",0) == 1;
 		randomizeMazeY = arguments.getArgumentAsIntOrSetDefault("randomizemazey",0) == 1;
+		
+		objectWidth = arguments.getArgumentAsDoubleOrSetDefault("objectwidth",objectWidth);
 	}
 	
 	@Override
@@ -116,11 +118,16 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		}
 		
 		double exitX = -arenaWidth/2;
-		
-		while(exitX < -arenaWidth/2+exitWidth+0.2 || exitX > arenaWidth/2-exitWidth-0.2) {
+		int count = 0;
+		while(exitX < -arenaWidth/2+exitWidth+0.1 || exitX > arenaWidth/2-exitWidth-0.1) {
 			double exitPercentage = random.nextDouble();
 			exitX = -(arenaWidth/2)+arenaWidth*exitPercentage;
+			count++;
+			if(count > 100)
+				break;
 		}
+		if(count >= 100)
+			exitX = 0;
 		
 		applyOffset(exitX,-offsetY);
 		

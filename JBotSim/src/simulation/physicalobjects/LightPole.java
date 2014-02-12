@@ -1,6 +1,8 @@
 package simulation.physicalobjects;
 
 
+import java.awt.Color;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
@@ -8,6 +10,7 @@ import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 public class LightPole extends PhysicalObject {
 	
 	boolean turnedOn = true;
+	private Color color = Color.YELLOW;
 
 	public LightPole(Simulator simulator,  String name, double x, double y, double radius) {
 		super(simulator, name, x, y, 0, 0, PhysicalObjectType.LIGHTPOLE);
@@ -24,6 +27,14 @@ public class LightPole extends PhysicalObject {
 
 	public void setTurnedOn(boolean turnedOn) {
 		this.turnedOn = turnedOn;
+	}
+	
+	public void setColor(Color c) {
+		this.color = c;
+	}
+	
+	public Color getColor() {
+		return color;
 	}
 	
 }

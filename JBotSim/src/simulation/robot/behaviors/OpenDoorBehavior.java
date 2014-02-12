@@ -15,11 +15,13 @@ public class OpenDoorBehavior extends Behavior{
 	protected double distanceToDoor = 0.2;
 	protected boolean openedDoor = false;
 	protected Robot robot;
+	protected int stopTime = 0;
 
 	public OpenDoorBehavior(Simulator simulator, Robot r, Arguments args) {
 		super(simulator, r, args);
 		env = (TwoRoomsEnvironment)simulator.getEnvironment();
 		distanceToDoor = args.getArgumentAsDoubleOrSetDefault("distancetodoor", distanceToDoor);
+		stopTime = args.getArgumentAsIntOrSetDefault("stoptime", stopTime);
 		this.robot = r;
 	}
 
@@ -31,11 +33,14 @@ public class OpenDoorBehavior extends Behavior{
 		
 		for(Wall b : buttons) {
 			Vector2d bPos = b.getPosition();
-			if(bPos.distanceTo(r) < distanceToDoor) {
-				openedDoor = env.openDoor(bPos.getX());
-				break;
+			
+			if((bPos.getX() > 0 && r.getX() > bPos.getX()) || bPos.getX() < 0 && r.getX() < bPos.getX()) {
+				if(bPos.distanceTo(r) < distanceToDoor){
+					openedDoor = env.openDoor(bPos.getX());
+					break;
+				}
 			}
 		}
-		((DifferentialDriveRobot) robot).setWheelSpeed(0, 0);
+		((DifferentialDriveRobot) robot).stopTimestep(stopTime);
 	}
 }

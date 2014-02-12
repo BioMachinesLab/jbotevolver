@@ -34,6 +34,28 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		
 	}
 	
+	protected void drawLines(Vector2d[][][] positions, Graphics graphics) {
+		if(positions != null) {
+			for(int i = 0 ; i < positions.length ; i++) {
+				for(int j = 0 ; j < positions[i].length ; j++) {
+					if(i % 2 == 0) {
+						graphics.setColor(Color.RED);
+					}else {
+						graphics.setColor(Color.BLACK);
+					}
+					
+					if(positions[i][j][0] != null) {
+						int x1 = transformX(positions[i][j][0].x);
+						int y1 = transformY(positions[i][j][0].y);
+						int x2 = transformX(positions[i][j][1].x);
+						int y2 = transformY(positions[i][j][1].y);
+						graphics.drawLine(x1, y1, x2, y2);
+					}
+				}
+			}
+		}
+	}
+	
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
 			createImage();
@@ -105,7 +127,18 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		}
 		
 		if(wallRay){
+			
 			Sensor s = robot.getSensorByType(WallRaySensor.class);
+			
+			if(s == null) {
+				for(Sensor sensor : robot.getSensors()) {
+					if(WallRaySensor.class.isAssignableFrom(sensor.getClass())) {
+						s = sensor;
+						break;
+					}
+				}
+			}
+			
 			if(s != null) {
 				WallRaySensor wall = (WallRaySensor)s;
 				drawLines(wall.rayPositions, graphics);
@@ -162,11 +195,20 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	public int getSelectedRobot() {
 		return selectedRobot;
 	}
+	
+	protected double screenToSimulationX(double x) {
+		return 1*((x - centerX)/scale - horizontalMovement);
+	}
+
+	protected double screenToSimulationY(double y) {
+		return -1*((y - centerY)/scale - verticalMovement);
+	}
 
 	public class MouseListenerSentinel implements MouseListener {
 
 		//		@Override
 		public void mouseClicked(MouseEvent e) {
+			System.out.println(new Vector2d(screenToSimulationX(e.getX()),screenToSimulationY(e.getY())));
 			for (Robot robot : simulator.getEnvironment().getRobots()) {
 				int circleDiameter = (int) Math.round(0.5 + robot.getDiameter() * scale);
 				int x1 = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);

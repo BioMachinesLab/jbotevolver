@@ -22,14 +22,14 @@ import simulation.util.Arguments;
 @SuppressWarnings("serial")
 public class WallRaySensor extends ConeTypeSensor {
 
-	private int numberOfRays = 7;
-	private double[][] rayReadings;
+	protected int numberOfRays = 7;
+	protected double[][] rayReadings;
 	
 	protected Random random;
-	private Vector2d[][] cones;
-	private Vector2d[] sensorPositions;
-	private double minimumDistances[][];
-	private double cutoffAngle = 90;
+	protected Vector2d[][] cones;
+	protected Vector2d[] sensorPositions;
+	protected double minimumDistances[][];
+	protected double cutoffAngle = 90;
 	
 	public Vector2d[][][] rayPositions;
 	
@@ -59,28 +59,33 @@ public class WallRaySensor extends ConeTypeSensor {
 	
 	private void updateCones() {
 		
-		rayPositions = new Vector2d[numberOfSensors][numberOfRays][2];
-		minimumDistances = new double[numberOfSensors][numberOfRays];
-		
-		for(int sensorNumber = 0 ; sensorNumber < numberOfSensors ; sensorNumber++) {
-			double orientation = angles[sensorNumber] + robot.getOrientation();
+		try {
+			rayPositions = new Vector2d[numberOfSensors][numberOfRays][2];
+			minimumDistances = new double[numberOfSensors][numberOfRays];
 			
-			sensorPositions[sensorNumber].set(
-					Math.cos(orientation) * robot.getRadius() + robot.getPosition().getX(),
-					Math.sin(orientation) * robot.getRadius() + robot.getPosition().getY()
-				);
-			
-			double alpha = (this.openingAngle)/(numberOfRays-1);
-			
-			double halfOpening = openingAngle/2.0;
-			
-			for(int i = 0 ; i < numberOfRays ; i++) {
+			for(int sensorNumber = 0 ; sensorNumber < numberOfSensors ; sensorNumber++) {
+				double orientation = angles[sensorNumber] + robot.getOrientation();
 				
-				cones[sensorNumber][i].set(
-						Math.cos(orientation - halfOpening + alpha*i)* range + sensorPositions[sensorNumber].getX(),
-						Math.sin(orientation - halfOpening + alpha*i)* range + sensorPositions[sensorNumber].getY()
-					 );
+				sensorPositions[sensorNumber].set(
+						Math.cos(orientation) * robot.getRadius() + robot.getPosition().getX(),
+						Math.sin(orientation) * robot.getRadius() + robot.getPosition().getY()
+					);
+				
+				double alpha = (this.openingAngle)/(numberOfRays-1);
+				
+				double halfOpening = openingAngle/2.0;
+				
+				for(int i = 0 ; i < numberOfRays ; i++) {
+					
+					cones[sensorNumber][i].set(
+							Math.cos(orientation - halfOpening + alpha*i)* range + sensorPositions[sensorNumber].getX(),
+							Math.sin(orientation - halfOpening + alpha*i)* range + sensorPositions[sensorNumber].getY()
+						 );
+				}
 			}
+		}catch(Throwable e) {
+			System.out.println("HOLY SHIT");
+			e.printStackTrace();
 		}
 	}
 
@@ -156,8 +161,9 @@ public class WallRaySensor extends ConeTypeSensor {
 			
 			for(int i = 0; i < numberOfSensors; i++){
 				double avg = 0;
-				for(int ray = 0 ; ray < numberOfRays ; ray++)
+				for(int ray = 0 ; ray < numberOfRays ; ray++) {
 					avg+= rayReadings[i][ray]/numberOfRays;
+				}
 				readings[i]=avg;
 			}
 		} catch (Exception e) {

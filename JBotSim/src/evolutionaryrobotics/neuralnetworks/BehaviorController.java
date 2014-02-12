@@ -23,6 +23,7 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 	boolean debugMax = false;
 	private int fixedOutput = -1;
 	private boolean printValues = false;
+	private int switches = 0;
 	
 	public BehaviorController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
@@ -48,6 +49,7 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 			}
 			
 			if(output != currentSubNetwork && !skip) {
+				switches++;
 				currentSubNetwork = output;
 				if(resetChosen) {
 					subControllers.get(currentSubNetwork).reset();
@@ -162,5 +164,9 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 	
 	public int getCurrentSubNetwork() {
 		return currentSubNetwork;
+	}
+	
+	public int getNumberOfSwitches() {
+		return switches;
 	}
 }

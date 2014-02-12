@@ -9,6 +9,7 @@ import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
+import simulation.physicalobjects.checkers.AllowAllRobotsChecker;
 import simulation.physicalobjects.checkers.AllowOrderedLightChecker;
 import simulation.physicalobjects.checkers.AllowOrderedPreyChecker;
 import simulation.physicalobjects.checkers.AllowOrderedRobotsChecker;
@@ -46,7 +47,7 @@ public abstract class Shape implements Serializable {
 		relativePosition = new Vector2d(relativePosX, relativePosY);
 		
 		closeRobots 	 = new ClosePhysicalObjects(simulator.getEnvironment(), 
-				simulator.getTime(), range,new AllowOrderedRobotsChecker(parent.getId()));
+				simulator.getTime(), range,new AllowAllRobotsChecker(parent.getId()));
 		closePrey   	 = new ClosePhysicalObjects(simulator.getEnvironment(), 
 				simulator.getTime(), range,new AllowOrderedPreyChecker(parent.getId()));
 		closeLightPoles  = new ClosePhysicalObjects(simulator.getEnvironment(), 

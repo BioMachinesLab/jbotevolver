@@ -2,8 +2,10 @@ package simulation.environment;
 
 import java.util.LinkedList;
 import java.util.Random;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
+import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;

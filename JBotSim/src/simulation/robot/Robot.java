@@ -5,6 +5,8 @@ import java.awt.event.KeyEvent;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
+
 import simulation.Simulator;
 import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;
@@ -56,6 +58,8 @@ public class Robot extends MovableObject {
 	
 	protected boolean specialWallCollisions = false;
 	protected boolean ignoreRobotToRobotCollisions = false;
+	
+	protected LinkedList<PhysicalObject> collidingObjects = new LinkedList<PhysicalObject>();
 	
 	/**
 	 * Initialize a new robot.
@@ -367,6 +371,10 @@ public class Robot extends MovableObject {
 				return a;
 		}
 		return null;
+	}
+	
+	public LinkedList<PhysicalObject> getCollidingObjects() {
+		return collidingObjects;
 	}
 	
 	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
