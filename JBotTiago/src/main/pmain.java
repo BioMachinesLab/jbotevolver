@@ -6,9 +6,9 @@ public class pmain {
 	
 	public static void main(String[] args) {
 //		PostEvaluation p = new PostEvaluation(new String[] {"dir=Evolution/Foraging/Evo3","samples=100","singleevaluation=1"});
-		PostEvaluation p = new PostEvaluation(new String[] {"dir=../../bigdisk/paper_hugearena/normal_sensores_5hidden/","samples=100","singleevaluation=0","localevaluation=1"});
+		PostEvaluation p = new PostEvaluation(new String[] {"dir=bigdisk/change_orientation/orientation&range/","samples=100","singleevaluation=0","localevaluation=1"});
 		
-		int nRuns = 20;
+		int nRuns = 10;
 		
 		double[][] values = p.runPostEval();
 		

@@ -15,7 +15,7 @@ public class Averages {
 
 			LinkedList<String> runs = new LinkedList<String>();
 			
-			String dir ="/home/tiagor/Documents/bigdisk/genome_sensor_evolution/";
+			String dir ="/home/tiagor/Documents/workspace/JBotTiago/bigdisk/paper_hugearena/";
 			
 			File f = new File(dir);
 			for(File ff : f.listFiles()) {
@@ -37,13 +37,14 @@ public class Averages {
 				
 				int generations = s.nextInt()+1;
 				
-				boolean average = false;
+				boolean average = true;
 				
 				for(int z = 0 ; z < 2 ; z++) {
 					
 					average = !average;
 				
 					double values[] = new double[generations];
+					double realVals[][] = new double[generations][number];
 					
 					double maxValue = 0;
 					
@@ -65,6 +66,7 @@ public class Averages {
 //									System.out.println(run + i +" "+gen+" "+val);
 									if(average) {
 										values[gen]+= val;
+										realVals[gen][i-1] = val;
 									}else{
 										values[gen] = Math.max(val,values[gen]);
 										maxValue = Math.max(maxValue,values[gen]);
@@ -75,15 +77,27 @@ public class Averages {
 						}
 					}
 					
-					PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter((average? "a" : "b") + "_"+run+".txt")));
+					PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("plots/"+(average? "a" : "b") + "_"+run+".txt")));
 					
 					String ss="";
+					
+					double deviation[] = new double[generations];
 					
 					for(int i = 0 ; i < values.length ; i++) {
 						if(average) {
 							values[i]/=number;
+							
+							for (int j = 0; j < realVals[i].length; j++) {
+								deviation[i] += Math.pow((realVals[i][j]-values[i]),2);
+							}
+							deviation[i] /= number;
+							deviation[i] = Math.sqrt(deviation[i]);
+							
 						}
-						ss+=i+" "+values[i]+"\n";
+						if(average)
+							ss+=i+" "+values[i]+" "+(values[i] + deviation[i])+" "+(values[i] - deviation[i])+"\n";
+						else
+							ss+=i+" "+values[i]+"\n";
 					}
 					out.println(ss);
 					out.close();
@@ -102,7 +116,7 @@ public class Averages {
 	
 	static void createPlotAllFile(LinkedList<String> strings) {
 		try {
-			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("plot_all.sh")));
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("plots/plot_all.sh")));
 			
 			out.println("#!/bin/bash");
 			for(String s : strings) {
@@ -118,7 +132,7 @@ public class Averages {
 	static void createPlotFile(String name, double x, double y) {
 		String template = "";
 		try {
-			Scanner s = new Scanner(new File("template.sh"));
+			Scanner s = new Scanner(new File("template_deviation.sh"));
 			
 			while(s.hasNextLine()) {
 				template+=s.nextLine()+"\n";
@@ -129,7 +143,7 @@ public class Averages {
 			template = template.replaceAll("_MAX_", "b_"+name+".txt");
 			template = template.replaceAll("_AVG_", "a_"+name+".txt");
 			
-			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("plot_"+name+".sh")));
+			PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("plots/plot_"+name+".sh")));
 			out.println(template);
 			out.close();
 		} catch (Exception e) {
