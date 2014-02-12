@@ -8,13 +8,13 @@ import simulation.util.Arguments;
 
 public class TwoRoomsMultiPreyEnvironment extends TwoRoomsMultiEnvironment {
 	
-	private Prey prey;
-	private boolean preyRoomRight;
-	private double preyDistance = 0.15;
-	private int preysCaught = 0;
-	private boolean preySameRoom = false;
-	private boolean includePrey = true;
-	private boolean heavyPrey = true;
+	protected Prey prey;
+	protected boolean preyRoomRight;
+	protected double preyDistance = 0.15;
+	protected int preysCaught = 0;
+	protected boolean preySameRoom = false;
+	protected boolean includePrey = true;
+	protected boolean heavyPrey = true;
 	
 	public TwoRoomsMultiPreyEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator,arguments);
@@ -28,14 +28,14 @@ public class TwoRoomsMultiPreyEnvironment extends TwoRoomsMultiEnvironment {
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
 		
-		prey = new Prey(simulator,"prey",new Vector2d(0,0),0,heavyPrey ? Integer.MAX_VALUE : 100,0.05);
+		prey = new Prey(simulator,"prey",new Vector2d(0,0),0,heavyPrey ? robots.size() : 1,0.05);
 		addPrey(prey);
 		
 		preyRoomRight = random.nextDouble() > 0.5;
 		placePrey();
 	}
 	
-	private void placePrey() {
+	public void placePrey() {
 		
 		if(preySameRoom)
 			preyRoomRight = true;

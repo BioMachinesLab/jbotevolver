@@ -10,15 +10,19 @@ import simulation.util.Arguments;
 
 public class TwoRoomsMultiEnvironment extends TwoRoomsEnvironment {
 	
-	private double maxSize = 0.4;
-	private double minSize = 0.75;
-	private boolean aggregateRobots = true;
-	private boolean specialDoor = false;
-	private boolean firstDoorClosed = false;
-	private boolean openDoorAuto = false;
-	private boolean autoCloseDoor = false;
-	private boolean minMaxSize = false;
-	private boolean holdDoor = false;
+	protected double maxSize = 0.4;
+	protected double minSize = 0.75;
+	protected boolean aggregateRobots = true;
+	protected boolean specialDoor = false;
+	protected boolean firstDoorClosed = false;
+	protected boolean openDoorAuto = false;
+	protected boolean autoCloseDoor = false;
+	protected boolean minMaxSize = false;
+	protected boolean holdDoor = false;
+	private boolean robotInsideCorridor = false;
+	protected double buttonDistance = 0;
+	protected double delayDoor = 0;
+	protected double currentDelayDoor = 0;
 	
 	public TwoRoomsMultiEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator,arguments);
@@ -29,6 +33,13 @@ public class TwoRoomsMultiEnvironment extends TwoRoomsEnvironment {
 		openDoorAuto = arguments.getArgumentAsIntOrSetDefault("opendoorauto", 0) == 1;
 		minMaxSize = arguments.getArgumentAsIntOrSetDefault("minmaxsize", 0) == 1;
 		holdDoor = arguments.getArgumentAsIntOrSetDefault("holddoor", 0) == 1;
+		buttonDistance = arguments.getArgumentAsIntOrSetDefault("buttondistance", 0);
+		delayDoor = arguments.getArgumentAsDoubleOrSetDefault("delaydoor", 0);
+		robotInsideCorridor = arguments.getArgumentAsIntOrSetDefault("robotsinsidecorridor", 0) == 1;
+		
+		if(delayDoor > 0) {
+			delayDoor = simulator.getRandom().nextDouble()*delayDoor;
+		}
 		
 		if(minMaxSize) {
 			minSize = arguments.getArgumentAsDoubleOrSetDefault("minsize", minSize);
@@ -40,7 +51,18 @@ public class TwoRoomsMultiEnvironment extends TwoRoomsEnvironment {
 		
 		int numberOfRobots = simulator.getRobots().size();
 		
-		if(aggregateRobots) {
+		if(robotInsideCorridor) {
+			
+			for(Robot r : simulator.getRobots()) {
+			
+				double randX = random.nextDouble()*(corridorWidth)-corridorWidth/2;
+				double randY = random.nextDouble()*(exitWidth)-exitWidth/2;
+				r.teleportTo(new Vector2d(randX*0.5,randY*0.6));
+				r.setOrientation(random.nextDouble()*Math.PI*2);
+			}
+			
+		
+		}else if(aggregateRobots) {
 			int side = (int)Math.ceil(Math.sqrt(numberOfRobots));
 			int line = 0;
 			int column = 0;
@@ -122,8 +144,14 @@ public class TwoRoomsMultiEnvironment extends TwoRoomsEnvironment {
 //					if(r.getPosition().getX() > corridorWidth/2-0.05 || r.getPosition().getX() < -(corridorWidth/2-0.05))
 //						insideDoor = false;
 //				}
-				if(allRobotsInsideCorridor())
-					closeDoor();
+				if(allRobotsInsideCorridor()) {
+					if(currentDelayDoor >= delayDoor) {
+						currentDelayDoor = 0;
+						closeDoor();
+					} else {
+						currentDelayDoor++;
+					}
+				}
 			}
 		}
 	}
@@ -208,7 +236,7 @@ public class TwoRoomsMultiEnvironment extends TwoRoomsEnvironment {
 	protected boolean allRobotsInsideCorridor() {
 		for(Robot r : robots) {
 			double x = r.getPosition().getX();
-			if(!(x < corridorWidth/2 && x > -corridorWidth/2))
+			if(!(x < corridorWidth/2-0.1 && x > -corridorWidth/2))
 				return false;
 		}
 		return true;

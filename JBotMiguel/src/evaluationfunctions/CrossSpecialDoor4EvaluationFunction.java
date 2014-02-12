@@ -9,7 +9,7 @@ import simulation.util.Arguments;
 import environments.TwoRoomsMultiEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
-public class CrossSpecialDoor3EvaluationFunction extends EvaluationFunction {
+public class CrossSpecialDoor4EvaluationFunction extends EvaluationFunction {
 	
 	private double steps = 0;
 	private double bestMinX = 10000;
@@ -17,7 +17,7 @@ public class CrossSpecialDoor3EvaluationFunction extends EvaluationFunction {
 	private double stayPutBonus = 0;
 	private boolean doorClosed = false;
 
-	public CrossSpecialDoor3EvaluationFunction(Arguments arguments) {
+	public CrossSpecialDoor4EvaluationFunction(Arguments arguments) {
 		super(arguments);
 		doorClosed = arguments.getArgumentAsIntOrSetDefault("doorclosed",0) == 1;
 	}
@@ -32,7 +32,6 @@ public class CrossSpecialDoor3EvaluationFunction extends EvaluationFunction {
 		double maxX = -1000;
 		double minX = 1000;
 		boolean allInside = true;
-		boolean crashed = false;
 		
 		for(int i = 0 ; i <  robots.size() ; i++) {
 			
@@ -55,7 +54,6 @@ public class CrossSpecialDoor3EvaluationFunction extends EvaluationFunction {
 			}
 			
 			if(robots.get(i).isInvolvedInCollison()) {
-				crashed = true;
 				penalty-= 0.001;
 			}
 		}
@@ -69,23 +67,15 @@ public class CrossSpecialDoor3EvaluationFunction extends EvaluationFunction {
 		
 		TwoRoomsMultiEnvironment env = (TwoRoomsMultiEnvironment)simulator.getEnvironment();
 		
-		if(!allInside && crashed) {
-//			penalty-= 0.001;
-		}
-		
 		if(!allInside && env.isFirstDoorClosed() && env.doorsOpen) {
 			simulator.stopSimulation();
 		}
-		
-//		if(allInside) {
-//			fitness+=1;
-//		}
 		
 		if(!doorClosed && !allCrossed && !env.doorsOpen) {
 			simulator.stopSimulation();
 		}
 		
-		if(bestMinX < -0.3) {
+		if(allInside) {
 			fitness+=1;
 		}
 		
@@ -94,7 +84,6 @@ public class CrossSpecialDoor3EvaluationFunction extends EvaluationFunction {
 			fitness+=(steps-simulator.getTime())/steps;
 			simulator.stopSimulation();
 		}
-		
 		fitness+=penalty+stayPutBonus;
 	}
 }

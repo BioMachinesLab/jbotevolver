@@ -1,4 +1,3 @@
-import evolutionaryrobotics.ViewerMain;
 import extensions.ExtendedJBotEvolver;
 
 public class NEATfVMain {

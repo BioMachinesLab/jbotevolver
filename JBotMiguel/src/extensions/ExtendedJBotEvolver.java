@@ -1,10 +1,8 @@
 package extensions;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import mathutils.Vector2d;
 import neatCompatibilityImplementation.ERNEATPopulation;
 import neatCompatibilityImplementation.NEATNetworkController;
 
@@ -19,6 +17,7 @@ import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
@@ -101,6 +100,16 @@ public class ExtendedJBotEvolver extends JBotEvolver {
 					}
 				}
 			}
+		}
+	}
+	
+	@Override
+	public EvaluationFunction getEvaluationFunction() {
+		if(arguments.get("--objective1") == null){
+			return super.getEvaluationFunction();
+		}
+		else {
+			return EvaluationFunction.getEvaluationFunction(arguments.get("--objective1"));
 		}
 	}
 

@@ -1,17 +1,17 @@
 package evaluationfunctions;
 
 import java.util.ArrayList;
+
 import simulation.Simulator;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import environments.TwoRoomsMultiPreyEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.BehaviorController;
 
 public class PreyAggregationExponentialEvaluationFunction extends EvaluationFunction {
 	
-	double robotPercentage;
-	double preyPercentage;
 	double robotDistance;
 	double preyDistance;
 	
@@ -22,14 +22,19 @@ public class PreyAggregationExponentialEvaluationFunction extends EvaluationFunc
 	
 	int preysCaught = 0;
 	
+	boolean killCollision = false;
+	double punishCollision = 0;
+	
+	double penalty = 0;
+	
 	public PreyAggregationExponentialEvaluationFunction(Arguments args) {
 		super(args);
-		this.robotPercentage = args.getArgumentAsDoubleOrSetDefault("robotpercentage", 1);
-		this.preyPercentage = args.getArgumentAsDoubleOrSetDefault("preypercentage", 1);
 		
 		this.preyDistance = args.getArgumentAsDoubleOrSetDefault("preydistance", 1);
 		this.robotDistance = args.getArgumentAsDoubleOrSetDefault("robotdistance", 1);
 		this.onlyOnePrey = args.getArgumentAsIntOrSetDefault("onlyoneprey", 0) == 1;
+		this.killCollision = args.getArgumentAsIntOrSetDefault("killcollision", 0) == 1;
+		this.punishCollision = args.getArgumentAsDoubleOrSetDefault("punishcollision", punishCollision);
 //		this.debug2 = args.getArgumentAsIntOrSetDefault("debug2", 0) == 1;
 	}
 	
@@ -38,11 +43,17 @@ public class PreyAggregationExponentialEvaluationFunction extends EvaluationFunc
 		ArrayList<Robot> robots = simulator.getRobots();
 		
 		double currentFitness = 0;
+		double maxSwitches = 0;
 		
 		for(int i = 0 ; i <  robots.size() ; i++) {
 			
 			if(robots.get(i).isInvolvedInCollison())
-				continue;
+				penalty+=punishCollision;
+			
+			if(robots.get(i).getController() instanceof BehaviorController) {
+				BehaviorController c = (BehaviorController)robots.get(i).getController();
+				maxSwitches = c.getNumberOfSwitches() > maxSwitches ? c.getNumberOfSwitches() : maxSwitches;
+			}
 			
 			double currentRobotFitness = 0;
 			int nearRobots = 0;
@@ -64,7 +75,7 @@ public class PreyAggregationExponentialEvaluationFunction extends EvaluationFunc
 			for(Prey p : simulator.getEnvironment().getPrey()) {
 				double distance = robots.get(i).getPosition().distanceTo(p.getPosition());
 				if(distance < preyDistance) {
-					currentRobotFitness+= (preyDistance-distance);
+					currentRobotFitness+= (preyDistance-distance)/preyDistance;
 				}
 			}
 			
@@ -77,6 +88,11 @@ public class PreyAggregationExponentialEvaluationFunction extends EvaluationFunc
 		}
 
 		fitness+= currentFitness/(double)simulator.getEnvironment().getSteps();
+		
+		if(maxSwitches > simulator.getEnvironment().getSteps()/50.0) {
+			fitness = 0;
+			simulator.stopSimulation();
+		}
 		
 		if(simulator.getEnvironment() instanceof TwoRoomsMultiPreyEnvironment) {
 			preysCaught = ((TwoRoomsMultiPreyEnvironment)simulator.getEnvironment()).getPreysCaught();
@@ -95,6 +111,6 @@ public class PreyAggregationExponentialEvaluationFunction extends EvaluationFunc
 	public double getFitness() {
 		if(onlyOnePrey)
 			return fitness;
-		return fitness+preysCaught;
+		return fitness+preysCaught-penalty;
 	}
 }
