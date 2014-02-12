@@ -39,15 +39,15 @@ public class TwoWheelActuator extends Actuator {
 		leftSpeed*= (1 + random.nextGaussian() * NOISESTDEV);
 		rightSpeed*= (1 + random.nextGaussian() * NOISESTDEV);
 
-		if (leftSpeed < -Robot.MAXIMUMSPEED)
-			leftSpeed = -Robot.MAXIMUMSPEED;
-		else if (leftSpeed > Robot.MAXIMUMSPEED)
-			leftSpeed = Robot.MAXIMUMSPEED;
+		if (leftSpeed < -maxSpeed)
+			leftSpeed = -maxSpeed;
+		else if (leftSpeed > maxSpeed)
+			leftSpeed = maxSpeed;
 
-		if (rightSpeed < -Robot.MAXIMUMSPEED)
-			rightSpeed = -Robot.MAXIMUMSPEED;
-		else if (rightSpeed > Robot.MAXIMUMSPEED)
-			rightSpeed = Robot.MAXIMUMSPEED;
+		if (rightSpeed < -maxSpeed)
+			rightSpeed = -maxSpeed;
+		else if (rightSpeed > maxSpeed)
+			rightSpeed = maxSpeed;
 		((DifferentialDriveRobot) robot).setWheelSpeed(leftSpeed, rightSpeed);
 	}
 
