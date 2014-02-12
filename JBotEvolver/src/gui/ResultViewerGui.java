@@ -19,7 +19,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -51,6 +50,7 @@ import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
 import simulation.util.Arguments;
+import updatables.BlenderExport;
 
 public class ResultViewerGui extends Gui {
 	protected JFrame      frame;
@@ -108,6 +108,7 @@ public class ResultViewerGui extends Gui {
 	protected boolean showNeuralNetwork = false;
 	protected JCheckBox neuralNetworkCheckbox;
 	protected JCheckBox neuralNetworkViewerCheckbox;
+	protected JCheckBox exportToBlender;
 	
 	protected EnvironmentKeyDispatcher dispatcher;
 
@@ -121,7 +122,7 @@ public class ResultViewerGui extends Gui {
 		
 		frame = new JFrame("Result Viewer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1200, 750);
+		frame.setSize(1200, 790);
 	
 		frame.getContentPane().add(initBottomPanel(), BorderLayout.SOUTH);	
 		frame.getContentPane().add(initRightWrapperPanel(), BorderLayout.EAST);
@@ -164,7 +165,7 @@ public class ResultViewerGui extends Gui {
 	protected JPanel initRightWrapperPanel() {
 
 		JPanel sideTopPanel = new JPanel();
-		sideTopPanel.setLayout(new GridLayout(12,1));
+		sideTopPanel.setLayout(new GridLayout(13,1));
 		sideTopPanel.add(startButton);
 		sideTopPanel.add(pauseButton);
 		sideTopPanel.add(quitButton);
@@ -201,6 +202,9 @@ public class ResultViewerGui extends Gui {
 		
 		neuralNetworkViewerCheckbox = new JCheckBox("Show Neural Network #2");
 		sideTopPanel.add(neuralNetworkViewerCheckbox);
+		
+		exportToBlender = new JCheckBox("Export to Blender");
+		sideTopPanel.add(exportToBlender);
 		
 		JPanel sideWrapperPanel = new JPanel();
 		sideWrapperPanel.setLayout(new BorderLayout());
@@ -620,7 +624,8 @@ public class ResultViewerGui extends Gui {
 			if(validFile(filename)) {
 				jBotEvolver.loadFile(filename,extraArguments.getText());
 				simulator = loadSimulator();
-				
+				if(exportToBlender.isSelected())
+					simulator.addCallback(new BlenderExport());
 				if(simulateUntil == 0)
 					playPosition.setValue(0);
 
@@ -787,12 +792,7 @@ public class ResultViewerGui extends Gui {
 		
 		Simulator simulator = jBotEvolver.createSimulator();
 
-		if(args.get("--objective1") == null){
-			evaluationFunction = jBotEvolver.getEvaluationFunction();
-		}
-		else {
-			evaluationFunction = EvaluationFunction.getEvaluationFunction(args.get("--objective1"));
-		}
+		evaluationFunction = jBotEvolver.getEvaluationFunction();
 
 		simulator.addCallback(evaluationFunction);
 		

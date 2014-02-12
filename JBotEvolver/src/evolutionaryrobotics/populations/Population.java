@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
+
+import comm.FileProvider;
+
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import simulation.util.Arguments;
 import simulation.util.Factory;
@@ -368,6 +371,8 @@ public abstract class Population implements Serializable {
 	}
 	
 	private static Population loadSpecificPopulationFromFile(Arguments args, String name) throws Exception{
+		
+		FileProvider fp = FileProvider.getDefaultFileProvider();
 		File f = new File(args.getArgumentAsString("load" + name.toLowerCase()));
 		
 		File populationFile = new File(args.getArgumentAsString("parentfolder")+"/populations/"+f.getName());

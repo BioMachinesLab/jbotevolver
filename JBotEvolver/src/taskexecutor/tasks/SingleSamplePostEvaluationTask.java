@@ -34,15 +34,14 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 	
 	@Override
 	public void run() {
-		
 		jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
 		
 		Simulator simulator = jBotEvolver.createSimulator(new Random(sample));
 		simulator.setFileProvider(getFileProvider());
-		
 		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 		jBotEvolver.setChromosome(robots, chromosome);
 		simulator.addRobots(robots);
+//		jBotEvolver.setupBestIndividual(simulator);
 		EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
 		simulator.addCallback(eval);
 		simulator.simulate();

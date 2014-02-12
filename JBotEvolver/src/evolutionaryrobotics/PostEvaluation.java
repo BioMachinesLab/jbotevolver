@@ -109,10 +109,13 @@ public class PostEvaluation {
 						JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
 						SingleSamplePostEvaluationTask t = new SingleSamplePostEvaluationTask(i,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,targetfitness);
 						taskExecutor.addTask(t);
+						System.out.print(".");
 					}
+					System.out.println();
 				}
+				System.out.println();
 			}
-			
+			System.out.println();
 			for(int i = startTrial ; i <= maxTrial ; i++) {
 				for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
 					for(int sample = 0 ; sample < samples ; sample++) {
