@@ -13,7 +13,7 @@ import simulation.util.Arguments;
 
 public class SharedStateForageEnvironment extends Environment {
 	
-	private static final double PREY_RADIUS = 0.025;
+	private static final double PREY_RADIUS = 0.1;
 	private static final double PREY_MASS = 1000;
 	private LinkedList<Wall> walls;
 	private Random random;

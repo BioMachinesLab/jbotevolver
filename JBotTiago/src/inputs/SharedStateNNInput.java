@@ -15,7 +15,7 @@ public class SharedStateNNInput extends NNInput {
 
 	@Override
 	public int getNumberOfInputValues() {
-		return 1;
+		return sensor.getNumberOfSensors();
 	}
 
 	@Override
