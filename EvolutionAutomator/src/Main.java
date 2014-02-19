@@ -49,6 +49,12 @@ public class Main {
 
 				if(line.startsWith("#"))
 					parseController(s, line);
+				
+				if(line.startsWith("/*")) {
+					do{
+						line = s.nextLine();
+					} while(!line.startsWith("*/"));
+				}
 			}
 			
 			if(testMode)
@@ -211,6 +217,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		Main main = new Main(args);
+//		Main main = new Main(new String[]{"basket.conf"});
 		main.execute();
 	}
 }

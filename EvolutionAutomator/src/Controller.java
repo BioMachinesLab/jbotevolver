@@ -27,8 +27,9 @@ public class Controller {
 			for(String argName : defaultConfigs.keySet())
 				args.put(argName, new Arguments(defaultConfigs.get(argName).getCompleteArgumentString()));
 			
-			for(int i = 0 ; i < options.length ; i+=2)
+			for(int i = 0 ; i < options.length ; i+=2) {
 				args.put(options[i],Arguments.createOrPrependArguments(args.get(options[i]),options[i+1]));
+			}
 			
 			this.skipEvolution = true;
 			
