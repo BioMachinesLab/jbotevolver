@@ -3,12 +3,15 @@ package environment;
 import java.util.LinkedList;
 import java.util.Random;
 
+import controllers.Controller;
+import controllers.RandomRobotController;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
+import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class SharedStateForageEnvironment extends Environment {
@@ -31,6 +34,11 @@ public class SharedStateForageEnvironment extends Environment {
 		super.setup(simulator);
 		addPrey(new Prey(simulator, "Prey ", newRandomPosition(), 0, PREY_MASS, PREY_RADIUS));
 		
+		Arguments programmedRobotArguments = simulator.getArguments().get("--programmedrobots");
+		Robot robot = Robot.getRobot(simulator,programmedRobotArguments);
+		robot.setController(new RandomRobotController(simulator,robot,programmedRobotArguments));
+		addRobot(robot);
+		
 		// Parede do mapa
 		walls.add(new Wall(simulator, "topWall", 0, height/2, Math.PI, 1, 1, 0, width, 0.05, PhysicalObjectType.WALL));
 		walls.add(new Wall(simulator, "bottomWall", 0, -height/2, Math.PI, 1, 1, 0, width, 0.05, PhysicalObjectType.WALL));
@@ -40,11 +48,18 @@ public class SharedStateForageEnvironment extends Environment {
 			addObject(wall);
 		}
 		
+		for (Robot r : getRobots()) {
+			r.setOrientation(random.nextDouble()*(2*Math.PI));
+			
+			double max = 0.5;
+			r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);
+		}
+		
 	}
 	
 	private Vector2d newRandomPosition() {
-		double x = random.nextDouble() * (width - 0.1) - ((width-0.1)/2);
-		double y = random.nextDouble() * (height - 0.1) - ((height-0.1)/2);
+		double x = random.nextDouble() * (width - 0.3) - ((width-0.3)/2);
+		double y = random.nextDouble() * (height - 0.3) - ((height-0.3)/2);
 		return new Vector2d(x, y);
 	}
 
