@@ -1,17 +1,20 @@
 package gui.util;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.Scanner;
 import java.util.Vector;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -23,6 +26,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import simulation.Simulator;
+import simulation.Updatable;
+import simulation.robot.Robot;
+
 import com.panayotis.gnuplot.JavaPlot;
 import com.panayotis.gnuplot.dataset.FileDataSet;
 import com.panayotis.gnuplot.plot.DataSetPlot;
@@ -31,13 +38,7 @@ import com.panayotis.gnuplot.style.PlotStyle;
 import com.panayotis.gnuplot.style.Smooth;
 import com.panayotis.gnuplot.style.Style;
 
-import simulation.Simulator;
-import simulation.Updatable;
-import simulation.robot.Robot;
-import simulation.robot.actuators.Actuator;
-import simulation.robot.behaviors.Behavior;
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
@@ -175,71 +176,122 @@ public class GraphPlotter extends JFrame implements Updatable {
 	 * @param files list of file names of the fitness.log files to plot
 	 */
 	public GraphPlotter(String[] files) {
-		JavaPlot plot = new JavaPlot();
-		FileDataSet fileDataSet;
-		
-		int subStringIndex = 0;
-		int amountOfGoodPlots = 0;
-		
-		for(String s : files)
-			if(!s.isEmpty())
-				amountOfGoodPlots++;
-		
-		if(files.length > 0) {
-			String s = files[0];
-			boolean stop = false;
-			int i = 0;
-			for(i = 1 ; i < s.length() && !stop; i++) {
-				String subString = s.substring(0, i);
-				for(String other : files)
-					if(!other.isEmpty() && !other.startsWith(subString)) stop = true;
-			}
-			subStringIndex = i-2;
-		}
-		
-		if(amountOfGoodPlots == 1)
-			subStringIndex=0;
-		
-		NamedPlotColor[] colors = {NamedPlotColor.RED, NamedPlotColor.BLUE, NamedPlotColor.GREEN, NamedPlotColor.ORANGE, NamedPlotColor.YELLOW,
-				NamedPlotColor.VIOLET, NamedPlotColor.PINK, NamedPlotColor.GOLDENROD, NamedPlotColor.TURQUOISE, NamedPlotColor.SALMON};
-		int colorIndex = 0;
-		
-		for(String s : files) {
-			if(!s.isEmpty()) {
+		if (System.getProperty("os.name").contains("Windows")) {
+			
+			JFrame window = new JFrame();
+			JPanel graphPanel = new JPanel(new BorderLayout());
+			window.getContentPane().add(graphPanel);
+			GraphingData graph = new GraphingData();
+			graphPanel.add(graph);
+			
+			int numberOfPoints = 0;
+			
+			for (String file : files) {
 				try {
-					File f = new File(s);
-					boolean coEvolution = (new File(f.getParent()+"/_ashowbest_current.conf").exists());
-					
-					fileDataSet = new FileDataSet(new File(s));
-					DataSetPlot dataSet = new DataSetPlot(fileDataSet);
-					PlotStyle style = getNewPlotStyle();
-					dataSet.setPlotStyle(style);
-					int currentColor = (colorIndex++)%colors.length;
-					style.setLineType(colors[currentColor]);
-					dataSet.setTitle(s.substring(subStringIndex));
-					
-					plot.addPlot(dataSet);
-					
-					//In co-evolution, the fitness is plotted in pairs
-					if(coEvolution) {
-						DataSetPlot dataSetB = new DataSetPlot(fileDataSet);
-						dataSetB.put("using", "1:5");
-						PlotStyle styleB = getNewPlotStyle();
-						styleB.setStyle(Style.LINESPOINTS);
-						dataSetB.setPlotStyle(styleB);
-						styleB.setLineType(colors[currentColor]);
-						dataSetB.setTitle(s.substring(subStringIndex)+" B");
-						dataSet.setTitle(s.substring(subStringIndex)+" A");
-						plot.addPlot(dataSetB);
+
+			        Scanner sc = new Scanner(new File(file));
+			        int currentNumberOfPoints = 0;
+			        
+			        while (sc.hasNextLine()) {
+			        	String line = sc.nextLine();
+			            if(line.charAt(0) == '#')
+			            	continue;
+			            else{
+			            	line = line.replaceAll(" ", "");
+			            	line = line.replaceAll("\t\t", "\t");
+			            	Double value = Double.valueOf(line.trim().split("\t")[1]);
+			            	graph.addData(value);
+			            	currentNumberOfPoints++;
+			            }
+			            	
+			        }
+			        sc.close();
+			        
+			        if(currentNumberOfPoints > numberOfPoints)
+			        	numberOfPoints = currentNumberOfPoints;
+			    } 
+			    catch (FileNotFoundException e) {
+			        e.printStackTrace();
+			    }
+			}
+			
+
+			graph.setxLabel(numberOfPoints);
+	        graph.setShowLast(numberOfPoints);
+			
+			window.setVisible(true);
+			window.setSize(800,500);
+			window.setLocationRelativeTo(null);
+			window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			
+		}else{
+			
+			JavaPlot plot = new JavaPlot();
+			FileDataSet fileDataSet;
+			
+			int subStringIndex = 0;
+			int amountOfGoodPlots = 0;
+			
+			for(String s : files)
+				if(!s.isEmpty())
+					amountOfGoodPlots++;
+			
+			if(files.length > 0) {
+				String s = files[0];
+				boolean stop = false;
+				int i = 0;
+				for(i = 1 ; i < s.length() && !stop; i++) {
+					String subString = s.substring(0, i);
+					for(String other : files)
+						if(!other.isEmpty() && !other.startsWith(subString)) stop = true;
+				}
+				subStringIndex = i-2;
+			}
+			
+			if(amountOfGoodPlots == 1)
+				subStringIndex=0;
+			
+			NamedPlotColor[] colors = {NamedPlotColor.RED, NamedPlotColor.BLUE, NamedPlotColor.GREEN, NamedPlotColor.ORANGE, NamedPlotColor.YELLOW,
+					NamedPlotColor.VIOLET, NamedPlotColor.PINK, NamedPlotColor.GOLDENROD, NamedPlotColor.TURQUOISE, NamedPlotColor.SALMON};
+			int colorIndex = 0;
+			
+			for(String s : files) {
+				if(!s.isEmpty()) {
+					try {
+						File f = new File(s);
+						boolean coEvolution = (new File(f.getParent()+"/_ashowbest_current.conf").exists());
+						
+						fileDataSet = new FileDataSet(new File(s));
+						DataSetPlot dataSet = new DataSetPlot(fileDataSet);
+						PlotStyle style = getNewPlotStyle();
+						dataSet.setPlotStyle(style);
+						int currentColor = (colorIndex++)%colors.length;
+						style.setLineType(colors[currentColor]);
+						dataSet.setTitle(s.substring(subStringIndex));
+						
+						plot.addPlot(dataSet);
+						
+						//In co-evolution, the fitness is plotted in pairs
+						if(coEvolution) {
+							DataSetPlot dataSetB = new DataSetPlot(fileDataSet);
+							dataSetB.put("using", "1:5");
+							PlotStyle styleB = getNewPlotStyle();
+							styleB.setStyle(Style.LINESPOINTS);
+							dataSetB.setPlotStyle(styleB);
+							styleB.setLineType(colors[currentColor]);
+							dataSetB.setTitle(s.substring(subStringIndex)+" B");
+							dataSet.setTitle(s.substring(subStringIndex)+" A");
+							plot.addPlot(dataSetB);
+						}
+						
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
-					
-				} catch (Exception e) {
-					e.printStackTrace();
 				}
 			}
+			
+			(new Plotter(plot)).start();
 		}
-		
-		(new Plotter(plot)).start();
 		
 		dispose();
 	}
