@@ -75,7 +75,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					drawPreys(graphics, (Prey)m);
 					break;
 				case ROBOT:
-					drawRobot(graphics, (Robot) m);
+					drawCones(graphics, (Robot) m);
 					break;
 				case WALLBUTTON:
 					drawWall((Wall) m);
@@ -87,9 +87,19 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					drawLine((Line) m);
 					break;
 				}
-			}	
+			}
+			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
+				switch(m.getType()){
+				case ROBOT:
+					drawRobot(graphics, (Robot) m);
+				}
+			}
 		}
 		repaint();
+	}
+	
+	protected void drawCones(Graphics g, Robot robot){
+		
 	}
 
 	public void zoomIn() {

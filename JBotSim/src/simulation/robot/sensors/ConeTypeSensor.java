@@ -1,4 +1,4 @@
-package simulation.robot.sensors;
+	package simulation.robot.sensors;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -41,8 +41,10 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected boolean checkObstacles = false;
 	protected double[] obstacleReadings;
 	
-	protected boolean evolvable = false;
+	protected boolean evolvableRange = false;
+	protected boolean evolvableOpeningAngle = false;
 	protected boolean eyes = false;
+	protected boolean epuckSensorsPosition = false;
 	
 	protected double initialRange = 0;
 	protected double initialOpeningAngle = 0;
@@ -59,9 +61,17 @@ public abstract class ConeTypeSensor extends Sensor {
 		openingAngle = Math.toRadians((args.getArgumentIsDefined("angle")) ? args.getArgumentAsDouble("angle") : 90);
 		
 		checkObstacles = args.getArgumentAsIntOrSetDefault("checkobstacles",0) == 1;
-		evolvable = args.getArgumentAsIntOrSetDefault("evolvable",0) == 1;
+		evolvableRange = args.getArgumentAsIntOrSetDefault("evolvablerange",0) == 1; 
+		evolvableOpeningAngle = args.getArgumentAsIntOrSetDefault("evolvableangle",0) == 1;
+		
+		if (args.getArgumentAsIntOrSetDefault("evolvable",0) == 1){
+			evolvableRange = true; 
+			evolvableOpeningAngle = true;
+		}
+		
 		angleposition = args.getArgumentAsDoubleOrSetDefault("forcesensorposition", -1);
 		eyes = args.getArgumentAsIntOrSetDefault("eyes", 0) == 1;
+		epuckSensorsPosition = args.getArgumentAsIntOrSetDefault("epucksensorsposition", 0) == 1;
 
 		cutOff = range;
 		
@@ -71,6 +81,11 @@ public abstract class ConeTypeSensor extends Sensor {
 		if(eyes){
 			angles[0]= Math.toRadians(17);
 			angles[1]= Math.toRadians(343);
+		}else if(epuckSensorsPosition){
+			angles[0]= Math.toRadians(17);
+			angles[1]= Math.toRadians(90);
+			angles[2]= Math.toRadians(270);
+			angles[3]= Math.toRadians(343);
 		}else if(angleposition < 0)
 			setupPositions(numberOfSensors);
 		else
@@ -238,26 +253,46 @@ public abstract class ConeTypeSensor extends Sensor {
 	
 	@Override
 	public int getNumberExtraParameters() {
-		if(evolvable)
-			return 2;
-		else
-			return 0;
+		
+		int extraParams = 0;
+		
+		if(evolvableRange)
+			extraParams++;
+		if(evolvableOpeningAngle)
+			extraParams++;
+			
+		return extraParams;
 	}
 	
 	@Override
 	public void setExtraParameters(double[] parameters) {
-		if(evolvable) {
-			setRange(normalize(parameters[0])*initialRange);
-			setCutOff(normalize(parameters[0])*initialRange);
+		
+		int param = 0;
+		
+		if(evolvableRange) {
+			setRange(normalize(parameters[param])*initialRange);
+			setCutOff(normalize(parameters[param])*initialRange);
+			param++;
+		}
+		if(evolvableOpeningAngle){
 //			System.out.println("RANGE: "+ range);
-			setOpeningAngle(normalize(parameters[1])*initialOpeningAngle);
+			setOpeningAngle(normalize(parameters[param])*initialOpeningAngle);
 //			System.out.println("ANGLE: "+ Math.toDegrees(openingAngle));
+			param++;
 		}
 	}
 	
 	public double normalize(double parameter) {
 		//from [-10;10] to [0;1]
 		return (parameter+10.0)/20.0;
+	}
+	
+	public double getInitialOpeningAngle() {
+		return initialOpeningAngle;
+	}
+	
+	public double getInitialRange() {
+		return initialRange;
 	}
 
 }

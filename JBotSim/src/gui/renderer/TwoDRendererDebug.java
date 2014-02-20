@@ -143,10 +143,12 @@ public class TwoDRendererDebug extends TwoDRenderer {
 				WallRaySensor wall = (WallRaySensor)s;
 				drawLines(wall.rayPositions, graphics);
 			}
-		}	
+		}
 		
-		if(coneSensorId >= 0 || !coneClass.isEmpty()){
-			
+	}
+
+	protected void drawCones(Graphics graphics, Robot robot){
+		if(coneSensorId >= 0 || !coneClass.isEmpty()){	
 			for(Sensor s : robot.getSensors())
 				if(s.getClass().getSimpleName().equals(coneClass) || s.getId() == coneSensorId){
 					if(s != null){
@@ -187,11 +189,8 @@ public class TwoDRendererDebug extends TwoDRenderer {
 					}
 				}
 		}
-			
-			
-		
 	}
-
+	
 	public int getSelectedRobot() {
 		return selectedRobot;
 	}
