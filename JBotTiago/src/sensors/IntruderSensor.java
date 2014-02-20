@@ -42,7 +42,7 @@ public class IntruderSensor extends ConeTypeSensor {
 			foundIntruder = true;
 			calculateOrientation(sensorInfo);
 			calculateEstimatedIntruderPosition();
-			return 1;
+			return ((openingAngle/2) - Math.abs(intruderOrientation)) / (openingAngle/2);
 		}else
 			return 0;		
 	}

@@ -53,8 +53,6 @@ public class SharedStateSensor extends ConeTypeSensor {
 			return 0;
 		} else if (robotsSeeingIntruder == 1) {
 			Vector2d estimation = valid.getEstimatedIntruder();
-			if(estimation==null)
-				System.out.println();
 			return calculateValue(i,estimation);
 		} else {
 			return calculateValue(i,source.getObject().getPosition());

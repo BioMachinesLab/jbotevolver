@@ -22,7 +22,7 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 
 	@Override
 	public void update(Simulator simulator) {
-		double numberIntruders = 0;
+//		double numberIntruders = 0;
 		Prey p = simulator.getEnvironment().getPrey().get(0);
 		
 		if(sensors == null) {
@@ -33,37 +33,52 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 				sensors[j] = s;
 			}	
 		}
-
+		
+		double bonus = 0;  
+		
 		for(int j = 0 ; j < sensors.length ; j++){
 			IntruderSensor s = sensors[j];
 			if (s.foundIntruder()) {
-				numberIntruders++;
-				double angle = Math.abs(s.getIntruderOrientation());
-				if (angle <= 7){
-					double reward = (s.getInitialOpeningAngle()/2-angle)/(s.getInitialOpeningAngle()/2);
-					fitness += reward * 1.0/simulator.getRobots().size()/simulator.getEnvironment().getSteps();
-				}
+//				double angle = Math.abs(s.getIntruderOrientation());
+				bonus += s.getSensorReading(0)/simulator.getRobots().size();
+//				if (angle <= 7){
+//					numberIntruders++;
+//					double reward = (s.getInitialOpeningAngle()/2-angle)/(s.getInitialOpeningAngle()/2);
+//					fitness += reward * 1.0/simulator.getRobots().size()/simulator.getEnvironment().getSteps();
+//				}
 			}
 		}
+		if(bonus > 0) {
+			bonus /= (double)simulator.getEnvironment().getSteps();
+			fitness+=bonus;
+		}
+		
 		
 		for (Robot r : simulator.getRobots()) {
 			double distanceToPrey = r.getPosition().distanceTo(p.getPosition()) - (r.getRadius() - p.getRadius());
-			
-			if (distanceToPrey < 1)
-				fitness += (1-distanceToPrey) * 0.2/simulator.getRobots().size()/simulator.getEnvironment().getSteps();
-			
+//			
+//			if (distanceToPrey < 1)
+//				fitness += (1-distanceToPrey) * 0.2/simulator.getRobots().size()/simulator.getEnvironment().getSteps();
+//			
 			DifferentialDriveRobot dr = (DifferentialDriveRobot) r;			
 			averageWheelSpeed += ((dr.getLeftWheelSpeed() + dr.getRightWheelSpeed())/2)/simulator.getRobots().size();
 			
+			if(r.isInvolvedInCollison()){                                                                           
+				simulator.stopSimulation();                                                                                    
+			} 
+		
+			if(distanceToPrey < 0.5){                                                                               
+				fitness += distanceToPrey * 0.2/simulator.getRobots().size()/simulator.getEnvironment().getSteps();    
+			} 
+			
 		}
 		
-		if (numberIntruders == simulator.getRobots().size()){
-			simulator.stopSimulation();
-			fitness += 1 + (simulator.getEnvironment().getSteps() - simulator.getTime())/simulator.getEnvironment().getSteps();
-		}
+//		if (numberIntruders == simulator.getRobots().size()){
+//			simulator.stopSimulation();
+//			fitness += 1 + (simulator.getEnvironment().getSteps() - simulator.getTime())/simulator.getEnvironment().getSteps();
+//		}
 
 		timesteps = simulator.getTime();
-		
 		
 	}
 	
