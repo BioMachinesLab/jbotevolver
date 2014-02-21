@@ -188,10 +188,16 @@ public class GraphPlotter extends JFrame implements Updatable {
 			
 			for (String file : files) {
 				try {
-
-			        Scanner sc = new Scanner(new File(file));
-			        Vector<Double> dataList = new Vector<Double>();
-	 		        int currentNumberOfPoints = 0;
+					
+					File fitnessFile = new File(file);
+					File generationsFile = new File(fitnessFile.getParent() + "\\_generationnumber");
+					
+					Scanner sc = new Scanner(generationsFile);
+					int totalGenerations = sc.nextInt();
+					sc.close();
+					
+			        sc = new Scanner(fitnessFile);
+			        Double[] dataList = new Double[totalGenerations+1];
 			        
 			        while (sc.hasNextLine()) {
 			        	String line = sc.nextLine();
@@ -202,16 +208,16 @@ public class GraphPlotter extends JFrame implements Updatable {
 			            	line = line.replaceAll("\t\t", "\t");
 			            	String[] lineValues = line.trim().split("\t");
 			            	lineValues = removeBlankSpaceOnArray(lineValues);
+			            	int generation = Integer.valueOf(lineValues[0]);
 			            	Double value = Double.valueOf(lineValues[1]);
-			            	dataList.add(value);
-			            	currentNumberOfPoints++;
+			            	dataList[generation] = value;
 			            }
 			            	
 			        }
 			        sc.close();
 			        
-			        if(currentNumberOfPoints > numberOfPoints)
-			        	numberOfPoints = currentNumberOfPoints;
+			        if(totalGenerations > numberOfPoints)
+			        	numberOfPoints = totalGenerations;
 			        
 			        graph.addDataList(dataList);
 			    } 
@@ -221,7 +227,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 			}
 			
 
-			graph.setxLabel(numberOfPoints);
+			graph.setxLabel(numberOfPoints+1);
 	        graph.setShowLast(numberOfPoints);
 			
 			window.setVisible(true);

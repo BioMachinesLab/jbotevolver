@@ -12,14 +12,14 @@ import java.util.Vector;
 
 import javax.swing.JPanel;
 
-import com.panayotis.gnuplot.style.NamedPlotColor;
-
 public class GraphingData extends JPanel {
-	private static final int MAX = 4000;
+//	private static final int MAX = 4000;
 	private int showLast = 2000;
-	Vector<Double> data = new Vector<Double>();
 	final int PAD = 20;
 	private String xLabel = "Generations";
+	private double max = 0;
+	private double xInc = 0;
+	private double scale = 0;
 	
 	private Vector<Vector<Double>> listOfData = new Vector<Vector<Double>>();
 
@@ -31,8 +31,13 @@ public class GraphingData extends JPanel {
 //		repaint();
 //	}
 	
-	public void addDataList(Vector<Double> dataList){
-		listOfData.add(dataList);
+	public void addDataList(Double[] dataList){
+		Vector<Double> aux = new Vector<Double>();
+		
+		for (int i = 0; i < dataList.length; i++) 
+			aux.add(dataList[i]);
+		
+		listOfData.add(aux);
 	}
 
 	public int getShowLast() {
@@ -79,17 +84,26 @@ public class GraphingData extends JPanel {
 		
 		Color[] colors = {Color.BLUE, Color.GREEN, Color.ORANGE, Color.YELLOW, Color.BLACK, Color.CYAN, Color.DARK_GRAY, Color.MAGENTA};
 		int colorIndex = 0;
+
+		for (Vector<Double> dataList : listOfData) {
+			double currentMax = getMax(dataList);
+			
+			if(currentMax > max)
+				max = currentMax;
+			
+			xInc = (double) (w - 2 * PAD) / (showLast - 1);
+			scale = (double) (h - 2 * PAD) / max;
+		}
 		
 		for (Vector<Double> dataList : listOfData) {
+			
+			Vector<Double> data = new Vector<Double>();
+			
 			data.addAll(dataList);
 			
 			int currentColor = (colorIndex++)%colors.length;
-			
-			// Draw lines.
-			double max = getMax();
-			double xInc = (double) (w - 2 * PAD) / (showLast - 1);
-			double scale = (double) (h - 2 * PAD) / max;
 
+			// Draw lines.
 			int init = Math.max(0, data.size() - showLast);
 			g2.setPaint(colors[currentColor]);
 			for (int i = init; i < data.size() - 1; i++) {
@@ -99,10 +113,7 @@ public class GraphingData extends JPanel {
 				double y2 = h - PAD - scale * data.get(i + 1);
 				g2.draw(new Line2D.Double(x1, y1, x2, y2));
 			}
-
-			g2.setPaint(Color.black);
-			g2.drawString(String.valueOf(max), 0, (int) (h - PAD - scale * max));
-
+			
 			// Mark data points.
 			g2.setPaint(Color.red);
 			for (int i = Math.max(0, data.size() - showLast); i < data.size(); i++) {
@@ -110,16 +121,20 @@ public class GraphingData extends JPanel {
 				double y = h - PAD - scale * data.get(i);
 				g2.fill(new Ellipse2D.Double(x - 2, y - 2, 4, 4));
 			}
-			
-			data = new Vector<Double>();
+
 		}
+		
+		g2.setPaint(Color.black);
+		double scale = (double) (h - 2 * PAD) / max;
+		g2.drawString(String.valueOf(max), 0, (int) (h - PAD - scale * max));
+		
 	}
 
-	private double getMax() {
+	private double getMax(Vector<Double> dataList) {
 		double max = -Integer.MAX_VALUE;
-		for (int i = Math.max(0, data.size() - showLast); i < data.size(); i++) {
-			if (data.get(i) > max)
-				max = data.get(i);
+		for (int i = Math.max(0, dataList.size() - showLast); i < dataList.size(); i++) {
+			if (dataList.get(i) > max)
+				max = dataList.get(i);
 		}
 		return max;
 	}
