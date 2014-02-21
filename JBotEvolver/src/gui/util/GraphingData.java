@@ -51,7 +51,13 @@ public class GraphingData extends JPanel {
 
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
+		
+		g.setColor(Color.WHITE);
+		g.fillRect(0, 0, getWidth(), getHeight());
+		g.setColor(Color.BLACK);
+		
 		Graphics2D g2 = (Graphics2D) g;
+		
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 		int w = getWidth();
@@ -82,7 +88,7 @@ public class GraphingData extends JPanel {
 		float sx = (w - sw) / 2;
 		g2.drawString(s, sx, sy);
 		
-		Color[] colors = {Color.BLUE, Color.GREEN, Color.ORANGE, Color.YELLOW, Color.BLACK, Color.CYAN, Color.DARK_GRAY, Color.MAGENTA};
+		Color[] colors = {Color.RED, Color.BLUE, Color.GREEN, Color.ORANGE, Color.BLACK, Color.CYAN, Color.DARK_GRAY, Color.MAGENTA,Color.YELLOW,};
 		int colorIndex = 0;
 
 		for (Vector<Double> dataList : listOfData) {
@@ -115,12 +121,12 @@ public class GraphingData extends JPanel {
 			}
 			
 			// Mark data points.
-			g2.setPaint(Color.red);
-			for (int i = Math.max(0, data.size() - showLast); i < data.size(); i++) {
-				double x = PAD + (i - init) * xInc;
-				double y = h - PAD - scale * data.get(i);
-				g2.fill(new Ellipse2D.Double(x - 2, y - 2, 4, 4));
-			}
+//			g2.setPaint(Color.red);
+//			for (int i = Math.max(0, data.size() - showLast); i < data.size(); i++) {
+//				double x = PAD + (i - init) * xInc;
+//				double y = h - PAD - scale * data.get(i);
+//				g2.fill(new Ellipse2D.Double(x - 2, y - 2, 4, 4));
+//			}
 
 		}
 		

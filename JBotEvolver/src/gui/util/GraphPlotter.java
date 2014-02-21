@@ -1,6 +1,7 @@
 package gui.util;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -177,7 +178,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 	 */
 	public GraphPlotter(String[] files) {
 		if (System.getProperty("os.name").contains("Windows")) {
-			
 			JFrame window = new JFrame();
 			JPanel graphPanel = new JPanel(new BorderLayout());
 			window.getContentPane().add(graphPanel);
