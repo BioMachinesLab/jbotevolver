@@ -190,7 +190,8 @@ public class GraphPlotter extends JFrame implements Updatable {
 				try {
 
 			        Scanner sc = new Scanner(new File(file));
-			        int currentNumberOfPoints = 0;
+			        Vector<Double> dataList = new Vector<Double>();
+	 		        int currentNumberOfPoints = 0;
 			        
 			        while (sc.hasNextLine()) {
 			        	String line = sc.nextLine();
@@ -199,8 +200,10 @@ public class GraphPlotter extends JFrame implements Updatable {
 			            else{
 			            	line = line.replaceAll(" ", "");
 			            	line = line.replaceAll("\t\t", "\t");
-			            	Double value = Double.valueOf(line.trim().split("\t")[1]);
-			            	graph.addData(value);
+			            	String[] lineValues = line.trim().split("\t");
+			            	lineValues = removeBlankSpaceOnArray(lineValues);
+			            	Double value = Double.valueOf(lineValues[1]);
+			            	dataList.add(value);
 			            	currentNumberOfPoints++;
 			            }
 			            	
@@ -209,6 +212,8 @@ public class GraphPlotter extends JFrame implements Updatable {
 			        
 			        if(currentNumberOfPoints > numberOfPoints)
 			        	numberOfPoints = currentNumberOfPoints;
+			        
+			        graph.addDataList(dataList);
 			    } 
 			    catch (FileNotFoundException e) {
 			        e.printStackTrace();
@@ -296,6 +301,23 @@ public class GraphPlotter extends JFrame implements Updatable {
 		dispose();
 	}
 	
+	private String[] removeBlankSpaceOnArray(String[] lineValues) {
+		ArrayList<String> list = new ArrayList<String>();
+		int j = 0;
+		
+		for (int i = 0; i < lineValues.length; i++) {
+			if(!lineValues[i].equals(""))
+				list.add(lineValues[i]);
+		}
+		
+		String[] result = new String[list.size()];
+		for (int i = 0; i < list.size(); i++) {
+			result[i] = list.get(i);
+		}
+		
+		return result;
+	}
+
 	private PlotStyle getNewPlotStyle() {
 		PlotStyle myPlotStyle = new PlotStyle();
 		myPlotStyle.setStyle(Style.LINES);
