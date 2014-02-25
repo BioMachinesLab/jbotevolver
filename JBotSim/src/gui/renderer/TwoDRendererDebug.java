@@ -107,16 +107,16 @@ public class TwoDRendererDebug extends TwoDRenderer {
 			
 		graphics.setColor(Color.BLACK);
 		
-		System.out.println("Robot ID: "+robot.getId());
-		System.out.println("\n Actuators:");
-		for(Actuator act:robot.getActuators()){
-			System.out.println(act);
-		}
-		System.out.println("\n Sensors:");
-		for(Sensor sensor:robot.getSensors()){
-			System.out.println(sensor);
-		}
-		System.out.println("\n\n");
+//		System.out.println("Robot ID: "+robot.getId());
+//		System.out.println("\n Actuators:");
+//		for(Actuator act:robot.getActuators()){
+//			System.out.println(act);
+//		}
+//		System.out.println("\n Sensors:");
+//		for(Sensor sensor:robot.getSensors()){
+//			System.out.println(sensor);
+//		}
+//		System.out.println("\n\n");
 		
 		if(robot instanceof Epuck) {
 			Sensor s = robot.getSensorByType(EpuckIRSensor.class);

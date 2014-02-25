@@ -13,7 +13,7 @@ public class SimpleMouseSensor extends SimpleLightTypeSensor {
 	public SimpleMouseSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
-		setAllowedObjectsChecker(new AllowMouseChecker());
+		setAllowedObjectsChecker(new AllowMouseChecker(id));
 		
 		initAngles();
 	}
