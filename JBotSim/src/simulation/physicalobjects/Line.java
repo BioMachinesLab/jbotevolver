@@ -46,5 +46,17 @@ public class Line extends PhysicalObject{
 		}
 		return fromPoint.distanceTo(position);
 	}
+	
+	public Vector2d getIntersection(Vector2d fromPoint) {
+		
+		Vector2d light = new Vector2d(position);
+		lightDirection.set(light.getX()-fromPoint.getX(),light.getY()-fromPoint.getY());
+
+		Vector2d intersection = intersectsWithLineSegment(lightDirection,fromPoint);
+		if(intersection != null) {
+			return intersection;
+		}
+		return null;
+	}
 
 }

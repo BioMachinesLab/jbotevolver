@@ -37,6 +37,12 @@ public class Simulator implements Serializable {
 		this.arguments = arguments;
 		this.environment = Environment.getEnvironment(this, arguments.get("--environment"));
 		calculator = new GeometricCalculator();
+		
+		Arguments args = arguments.get("--simulator");
+		
+		if(args != null) {
+			timeDelta = args.getArgumentAsDoubleOrSetDefault("timedelta", timeDelta);
+		}
 	}
 	
 	public Double getTime(){
