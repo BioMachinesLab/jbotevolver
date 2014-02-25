@@ -1,5 +1,7 @@
 package evaluationfunctions;
 
+import java.util.ArrayList;
+
 import sensors.IntruderSensor;
 import simulation.Simulator;
 import simulation.physicalobjects.Prey;
@@ -23,14 +25,22 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 	@Override
 	public void update(Simulator simulator) {
 //		double numberIntruders = 0;
-		Prey p = simulator.getEnvironment().getPrey().get(0);
+		Robot prey = null;
+		
+		for (Robot r : simulator.getEnvironment().getRobots()) {
+			if(r.getDescription().equals("prey")){
+				prey = r;
+			}
+		}
 		
 		if(sensors == null) {
-			sensors = new IntruderSensor[simulator.getRobots().size()];
+			sensors = new IntruderSensor[simulator.getRobots().size()-1];
 			
 			for (int j = 0; j < simulator.getRobots().size(); j++) {
-				IntruderSensor s = (IntruderSensor)simulator.getRobots().get(j).getSensorByType(IntruderSensor.class);
-				sensors[j] = s;
+				if(!simulator.getRobots().get(j).getDescription().equals("prey")){
+					IntruderSensor s = (IntruderSensor)simulator.getRobots().get(j).getSensorByType(IntruderSensor.class);
+					sensors[j] = s;
+				}
 			}	
 		}
 		
@@ -40,7 +50,7 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 			IntruderSensor s = sensors[j];
 			if (s.foundIntruder()) {
 //				double angle = Math.abs(s.getIntruderOrientation());
-				bonus += s.getSensorReading(0)/simulator.getRobots().size();
+				bonus += s.getSensorReading(0)/(simulator.getRobots().size()-1);
 //				if (angle <= 7){
 //					numberIntruders++;
 //					double reward = (s.getInitialOpeningAngle()/2-angle)/(s.getInitialOpeningAngle()/2);
@@ -55,22 +65,24 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 		
 		
 		for (Robot r : simulator.getRobots()) {
-			double distanceToPrey = r.getPosition().distanceTo(p.getPosition()) - (r.getRadius() - p.getRadius());
-//			
-//			if (distanceToPrey < 1)
-//				fitness += (1-distanceToPrey) * 0.2/simulator.getRobots().size()/simulator.getEnvironment().getSteps();
-//			
-			DifferentialDriveRobot dr = (DifferentialDriveRobot) r;			
-			averageWheelSpeed += ((dr.getLeftWheelSpeed() + dr.getRightWheelSpeed())/2)/simulator.getRobots().size();
 			
-			if(r.isInvolvedInCollison()){                                                                           
-				simulator.stopSimulation();                                                                                    
-			} 
-		
-			if(distanceToPrey < 0.5){                                                                               
-				fitness += distanceToPrey * 0.2/simulator.getRobots().size()/simulator.getEnvironment().getSteps();    
-			} 
+			if(!r.getDescription().equals("prey")){
+//				double distanceToPrey = r.getPosition().distanceTo(prey.getPosition()) - (r.getRadius() - prey.getRadius());
+//				
+//				if (distanceToPrey < 1)
+//					fitness += (1-distanceToPrey) * 0.2/simulator.getRobots().size()/simulator.getEnvironment().getSteps();
+//				
+				DifferentialDriveRobot dr = (DifferentialDriveRobot) r;			
+				averageWheelSpeed += ((dr.getLeftWheelSpeed() + dr.getRightWheelSpeed())/2)/(simulator.getRobots().size()-1);
+				
+//				if(r.isInvolvedInCollison()){                                                                           
+//					simulator.stopSimulation();                                                                                    
+//				} 
 			
+//				if(distanceToPrey < 0.5){                                                                               
+//					fitness += distanceToPrey * 0.2/simulator.getRobots().size()/simulator.getEnvironment().getSteps();    
+//				} 
+			}
 		}
 		
 //		if (numberIntruders == simulator.getRobots().size()){

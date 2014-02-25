@@ -8,8 +8,8 @@ import simulation.util.Arguments;
 
 public class ChangeSensorActuator extends Actuator {
 	
-	private double range;
-	private double openingAngle;
+	private double range = 1;
+	private double openingAngle = 1;
 	private double orientation;
 	private double maxRange;
 	private double maxOpeningAngle;

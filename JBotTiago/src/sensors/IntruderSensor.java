@@ -4,7 +4,7 @@ import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
-import simulation.physicalobjects.checkers.AllowPreyChecker;
+import simulation.physicalobjects.checkers.AllowMouseChecker;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
@@ -19,12 +19,13 @@ public class IntruderSensor extends ConeTypeSensor {
 	public IntruderSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
-		setAllowedObjectsChecker(new AllowPreyChecker(robot.getId()));
+		setAllowedObjectsChecker(new AllowMouseChecker(id));
 		metersAhead = args.getArgumentAsDoubleOrSetDefault("metersahead", 0.5);
 	}
 	
 	@Override
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
+		foundIntruder = false;
 		for(int j = 0; j < readings.length; j++){
 			if(openingAngle > 0.018){ //1degree
 				readings[j] = calculateContributionToSensor(j, source);
@@ -36,19 +37,20 @@ public class IntruderSensor extends ConeTypeSensor {
 	protected double calculateContributionToSensor(int i, PhysicalObjectDistance source) {
 		
 		GeometricInfo sensorInfo = getSensorGeometricInfo(i, source);
-		foundIntruder = false;
 		
 		if((sensorInfo.getDistance() < getCutOff()) && (sensorInfo.getAngle() < (openingAngle / 2.0)) && (sensorInfo.getAngle() > (-openingAngle / 2.0))) {
 			foundIntruder = true;
-			calculateOrientation(sensorInfo);
+			calculateOrientation(sensorInfo,angles[i]);
 			calculateEstimatedIntruderPosition();
-			return ((openingAngle/2) - Math.abs(intruderOrientation)) / (openingAngle/2);
+			return ((openingAngle/2) - Math.abs(sensorInfo.getAngle())) / (openingAngle/2);
 		}else
 			return 0;		
 	}
 
-	private void calculateOrientation(GeometricInfo sensorInfo) {
-		intruderOrientation = sensorInfo.getAngle();
+	private void calculateOrientation(GeometricInfo sensorInfo, double offset) {
+		if(offset > Math.PI)
+			offset-=Math.PI*2;
+		intruderOrientation = sensorInfo.getAngle() - offset;
 	}
 	
 	private void calculateEstimatedIntruderPosition(){

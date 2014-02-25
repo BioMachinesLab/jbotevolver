@@ -4,6 +4,7 @@ import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
+import simulation.physicalobjects.checkers.AllowMouseChecker;
 import simulation.physicalobjects.checkers.AllowPreyChecker;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
@@ -18,7 +19,7 @@ public class SharedStateSensor extends ConeTypeSensor {
 			Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;
-		setAllowedObjectsChecker(new AllowPreyChecker(robot.getId()));
+		setAllowedObjectsChecker(new AllowMouseChecker(id));
 	}
 
 	@Override
@@ -27,11 +28,13 @@ public class SharedStateSensor extends ConeTypeSensor {
 		int robotsSeeingIntruder = 0;
 		
 		if(sensors == null) {
-			sensors = new IntruderSensor[simulator.getRobots().size()];
+			sensors = new IntruderSensor[simulator.getRobots().size()-1];
 			
 			for (int j = 0; j < simulator.getRobots().size(); j++) {
-				IntruderSensor s = (IntruderSensor)simulator.getRobots().get(j).getSensorByType(IntruderSensor.class);
-				sensors[j] = s;
+				if(!simulator.getRobots().get(j).getDescription().equals("prey")){
+					IntruderSensor s = (IntruderSensor)simulator.getRobots().get(j).getSensorByType(IntruderSensor.class);
+					sensors[j] = s;
+				}
 			}	
 		}
 		
@@ -57,6 +60,7 @@ public class SharedStateSensor extends ConeTypeSensor {
 		} else {
 			return calculateValue(i,source.getObject().getPosition());
 		}
+		
 	}
 
 	private double calculateValue(int i, Vector2d source) {
@@ -64,7 +68,6 @@ public class SharedStateSensor extends ConeTypeSensor {
 		if ((sensorInfo.getDistance() < getCutOff()) && (sensorInfo.getAngle() < (openingAngle / 2.0)) && (sensorInfo.getAngle() > (-openingAngle / 2.0))) {
 			return (getRange() - sensorInfo.getDistance()) / getRange();
 		}
-		
 		return 0;
 	}
 	
