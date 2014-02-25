@@ -20,11 +20,13 @@ public class PreyBasketEvaluationFunction extends EvaluationFunction {
 	private boolean penalty = false;
 	private double penaltyValue = 0;
 	private double totalPenalty = 0;
+	private boolean neat = false;
 
 	public PreyBasketEvaluationFunction(Arguments args) {
 		super(args);
 		onePrey = args.getArgumentAsIntOrSetDefault("oneprey", 1) == 1;
 		penalty = args.getArgumentAsIntOrSetDefault("penalty", 0) == 1;
+		neat = args.getArgumentAsIntOrSetDefault("neat", 0) == 1;
 		penaltyValue = args.getArgumentAsIntOrSetDefault("penaltyvalue", 0);
 	}
 
@@ -33,9 +35,8 @@ public class PreyBasketEvaluationFunction extends EvaluationFunction {
 		if(env == null) {
 			setup(sim);
 			if(penalty && penaltyValue == 0)
-				penaltyValue = sim.getRobots().size()/(double)sim.getEnvironment().getSteps();
+				penaltyValue = 1.0/sim.getRobots().size()/(double)sim.getEnvironment().getSteps();
 		}
-		
 		if(penalty) {
 			for(Robot r : sim.getEnvironment().getRobots()) {
 				if(r.isInvolvedInCollison()) {
@@ -50,24 +51,28 @@ public class PreyBasketEvaluationFunction extends EvaluationFunction {
 		
 		if(env.getPreysCaught() > 0 && onePrey) {
 			sim.stopSimulation();
-			fitness = 1 + (env.getSteps()-sim.getTime())/(double)env.getSteps() - penaltyValue;
+			fitness = 1 + (env.getSteps()-sim.getTime())/(double)env.getSteps() - totalPenalty;
 		} else if (!onePrey){
 			
 			if(preyCaught != env.getPreysCaught()) {
 				preyCaught = env.getPreysCaught();
 				setup(sim);
 			}
-			
-			fitness = (totalDistance-distance)/totalDistance - penaltyValue;
+			fitness = (totalDistance-distance)/totalDistance - totalPenalty;
 			
 		} else {
-			fitness = (totalDistance-distance)/totalDistance - penaltyValue;
+			fitness = (totalDistance-distance)/totalDistance - totalPenalty;
 		}
 	}
 	
 	@Override
 	public double getFitness() {
-		return onePrey ? fitness : fitness + env.getPreysCaught();
+		if(onePrey) {
+			return fitness;
+		} else {
+			double f = fitness + env.getPreysCaught();
+			return neat ? Math.max(0,f) : f;
+		}
 	}
 	
 	private void setup(Simulator sim) {

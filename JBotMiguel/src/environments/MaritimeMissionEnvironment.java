@@ -11,6 +11,8 @@ import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.Line;
+import simulation.physicalobjects.PhysicalObject;
+import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
@@ -18,26 +20,28 @@ public class MaritimeMissionEnvironment extends Environment {
 	
 	private String missionFile;
 	public LightPole base;
-	
+	public double baseRadius = 5;
+
 	public MaritimeMissionEnvironment(Simulator simulator, Arguments args) {
 		super(simulator, args);
-		missionFile = args.getArgumentAsStringOrSetDefault("mission","mission.txt");
-	}
+		missionFile = "missions/"+args.getArgumentAsStringOrSetDefault("mission","mission_evolve.txt");
+	}	
 	
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
 		
+		LinkedList<LightPole> currentWPs = new LinkedList<LightPole>();
+		
 		try {
 			Scanner s = new Scanner(simulator.getFileProvider().getFile(missionFile));
 			
-			LinkedList<LightPole> currentWPs = new LinkedList<LightPole>();
 			double offsetX = 0;
 			double offsetY = 0;
 			int count = 0;
 			String currentName = "";
 			
-			base = createWP(simulator, "base", 0, 0, 5);
+			base = createWP(simulator, "base", 0, 0, baseRadius);
 			
 			while(s.hasNextLine()) {
 				String line = s.nextLine();
@@ -45,7 +49,7 @@ public class MaritimeMissionEnvironment extends Environment {
 				String[] split = line.split(" ");
 				
 				if(line.startsWith("B")) {
-					base = createWP(simulator,"base", Double.parseDouble(split[1]), Double.parseDouble(split[2]),0.5);
+					base = createWP(simulator,"base", Double.parseDouble(split[1]), Double.parseDouble(split[2]),baseRadius);
 				} else if (line.startsWith("A")) {
 					
 					if(!currentWPs.isEmpty())
@@ -70,15 +74,63 @@ public class MaritimeMissionEnvironment extends Environment {
 				createArea(simulator,currentWPs,currentName);
 			
 			for(Robot r : robots) {
-				r.setPosition(new Vector2d(base.getPosition()));
+				r.setPosition(new Vector2d(base.getPosition().getX()+simulator.getRandom().nextDouble()*baseRadius,base.getPosition().getY()+simulator.getRandom().nextDouble()*baseRadius));
 				r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
 				
 				ParameterSensor sensor = (ParameterSensor)r.getSensorByType(ParameterSensor.class);
-				sensor.setCurrentValue(1);
+				if(sensor != null)
+					sensor.setCurrentValue(1);
 			}
 		
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+		
+		createPatrolPositions(simulator,currentWPs);
+	}
+	
+	private void createPatrolPositions(Simulator simulator, LinkedList<LightPole> areaWP) {
+		
+		double minX = Double.MAX_VALUE;
+		double maxX = -Double.MAX_VALUE;
+		double minY = Double.MAX_VALUE;
+		double maxY = -Double.MAX_VALUE;
+		
+		for(LightPole l : areaWP) {
+			minX = minX < l.getPosition().getX() ? minX : l.getPosition().getX();
+			maxX = maxX > l.getPosition().getX() ? maxX : l.getPosition().getX();
+			minY = minY < l.getPosition().getY() ? minY : l.getPosition().getY();
+			maxY = maxY > l.getPosition().getY() ? maxY : l.getPosition().getY();
+		}
+		
+		double sizeX = maxX - minX;
+		double sizeY = maxY - minY;
+		
+		double sqrt = Math.sqrt(robots.size());
+		
+		double areaPerX = sizeX/sqrt;
+		double areaPerY = sizeY/sqrt;
+		
+		if(sqrt != Math.floor(sqrt)) {
+			areaPerX = sizeX/Math.ceil(sqrt);
+			areaPerY = sizeY/Math.floor(sqrt);
+			
+			if(sizeX < sizeY) {
+				double temp = areaPerX;
+				areaPerX = areaPerY;
+				areaPerY = temp;
+			}
+		}
+		
+		int id = robots.get(0).getId();
+		
+		for(double y = minY+areaPerY/2 ; y < maxY ; y+=areaPerY) {
+			double posY = y;
+			for(double x = minX+areaPerX/2 ; x < maxX ; x+=areaPerX) {
+				double posX = x;
+				addObject(createWP(simulator, "r"+id, posX, posY));
+				id++;
+			}
 		}
 	}
 	
@@ -123,5 +175,15 @@ public class MaritimeMissionEnvironment extends Environment {
 	@Override
 	public void update(double time) {
 		
+	}
+
+	public String getDestination(int id) {
+		for(PhysicalObject p : this.getAllObjects()) {
+			if(p.getType() == PhysicalObjectType.LIGHTPOLE) {
+				if(p.getName().equals("r"+id))
+					return p.getName();
+			}
+		}
+		return "area1";
 	}
 }

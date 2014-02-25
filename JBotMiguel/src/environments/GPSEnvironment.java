@@ -12,10 +12,12 @@ public class GPSEnvironment extends Environment{
 	
 	protected LinkedList<LightPole> waypoints = new LinkedList<LightPole>();
 	protected String waypointCoordinates = "";
+	protected boolean rand = false;
 	
 	public GPSEnvironment(Simulator simulator, Arguments args) {
 		super(simulator,args);
 		waypointCoordinates = args.getArgumentAsString("waypoints");
+		rand = args.getArgumentAsIntOrSetDefault("random", 0) == 1;
 	}
 
 	@Override
@@ -26,7 +28,16 @@ public class GPSEnvironment extends Environment{
 		int i = 0;
 		for(String s : splitted) {
 			String[] sp = s.split(",");
-			LightPole p = new LightPole(simulator, "wp"+i, Double.parseDouble(sp[0]), Double.parseDouble(sp[1]), 0.1);
+			
+			double x = Double.parseDouble(sp[0]);
+			double y = Double.parseDouble(sp[1]);
+			
+			if(rand) {
+				x= x/2+simulator.getRandom().nextDouble()*x/2;
+				y= y/2+simulator.getRandom().nextDouble()*y/2;
+			}
+			
+			LightPole p = new LightPole(simulator, "wp"+i, x, y, 0.1);
 			waypoints.add(p);
 			addObject(p);
 			i++;

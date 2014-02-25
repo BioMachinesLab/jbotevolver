@@ -1,8 +1,8 @@
 package outputs;
 
 import simulation.robot.actuators.Actuator;
+import simulation.robot.actuators.StopActuator;
 import simulation.util.Arguments;
-import actuators.StopActuator;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 public class GraspPreyNNOutput extends NNOutput {
