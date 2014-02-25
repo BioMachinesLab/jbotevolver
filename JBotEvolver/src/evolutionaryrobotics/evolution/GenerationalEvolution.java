@@ -17,11 +17,11 @@ import evolutionaryrobotics.util.DiskStorage;
 
 public class GenerationalEvolution extends Evolution {
 	
-	private Population population;
-	private boolean supressMessages = false;
-	private DiskStorage diskStorage;
-	private String output = "";
-	private DecimalFormat df = new DecimalFormat("#.##");
+	protected Population population;
+	protected boolean supressMessages = false;
+	protected DiskStorage diskStorage;
+	protected String output = "";
+	protected DecimalFormat df = new DecimalFormat("#.##");
 
 	public GenerationalEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
@@ -126,7 +126,7 @@ public class GenerationalEvolution extends Evolution {
 		return genomeLength;
 	}
 	
-	private void print(String s) {
+	protected void print(String s) {
 		if(!supressMessages)
 			System.out.print(s);
 	}
