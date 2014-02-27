@@ -8,9 +8,7 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class RandomWallRobotController extends Controller {
-
-	private static final double INITIAL_CIRCLE_WHEN_LOST = 0.3;
-	private double multFactor = INITIAL_CIRCLE_WHEN_LOST;
+	
 	private double maxSpeed = 0.1;
 	private Random random;
 	private double direction = 1;
@@ -41,7 +39,6 @@ public class RandomWallRobotController extends Controller {
 		double rightRobotSensor = robot.getSensorWithId(2).getSensorReading(2);
 		double backRobotSensor = robot.getSensorWithId(2).getSensorReading(3);
 		
-		
 		double maxVal = Math.max(frontRobotSensor, leftRobotSensor);
 		maxVal = Math.max(maxVal, rightRobotSensor);
 		maxVal = Math.max(maxVal, backRobotSensor);
@@ -53,7 +50,6 @@ public class RandomWallRobotController extends Controller {
 				((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed*direction, -maxSpeed*direction);
 				currentExtraSteps = extraSteps;
 			} else {
-				
 				if(currentExtraSteps > 0) {
 					currentExtraSteps--;
 					((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed*direction, -maxSpeed*direction);
@@ -62,6 +58,7 @@ public class RandomWallRobotController extends Controller {
 					((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed);
 			}
 		}else{
+			direction = random.nextDouble() > 0.5 ? -1 : 1;
 			((DifferentialDriveRobot)robot).setWheelSpeed(0,0);
 		}
 		

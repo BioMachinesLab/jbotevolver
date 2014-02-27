@@ -97,7 +97,7 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 	@Override
 	public double getFitness() {
 		if (averageWheelSpeed/timesteps < 0) {
-			return 0;
+			return -1;
 		}else
 			return super.getFitness();
 	}
