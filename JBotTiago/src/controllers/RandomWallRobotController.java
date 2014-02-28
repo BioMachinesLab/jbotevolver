@@ -5,6 +5,7 @@ import java.util.Random;
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
+import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 
 public class RandomWallRobotController extends Controller {
@@ -20,7 +21,12 @@ public class RandomWallRobotController extends Controller {
 		super(simulator, robot, args);
 		if(args.getArgumentIsDefined("actuators")){
 			Arguments actuators = new Arguments(args.getArgumentAsString("actuators"));
-			maxSpeed =actuators.getArgumentAsDoubleOrSetDefault("maxspeed", 0.1);
+			for (int i = 0; i < actuators.getNumberOfArguments(); i++) {
+				Arguments actuatorArgs = new Arguments(actuators.getValueAt(i));
+				if(actuatorArgs.getArgumentIsDefined("maxspeed")){
+					maxSpeed = actuatorArgs.getArgumentAsDoubleOrSetDefault("maxspeed", 0.1);
+				}
+			}
 		}
 		random = simulator.getRandom();
 		direction = random.nextDouble() > 0.5 ? -1 : 1;
@@ -38,7 +44,7 @@ public class RandomWallRobotController extends Controller {
 		double leftRobotSensor = robot.getSensorWithId(2).getSensorReading(1);
 		double rightRobotSensor = robot.getSensorWithId(2).getSensorReading(2);
 		double backRobotSensor = robot.getSensorWithId(2).getSensorReading(3);
-		
+		  
 		double maxVal = Math.max(frontRobotSensor, leftRobotSensor);
 		maxVal = Math.max(maxVal, rightRobotSensor);
 		maxVal = Math.max(maxVal, backRobotSensor);
