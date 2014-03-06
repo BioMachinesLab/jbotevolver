@@ -35,12 +35,16 @@ public class Evolution extends Thread {
 				createConfigFile(outputFolder,controller.getName()+".conf");
 				runEvolutions();
 				System.out.println("Evolution finished, running Post Eval on "+controller.getName());
-				int run = runPostEvaluation();
-				System.out.println("Post-evaluation on "+controller.getName()+": "+run);
-				String weights = getWeights(run);
-				System.out.println("Got weights (#"+weights.length()+") for "+controller.getName()+": "+run);
-				controller.setWeights(weights);
-				createConfigFile(outputFolder,"best.conf");
+				Arguments postArguments = controller.getArguments("--postevaluation");
+				if(postArguments != null) {
+					int run = runPostEvaluation();
+					System.out.println("Post-evaluation on "+controller.getName()+": "+run);
+					String weights = getWeights(run);
+					System.out.println("Got weights (#"+weights.length()+") for "+controller.getName()+": "+run);
+					controller.setWeights(weights);
+					createConfigFile(outputFolder,"best.conf");
+				}else
+					controller.setWeights("weights");
 				
 			} catch (Exception e) {
 				e.printStackTrace();
