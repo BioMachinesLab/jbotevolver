@@ -10,15 +10,22 @@ import simulation.util.Arguments;
 
 public class RandomWallRobotController extends Controller {
 	
+	private static final double CONTINUE_EXTRA_STEPS = 60;
+	
 	private double maxSpeed = 0.1;
 	private Random random;
 	private double direction = 1;
 	private double extraSteps = 3;
 	private double currentExtraSteps = 0;
+	private double continueExtraSteps = 0;
+	private boolean continueForward = false;
+	private boolean reset = true;
+	private boolean specialBeahvior;
 	
 
-	public RandomWallRobotController(Simulator simulator, Robot robot, Arguments args) {
+	public RandomWallRobotController(Simulator simulator, Robot robot, Arguments args, boolean specialBeahvior) {
 		super(simulator, robot, args);
+		this.specialBeahvior = specialBeahvior;
 		if(args.getArgumentIsDefined("actuators")){
 			Arguments actuators = new Arguments(args.getArgumentAsString("actuators"));
 			for (int i = 0; i < actuators.getNumberOfArguments(); i++) {
@@ -50,6 +57,9 @@ public class RandomWallRobotController extends Controller {
 		maxVal = Math.max(maxVal, backRobotSensor);
 		
 		if(maxVal > 0){
+			continueForward = true;
+			reset = true;
+			
 			double val = Math.max(rightSpeed, leftSpeed);
 			val = Math.max(val, frontRobotSensor);
 			if(val > 0) {
@@ -60,12 +70,46 @@ public class RandomWallRobotController extends Controller {
 					currentExtraSteps--;
 					((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed*direction, -maxSpeed*direction);
 				}
-				else
+				else{
 					((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed);
+				}
 			}
 		}else{
-			direction = random.nextDouble() > 0.5 ? -1 : 1;
-			((DifferentialDriveRobot)robot).setWheelSpeed(0,0);
+			
+			if(specialBeahvior){
+				if (reset){
+					continueExtraSteps = CONTINUE_EXTRA_STEPS;
+					reset = false;
+				}
+					
+				if (continueForward) {
+					if(continueExtraSteps > 0){
+						continueExtraSteps --;
+						double val = Math.max(rightSpeed, leftSpeed);
+						val = Math.max(val, frontRobotSensor);
+						if(val > 0) {
+							((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed*direction, -maxSpeed*direction);
+							currentExtraSteps = extraSteps;
+						} else {
+							if(currentExtraSteps > 0) {
+								currentExtraSteps--;
+								((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed*direction, -maxSpeed*direction);
+							}
+							else{
+								((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed);
+							}
+						}
+					}else
+						continueForward = false;
+		
+				}else{
+					direction = random.nextDouble() > 0.5 ? -1 : 1;
+					((DifferentialDriveRobot)robot).setWheelSpeed(0,0);
+				}
+			}else{
+				((DifferentialDriveRobot)robot).setWheelSpeed(0,0);
+			}
+			
 		}
 		
 //		if(leftSpeed == 0.0 && rightSpeed == 0.0){

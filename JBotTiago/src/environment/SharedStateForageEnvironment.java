@@ -18,12 +18,14 @@ public class SharedStateForageEnvironment extends Environment {
 	private static final double PREY_MASS = 1000;
 	private LinkedList<Wall> walls;
 	private Random random;
+	private boolean specialBeahvior;
 
 	public SharedStateForageEnvironment(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		
 		walls = new LinkedList<Wall>();
 		
+		specialBeahvior = args.getArgumentAsIntOrSetDefault("specialbeahvior", 0) == 1;
 		this.random = simulator.getRandom();
 	}
 	
@@ -34,7 +36,7 @@ public class SharedStateForageEnvironment extends Environment {
 		
 		Arguments programmedRobotArguments = simulator.getArguments().get("--programmedrobots");
 		Robot robot = Robot.getRobot(simulator,programmedRobotArguments);
-		robot.setController(new RandomWallRobotController(simulator,robot,programmedRobotArguments));
+		robot.setController(new RandomWallRobotController(simulator,robot,programmedRobotArguments, specialBeahvior));
 		robot.setPosition(newRandomPosition());
 		addRobot(robot);
 		
