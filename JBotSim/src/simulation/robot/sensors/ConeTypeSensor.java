@@ -79,8 +79,8 @@ public abstract class ConeTypeSensor extends Sensor {
 		this.angles 		= new double[numberOfSensors];
 		
 		if(eyes){
-			angles[0]= Math.toRadians(17);
-			angles[1]= Math.toRadians(343);
+			angles[0]= Math.toRadians(15);
+			angles[1]= Math.toRadians(345);
 		}else if(epuckSensorsPosition){
 			angles[0]= Math.toRadians(17);
 			angles[1]= Math.toRadians(90);
