@@ -11,6 +11,8 @@ import simulation.util.Arguments;
 
 public class IntruderSensor extends ConeTypeSensor {
 	
+	private static final double CENTER_OF_MASS = 0.275664;
+	
 	private boolean foundIntruder;
 	private double intruderOrientation;
 	private Vector2d estimatedValue;
@@ -56,8 +58,8 @@ public class IntruderSensor extends ConeTypeSensor {
 	private void calculateEstimatedIntruderPosition(){
 		double alpha = robot.getOrientation() + getIntruderOrientation();
 		
-		double x = robot.getPosition().x + (Math.cos(alpha) * metersAhead);
-		double y = robot.getPosition().y + (Math.sin(alpha) * metersAhead);
+		double x = robot.getPosition().x + robot.getRadius() + (Math.cos(alpha) * CENTER_OF_MASS);
+		double y = robot.getPosition().y + robot.getRadius() + (Math.sin(alpha) * CENTER_OF_MASS);
 		
 		estimatedValue = new Vector2d(x, y);
 	}

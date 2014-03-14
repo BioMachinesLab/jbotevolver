@@ -1,10 +1,7 @@
 package evaluationfunctions;
 
-import java.util.ArrayList;
-
 import sensors.IntruderSensor;
 import simulation.Simulator;
-import simulation.physicalobjects.Prey;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -12,6 +9,7 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class SharedStateEvaluationFunction extends EvaluationFunction {
 
+	private static final double MAXFITNESS = 1;
 	private IntruderSensor sensors[];
 	private double averageWheelSpeed;
 	private double timesteps;
@@ -25,13 +23,13 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 	@Override
 	public void update(Simulator simulator) {
 //		double numberIntruders = 0;
-		Robot prey = null;
-		
-		for (Robot r : simulator.getEnvironment().getRobots()) {
-			if(r.getDescription().equals("prey")){
-				prey = r;
-			}
-		}
+//		Robot prey = null;
+//		
+//		for (Robot r : simulator.getEnvironment().getRobots()) {
+//			if(r.getDescription().equals("prey")){
+//				prey = r;
+//			}
+//		}
 		
 		if(sensors == null) {
 			sensors = new IntruderSensor[simulator.getRobots().size()-1];
@@ -44,13 +42,15 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 			}	
 		}
 		
-		double bonus = 0;  
+//		double bonus = 0;  
+		int robotsSeeingIntruder = 0;
 		
 		for(int j = 0 ; j < sensors.length ; j++){
 			IntruderSensor s = sensors[j];
 			if (s.foundIntruder()) {
+				robotsSeeingIntruder++;
 //				double angle = Math.abs(s.getIntruderOrientation());
-				bonus += s.getSensorReading(0)/(simulator.getRobots().size()-1);
+//				bonus += s.getSensorReading(0)/(simulator.getRobots().size()-1);
 //				if (angle <= 7){
 //					numberIntruders++;
 //					double reward = (s.getInitialOpeningAngle()/2-angle)/(s.getInitialOpeningAngle()/2);
@@ -58,10 +58,18 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 //				}
 			}
 		}
-		if(bonus > 0) {
-			bonus /= (double)simulator.getEnvironment().getSteps();
-			fitness+=bonus;
+		
+		
+		if(robotsSeeingIntruder == 1){
+			fitness += (MAXFITNESS/2)/simulator.getEnvironment().getSteps();
+		}else if (robotsSeeingIntruder > 1) {
+			fitness += MAXFITNESS/simulator.getEnvironment().getSteps();
 		}
+		
+//		if(bonus > 0) {
+//			bonus /= (double)simulator.getEnvironment().getSteps();
+//			fitness+=bonus;
+//		}
 		
 		
 		for (Robot r : simulator.getRobots()) {
@@ -101,5 +109,5 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 		}else
 			return super.getFitness();
 	}
-
+	
 }
