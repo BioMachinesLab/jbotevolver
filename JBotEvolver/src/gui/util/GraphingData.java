@@ -6,7 +6,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.util.Vector;
 
@@ -145,7 +144,7 @@ public class GraphingData extends JPanel {
 		return max;
 	}
 	
-	public void setxLabel(int generationsNumber) {
-		xLabel = "Generations (" + generationsNumber + " )";
+	public void setxLabel(String name,int generationsNumber) {
+		xLabel = name + " ( " + generationsNumber + " )";
 	}
 }

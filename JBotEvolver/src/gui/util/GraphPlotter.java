@@ -227,7 +227,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 			}
 			
 
-			graph.setxLabel(numberOfPoints+1);
+			graph.setxLabel("Generations", numberOfPoints+1);
 	        graph.setShowLast(numberOfPoints);
 			
 			window.setVisible(true);
@@ -674,27 +674,55 @@ public class GraphPlotter extends JFrame implements Updatable {
 					pw.close();
 				} catch(Exception e) {e.printStackTrace();}
 			} else {
-	
-				JavaPlot p = new JavaPlot();
-		
-				PlotStyle myPlotStyle = new PlotStyle();
-				myPlotStyle.setStyle(Style.LINES);
-				myPlotStyle.setLineWidth(1);
-				
-				boolean smooth = smoothCheckBox.isSelected();
-		
-				for(int i = 0 ; i < valuesList.size() ; i++) { 
-					DataSetPlot s = new DataSetPlot(valuesList.get(i));
-					s.setPlotStyle(myPlotStyle);
-					if(smooth)
-						s.setSmooth(Smooth.CSPLINES);
-					s.setTitle(titlesList.get(i));
-					p.addPlot(s);
+				if (System.getProperty("os.name").contains("Windows")) {
+					JFrame window = new JFrame();
+					JPanel graphPanel = new JPanel(new BorderLayout());
+					window.getContentPane().add(graphPanel);
+					GraphingData graph = new GraphingData();
+					graphPanel.add(graph);
+					
+					int dataSize = 0;
+					for(int i = 0 ; i < valuesList.size() ; i++) {
+						double[][] aux = valuesList.get(i);
+						Double[] data = new Double[aux.length];
+						for (int x = 0; x < aux.length; x++) {
+							data[x] = (aux[x][1]);
+						}
+						
+						if(data.length > dataSize)
+							dataSize = data.length;
+						
+						graph.addDataList(data);
+					}
+					
+					graph.setxLabel("TimeSteps", dataSize+1);
+			        graph.setShowLast(dataSize);
+					
+					window.setVisible(true);
+					window.setSize(800,500);
+					window.setLocationRelativeTo(null);
+					window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				}else{
+					JavaPlot p = new JavaPlot();
+					PlotStyle myPlotStyle = new PlotStyle();
+					myPlotStyle.setStyle(Style.LINES);
+					myPlotStyle.setLineWidth(1);
+					
+					boolean smooth = smoothCheckBox.isSelected();
+			
+					for(int i = 0 ; i < valuesList.size() ; i++) { 
+						DataSetPlot s = new DataSetPlot(valuesList.get(i));
+						s.setPlotStyle(myPlotStyle);
+						if(smooth)
+							s.setSmooth(Smooth.CSPLINES);
+						s.setTitle(titlesList.get(i));
+						p.addPlot(s);
+					}
+			
+					p.set("xrange", "[0:"+(currentStep-1)+"]");
+					p.set("border", "3");
+					(new Plotter(p)).start();
 				}
-		
-				p.set("xrange", "[0:"+(currentStep-1)+"]");
-				p.set("border", "3");
-				(new Plotter(p)).start();
 			}
 		}
 	}
