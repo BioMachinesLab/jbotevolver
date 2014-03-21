@@ -3,6 +3,7 @@ package sensors;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
+import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowMouseChecker;
 import simulation.physicalobjects.checkers.AllowPreyChecker;
@@ -28,7 +29,13 @@ public class SharedStateSensor extends ConeTypeSensor {
 		int robotsSeeingIntruder = 0;
 		
 		if(sensors == null) {
-			sensors = new IntruderSensor[simulator.getRobots().size()-1];
+			int count = 0;
+			for(Robot r : env.getRobots()) {
+				if(r.getSensorByType(IntruderSensor.class) != null)
+					count++;
+			}
+			
+			sensors = new IntruderSensor[count];
 			
 			for (int j = 0; j < simulator.getRobots().size(); j++) {
 				if(!simulator.getRobots().get(j).getDescription().equals("prey")){
@@ -55,8 +62,13 @@ public class SharedStateSensor extends ConeTypeSensor {
 		if (robotsSeeingIntruder == 0) {
 			return 0;
 		} else if (robotsSeeingIntruder == 1) {
-			Vector2d estimation = valid.getEstimatedIntruder();
-			return calculateValue(i,estimation);
+			double biggerEstimation = 0;
+			for(PhysicalObject v : valid.getEstimatedIntruder()){
+				double d = calculateValue(i,v.getPosition());
+				if(d > biggerEstimation)
+					biggerEstimation = d;
+			}
+			return biggerEstimation;
 		} else {
 			return calculateValue(i,source.getObject().getPosition());
 		}

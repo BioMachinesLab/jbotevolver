@@ -35,10 +35,14 @@ public class SharedStateForageEnvironment extends Environment {
 //		addPrey(new Prey(simulator, "Prey ", newRandomPosition(), 0, PREY_MASS, PREY_RADIUS));
 		
 		Arguments programmedRobotArguments = simulator.getArguments().get("--programmedrobots");
-		Robot robot = Robot.getRobot(simulator,programmedRobotArguments);
-		robot.setController(new RandomWallRobotController(simulator,robot,programmedRobotArguments, specialBeahvior));
-		robot.setPosition(newRandomPosition());
-		addRobot(robot);
+		int programmesRobots = programmedRobotArguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+		
+		for (int i = 0; i < programmesRobots; i++) {
+			Robot robot = Robot.getRobot(simulator,programmedRobotArguments);
+			robot.setController(new RandomWallRobotController(simulator,robot,programmedRobotArguments, specialBeahvior));
+			robot.setPosition(newRandomPosition());
+			addRobot(robot);
+		}
 		
 		// Parede do mapa
 		walls.add(new Wall(simulator, "topWall", 0, height/2, Math.PI, 1, 1, 0, width, 0.05, PhysicalObjectType.WALL));
