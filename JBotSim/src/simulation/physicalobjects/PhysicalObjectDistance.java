@@ -6,6 +6,7 @@ public class PhysicalObjectDistance implements
 		Comparable<PhysicalObjectDistance>, Serializable {
 	private PhysicalObject object;
 	private Double time;
+	private Double lastDistance = 0.0;
 
 	public PhysicalObjectDistance(PhysicalObject object, Double time) {
 		super();
@@ -23,6 +24,14 @@ public class PhysicalObjectDistance implements
 
 	public PhysicalObject getObject() {
 		return object;
+	}
+	
+	public Double getLastDistance() {
+		return lastDistance;
+	}
+	
+	public void setLastDistance(Double lastDistance) {
+		this.lastDistance = lastDistance;
 	}
 
 	@Override

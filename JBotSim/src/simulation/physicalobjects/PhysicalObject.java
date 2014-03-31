@@ -17,6 +17,7 @@ public class PhysicalObject extends SimulatorObject implements
 	private boolean involvedInCollison = false;
 	private PhysicalObjectType type;
 	public Shape shape = null;
+	private boolean invisible = false;
 
 	private boolean enabled = true;
 	protected Vector2d lightDirection = new Vector2d();
@@ -131,5 +132,13 @@ public class PhysicalObject extends SimulatorObject implements
 	public double getDistanceBetween(Vector2d fromPoint) {
 		lightDirection.set(position.getX()-fromPoint.getX(),position.getY()-fromPoint.getY());
 		return lightDirection.length();
+	}
+	
+	public void setInvisible(boolean invisible) {
+		this.invisible = invisible;
+	}
+	
+	public boolean isInvisible() {
+		return invisible;
 	}
 }

@@ -1,11 +1,8 @@
 package simulation.robot.sensors;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
-
-import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
@@ -30,6 +27,8 @@ public class WallRaySensor extends ConeTypeSensor {
 	protected Vector2d[] sensorPositions;
 	protected double minimumDistances[][];
 	protected double cutoffAngle = 90;
+	
+	protected double closestDistance;
 	
 	public Vector2d[][][] rayPositions;
 	
@@ -76,10 +75,11 @@ public class WallRaySensor extends ConeTypeSensor {
 				double halfOpening = openingAngle/2.0;
 				
 				for(int i = 0 ; i < numberOfRays ; i++) {
-					
+					//the multiplication by 5 is necessary because of the close/far objects estimation
+					//the number 5 is arbitrary
 					cones[sensorNumber][i].set(
-							Math.cos(orientation - halfOpening + alpha*i)* range + sensorPositions[sensorNumber].getX(),
-							Math.sin(orientation - halfOpening + alpha*i)* range + sensorPositions[sensorNumber].getY()
+							Math.cos(orientation - halfOpening + alpha*i)* range*5 + sensorPositions[sensorNumber].getX(),
+							Math.sin(orientation - halfOpening + alpha*i)* range*5 + sensorPositions[sensorNumber].getY()
 						 );
 				}
 			}
@@ -118,6 +118,7 @@ public class WallRaySensor extends ConeTypeSensor {
 				if(intersection != null) {
 					
 					double distance = intersection.distanceTo(sensorPositions[sensorNumber]);
+					closestDistance = distance < closestDistance ? distance : closestDistance;
 					cone.angle(intersection);
 					
 					if(distance < range) {
@@ -138,7 +139,7 @@ public class WallRaySensor extends ConeTypeSensor {
 	public void update(double time, ArrayList<PhysicalObject> teleported) {
 		
 		updateCones();
-
+		
 		if(closeObjects != null) {
 			closeObjects.update(time, teleported);
 		}
@@ -154,8 +155,9 @@ public class WallRaySensor extends ConeTypeSensor {
 			while(iterator.hasNext()){
 				PhysicalObjectDistance source=iterator.next();
 				if (source.getObject().isEnabled()){
+					closestDistance = range*5;
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(robot.getPosition(), source.getObject(),time));
+					iterator.updateCurrentDistance(closestDistance);
 				}
 			}
 			
