@@ -46,14 +46,10 @@ public abstract class Shape implements Serializable {
 		collidedWith 	 = new ArrayList<Shape>(10);
 		relativePosition = new Vector2d(relativePosX, relativePosY);
 		
-		closeRobots 	 = new ClosePhysicalObjects(simulator.getEnvironment(), 
-				simulator.getTime(), range,new AllowAllRobotsChecker(parent.getId()));
-		closePrey   	 = new ClosePhysicalObjects(simulator.getEnvironment(), 
-				simulator.getTime(), range,new AllowOrderedPreyChecker(parent.getId()));
-		closeLightPoles  = new ClosePhysicalObjects(simulator.getEnvironment(), 
-				simulator.getTime(), range,new AllowOrderedLightChecker(parent.getId()));
-		closeWalls = new ClosePhysicalObjects(simulator.getEnvironment(), 
-				simulator.getTime(), range, new AllowWallChecker());
+		closeRobots 	 = new ClosePhysicalObjects(simulator.getEnvironment(), range,new AllowAllRobotsChecker(parent.getId()));
+		closePrey   	 = new ClosePhysicalObjects(simulator.getEnvironment(), range,new AllowOrderedPreyChecker(parent.getId()));
+		closeLightPoles  = new ClosePhysicalObjects(simulator.getEnvironment(), range,new AllowOrderedLightChecker(parent.getId()));
+		closeWalls = new ClosePhysicalObjects(simulator.getEnvironment(), range, new AllowWallChecker());
 		//closeHoles = new ClosePhysicalObjects(simulator, range, new AllowHoleChecker());
 		
 		if (parent != null) {

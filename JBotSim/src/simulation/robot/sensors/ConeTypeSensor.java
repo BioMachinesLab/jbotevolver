@@ -104,12 +104,12 @@ public abstract class ConeTypeSensor extends Sensor {
 	
 	public void setAllowedObstaclesChecker(AllowedObjectsChecker aoc) {
 		if(aoc != null)
-			this.closeObstacles = new ClosePhysicalObjects(env, time, range,aoc);
+			this.closeObstacles = new ClosePhysicalObjects(env, range,aoc);
 	}
 	
 	public void setAllowedObjectsChecker(AllowedObjectsChecker aoc) {
 		if(aoc != null)
-			this.closeObjects 	= new ClosePhysicalObjects(env, time,range,aoc);
+			this.closeObjects 	= new ClosePhysicalObjects(env,range,aoc);
 	}
 	
 	public void setupPositions(Vector2d[] positions) {
