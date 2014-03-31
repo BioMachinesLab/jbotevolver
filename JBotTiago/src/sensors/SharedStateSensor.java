@@ -1,12 +1,16 @@
 package sensors;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
+import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.checkers.AllowMouseChecker;
-import simulation.physicalobjects.checkers.AllowPreyChecker;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
@@ -14,64 +18,47 @@ import simulation.util.Arguments;
 public class SharedStateSensor extends ConeTypeSensor {
 
 	private Simulator simulator;
-	private IntruderSensor sensors[];
-
+	private int numberOfRobots;
+	private Prey[] preys;
+	private HashMap<Integer, Vector2d[]> intrudersEstimations;
+	
 	public SharedStateSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;
 		setAllowedObjectsChecker(new AllowMouseChecker(id));
+		
+		Arguments robotsArguments = simulator.getArguments().get("--robots");
+		numberOfRobots = robotsArguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+		intrudersEstimations = new HashMap<Integer, Vector2d[]>();
+		
+		preys = new Prey[numberOfRobots];
 	}
-
+	
 	@Override
 	protected double calculateContributionToSensor(int i, PhysicalObjectDistance source) {
 
-		int robotsSeeingIntruder = 0;
+		Vector2d[] estimations = intrudersEstimations.get(source.getObject().getId());
 		
-		if(sensors == null) {
-			int count = 0;
-			for(Robot r : env.getRobots()) {
-				if(r.getSensorByType(IntruderSensor.class) != null)
-					count++;
-			}
-			
-			sensors = new IntruderSensor[count];
-			
-			for (int j = 0; j < simulator.getRobots().size(); j++) {
-				if(!simulator.getRobots().get(j).getDescription().equals("prey")){
-					IntruderSensor s = (IntruderSensor)simulator.getRobots().get(j).getSensorByType(IntruderSensor.class);
-					sensors[j] = s;
+		if(estimations != null) {
+		
+			int robotsSeeingIntruder = 0;
+			Vector2d est = null;
+			for (Vector2d value : estimations) {
+				if(value != null) {
+					robotsSeeingIntruder++;
+					est = value;
 				}
-			}	
+			}
+			
+			if (robotsSeeingIntruder == 1) {
+				return calculateValue(i, est);
+			} else if(robotsSeeingIntruder > 1){
+				return calculateValue(i, source.getObject().getPosition()); //posicao da presa
+			}
 		}
 		
-		IntruderSensor valid = null;
-
-		for(int j = 0 ; j < sensors.length ; j++){
-			IntruderSensor s = sensors[j];
-			
-			if (s.foundIntruder()) {
-				valid = s;
-				robotsSeeingIntruder++;
-			}
-			
-			if(robotsSeeingIntruder >= 2)
-				break;
-		}
-
-		if (robotsSeeingIntruder == 0) {
-			return 0;
-		} else if (robotsSeeingIntruder == 1) {
-			double biggerEstimation = 0;
-			for(PhysicalObject v : valid.getEstimatedIntruder()){
-				double d = calculateValue(i,v.getPosition());
-				if(d > biggerEstimation)
-					biggerEstimation = d;
-			}
-			return biggerEstimation;
-		} else {
-			return calculateValue(i,source.getObject().getPosition());
-		}
+		return 0;
 		
 	}
 
@@ -81,6 +68,32 @@ public class SharedStateSensor extends ConeTypeSensor {
 			return (getRange() - sensorInfo.getDistance()) / getRange();
 		}
 		return 0;
+	}
+	
+	public void addEstimation(int robotId, int preyId, Vector2d estimation) {
+		Vector2d[] estimations;
+		
+		if(intrudersEstimations.get(preyId) == null){
+			estimations = new Vector2d[numberOfRobots];
+			estimations[robotId] = estimation;
+			intrudersEstimations.put(preyId, estimations);
+		}else{
+			estimations = intrudersEstimations.get(preyId);
+			estimations[robotId] = estimation;
+			intrudersEstimations.put(preyId, estimations);
+		}
+		
+	}
+
+	public void clearEstimations(int robotId, int preyId) {
+		Vector2d[] estimations;
+		
+		if(intrudersEstimations.get(preyId) != null){
+			estimations = intrudersEstimations.get(preyId);
+			estimations[robotId] = null;
+			intrudersEstimations.put(preyId, estimations);
+		}
+		
 	}
 	
 }
