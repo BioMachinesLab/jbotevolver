@@ -1,18 +1,16 @@
 package simulation.physicalobjects;
 
-import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import simulation.environment.Environment;
-import simulation.physicalobjects.checkers.AllowWallChecker;
 import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 
 public class ClosePhysicalObjects implements Serializable {
 
-	private static final double EXTENDED_VISIBILITY = 5;
+	private static final double EXTENDED_VISIBILITY = 1;
 
 	private LinkedList<PhysicalObjectDistance> closeObjects = new LinkedList<PhysicalObjectDistance>();
 	private LinkedList<PhysicalObjectDistance> farObjects   = new LinkedList<PhysicalObjectDistance>();
@@ -20,18 +18,19 @@ public class ClosePhysicalObjects implements Serializable {
 	private double farTime;
 	private boolean notInitialized = true;
 
-	private double visibility;
+	private double range;
+	private double twiceSpeed;
 	private AllowedObjectsChecker allowedObjectsChecker;
 
 	protected Environment env;
 
-	public ClosePhysicalObjects(Environment env, Double time, double range, 
-			AllowedObjectsChecker allowedObjectsChecker) {
+	public ClosePhysicalObjects(Environment env, double range, AllowedObjectsChecker allowedObjectsChecker) {
 		this.env = env;
-		this.time = time;
-		this.visibility = (range/env.getMaxApproximationSpeed()) + EXTENDED_VISIBILITY;
+		this.range = range*1.5;
 		this.allowedObjectsChecker = allowedObjectsChecker;
-		farTime = time + visibility;
+		farTime = 0;
+		time = 0.0;
+		twiceSpeed = env.getMaxApproximationSpeed();
 	}
 
 	public void update(double time, ArrayList<PhysicalObject> teleported){
@@ -40,8 +39,7 @@ public class ClosePhysicalObjects implements Serializable {
 			notInitialized=false;
 		}
 		this.time = time;
-		farTime = time + visibility;
-		
+
 		if (teleported.size() > 0) {
 			if(closeObjects.isEmpty() && farObjects.isEmpty()){
 				updateTeleportedNoCheck(teleported);
@@ -57,23 +55,22 @@ public class ClosePhysicalObjects implements Serializable {
 	}
 
 	private void updateCloseObjects() {
-		if(farObjects.size()>0){
+		if(farObjects.size() > 0){
 			Iterator<PhysicalObjectDistance> i = farObjects.iterator();
 			PhysicalObjectDistance next = i.next();
-			double doneTime = farTime - EXTENDED_VISIBILITY; 
-			while( next.getTime() <= doneTime ){
-				i.remove();
-				closeObjects.add(next);
+			int o = 0;
+			while(next.getTime() <= time){
+				if(next.getObject().isEnabled()) {
+					i.remove();
+					o++;
+					closeObjects.add(next);
+				}
 				if (!i.hasNext()){
 					break;
 				}
 				next = i.next();
 			}
 		}
-		//		if(closeObjects.size()>50){
-		//			System.out.println();
-		//		}
-		//		System.out.println(time + " CO: " + closeObjects.size() + " FO: " + farObjects.size());
 	}
 
 
@@ -145,14 +142,18 @@ public class ClosePhysicalObjects implements Serializable {
 		}
 
 		private void updateCurrentElement() {
-			if(currentObject.getTime() > farTime) {
+			if(currentObject.getTime() > time) {
 				iterador.remove();
 				insertInFarObjects(currentObject);
 			}
 		}
 
 		public void updateCurrentDistance(Double distanceBetween) {
-			currentObject.setTime(time+((distanceBetween)/MovableObject.TWICEMAXIMUMSPEEDPERTIMESTEP));	
+			double d = range - distanceBetween;
+			if(d < 0) //far away
+				currentObject.setTime(time-(d/twiceSpeed));	
+			else
+				currentObject.setTime(time);
 		}
 	}
 }

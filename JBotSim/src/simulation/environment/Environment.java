@@ -20,7 +20,7 @@ import simulation.util.Factory;
 
 public abstract class Environment implements KeyListener, Serializable {
 
-	protected final double MAX_APPROX_SPEED = 0.1;
+	private static double MAX_APPROX_SPEED = 0.15;
 
 	protected final int MAXOBJECTS = 5000;
 	
@@ -45,7 +45,7 @@ public abstract class Environment implements KeyListener, Serializable {
 		this.height = args.getArgumentAsDoubleOrSetDefault("height", 4);
 		this.steps = args.getArgumentAsIntOrSetDefault("steps", 0);
 		collisionManager = new SimpleCollisionManager(simulator);
-		this.geometricCalculator = simulator.getGeoCalculator();
+		this.geometricCalculator = new GeometricCalculator();//simulator.getGeoCalculator();
 	}
 	
 	public void setup(Simulator simulator) {
@@ -144,7 +144,7 @@ public abstract class Environment implements KeyListener, Serializable {
 	}
 
 	public void updateCollisions(double time) {
-		// updateRobotCloseObjects(time);
+//		 updateRobotCloseObjects(time);
 		collisionManager.handleCollisions(this, time);
 	}
 
