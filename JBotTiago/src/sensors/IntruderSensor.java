@@ -69,6 +69,8 @@ public class IntruderSensor extends ConeTypeSensor {
 		for (int i = 0; i < robotsCloseToPrey.length; i++) {
 			if(robotsCloseToPrey[i] != null){
 				SharedStateSensor sharedSensor = (SharedStateSensor) ((Robot)robotsCloseToPrey[i]).getSensorByType(SharedStateSensor.class);
+				if(sharedSensor == null)
+					return;
 				sharedSensor.clearEstimations(this.robot.getId(), preyId);
 			}
 			robotsCloseToPrey[i] = null;
@@ -81,6 +83,8 @@ public class IntruderSensor extends ConeTypeSensor {
 	private void sendEstimationToCloseRobots() {
 		for (int i = 0; i < robotsCloseToPrey.length; i++) {
 			SharedStateSensor sharedSensor = (SharedStateSensor) ((Robot)robotsCloseToPrey[i]).getSensorByType(SharedStateSensor.class);
+			if(sharedSensor == null)
+				return;
 			sharedSensor.addEstimation(this.robot.getId(),preyId, estimatedValue);
 		}
 		//enviar para o próprio
