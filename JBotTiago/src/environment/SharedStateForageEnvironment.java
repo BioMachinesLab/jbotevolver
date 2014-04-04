@@ -41,6 +41,7 @@ public class SharedStateForageEnvironment extends Environment {
 			Robot robot = Robot.getRobot(simulator,programmedRobotArguments);
 			robot.setController(new RandomWallRobotController(simulator,robot,programmedRobotArguments, specialBeahvior));
 			robot.setPosition(newRandomPosition());
+			robot.setOrientation(random.nextDouble()*(2*Math.PI));
 			addRobot(robot);
 		}
 		
