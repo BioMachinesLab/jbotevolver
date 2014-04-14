@@ -81,11 +81,13 @@ public class IntruderSensor extends ConeTypeSensor {
 	}
 	
 	private void sendEstimationToCloseRobots() {
-		for (int i = 0; i < robotsCloseToPrey.length; i++) {
-			SharedStateSensor sharedSensor = (SharedStateSensor) ((Robot)robotsCloseToPrey[i]).getSensorByType(SharedStateSensor.class);
-			if(sharedSensor == null)
-				return;
-			sharedSensor.addEstimation(this.robot.getId(),preyId, estimatedValue);
+		for (int i = 0; i < numberOfRecivingRobots; i++) {
+			if(robotsCloseToPrey[i] != null) {
+				SharedStateSensor sharedSensor = (SharedStateSensor) ((Robot)robotsCloseToPrey[i]).getSensorByType(SharedStateSensor.class);
+				if(sharedSensor == null)
+					return;
+				sharedSensor.addEstimation(this.robot.getId(),preyId, estimatedValue);
+			}
 		}
 		//enviar para o próprio
 		SharedStateSensor sharedSensor = (SharedStateSensor) this.robot.getSensorByType(SharedStateSensor.class);
@@ -118,7 +120,7 @@ public class IntruderSensor extends ConeTypeSensor {
 		for (Robot robot : robots) {
 			if (!robot.getDescription().equals("prey") && robot.getId() != this.robot.getId()) {
 
-				if(count < robotsCloseToPrey.length){
+				if(count < numberOfRecivingRobots){
 					robotsCloseToPrey[count] = robot;
 					count ++;
 				}else if(robot.getDistanceBetween(prey.getPosition()) < biggerDistanceToPrey)
@@ -126,7 +128,7 @@ public class IntruderSensor extends ConeTypeSensor {
 				 
 				double aux = 0;
 				
-				for (int j = 0; j < robotsCloseToPrey.length; j++) {
+				for (int j = 0; j < numberOfRecivingRobots; j++) {
 					if(robotsCloseToPrey[j] != null){
 						double distanceToPrey = robotsCloseToPrey[j].getDistanceBetween(prey.getPosition());
 						if(distanceToPrey > aux){
@@ -162,6 +164,14 @@ public class IntruderSensor extends ConeTypeSensor {
 	
 	public PhysicalObject[] getRobotsCloseToPrey() {
 		return robotsCloseToPrey;
+	}
+	
+	public int getNumberOfRecivingRobots() {
+		return numberOfRecivingRobots;
+	}
+	
+	public void setNumberOfRecivingRobots(int numberOfRecivingRobots) {
+		this.numberOfRecivingRobots = numberOfRecivingRobots;
 	}
 	
 }
