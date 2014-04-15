@@ -430,14 +430,6 @@ public class GraphViz
       return "}";
    }
    
-   public static void main(String[] args) {
-	   GraphViz gv = new GraphViz(6,10,3);
-//       System.out.println(gv.getDotSource());
-	   
-	   BufferedImage img = gv.getGraph(gv.getDotSource());
-	   gv.new ImageShower(img);
-   }
-   
    public class ImageShower extends JFrame{
 	   
 	   private ImagePanel panel;
