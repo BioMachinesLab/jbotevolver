@@ -110,6 +110,8 @@ public class ResultViewerGui extends Gui {
 	protected JCheckBox neuralNetworkViewerCheckbox;
 	protected JCheckBox exportToBlender;
 	
+	private boolean enableDebugOptions = false;
+	
 	protected EnvironmentKeyDispatcher dispatcher;
 
 	public ResultViewerGui(JBotSim jBotEvolver, Arguments args) {
@@ -119,6 +121,8 @@ public class ResultViewerGui extends Gui {
 		if(args.getArgumentIsDefined("renderer")) {
 			createRenderer(new Arguments(args.getArgumentAsString("renderer")));
 		}
+		
+		enableDebugOptions = args.getArgumentAsIntOrSetDefault("enabledebugoptions", 0) == 1;
 		
 		frame = new JFrame("Result Viewer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -197,14 +201,18 @@ public class ResultViewerGui extends Gui {
 		buttonPanel.add(shiftButton);
 		sideTopPanel.add(buttonPanel);
 		
-		neuralNetworkCheckbox = new JCheckBox("Show Neural Network");
-		sideTopPanel.add(neuralNetworkCheckbox);
+		if(enableDebugOptions) {
 		
-		neuralNetworkViewerCheckbox = new JCheckBox("Show Neural Network #2");
-		sideTopPanel.add(neuralNetworkViewerCheckbox);
+			neuralNetworkCheckbox = new JCheckBox("Show Neural Network");
+			sideTopPanel.add(neuralNetworkCheckbox);
+			
+			neuralNetworkViewerCheckbox = new JCheckBox("Show Neural Network #2");
+			sideTopPanel.add(neuralNetworkViewerCheckbox);
+			
+			exportToBlender = new JCheckBox("Export to Blender");
+			sideTopPanel.add(exportToBlender);
 		
-		exportToBlender = new JCheckBox("Export to Blender");
-		sideTopPanel.add(exportToBlender);
+		}
 		
 		JPanel sideWrapperPanel = new JPanel();
 		sideWrapperPanel.setLayout(new BorderLayout());
@@ -456,19 +464,21 @@ public class ResultViewerGui extends Gui {
 			}
 		});
 		
-		neuralNetworkCheckbox.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				JCheckBox check = (JCheckBox)arg0.getSource();
-				showNeuralNetwork = check.isSelected();
-			}
-		});
-		
-		neuralNetworkViewerCheckbox.addChangeListener(new ChangeListener() {
-			public void stateChanged(ChangeEvent arg0) {
-				JCheckBox check = (JCheckBox)arg0.getSource();
-				networkViewer.setVisible(check.isSelected());
-			}
-		});
+		if(enableDebugOptions) {
+			neuralNetworkCheckbox.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent arg0) {
+					JCheckBox check = (JCheckBox)arg0.getSource();
+					showNeuralNetwork = check.isSelected();
+				}
+			});
+			
+			neuralNetworkViewerCheckbox.addChangeListener(new ChangeListener() {
+				public void stateChanged(ChangeEvent arg0) {
+					JCheckBox check = (JCheckBox)arg0.getSource();
+					networkViewer.setVisible(check.isSelected());
+				}
+			});
+		}
 	}
 	
 	protected void plotFitness() {
