@@ -221,13 +221,13 @@ public class ResultViewerGui extends Gui {
 
 		bottomPanel.add(new JLabel("Simulation time: "));
 		simulationTimeTextField = new JTextField("N/A");
-		simulationTimeTextField.setPreferredSize(new Dimension(50, 20));
+		simulationTimeTextField.setPreferredSize(new Dimension(100, 20));
 		simulationTimeTextField.setHorizontalAlignment(JTextField.RIGHT);
 		bottomPanel.add(simulationTimeTextField);
 
 		bottomPanel.add(new JLabel("Control step: "));
 		controlStepTextField = new JTextField("N/A");
-		controlStepTextField.setPreferredSize(new Dimension(50, 20));
+		controlStepTextField.setPreferredSize(new Dimension(100, 20));
 		controlStepTextField.setHorizontalAlignment(JTextField.RIGHT);
 		bottomPanel.add(controlStepTextField);
 

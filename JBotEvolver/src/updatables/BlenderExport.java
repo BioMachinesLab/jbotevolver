@@ -1,5 +1,7 @@
 package updatables;
 
+import java.awt.Color;
+
 import simulation.Simulator;
 import simulation.Updatable;
 import simulation.physicalobjects.PhysicalObject;
@@ -31,16 +33,22 @@ public class BlenderExport implements Updatable {
 				case NEST:
 					output+="NEST "+id+" "+x+" "+y+" "+p.getRadius()+"\n";
 					break;
+				case LIGHTPOLE:
+					output+="LIGHTPOLE "+id+" "+x+" "+y+" "+p.getRadius()+"\n";
+					break;
 				case PREY:
 					output+="PREY "+id+" "+x+" "+y+" "+p.getRadius()+"\n";
 					break;
 				case WALLBUTTON:
 					Wall w1 = (Wall)p;
-					output+="WALL "+id+" "+x+" "+y+" "+w1.getWidth()+" "+w1.getHeight()+"\n";
+					output+="WALLBUTTON "+id+" "+x+" "+y+" "+w1.getWidth()+" "+w1.getHeight()+"\n";
 					break;
 				case WALL:
 					Wall w2 = (Wall)p;
-					output+="WALL "+id+" "+x+" "+y+" "+w2.getWidth()+" "+w2.getHeight()+"\n";
+					if(w2.color.equals(Color.BLACK))//door
+						output+="DOOR "+id+" "+x+" "+y+" "+w2.getWidth()+" "+w2.getHeight()+"\n";
+					else
+						output+="WALL "+id+" "+x+" "+y+" "+w2.getWidth()+" "+w2.getHeight()+"\n";
 					break;
 				case ROBOT:
 					output+="ROBOT "+id+" "+x+" "+y+" "+orientation+"\n";
