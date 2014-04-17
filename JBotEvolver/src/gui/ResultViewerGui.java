@@ -634,7 +634,7 @@ public class ResultViewerGui extends Gui {
 			if(validFile(filename)) {
 				jBotEvolver.loadFile(filename,extraArguments.getText());
 				simulator = loadSimulator();
-				if(exportToBlender.isSelected())
+				if(exportToBlender != null && exportToBlender.isSelected())
 					simulator.addCallback(new BlenderExport());
 				if(simulateUntil == 0)
 					playPosition.setValue(0);
