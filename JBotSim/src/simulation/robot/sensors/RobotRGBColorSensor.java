@@ -59,7 +59,8 @@ public class RobotRGBColorSensor extends ConeTypeSensor {
 		setAllowedObjectsChecker(new AllowAllRobotsChecker(robot.getId()));
 	}
 
-	public void update(int time, ArrayList<PhysicalObject> teleported) {
+	@Override
+	public void update(double time, ArrayList<PhysicalObject> teleported) {
 		
 		readings = new double[slices];
 		
@@ -82,6 +83,7 @@ public class RobotRGBColorSensor extends ConeTypeSensor {
 		}
 
 		super.update(time, teleported);
+				
 	}
 
 	@Override
