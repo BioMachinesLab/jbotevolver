@@ -1,5 +1,6 @@
 package sensors;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -11,6 +12,7 @@ import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowMouseChecker;
 import simulation.robot.Robot;
+import simulation.robot.actuators.RobotRGBColorActuator;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
 
@@ -25,12 +27,14 @@ public class IntruderSensor extends ConeTypeSensor {
 	private Simulator simulator;
 	private GeometricCalculator geometricCalculator;
 	private int preyId;
+	private boolean changeColor;
 	
 	public IntruderSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;
 		setAllowedObjectsChecker(new AllowMouseChecker(id));
+		changeColor = args.getArgumentAsIntOrSetDefault("changecolor", 0)==1;
 		numberOfRecivingRobots = args.getArgumentAsIntOrSetDefault("sharewith", 3);
 		metersAhead = robot.getRadius()*10;
 		robots = simulator.getRobots();
@@ -60,8 +64,20 @@ public class IntruderSensor extends ConeTypeSensor {
 		
 		super.update(time, teleported);
 		
-		if(estimatedValue != null)
+		if(estimatedValue != null){
 			sendEstimationToCloseRobots();
+			
+			if(changeColor){
+				RobotRGBColorActuator rgbActuator = (RobotRGBColorActuator) robot.getActuatorByType(RobotRGBColorActuator.class);
+				rgbActuator.setAll(1, 0, 0);
+			}
+			
+		}else{
+			if(changeColor){
+				RobotRGBColorActuator rgbActuator = (RobotRGBColorActuator) robot.getActuatorByType(RobotRGBColorActuator.class);
+				rgbActuator.setAll(0, 0, 0);
+			}
+		}
 		
 	}
 
