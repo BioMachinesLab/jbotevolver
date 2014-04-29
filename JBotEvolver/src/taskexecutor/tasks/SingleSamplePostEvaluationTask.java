@@ -41,7 +41,7 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 		jBotEvolver.setChromosome(robots, chromosome);
 		simulator.addRobots(robots);
-		jBotEvolver.setupBestIndividual(simulator);
+//		jBotEvolver.setupBestIndividual(simulator);
 		EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
 		simulator.addCallback(eval);
 		simulator.simulate();
