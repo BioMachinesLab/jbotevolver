@@ -84,7 +84,6 @@ public class WallRaySensor extends ConeTypeSensor {
 				}
 			}
 		}catch(Throwable e) {
-			System.out.println("HOLY SHIT");
 			e.printStackTrace();
 		}
 	}
