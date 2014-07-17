@@ -30,6 +30,8 @@ public class SharedStateEvaluationFunction extends EvaluationFunction {
 	@Override
 	public void update(Simulator simulator) {
 
+		preysSeen.clear();
+		
 		if(sensors == null) {
 			
 			Arguments programmedRobotArguments = simulator.getArguments().get("--programmedrobots");

@@ -112,13 +112,6 @@ public class RandomWallRobotController extends Controller {
 			
 		}
 		
-//		if(leftSpeed == 0.0 && rightSpeed == 0.0){
-//			((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed);
-//		}else{
-//			((DifferentialDriveRobot)robot).setWheelSpeed(0, 0);
-//			multFactor *= 0.995;
-//			((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed * Math.min(.98, 1 - multFactor));
-//		}
 	}
 	
 }

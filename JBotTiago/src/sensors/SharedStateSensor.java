@@ -1,8 +1,8 @@
 package sensors;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map.Entry;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -21,6 +21,7 @@ public class SharedStateSensor extends ConeTypeSensor {
 	private int numberOfRobots;
 	private Prey[] preys;
 	private HashMap<Integer, Vector2d[]> intrudersEstimations;
+	private int robotOneSeeing = 0;
 	
 	public SharedStateSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
@@ -33,6 +34,7 @@ public class SharedStateSensor extends ConeTypeSensor {
 		intrudersEstimations = new HashMap<Integer, Vector2d[]>();
 		
 		preys = new Prey[numberOfRobots];
+		
 	}
 	
 	@Override
@@ -65,6 +67,11 @@ public class SharedStateSensor extends ConeTypeSensor {
 	private double calculateValue(int i, Vector2d source) {
 		GeometricInfo sensorInfo = getSensorGeometricInfo(i, source);
 		if ((sensorInfo.getDistance() < getCutOff()) && (sensorInfo.getAngle() < (openingAngle / 2.0)) && (sensorInfo.getAngle() > (-openingAngle / 2.0))) {
+//			if(robot.getId() == 1){
+//				robot.setBodyColor(Color.green);
+//				robotOneSeeing ++;
+//				System.out.println(robotOneSeeing);
+//			}
 			return (getRange() - sensorInfo.getDistance()) / getRange();
 		}
 		return 0;
@@ -82,7 +89,7 @@ public class SharedStateSensor extends ConeTypeSensor {
 			estimations[robotId] = estimation;
 			intrudersEstimations.put(preyId, estimations);
 		}
-		
+
 	}
 
 	public void clearEstimations(int robotId, int preyId) {
@@ -95,5 +102,15 @@ public class SharedStateSensor extends ConeTypeSensor {
 		}
 		
 	}
+	
+//	@Override
+//	public void update(double time, ArrayList<PhysicalObject> teleported) {
+//		if(robot.getId() == 1){
+//			robotOneSeeing = 0;
+//			robot.setBodyColor(Color.yellow);
+//		}
+//		super.update(time, teleported);
+//		
+//	}
 	
 }

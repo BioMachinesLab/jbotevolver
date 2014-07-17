@@ -1,6 +1,5 @@
 package sensors;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -160,14 +159,21 @@ public class IntruderSensor extends ConeTypeSensor {
 	}
 
 	private void calculateEstimatedIntruderPosition(int sensor, double orientation, PhysicalObject obj){
-		double alpha = robot.getOrientation() - orientation;
-		
-		double x = robot.getPosition().x + (Math.cos(alpha) * (metersAhead + robot.getRadius()));
-		double y = robot.getPosition().y + (Math.sin(alpha) * (metersAhead + robot.getRadius()));
-		
-		estimatedValue = new Vector2d(x, y);
-		
-		estimatedIntruders.add(obj);
+		if(!estimatedIntruders.contains(obj)){
+			double alpha = robot.getOrientation() - orientation;
+			
+			double x = robot.getPosition().x + (Math.cos(alpha) * (metersAhead + robot.getRadius()));
+			double y = robot.getPosition().y + (Math.sin(alpha) * (metersAhead + robot.getRadius()));
+			
+			if(estimatedValue == null){
+				estimatedValue = new Vector2d(x, y);
+			}else{
+				estimatedValue.setX(x);
+				estimatedValue.setY(y);
+			}
+				
+			estimatedIntruders.add(obj);
+		}
 	}
 	
 	public boolean foundIntruder() {
@@ -186,8 +192,13 @@ public class IntruderSensor extends ConeTypeSensor {
 		return numberOfRecivingRobots;
 	}
 	
-	public void setNumberOfRecivingRobots(int numberOfRecivingRobots) {
-		this.numberOfRecivingRobots = numberOfRecivingRobots;
+	public void setNumberOfRecivingRobots(int recivingRobots) {
+		this.numberOfRecivingRobots = recivingRobots;
+		
+		if(recivingRobots > robotsCloseToPrey.length){
+			robotsCloseToPrey = new PhysicalObject[recivingRobots];
+		}
+		
 	}
 	
 }
