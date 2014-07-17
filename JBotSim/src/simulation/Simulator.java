@@ -1,11 +1,21 @@
 package simulation;
 
+import java.awt.List;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+
 import simulation.environment.Environment;
 import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.PhysicalObject;
@@ -25,10 +35,13 @@ public class Simulator implements Serializable {
 	private int numberRobots = 0;
 	private int numberPhysicalObjects = 0;
 	private ArrayList<Updatable> callbacks = new ArrayList<Updatable>(); 
-	private GeometricCalculator calculator;
 	private boolean stopSimulation = false;
 	private int[] robotIndexes;
 	private boolean setup = false;
+	
+	private boolean parallel = false;
+	private ExecutorService pool;
+	private ArrayList<StagedParallelRobotCallable> runnables;
 	
 	private HashMap<String,Arguments> arguments = new HashMap<String,Arguments>(); 
 	
@@ -36,21 +49,21 @@ public class Simulator implements Serializable {
 		this.random = random;
 		this.arguments = arguments;
 		this.environment = Environment.getEnvironment(this, arguments.get("--environment"));
-		calculator = new GeometricCalculator();
 		
 		Arguments args = arguments.get("--simulator");
 		
 		if(args != null) {
 			timeDelta = args.getArgumentAsDoubleOrSetDefault("timedelta", timeDelta);
+			parallel = args.getArgumentAsIntOrSetDefault("parallel", 0) == 1;
+		}
+		
+		if(parallel) {
+			pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		}
 	}
 	
 	public Double getTime(){
 		return time;
-	}
-	
-	public GeometricCalculator getGeoCalculator(){
-		return this.calculator;
 	}
 
 	public Environment getEnvironment() {
@@ -80,12 +93,48 @@ public class Simulator implements Serializable {
 	public void performOneSimulationStep(Double time) {
 		this.time = time;
 		
-		// Update the readings for all the sensors:
-		updateAllRobotSensors(time);
-		// Call the controllers:
-		updateAllControllers(time);
-		// Compute the actions of the robot's actuators on the environment and on itself
-		updateAllRobotActuators(time);
+		if(parallel) {
+			if(runnables == null) {
+				runnables = new ArrayList<StagedParallelRobotCallable>();
+				for(int i = 0 ; i < Runtime.getRuntime().availableProcessors(); i++)
+					runnables.add(new StagedParallelRobotCallable(i));
+			}
+//			for(int i = 0 ; i < 3 ; i++) {
+//				for(Callable<Object> c : runnables)
+//					((StagedParallelRobotCallable)c).stage=i;
+//				try {
+//					pool.invokeAll(runnables);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//			}
+//			environment.clearTeleported();
+			
+			try {
+				Thread[] t = new Thread[Runtime.getRuntime().availableProcessors()];
+				for(int i = 0 ; i < t.length ; i++) {
+					t[i] = new Thread(runnables.get(i));
+					t[i].start();
+				}
+				for(int i = 0 ; i < t.length ; i++) {
+					t[i].join();
+				}
+				environment.clearTeleported();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else {
+			// Update the readings for all the sensors:
+//			long d = System.currentTimeMillis();
+			updateAllRobotSensors(time);
+			// Call the controllers:
+			updateAllControllers(time);
+			// Compute the actions of the robot's actuators on the environment and on itself
+			updateAllRobotActuators(time);
+//			d = System.currentTimeMillis()-d;
+//			d/=environment.getRobots().size();
+//			System.out.println(d);
+		}
 		// Update non-robot objects in the environment
 		updateEnvironment(time);
 		// Update the positions of everything
@@ -98,7 +147,8 @@ public class Simulator implements Serializable {
 
 	protected void updateAllControllers(Double time) {
 		for (Robot r : environment.getRobots()) {
-			r.getController().controlStep(time);
+			if(r.isEnabled())
+				r.getController().controlStep(time);
 		}
 	}
 
@@ -109,7 +159,8 @@ public class Simulator implements Serializable {
 	protected void updateAllRobotSensors(double time) {
 		ArrayList<PhysicalObject> teleported = environment.getTeleported();
 		for (Robot r : environment.getRobots()) {
-			r.updateSensors(time, teleported);
+			if(r.isEnabled())
+				r.updateSensors(time, teleported);
 		}
 		environment.clearTeleported();
 	}
@@ -123,7 +174,8 @@ public class Simulator implements Serializable {
 		Collections.shuffle(Arrays.asList(robotIndexes),random);
 		
 		for (int i = 0 ; i < robotIndexes.length ; i++)
-			robots.get(robotIndexes[i]).updateActuators(time, timeDelta);
+			if(robots.get(robotIndexes[i]).isEnabled())
+				robots.get(robotIndexes[i]).updateActuators(time, timeDelta);
 	}
 	
 	private void createRobotIndexes(int size) {
@@ -189,5 +241,56 @@ public class Simulator implements Serializable {
 	
 	public ArrayList<Updatable> getCallbacks() {
 		return callbacks;
+	}
+	
+	class ParallelRobotCallable implements Callable<Object> {
+		
+		private Robot r;
+		
+		public ParallelRobotCallable(Robot r) {
+			this.r = r;
+		}
+
+		@Override
+		public Object call() {
+			if(r.isEnabled()) {
+//				long d = System.currentTimeMillis();
+				r.updateSensors(time, environment.getTeleported());
+				r.getController().controlStep(time);
+				r.updateActuators(time, timeDelta);
+//				d=System.currentTimeMillis()-d;
+//				System.out.println(d);
+			}
+			return r;
+		}
+	}
+	
+	class StagedParallelRobotCallable implements Runnable {
+		
+		private ArrayList<Robot> robots = new ArrayList<Robot>();
+		public int stage = 0;
+		
+		public StagedParallelRobotCallable(int i) {
+			int total = environment.getRobots().size()/Runtime.getRuntime().availableProcessors();
+			int start = total*i;
+			int end = total*(i+1);
+			
+			if(i == Runtime.getRuntime().availableProcessors()-1)
+				end = environment.getRobots().size();
+			
+			for(int j = start ; j < end ; j++) {
+				robots.add(environment.getRobots().get(j));
+			}
+		}
+
+		public void run() {
+			for(Robot r : robots) {
+				if(r.isEnabled()) {
+					r.updateSensors(time, environment.getTeleported());
+					r.getController().controlStep(time);
+					r.updateActuators(time, timeDelta);
+				}
+			}
+		}
 	}
 }
