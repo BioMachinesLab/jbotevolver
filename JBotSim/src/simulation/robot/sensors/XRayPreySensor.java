@@ -18,7 +18,7 @@ public class XRayPreySensor extends SimpleLightTypeSensor {
 	public XRayPreySensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 		setAllowedObjectsChecker(new AllowOrderedPreyChecker(robot.getId()));
-		this.calc = simulator.getGeoCalculator();
+		this.calc = new GeometricCalculator();
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class XRayPreySensor extends SimpleLightTypeSensor {
 				Prey prey = (Prey)source.getObject();
 				if (prey.isEnabled() || prey.getHolder()!=null && prey.getHolder()!=robot){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(calc.getDistanceBetween(sensorPosition, source.getObject(),time));
+//					iterator.updateCurrentDistance(calc.getDistanceBetween(sensorPosition, source.getObject(),time));
 				}
 			}
 

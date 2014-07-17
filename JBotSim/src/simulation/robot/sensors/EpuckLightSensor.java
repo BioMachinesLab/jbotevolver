@@ -6,9 +6,9 @@ import java.util.Random;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.LightPole;
+import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowLightChecker;
@@ -188,7 +188,7 @@ public class EpuckLightSensor extends LightTypeSensor {
 				PhysicalObjectDistance source=iterator.next();
 				if (source.getObject().isEnabled()){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(sensorPosition, source.getObject(),time));
+//					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(sensorPosition, source.getObject(),time));
 				}
 			}
 			

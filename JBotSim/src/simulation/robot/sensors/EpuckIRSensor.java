@@ -3,7 +3,6 @@ package simulation.robot.sensors;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
@@ -295,7 +294,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 				PhysicalObjectDistance source=iterator.next();
 				if (source.getObject().isEnabled()){
 					calculateSourceContributions(source);
-					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(robot.getPosition(), source.getObject(),time));
+//					iterator.updateCurrentDistance(geoCalc.getDistanceBetween(robot.getPosition(), source.getObject(),time));
 				}
 			}
 			

@@ -17,7 +17,7 @@ public class PerimeterSimpleLightTypeSensor extends SimpleLightTypeSensor {
 		super(simulator,id, robot, args);
 		setAllowedObjectsChecker(new AllowLightChecker());
 		time = simulator.getTime();
-		calc = simulator.getGeoCalculator();
+		calc = new GeometricCalculator();
 	}
 
 	@Override

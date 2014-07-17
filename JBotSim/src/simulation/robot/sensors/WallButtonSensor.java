@@ -1,20 +1,9 @@
 package simulation.robot.sensors;
 
-import java.util.Arrays;
-
-import mathutils.Vector2d;
-
 import simulation.Simulator;
-import simulation.physicalobjects.ClosePhysicalObjects;
-import simulation.physicalobjects.GeometricInfo;
-import simulation.physicalobjects.PhysicalObjectDistance;
-import simulation.physicalobjects.checkers.AllowNestChecker;
-import simulation.physicalobjects.checkers.AllowOrderedPreyChecker;
 import simulation.physicalobjects.checkers.AllowWallButtonChecker;
-import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.SimRandom;
 
 /**
  * @author miguelduarte

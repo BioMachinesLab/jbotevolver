@@ -33,7 +33,6 @@ public class RobotSensor extends ConeTypeSensor {
 	}
 
 	public void update(int time, ArrayList<PhysicalObject> teleported) {
-
 		for (int j = 0; j < slices; j++) {
 			readings[j] = 0.0;
 		}
@@ -68,7 +67,8 @@ public class RobotSensor extends ConeTypeSensor {
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
 //		Robot nextRobot = (Robot) source.getObject();
 		for (int j = 0; j < numberOfSensors; j++) {
-			double newReading = calculateContributionToSensor(j, source) * (1 + random.nextGaussian() * NOISESTDEV);
+			//TODO debug
+			double newReading = calculateContributionToSensor(j, source) * 1/*(1 + random.nextGaussian() * NOISESTDEV)*/;
 			if (newReading > readings[j]) {
 				readings[j] = newReading;
 			}

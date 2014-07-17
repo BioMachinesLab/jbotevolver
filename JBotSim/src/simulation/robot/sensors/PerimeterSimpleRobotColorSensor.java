@@ -17,7 +17,7 @@ public class PerimeterSimpleRobotColorSensor extends SimpleRobotColorSensor {
 		super(simulator, id, robot, args);
 		setAllowedObjectsChecker(new AllowAllRobotsChecker(robot.getId()));
 		time = simulator.getTime();
-		calc = simulator.getGeoCalculator();
+		calc = new GeometricCalculator();//simulator.getGeoCalculator();
 	}
 
 	@Override
