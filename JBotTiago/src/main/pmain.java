@@ -6,7 +6,7 @@ public class pmain {
 	
 	public static void main(String[] args) {
 //		PostEvaluation p = new PostEvaluation(new String[] {"dir=Evolution/Foraging/Evo3","samples=100","singleevaluation=1"});
-		PostEvaluation p = new PostEvaluation(new String[] {"dir=bigdisk/shared_sensor_big/shared_sensors_with_1/","samples=100","singleevaluation=0","localevaluation=1"});
+		PostEvaluation p = new PostEvaluation(new String[] {"dir=bigdisk/shared_sensors_paper/boss/","samples=100","singleevaluation=0","localevaluation=0","fitnesssamples=9"});
 		
 		int nRuns = 10;
 		

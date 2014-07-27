@@ -106,6 +106,11 @@ public class SharedSensorForageEnvironment extends Environment {
 					numberOfProgrammedRobots = 10;
 					changeNumberOfPredators(currentNumberOfPredators);
 					break;
+				default:
+					Arguments robotsArguments = simulator.getArguments().get("--robots");
+					currentNumberOfPredators = robotsArguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+					numberOfProgrammedRobots = programmedRobotArguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+					break;
 			}
 
 		}else {

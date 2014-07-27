@@ -44,7 +44,7 @@ public class SharedSensorsEvaluationFunction extends EvaluationFunction  {
 	
 	@Override
 	public double getFitness() {
-		System.out.println(numberOfPredators);
+//		System.out.println(numberOfPredators);
 		if(numberOfPredators == 0){
 			return super.getFitness() + foodForaged;
 		}else{
