@@ -632,7 +632,16 @@ public class ResultViewerGui extends Gui {
 
 		try{
 			if(validFile(filename)) {
-				jBotEvolver.loadFile(filename,extraArguments.getText());
+				
+				String extra = "";
+				if (System.getProperty("os.name").contains("Windows")) {
+					extra = extraArguments.getText();
+					extra = extra.replaceAll("\r", "");
+				}else{
+					extra = extraArguments.getText();
+				}
+				
+				jBotEvolver.loadFile(filename,extra);
 				simulator = loadSimulator();
 				if(exportToBlender != null && exportToBlender.isSelected())
 					simulator.addCallback(new BlenderExport());
