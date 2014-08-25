@@ -202,13 +202,13 @@ public class ResultViewerGui extends Gui {
 		sideTopPanel.add(buttonPanel);
 		
 		if(enableDebugOptions) {
-		
+		/*
 			neuralNetworkCheckbox = new JCheckBox("Show Neural Network");
 			sideTopPanel.add(neuralNetworkCheckbox);
 			
 			neuralNetworkViewerCheckbox = new JCheckBox("Show Neural Network #2");
 			sideTopPanel.add(neuralNetworkViewerCheckbox);
-			
+		*/
 			exportToBlender = new JCheckBox("Export to Blender");
 			sideTopPanel.add(exportToBlender);
 		
@@ -464,7 +464,7 @@ public class ResultViewerGui extends Gui {
 			}
 		});
 		
-		if(enableDebugOptions) {
+		/*if(enableDebugOptions) {
 			neuralNetworkCheckbox.addChangeListener(new ChangeListener() {
 				public void stateChanged(ChangeEvent arg0) {
 					JCheckBox check = (JCheckBox)arg0.getSource();
@@ -478,7 +478,7 @@ public class ResultViewerGui extends Gui {
 					networkViewer.setVisible(check.isSelected());
 				}
 			});
-		}
+		}*/
 	}
 	
 	protected void plotFitness() {

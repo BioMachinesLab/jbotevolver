@@ -1,6 +1,11 @@
 package updatables;
 
 import java.awt.Color;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import simulation.Simulator;
 import simulation.Updatable;
@@ -11,6 +16,20 @@ public class BlenderExport implements Updatable {
 	
 	private boolean firstFrame = true;
 	private String output = "";
+	private String filename = "blender.txt";
+	
+	public BlenderExport() {
+		
+		if(!(new File(filename).exists())) {
+			File f = new File(filename);
+			try {
+				f.createNewFile();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		saveToFile(false);
+	}
 
 	@Override
 	public void update(Simulator sim) {
@@ -20,7 +39,7 @@ public class BlenderExport implements Updatable {
 		} else {
 			updateObjects(sim);
 		}
-		saveToFile();
+		saveToFile(true);
 	}
 	
 	private void createObjects(Simulator sim) {
@@ -85,8 +104,17 @@ public class BlenderExport implements Updatable {
 		}
 	}
 	
-	private void saveToFile() {
+	private void saveToFile(boolean append) {
 		System.out.println(output);
+		
+		try {
+		    PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(filename, append)));
+		    out.println(output);
+		    out.close();
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+		
 		output = "";
 	}
 
