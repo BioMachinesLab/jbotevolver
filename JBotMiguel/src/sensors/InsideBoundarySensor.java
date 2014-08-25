@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
+import simulation.environment.Environment;
 import simulation.physicalobjects.Line;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
@@ -15,20 +16,21 @@ import simulation.util.Arguments;
 public class InsideBoundarySensor extends Sensor {
 	
 	private LinkedList<Line> lines = new LinkedList<Line>();
-	private boolean isSetup = false;
+	private Environment env;
 	
 	public InsideBoundarySensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);
+		this.env = simulator.getEnvironment();
 	}
 	
 	@Override
 	public void update(double time, ArrayList<PhysicalObject> teleported) {
-		if(!isSetup) {
-			for(PhysicalObject p :teleported) {
-				if(p.getType() == PhysicalObjectType.LINE)
+		if(lines.isEmpty()) {
+			for(PhysicalObject p :env.getAllObjects()) {
+				if(p.getType() == PhysicalObjectType.LINE) {
 					lines.add((Line)p);
+				}
 			}
-			isSetup = true;
 		}
 	}
 

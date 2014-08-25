@@ -118,8 +118,8 @@ public class NEATPostEval {
 				for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
 					for(int sample = 0 ; sample < samples ; sample++) {
 						JBotEvolver newJBot = new ExtendedJBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
-//						SingleSamplePostEvaluationTask t = new SingleSamplePostEvaluationTask(i,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,targetfitness);
-//						taskExecutor.addTask(t);
+						SingleSamplePostEvaluationTask t = new SingleSamplePostEvaluationTask(i,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,targetfitness);
+						taskExecutor.addTask(t);
 					}
 				}
 			}

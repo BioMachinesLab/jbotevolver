@@ -2,6 +2,7 @@ package sensors;
 
 import simulation.Simulator;
 import simulation.environment.Environment;
+import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.PhysicalObject;
@@ -16,11 +17,13 @@ public class WaypointSensor extends Sensor {
 	private double distance = 1;
 	private String destination = "";
 	private LightPole destinationLightPole = null;
+	protected GeometricCalculator calc;
 	
 	public WaypointSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);
 		this.sim = simulator;
 		distance = args.getArgumentAsDoubleOrSetDefault("distance",distance);
+		this.calc = new GeometricCalculator();
 	}
 
 	@Override
@@ -60,7 +63,7 @@ public class WaypointSensor extends Sensor {
 		
 		if(dest != null) {
 			
-			GeometricInfo sensorInfo = sim.getGeoCalculator().getGeometricInfoBetween(robot.getPosition(), robot.getOrientation(), dest, sim.getTime());
+			GeometricInfo sensorInfo = calc.getGeometricInfoBetween(robot.getPosition(), robot.getOrientation(), dest, sim.getTime());
 			
 			if(sensorNumber == 0) { //range
 				if (sensorInfo.getDistance() < distance)

@@ -2,6 +2,7 @@ package evaluationfunctions;
 
 import sensors.BoundarySensor;
 import sensors.InsideBoundarySensor;
+import sensors.IntruderSensor;
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
@@ -9,14 +10,14 @@ import simulation.robot.sensors.RobotSensor;
 import simulation.util.Arguments;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
-public class SpreadEvaluationFunction extends EvaluationFunction {
+public class SpreadAndFollowEvaluationFunction extends EvaluationFunction {
 	
 	private int steps = 0;
 	private boolean enableSpeed = false;
 	
-	public SpreadEvaluationFunction(Arguments args) {
+	public SpreadAndFollowEvaluationFunction(Arguments args) {
 		super(args);
-		enableSpeed = args.getArgumentAsIntOrSetDefault("speed", 0) == 1;
+		enableSpeed  = args.getArgumentAsIntOrSetDefault("speed", 0) == 1;
 	}
 
 	@Override
@@ -27,6 +28,9 @@ public class SpreadEvaluationFunction extends EvaluationFunction {
 		
 		double averageVal = 0;
 		double division = 0;
+		
+		int numberDetecting = 0;
+		
 		int numberOutside = 0;
 		
 		double speed = 0;
@@ -40,6 +44,10 @@ public class SpreadEvaluationFunction extends EvaluationFunction {
 				BoundarySensor bs = (BoundarySensor)r.getSensorByType(BoundarySensor.class);
 				InsideBoundarySensor ibs = (InsideBoundarySensor)r.getSensorByType(InsideBoundarySensor.class);
 				RobotSensor rs = (RobotSensor)r.getSensorByType(RobotSensor.class);
+				IntruderSensor is = (IntruderSensor)r.getSensorByType(IntruderSensor.class);
+				
+				if(is.foundIntruder())
+					numberDetecting++;
 				
 				for(int i = 0 ; i < bs.getNumberOfSensors() ; i++) {
 					robotMax = Math.max(bs.getSensorReading(i), robotMax);
@@ -48,21 +56,30 @@ public class SpreadEvaluationFunction extends EvaluationFunction {
 				for(int i = 0 ; i < rs.getNumberOfSensors() ; i++) {
 					robotMax = Math.max(rs.getSensorReading(i), robotMax);
 				}
+				
 				double l = Math.abs(((DifferentialDriveRobot)r).getLeftWheelSpeed());
 				double rr = Math.abs(((DifferentialDriveRobot)r).getRightWheelSpeed());
 				speed+=(l+rr)/2;
 				
 				division+= 1;
 				averageVal+=robotMax;
+				
 				numberOutside+= 1-ibs.getSensorReading(0);
+			
 			}
 		}
+		
 		speed/=division;
 		double maxSpeed = 2.77;
 
 		speed = (maxSpeed-speed)/maxSpeed;
 		averageVal/=division;
 		if(numberOutside == 0) {
+			
+			numberDetecting = Math.min(numberDetecting, 2);
+			
+			fitness+=numberDetecting;
+			
 			if(!enableSpeed)
 				fitness+= (1-averageVal);
 			else

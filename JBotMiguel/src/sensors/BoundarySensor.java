@@ -1,5 +1,7 @@
 package sensors;
 
+import java.awt.Color;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.Line;
@@ -39,6 +41,7 @@ public class BoundarySensor extends WallRaySensor {
 				
 				if(intersection != null) {
 					double distance = intersection.distanceTo(sensorPositions[sensorNumber]);
+					closestDistance = distance < closestDistance ? distance : closestDistance;
 					cone.angle(intersection);
 					
 					if(distance < range) {

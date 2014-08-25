@@ -16,9 +16,11 @@ public class GoToWaypointEvaluationFunction extends EvaluationFunction{
 	private double time = 0;
 	double totalDist = 0;
 	double bonus = 0;
+	double collisionPenalty = 0;
 	
 	public GoToWaypointEvaluationFunction(Arguments args) {
 		super(args);
+		collisionPenalty = args.getArgumentAsDoubleOrSetDefault("collisions",collisionPenalty);
 	}
 
 	@Override
@@ -50,6 +52,9 @@ public class GoToWaypointEvaluationFunction extends EvaluationFunction{
 		
 		if(avgSpeed/time/2.0 < 0)
 			fitness = 0;
+		
+		if(collisionPenalty > 0 && r.isInvolvedInCollison())
+			bonus-=collisionPenalty;
 	}
 	
 	@Override

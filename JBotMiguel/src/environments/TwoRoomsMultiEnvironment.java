@@ -1,5 +1,7 @@
 package environments;
 
+import java.awt.Color;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.TwoRoomsEnvironment;
@@ -274,7 +276,7 @@ public class TwoRoomsMultiEnvironment extends TwoRoomsEnvironment {
 		
 		double x = -centerX-arenaWidth/2;
 		double y = -arenaHeight/2/2-exitWidth/2;
-		double height = (arenaHeight-exitWidth-0.2)/2;
+		double height = (arenaHeight-exitWidth+0.05)/2;
 		
 		//center left
 		createWall(simulator,-x,y,0.1,height,PhysicalObjectType.WALL);
@@ -289,8 +291,12 @@ public class TwoRoomsMultiEnvironment extends TwoRoomsEnvironment {
 		
 		//buttons
 		if(useDoors) {
-			doors.add(createWall(simulator,-corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALL));
-			doors.add(createWall(simulator,corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALL));
+			Wall d1 = createWall(simulator,-corridorWidth/2-0.025,0,0.05,exitWidth+0.05,PhysicalObjectType.WALL);
+			Wall d2 = createWall(simulator,corridorWidth/2+0.025,0,0.05,exitWidth+0.05,PhysicalObjectType.WALL);
+			d1.color = Color.BLACK;
+			d2.color = Color.BLACK;
+			doors.add(d1);
+			doors.add(d2);
 			buttons.add(createWall(simulator,-corridorWidth/2,-0.25,0.1,0.1,PhysicalObjectType.WALLBUTTON));
 			buttons.add(createWall(simulator,corridorWidth/2,0.25,0.1,0.1,PhysicalObjectType.WALLBUTTON));
 		}

@@ -6,12 +6,12 @@ public class PMain {
 	public static void main(String[] args) {
 		//new String[]{"--controllers","+classname=CrossForageArbitrator"}
 		//new String[]{"--controllers","+classname=CrossForageArbitrator","--evaluation","classname=PreyAggregationExponentialEvaluationFunction,robotpercentage=0.5,preypercentage=0.5,robotdistance=0.5,preydistance=0.2"}
-		double[][] values = new PostEvaluation(
-				new String[]{"dir=bigdisk/january2014/cross_forage_size_variable_no_stop/top_push_stop_penalty","localevaluation=1","targetfitness=0","fitnesssamples=1"}).runPostEval();
+		double[][] values = new NEATPostEval(
+				new String[]{"dir=miguel2","localevaluation=1","targetfitness=0","fitnesssamples=1"}).runPostEval();
 //				new String[]{"dir=w2/neat_cluttered_params/single_network_10hn_die/","localevaluation=1","targetfitness=3","fitnesssamples=4","neat=1"}).runPostEval();
 //				new String[]{"dir=w1/neat_cluttered_params/single_network_10hn/","localevaluation=1","targetfitness=4","fitnesssamples=4","neat=1"}).runPostEval();
 		
-		int nRuns = 10;
+		int nRuns = 3;
 		
 		double[] results = new double[nRuns];
 		double[] averages = new double[nRuns];
