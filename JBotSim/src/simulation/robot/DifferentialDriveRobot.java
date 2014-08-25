@@ -81,19 +81,29 @@ public class DifferentialDriveRobot extends Robot {
 	}
 	
 	public double getRightWheelSpeed() {
-		return rightWheelSpeed;
+		return stopTimestep > 0 ? 0 : rightWheelSpeed;
 	}
 	
 	public double getLeftWheelSpeed() {
-		return leftWheelSpeed;
+		return stopTimestep > 0 ? 0 : leftWheelSpeed;
 	}
 	
 	public double getWheelDiameter(){
 		return this.wheelDiameter;
 	}
 	
+	@Override
+	public void stop() {
+		super.stop();
+		setWheelSpeed(0,0);
+	}
+	
 	public void stopTimestep(int time) {
 		this.stopTimestep = time;
+		if(time > 0) {
+			leftWheelSpeed = 0;
+			rightWheelSpeed = 0;
+		}
 	}
 	
 	public int getStopTimestep() {

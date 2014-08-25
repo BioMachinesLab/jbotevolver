@@ -35,11 +35,14 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	
 	private boolean debug = false;
 	
+	private double drawFrames = 1;
+	
 	public TwoDRenderer(Arguments args) {
 		super(args);
 		this.addComponentListener(this);
 		createImage();
 		bigRobots = args.getArgumentAsIntOrSetDefault("bigrobots", 0) == 1;
+		drawFrames = args.getArgumentAsIntOrSetDefault("drawframes", 1);
 	}
 	
 	public void paint(Graphics g) {
@@ -52,6 +55,13 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	@Override
 	public synchronized void drawFrame() {
+		if(simulator == null)
+			return;
+		
+		if(simulator.getTime() % drawFrames != 0) {
+			//repaint();
+			return;
+		}
 		
 		drawBackground();
 		
@@ -200,6 +210,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	
 	private void drawLightPole(Graphics graphics, LightPole lightPole){
 		int circleDiameter = (int) Math.round(0.5 + lightPole.getDiameter() * scale);
+		
 		int x = (int) (transformX(lightPole.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(lightPole.getPosition().getY()) - circleDiameter / 2);
 		
@@ -207,9 +218,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 			graphics.setColor(lightPole.getColor());
 			graphics.fillOval(x, y, circleDiameter, circleDiameter);
 		}
-		
 		graphics.setColor(Color.BLACK);
-		graphics.fillOval(x+circleDiameter/2-3, y+circleDiameter/2-3, 6, 6);
+		graphics.fillOval(x+circleDiameter/2-1, y+circleDiameter/2-1, 2, 2);
 		graphics.setColor(Color.BLACK);
 		
 	}
@@ -232,7 +242,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
 			createImage();
-		
 		int circleDiameter = bigRobots ? (int)Math.max(10,Math.round(robot.getDiameter() * scale)) : (int) Math.round(robot.getDiameter() * scale);
 		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
@@ -327,22 +336,22 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	}
 	
 	public void moveLeft() {
-		horizontalMovement-=0.1;
+		horizontalMovement-=0.1/scale*100;
 		componentResized(null);
 	}
 	
 	public void moveRight() {
-		horizontalMovement+=0.1;
+		horizontalMovement+=0.1/scale*100;
 		componentResized(null);
 	}
 	
 	public void moveUp() {
-		verticalMovement+=0.1;
+		verticalMovement+=0.1/scale*100;
 		componentResized(null);
 	}
 	
 	public void moveDown() {
-		verticalMovement-=0.1;
+		verticalMovement-=0.1/scale*100;
 		componentResized(null);
 	}
 }

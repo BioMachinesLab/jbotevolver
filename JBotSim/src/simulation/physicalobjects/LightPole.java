@@ -10,7 +10,7 @@ import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 public class LightPole extends PhysicalObject {
 	
 	boolean turnedOn = true;
-	private Color color = Color.YELLOW;
+	private Color color = Color.ORANGE;
 
 	public LightPole(Simulator simulator,  String name, double x, double y, double radius) {
 		super(simulator, name, x, y, 0, 0, PhysicalObjectType.LIGHTPOLE);

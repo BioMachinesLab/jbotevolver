@@ -56,4 +56,8 @@ public class TwoWheelActuator extends Actuator {
 		return "TwoWheelActuator [leftSpeed=" + leftSpeed + ", rightSpeed="
 				+ rightSpeed + "]";
 	}
+	
+	public double getMaxSpeed() {
+		return maxSpeed;
+	}
 }
