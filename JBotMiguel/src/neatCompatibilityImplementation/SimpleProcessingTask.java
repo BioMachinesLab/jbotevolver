@@ -31,7 +31,7 @@ public class SimpleProcessingTask extends JBotEvolverTask {
 	
 	@Override
 	public Result getResult() {
-		SimpleObjectiveResult fr = new SimpleObjectiveResult(objective.getId(), 1, score);
+		SimpleObjectiveResult fr = new SimpleObjectiveResult(objective.getId(), 1, score, method.hashCode());
 		return fr;
 	}
 }

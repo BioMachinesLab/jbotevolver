@@ -1,8 +1,5 @@
-
 import java.io.File;
-
 import evolutionaryrobotics.JBotEvolver;
-import extensions.ExtendedJBotEvolver;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.PostEvaluationResult;
@@ -94,7 +91,7 @@ public class NEATPostEval {
 			for(int i = 1 ; i < newArgs.length ; i++)
 				newArgs[i] = args[i-1];
 				
-			JBotEvolver jBotEvolver = new ExtendedJBotEvolver(newArgs);
+			JBotEvolver jBotEvolver = new JBotEvolver(newArgs);
 			
 			if (jBotEvolver.getArguments().get("--executor") != null) {
 				if(localEvaluation)
@@ -112,12 +109,12 @@ public class NEATPostEval {
 				else
 					file = dir+i+"/_showbest_current.conf";
 				newArgs[0] = file;
-				jBotEvolver = new ExtendedJBotEvolver(newArgs);
+				jBotEvolver = new JBotEvolver(newArgs);
 				taskExecutor.prepareArguments(jBotEvolver.getArguments());
 
 				for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
 					for(int sample = 0 ; sample < samples ; sample++) {
-						JBotEvolver newJBot = new ExtendedJBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
+						JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
 						SingleSamplePostEvaluationTask t = new SingleSamplePostEvaluationTask(i,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,targetfitness);
 						taskExecutor.addTask(t);
 					}

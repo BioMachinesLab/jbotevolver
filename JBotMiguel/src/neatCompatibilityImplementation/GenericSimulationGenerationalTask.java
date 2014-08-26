@@ -2,35 +2,34 @@ package neatCompatibilityImplementation;
 
 import java.util.ArrayList;
 import java.util.Random;
-
 import result.Result;
-
 import org.encog.ml.MLMethod;
-
+import org.encog.neural.neat.NEATNetwork;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import taskexecutor.tasks.JBotEvolverTask;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import extensions.ExtendedJBotEvolver;
 
 public class GenericSimulationGenerationalTask extends JBotEvolverTask {
 
 	private int sampleNumber;
 	protected Random random;
-	private ExtendedJBotEvolver jBotEvolver;
+	private JBotEvolver jBotEvolver;
 	protected MLMethod method;
 	protected SingleObjective objective;
 	protected double fitness = 0;
+	protected int netHash;
 
 	public GenericSimulationGenerationalTask(JBotEvolver jBotEvolver, int sampleNumber, 
-			SingleObjective objective, MLMethod method, long seed) {
+			SingleObjective objective, MLMethod method, long seed, int hash) {
 		super(jBotEvolver);
 		this.sampleNumber = sampleNumber;
 		this.method = method;
-		this.jBotEvolver = (ExtendedJBotEvolver) jBotEvolver;
+		this.jBotEvolver = jBotEvolver;
 		this.objective = objective;
 		this.random = new Random(seed);
+		this.netHash = hash;
 	}
 
 	@Override
@@ -43,7 +42,7 @@ public class GenericSimulationGenerationalTask extends JBotEvolverTask {
 
 		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 		//extended jbotevolver specific method
-		jBotEvolver.setMLControllers(robots, method);
+		setMLControllers(robots, method);
 		simulator.addRobots(robots);
 
 		EvaluationFunction eval = objective.getEvaluationFunction();
@@ -54,14 +53,21 @@ public class GenericSimulationGenerationalTask extends JBotEvolverTask {
 		this.fitness = eval.getFitness();
 		//System.out.println("fitness: " + this.fitness + "; sample: " + this.sampleNumber);
 	}
+	
+	private void setMLControllers(ArrayList<Robot> robots, MLMethod method) {
+		for(Robot r : robots) {
+			NEATNetworkController controller = (NEATNetworkController) r.getController();
+			NEATNetwork network = (NEATNetwork) method;
+			controller.setNetwork(network);
+		}
+	}
 
 	@Override
 	public Result getResult() {
 		/*if(finalScore < 0)
 			finalScore = 0;*/
 		//System.out.println("RESULT FITNESS: " + this.fitness + "; " + this.sampleNumber);
-		SimpleObjectiveResult fr = new SimpleObjectiveResult(objective.getId(), this.sampleNumber, this.fitness);
+		SimpleObjectiveResult fr = new SimpleObjectiveResult(objective.getId(), this.sampleNumber, this.fitness, this.netHash);
 		return fr;
 	}
-
 }

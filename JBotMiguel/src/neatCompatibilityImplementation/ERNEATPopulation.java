@@ -1,7 +1,11 @@
 package neatCompatibilityImplementation;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Map;
+
+import org.encog.ml.CalculateScore;
+import org.encog.ml.MLMethod;
 import org.encog.ml.ea.opp.CompoundOperator;
 import org.encog.ml.ea.opp.selection.TruncationSelection;
 import org.encog.ml.ea.train.basic.TrainEA;
@@ -16,9 +20,12 @@ import org.encog.neural.neat.training.opp.links.MutatePerturbLinkWeight;
 import org.encog.neural.neat.training.opp.links.MutateResetLinkWeight;
 import org.encog.neural.neat.training.opp.links.SelectProportion;
 import org.encog.neural.neat.training.species.OriginalNEATSpeciation;
+
+import simulation.robot.Robot;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
 
@@ -35,7 +42,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 
 	protected TrainEA trainer;
 
-	protected MOEvaluation<NEATNetwork> evaluator;
+	protected NEATEvaluation evaluator;
 
 	protected Map<NEATNetwork, TaskStatistics> stats;
 
@@ -68,11 +75,10 @@ public class ERNEATPopulation extends Population implements Serializable{
 		population.reset();
 
 		//encog's structure requires the fitness function and the EA within the population
-		this.evaluator = MOEvaluation.getEvaluationFunction(
-				jBotEvolver.getArguments().get("--evaluation"));
+		this.evaluator = (NEATEvaluation)EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get("--evalmanager"));
 
 		evaluator.setupObjectives(jBotEvolver.getArguments());
-
+		
 		trainer = constructPopulationTrainer();
 		
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
@@ -229,10 +235,6 @@ public class ERNEATPopulation extends Population implements Serializable{
 		this.avgFitness /= this.stats.size();
 	}
 
-	public int getNumberOfObjectives() {
-		return this.evaluator.getNumberOfObjectives();
-	}
-
 	@Override
 	public double getLowestFitness() {
 		return this.worstFitness;
@@ -260,6 +262,26 @@ public class ERNEATPopulation extends Population implements Serializable{
 
 	public Map<NEATNetwork, TaskStatistics> getStatistics(){
 		return this.stats;
+	}
+	
+	@Override
+	public void setupIndividual(Robot r) {
+		NEATGenome best = getBestGenome();
+		NEATNetwork net = (NEATNetwork) new NEATCODEC().decode(best);
+		setIndividualMLController(r, net);
+		
+	}
+	
+	public void setMLControllers(ArrayList<Robot> robots, MLMethod method) {
+		for(Robot r : robots) {
+			setIndividualMLController(r, method);
+		}
+	}
+	
+	public void setIndividualMLController(Robot r, MLMethod method) {
+		NEATNetworkController controller = (NEATNetworkController) r.getController();
+		NEATNetwork network = (NEATNetwork) method;
+		controller.setNetwork(network);
 	}
 
 	/**************************************************************************

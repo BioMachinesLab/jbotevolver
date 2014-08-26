@@ -1,8 +1,8 @@
-import extensions.ExtendedJBotEvolver;
+import evolutionaryrobotics.JBotEvolver;
 
 public class NEATfVMain {
 	
 	public static void main(String[] args) throws Exception {
-		new ExtendedJBotEvolver(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRenderer,bigrobots=1))"});
+		new JBotEvolver(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRenderer,bigrobots=1))"});
 	}
 }

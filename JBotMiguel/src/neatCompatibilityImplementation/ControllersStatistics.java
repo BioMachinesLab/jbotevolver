@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MOControllersStatistics<E> implements MOStatistics<E>, Serializable{
+public class ControllersStatistics<E> implements MOStatistics<E>, Serializable{
 
 	protected HashMap<E, TaskStatistics> map;
 	
-	public MOControllersStatistics(){
+	public ControllersStatistics(){
 		this.map = new HashMap<E, TaskStatistics>();
 	}
 	

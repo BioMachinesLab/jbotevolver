@@ -13,7 +13,7 @@ import org.encog.neural.neat.NEATNetwork;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
-import extensions.ExtendedJBotEvolver;
+import simulation.Simulator;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 
@@ -22,10 +22,9 @@ import taskexecutor.TaskExecutor;
  * @author fernando
  *
  */
-/**
- * @author fernando
- *
- */
+
+//TODO include here the changes made to SOEvaluationManager. This version is inefficient (not parallel)
+
 public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 
 	protected int numberOfSamples;
@@ -38,8 +37,6 @@ public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 	protected transient JBotEvolver evolver;
 	protected transient TaskExecutor taskExecutor;
 	
-	protected MOControllersStatistics<NEATNetwork> statsManager;
-
 	protected final String OBJECTIVE_KEY_PREFIX = "o";
 	
 	public MOEvaluationManager(Arguments args) {
@@ -51,22 +48,35 @@ public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 		setupWeights(args);
 
 		this.objectivesFunction = new MultiObjectiveFitness();
-		
-		statsManager = new MOControllersStatistics<NEATNetwork>();
 	}
 	
 	public void setupObjectives(HashMap<String, Arguments> arguments) {
-		for(int i = 0; i < this.numberOfObjectives; i++){
-			int objectiveId = i + 1;
-			
-			Arguments objectiveArgs = arguments.get("--objective" + objectiveId);
+		
+		if(!arguments.get("--evaluation").getCompleteArgumentString().isEmpty()) {
+			//single objective
+			int objectiveId = 1;
+			Arguments objectiveArgs = arguments.get("--evaluation");
 			SingleObjective objective = (SingleObjective) EvaluationFunction.getEvaluationFunction(objectiveArgs);
 			objective.setId(objectiveId);
 			objective.setKey(OBJECTIVE_KEY_PREFIX + objectiveId);
 			
-			this.objectives[i] = objective;
+			this.objectives[0] = objective;
 			
-			objectivesFunction.addObjective(objectivesWeights[i], objective);
+			objectivesFunction.addObjective(objectivesWeights[0], objective);
+		} else {
+			//multi objective
+			for(int i = 0; i < this.numberOfObjectives; i++){
+				int objectiveId = i + 1;
+				
+				Arguments objectiveArgs = arguments.get("--objective" + objectiveId);
+				SingleObjective objective = (SingleObjective) EvaluationFunction.getEvaluationFunction(objectiveArgs);
+				objective.setId(objectiveId);
+				objective.setKey(OBJECTIVE_KEY_PREFIX + objectiveId);
+				
+				this.objectives[i] = objective;
+				
+				objectivesFunction.addObjective(objectivesWeights[i], objective);
+			}
 		}
 	}
 
@@ -198,13 +208,14 @@ public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 	private int createSimulationTasks(SingleObjective objective,
 			NEATNetwork net) {
 		for(int i = 0; i < this.numberOfSamples; i++){
+			int hash = net.hashCode();
 			NEATNetwork taskNet = createTaskNet(net);
 			SingleObjective taskObjective = createTaskObjective(objective);
 			
 			this.taskExecutor.addTask(new GenericSimulationGenerationalTask(
-					new ExtendedJBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), 
+					new JBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), 
 					i, taskObjective, taskNet, 
-					generationalSeed+i));
+					generationalSeed+i,hash));
 		}
 		
 		return this.numberOfSamples;
@@ -220,13 +231,19 @@ public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 	}
 
 	@Override
-	public Map<NEATNetwork, TaskStatistics> getObjectivesStatistics() {
-		return this.statsManager.getObjectivesStatistics();
-	}
-
-	@Override
 	public void resetStatistics() {
 		this.statsManager.resetStatistics();
 	}
 
+	@Override
+	public void update(Simulator simulator) {
+		
+	}
+	
+	@Override
+	public double getFitness() {
+		if(objectives != null && objectives[0] != null)
+			return objectives[0].getFitness();
+		return -1;
+	}
 }
