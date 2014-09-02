@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import javax.swing.tree.VariableHeightLayoutCache;
+
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -12,6 +14,7 @@ import simulation.util.Arguments;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import evolutionaryrobotics.populations.Population;
 import gui.Gui;
 
@@ -62,7 +65,8 @@ public class JBotEvolver extends JBotSim {
 	
 	public void setChromosome(ArrayList<Robot> robots, Chromosome chromosome) {
 		for (Robot r : robots) {
-			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
+			
+			if(r.getController() instanceof NeuralNetworkController) {
 				FixedLenghtGenomeEvolvableController controller = (FixedLenghtGenomeEvolvableController)r.getController();
 				controller.setNNWeights(chromosome.getAlleles());
 			}
@@ -98,14 +102,8 @@ public class JBotEvolver extends JBotSim {
 			robots = simulator.getRobots();
 		
 		Population p = getPopulation();
-		Chromosome c = p.getBestChromosome();
 		for(Robot r : robots) {
-			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
-				FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
-				if(fc.getNNWeights() == null) {
-					fc.setNNWeights(c.getAlleles());
-				}
-			}
+			p.setupIndividual(r);
 		}
 	}
 	

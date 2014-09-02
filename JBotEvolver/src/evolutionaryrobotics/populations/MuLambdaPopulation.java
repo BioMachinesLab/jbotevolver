@@ -4,7 +4,10 @@ import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
+
+import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 /**
@@ -294,5 +297,16 @@ public class MuLambdaPopulation extends Population implements Serializable {
 	@Override
 	public Chromosome getChromosome(int chromosomeId) {
 		return chromosomes[chromosomeId];
+	}
+	
+	@Override
+	public void setupIndividual(Robot r) {
+		Chromosome c = getBestChromosome();
+		if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
+			FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
+			if(fc.getNNWeights() == null) {
+				fc.setNNWeights(c.getAlleles());
+			}
+		}
 	}
 }

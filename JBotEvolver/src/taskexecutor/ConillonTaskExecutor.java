@@ -100,7 +100,7 @@ public class ConillonTaskExecutor extends TaskExecutor {
 			return client.getNextResult();
 		return null;
 	}
-
+	
 	private ClientPriority getPriority(int priority) {
 		return (priority < 2) ? ClientPriority.VERY_HIGH
 				: (priority < 4) ? ClientPriority.HIGH

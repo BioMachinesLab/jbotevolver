@@ -9,8 +9,8 @@ import java.util.Random;
 import java.util.zip.GZIPInputStream;
 
 import comm.FileProvider;
-
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import simulation.robot.Robot;
 import simulation.util.Arguments;
 import simulation.util.Factory;
 
@@ -393,4 +393,6 @@ public abstract class Population implements Serializable {
 	public LinkedList<Serializable> getSerializableObjects() {
 		return serializableObjects;
 	}
+	
+	public abstract void setupIndividual(Robot r);
 }

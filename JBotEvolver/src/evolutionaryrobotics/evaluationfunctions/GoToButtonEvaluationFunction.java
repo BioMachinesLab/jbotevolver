@@ -17,6 +17,8 @@ public class GoToButtonEvaluationFunction extends EvaluationFunction {
 	private TwoRoomsEnvironment env;
 	private Wall closestWallButton;
 	private double penalty = 0;
+	private boolean kill = false;
+	private boolean dead = false;
 
 	public GoToButtonEvaluationFunction(Arguments arguments) {
 		super(arguments);
@@ -24,6 +26,7 @@ public class GoToButtonEvaluationFunction extends EvaluationFunction {
 		steps = arguments.getArgumentAsDoubleOrSetDefault("steps", steps);
 		punishCollision = arguments.getArgumentAsIntOrSetDefault("punishcollision", 1) == 1;
 		openDoor = arguments.getArgumentAsIntOrSetDefault("opendoor", 0) == 1;
+		kill = arguments.getArgumentAsIntOrSetDefault("kill", 0) == 1;
 	}
 
 	@Override
@@ -58,12 +61,17 @@ public class GoToButtonEvaluationFunction extends EvaluationFunction {
 				if(punishCollision){
 					penalty-=0.0005;
 				}
-//				simulator.stopSimulation();
+				if(kill) {
+					simulator.stopSimulation();
+					penalty-=1;
+					fitness+=penalty;
+					dead = true;
+				}
 			}
 		}
 		
-		if((openDoor && env.doorsOpen) || (!openDoor && getHorizontalDistanceToWall(closestRobot,closestWallButton) < 0.15 && Math.abs(closestWallButton.getPosition().getY()-closestRobot.getPosition().getY()) < 0.1)) {
-			fitness = 1 + ((steps-simulator.getTime())/steps) - penalty;
+		if(!dead && (openDoor && env.doorsOpen) || (!openDoor && getHorizontalDistanceToWall(closestRobot,closestWallButton) < 0.15 && Math.abs(closestWallButton.getPosition().getY()-closestRobot.getPosition().getY()) < 0.1)) {
+			fitness = 1 + ((steps-simulator.getTime())/steps) + penalty;
 			simulator.stopSimulation();
 		}
 	}

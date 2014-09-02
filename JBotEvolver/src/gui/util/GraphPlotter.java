@@ -380,7 +380,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 							}
 						}
 					}
-					if(hiddenCheckboxes.get(0).isSelected()){
+					if(!hiddenCheckboxes.isEmpty() && hiddenCheckboxes.get(0).isSelected()){
 						
 						String[] chosenHidden = hiddenTextFields.get(0).getText().trim().split(",");
 						int[] chosenInts = new int[chosenHidden.length];
@@ -438,7 +438,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		for(int j = 0 ; j < inputs.size() ; j++)
 			numberOfInputNeurons[j] = inputs.get(j).getNumberOfInputValues();
 		
-		int[] numberOfHiddenInputs = new int[hidden.length > 0 ? hidden.length : 1];
+		int[] numberOfHiddenInputs = new int[hidden != null && hidden.length > 0 ? hidden.length : 1];
 		
 		try{
 			CTRNNMultilayer multilayer = (CTRNNMultilayer)network;
