@@ -1,5 +1,7 @@
 package mathutils;
 
+import net.jafama.FastMath;
+
 public class Vector2d extends Point2d {
 
 	private double ay;
@@ -24,7 +26,7 @@ public class Vector2d extends Point2d {
 	 */  
 	public final double length()
 	{
-		return (double) Math.sqrt(this.x*this.x + this.y*this.y);
+		return (double) FastMath.sqrtQuick(this.x*this.x + this.y*this.y);
 	}
 
 
@@ -39,8 +41,8 @@ public class Vector2d extends Point2d {
 
 
 	public void rotate(double angle) {
-		double xTemp = x * Math.cos(angle) -  y * Math.sin(angle);
-		y = x * Math.sin(angle) + y * Math.cos(angle);
+		double xTemp = x * FastMath.cosQuick(angle) -  y * FastMath.sinQuick(angle);
+		y = x * FastMath.sinQuick(angle) + y * FastMath.cosQuick(angle);
 		x = xTemp;
 //		if(Double.isNaN(x)||Double.isNaN(y))
 //			System.out.println("ERROR");
@@ -96,7 +98,7 @@ public class Vector2d extends Point2d {
 	public double getAngle() {
 		//double a=  Math.atan2(y, x) ;
 		if(ax != x || ay != y){
-			angle	= Math.atan2(y, x) ;
+			angle	= FastMath.atan2(y, x) ;
 			ax		= x;
 			ay		= y;
 		}
@@ -115,7 +117,7 @@ public class Vector2d extends Point2d {
 		double vDot = this.dot(v1) / ( this.length()*v1.length() );
 		if( vDot < -1.0) vDot = -1.0;
 		if( vDot >  1.0) vDot =  1.0;
-		return((double) (Math.acos( vDot )));
+		return((double) (FastMath.acos( vDot )));
 
 	}
 
@@ -138,7 +140,7 @@ public class Vector2d extends Point2d {
 	public double distanceTo(Vector2d position) {
 		double x = position.x - this.x;
 		double y = position.y - this.y;		
-		return Math.sqrt(x*x+y*y);
+		return FastMath.sqrtQuick(x*x+y*y);
 	}
 	
 	@Override

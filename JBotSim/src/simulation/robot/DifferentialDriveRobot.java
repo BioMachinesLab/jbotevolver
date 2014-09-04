@@ -1,5 +1,6 @@
 package simulation.robot;
 
+import net.jafama.FastMath;
 import mathutils.MathUtils;
 import simulation.Simulator;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
@@ -38,8 +39,8 @@ public class DifferentialDriveRobot extends Robot {
 		if(stopTimestep <= 0) {
 			
 			position.set(
-					position.getX() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.cos(orientation),
-					position.getY() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * Math.sin(orientation));
+					position.getX() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * FastMath.cosQuick(orientation),
+					position.getY() + timeDelta * (leftWheelSpeed + rightWheelSpeed) / 2.0 * FastMath.sinQuick(orientation));
 			
 			orientation += timeDelta * 0.5/(distanceBetweenWheels/2.0) * (rightWheelSpeed - leftWheelSpeed); 
 	

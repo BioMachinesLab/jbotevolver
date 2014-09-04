@@ -1,11 +1,13 @@
 package simulation.robot.actuators;
 
 import java.util.Random;
+
 import mathutils.Vector2d;
+import net.jafama.FastMath;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects;
-import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
+import simulation.physicalobjects.Prey;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -88,10 +90,10 @@ public class PreyPickerActuator extends Actuator {
 					double offset = robot.getRadius() + prey.getRadius();
 					Vector2d newPosition = new Vector2d(
 							robot.getPosition().getX() + offset
-									* Math.cos(robot.getOrientation()), robot
+									* FastMath.cosQuick(robot.getOrientation()), robot
 									.getPosition().getY()
 									+ offset
-									* Math.sin(robot.getOrientation()));
+									* FastMath.sinQuick(robot.getOrientation()));
 					prey.teleportTo(newPosition);
 
 					// Stop robot

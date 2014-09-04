@@ -3,7 +3,9 @@ package simulation.robot.sensors;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+
 import mathutils.Vector2d;
+import net.jafama.FastMath;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.GeometricInfo;
@@ -13,7 +15,6 @@ import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Wall;
 import simulation.physicalobjects.checkers.AllowWallChecker;
 import simulation.robot.Robot;
-import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
 
 @SuppressWarnings("serial")
@@ -66,8 +67,8 @@ public class WallRaySensor extends ConeTypeSensor {
 				double orientation = angles[sensorNumber] + robot.getOrientation();
 				
 				sensorPositions[sensorNumber].set(
-						Math.cos(orientation) * robot.getRadius() + robot.getPosition().getX(),
-						Math.sin(orientation) * robot.getRadius() + robot.getPosition().getY()
+						FastMath.cosQuick(orientation) * robot.getRadius() + robot.getPosition().getX(),
+						FastMath.sinQuick(orientation) * robot.getRadius() + robot.getPosition().getY()
 					);
 				
 				double alpha = (this.openingAngle)/(numberOfRays-1);
@@ -78,8 +79,8 @@ public class WallRaySensor extends ConeTypeSensor {
 					//the multiplication by 5 is necessary because of the close/far objects estimation
 					//the number 5 is arbitrary
 					cones[sensorNumber][i].set(
-							Math.cos(orientation - halfOpening + alpha*i)* range*5 + sensorPositions[sensorNumber].getX(),
-							Math.sin(orientation - halfOpening + alpha*i)* range*5 + sensorPositions[sensorNumber].getY()
+							FastMath.cosQuick(orientation - halfOpening + alpha*i)* range*5 + sensorPositions[sensorNumber].getX(),
+							FastMath.sinQuick(orientation - halfOpening + alpha*i)* range*5 + sensorPositions[sensorNumber].getY()
 						 );
 				}
 			}
@@ -112,7 +113,7 @@ public class WallRaySensor extends ConeTypeSensor {
 					rayPositions[sensorNumber][i][1] = cone;
 				
 				Vector2d intersection = null;
-				intersection = w.intersectsWithLineSegment(sensorPositions[sensorNumber], cone, Math.toRadians(cutoffAngle));
+				intersection = w.intersectsWithLineSegment(sensorPositions[sensorNumber], cone, FastMath.toRadians(cutoffAngle));
 				
 				if(intersection != null) {
 					
@@ -185,9 +186,9 @@ public class WallRaySensor extends ConeTypeSensor {
 	protected GeometricInfo getSensorGeometricInfo(int sensorNumber,
 			Vector2d source) {
 		double orientation = angles[sensorNumber] + robot.getOrientation();
-		sensorPosition.set(Math.cos(orientation) * robot.getRadius()
+		sensorPosition.set(FastMath.cosQuick(orientation) * robot.getRadius()
 				+ robot.getPosition().getX(),
-				Math.sin(orientation) * robot.getRadius()
+				FastMath.sinQuick(orientation) * robot.getRadius()
 						+ robot.getPosition().getY());
 
 		GeometricInfo sensorInfo = geoCalc.getGeometricInfoBetweenPoints(sensorPosition, 

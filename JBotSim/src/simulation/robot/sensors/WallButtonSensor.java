@@ -1,5 +1,6 @@
 package simulation.robot.sensors;
 
+import net.jafama.FastMath;
 import simulation.Simulator;
 import simulation.physicalobjects.checkers.AllowWallButtonChecker;
 import simulation.robot.Robot;
@@ -21,8 +22,8 @@ public class WallButtonSensor extends LightTypeSensor {
 		super(simulator, id, robot, args);
 		
 		if(numberOfSensors == 2) {
-			angles[0] = Math.toRadians(30);
-			angles[1] = Math.toRadians(330);
+			angles[0] = FastMath.toRadians(30);
+			angles[1] = FastMath.toRadians(330);
 		}
 		
 		lagBufferSize = args.getArgumentAsIntOrSetDefault("lagbuffer", lagBufferSize);

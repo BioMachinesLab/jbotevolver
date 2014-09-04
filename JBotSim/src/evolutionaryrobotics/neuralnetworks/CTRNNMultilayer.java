@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Vector;
 
+import net.jafama.FastMath;
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
@@ -45,7 +46,7 @@ public class CTRNNMultilayer extends NeuralNetwork {
 	    for (int i = 0; i < numberOfHiddenNodes; i++)
 	    {
 	        for (int j = 0; j < numberOfHiddenNodes; j++) {
-	            double z              = 1.0/(Math.exp(-(hiddenStates[j] + hiddenBiases[j])) + 1.0 );
+	            double z              = 1.0/(FastMath.expQuick(-(hiddenStates[j] + hiddenBiases[j])) + 1.0 );
 	            hiddenDeltaStates[i] += hiddenToHiddenWeights[i * numberOfHiddenNodes + j] * z;
 	        }
 	    }
@@ -60,13 +61,13 @@ public class CTRNNMultilayer extends NeuralNetwork {
 	    {
 	        for (int j = 0; j < numberOfHiddenNodes; j++)
 	        {
-	            double z = ((1.0)/(Math.exp(-( hiddenStates[j] + hiddenBiases[j])) + 1.0 ));
+	            double z = ((1.0)/(FastMath.expQuick(-( hiddenStates[j] + hiddenBiases[j])) + 1.0 ));
 	            outputNeuronStates[i] += hiddenToOutputWeights[i * numberOfHiddenNodes + j] * z;
 	        }
 
 	        // Compute the activation function immediately, since this is
 	        // what we return and since the output layer is not recurrent:
-	        outputNeuronStates[i] = ((1.0)/(Math.exp(-(outputNeuronStates[i] + outputBiases[i])) + 1.0 ));
+	        outputNeuronStates[i] = ((1.0)/(FastMath.expQuick(-(outputNeuronStates[i] + outputBiases[i])) + 1.0 ));
 	    }
 	    
 	    if(printValues) {
@@ -145,7 +146,7 @@ public class CTRNNMultilayer extends NeuralNetwork {
 	    	}
 
 	    	for (int i = 0; i < B; i++) {
-	    		hiddenTaus[i] = Math.pow(10, (-1.0 + (tau * (weights[chromosomePosition++] + 10.0) / 20)));
+	    		hiddenTaus[i] = FastMath.powQuick(10, (-1.0 + (tau * (weights[chromosomePosition++] + 10.0) / 20)));
 	    	}
 
 	    	for (int i = 0; i < B * C; i++) {

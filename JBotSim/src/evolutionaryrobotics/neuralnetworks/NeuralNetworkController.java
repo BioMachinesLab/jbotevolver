@@ -1,8 +1,6 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.LinkedList;
-import java.util.Random;
-
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
@@ -13,7 +11,7 @@ import controllers.FixedLenghtGenomeEvolvableController;
 
 public class NeuralNetworkController extends Controller implements FixedLenghtGenomeEvolvableController {
 	protected NeuralNetwork neuralNetwork;
-	private boolean printWeights = false;
+	protected boolean printWeights = false;
 
 	public NeuralNetworkController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
@@ -65,6 +63,10 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 	@Override
 	public int getGenomeLength() {
 		return neuralNetwork.getGenomeLength();
+	}
+	
+	public void setNeuralNetwork(NeuralNetwork neuralNetwork) {
+		this.neuralNetwork = neuralNetwork;
 	}
 
 	public NeuralNetwork getNeuralNetwork() {
@@ -129,5 +131,5 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 					nnController.setNNWeights(weights);
 			}
 		}
-	}	
+	}
 }

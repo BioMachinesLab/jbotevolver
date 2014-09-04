@@ -810,4 +810,44 @@ public class Arguments implements Serializable {
 	public Vector<String> getValues() {
 		return values;
 	}
+	
+	public static String beautifyString(String s) {
+		
+		int nParenthesis = 0;
+		String newString = "\t";
+		
+		for(int i = 0 ; i < s.length(); i++) {
+			char c = s.charAt(i);
+			
+			switch(c) {
+				case ',':
+					newString+=",\n";
+					newString+=repeatString("\t", nParenthesis+1);
+					break;
+				case '(':
+					nParenthesis++;
+					newString+="(\n";
+					newString+=repeatString("\t", nParenthesis+1);
+					break;
+				case ')':
+					nParenthesis--;
+					newString+="\n";
+					newString+=repeatString("\t", nParenthesis+1);
+					newString+=")";
+					break;
+				default:
+					newString+=c;
+			}
+		}
+		return newString;
+	}
+	
+	public static String repeatString(String s, int n) {
+		String newString = "";
+		
+		for(int i = 0 ; i < n ; i++)
+			newString+=s;
+		
+		return newString;
+	}
 }

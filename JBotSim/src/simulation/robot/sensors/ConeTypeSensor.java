@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import mathutils.Vector2d;
+import net.jafama.FastMath;
 import simulation.Simulator;
 import simulation.environment.Environment;
-import simulation.physicalobjects.GeometricCalculator;
-import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.ClosePhysicalObjects;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
+import simulation.physicalobjects.GeometricCalculator;
+import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowObstacleChecker;
@@ -80,17 +81,17 @@ public abstract class ConeTypeSensor extends Sensor {
 		this.angles 		= new double[numberOfSensors];
 		
 		if(eyes){
-			angles[0]= Math.toRadians(15);
-			angles[1]= Math.toRadians(345);
+			angles[0]= FastMath.toRadians(15);
+			angles[1]= FastMath.toRadians(345);
 		}else if(epuckSensorsPosition){
-			angles[0]= Math.toRadians(17);
-			angles[1]= Math.toRadians(90);
-			angles[2]= Math.toRadians(270);
-			angles[3]= Math.toRadians(343);
+			angles[0]= FastMath.toRadians(17);
+			angles[1]= FastMath.toRadians(90);
+			angles[2]= FastMath.toRadians(270);
+			angles[3]= FastMath.toRadians(343);
 		}else if(angleposition < 0)
 			setupPositions(numberOfSensors);
 		else
-			angles[0] = Math.toRadians(angleposition);
+			angles[0] = FastMath.toRadians(angleposition);
 		
 		if(checkObstacles) {
 			setAllowedObstaclesChecker(new AllowObstacleChecker(robot.getId()*100));
@@ -210,14 +211,14 @@ public abstract class ConeTypeSensor extends Sensor {
 	
 	protected void calculatedObstacleContributions(PhysicalObjectDistance source) {
 		for(int j = 0; j < obstacleReadings.length; j++){
-			obstacleReadings[j] = Math.max(calculateContributionToSensor(j, source)*1/*(1 + random.nextGaussian()* NOISESTDEV)*/, readings[j]);
+			obstacleReadings[j] = FastMath.max(calculateContributionToSensor(j, source)*1/*(1 + random.nextGaussian()* NOISESTDEV)*/, readings[j]);
 		}
 	}
 
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
 		for(int j = 0; j < readings.length; j++){
 			if(openingAngle > 0.018){ //1degree
-				readings[j] = Math.max(calculateContributionToSensor(j, source)*1/*(1 + 
+				readings[j] = FastMath.max(calculateContributionToSensor(j, source)*1/*(1 + 
 						random.nextGaussian()* NOISESTDEV)*/, readings[j]);
 			}
 		}

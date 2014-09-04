@@ -3,6 +3,7 @@ package simulation.physicalobjects.collisionhandling.knotsandbolts;
 import java.io.Serializable;
 import java.util.LinkedList;
 
+import net.jafama.FastMath;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
@@ -126,7 +127,7 @@ public abstract class CollisionManager implements Serializable {
 					double distanceFromRectangleCorner = translatedCircleCenter.getX() - halfSizeX;
 					double temp = translatedCircleCenter.getY() - halfSizeY;
 
-					distanceFromRectangleCorner = Math.sqrt(distanceFromRectangleCorner * distanceFromRectangleCorner + temp * temp);
+					distanceFromRectangleCorner = FastMath.sqrtQuick(distanceFromRectangleCorner * distanceFromRectangleCorner + temp * temp);
 					if (distanceFromRectangleCorner < circle.getRadius()) {
 						return distanceFromRectangleCorner < circle.getRadius();
 					}

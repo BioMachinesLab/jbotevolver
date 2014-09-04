@@ -2,8 +2,8 @@ package evolutionaryrobotics.neuralnetworks;
 
 import java.util.Vector;
 
+import net.jafama.FastMath;
 import simulation.util.Arguments;
-
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
@@ -42,7 +42,7 @@ public class MulitlayerPerceptron extends NeuralNetwork {
 	        }
 	        
 	        // Apply the transfer function (sigmoid with output in [0,1])
-	        hiddenNeuronStates[i] = 1.0/( 1 + Math.exp(-hiddenNeuronStates[i]));	  
+	        hiddenNeuronStates[i] = 1.0/( 1 + FastMath.expQuick(-hiddenNeuronStates[i]));	  
 	    }
 
 	    // Offset for the weights to the output nodes
@@ -60,7 +60,7 @@ public class MulitlayerPerceptron extends NeuralNetwork {
 	            outputNeuronStates[i] += weights[ji] * hiddenNeuronStates[j];			
 	        }        
 
-	        outputNeuronStates[i] = 1.0/( 1 + Math.exp( - outputNeuronStates[i]) );	  
+	        outputNeuronStates[i] = 1.0/( 1 + FastMath.expQuick( - outputNeuronStates[i]) );	  
 	    }
 		
 		return outputNeuronStates;

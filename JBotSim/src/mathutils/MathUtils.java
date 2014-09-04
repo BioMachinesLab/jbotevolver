@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
 
+import net.jafama.FastMath;
+
 public class MathUtils implements Serializable {
 
 	public static double modPI(double angle) {
@@ -74,8 +76,7 @@ public class MathUtils implements Serializable {
 			fCCDenominatorSumFirst += fCCNumElemFirst * fCCNumElemFirst;
 			fCCDenominatorSumSecond += fCCNumElemSecond * fCCNumElemSecond;
 		}
-
-		double fCCDenominator = Math.sqrt(fCCDenominatorSumFirst
+		double fCCDenominator = FastMath.sqrtQuick(fCCDenominatorSumFirst
 				* fCCDenominatorSumSecond);
 		double fCrossCorrelation = fCCNumeratorSum / fCCDenominator;
 
@@ -88,9 +89,9 @@ public class MathUtils implements Serializable {
 		double similarity = 0;
 		assert(vec1.length == vec2.length);
 		for(int i = 0; i < vec1.length; i++){
-			similarity += Math.pow(vec1[i] - vec2[i], 2);
+			similarity += FastMath.powQuick(vec1[i] - vec2[i], 2);
 		}
-		similarity = Math.sqrt(similarity);
+		similarity = FastMath.sqrtQuick(similarity);
 		return similarity;
 	}
 	

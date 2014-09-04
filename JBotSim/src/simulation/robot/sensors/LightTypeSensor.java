@@ -3,6 +3,7 @@ package simulation.robot.sensors;
 import java.util.Arrays;
 import java.util.Random;
 
+import net.jafama.FastMath;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
@@ -24,7 +25,7 @@ public class LightTypeSensor extends ConeTypeSensor{
 	public LightTypeSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 		this.random = simulator.getRandom();
-		double openingAngle = (args.getArgumentIsDefined("angle")) ? Math.toRadians(args.getArgumentAsDouble("angle")): DEFAULT_OPENING_ANGLE;
+		double openingAngle = (args.getArgumentIsDefined("angle")) ? FastMath.toRadians(args.getArgumentAsDouble("angle")): DEFAULT_OPENING_ANGLE;
 		
 		this.openingAngle = openingAngle/2;
 		maxDistance = range - robot.getRadius();
@@ -52,7 +53,7 @@ public class LightTypeSensor extends ConeTypeSensor{
 				
 //			double val=1/distance*Math.cos((sensorInfo.getAngle())*r)/MIN_READING;
 //			return val;
-			double val = ((getRange()-sensorInfo.getDistance())/getRange())*Math.cos((sensorInfo.getAngle())*r) + 
+			double val = ((getRange()-sensorInfo.getDistance())/getRange())*FastMath.cosQuick((sensorInfo.getAngle())*r) + 
 					random.nextGaussian() * NOISESTDEV;
 			if (val > 1.0)
 				val = 1.0;

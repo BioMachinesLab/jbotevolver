@@ -209,10 +209,10 @@ public class TwoRoomsEnvironment extends Environment {
 				double oldX = w.getPosition().getX();
 				
 				if(oldX < 0) {
-					oldX-=0.1;
+					oldX-=0.10;
 					orientation = Math.PI/2;
 				} else {
-					oldX+=0.1;
+					oldX+=0.10;
 					orientation = -Math.PI/2;
 				}
 				r.teleportTo(new Vector2d(oldX,oldY));
@@ -278,9 +278,10 @@ public class TwoRoomsEnvironment extends Environment {
 		if(useDoors) {
 			doors.add(createWall(simulator,-corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALL));
 			doors.add(createWall(simulator,corridorWidth/2,0,0.1,exitWidth+0.05,PhysicalObjectType.WALL));
-			buttons.add(createWall(simulator,-corridorWidth/2,-0.25,0.1,0.1,PhysicalObjectType.WALLBUTTON));
-			buttons.add(createWall(simulator,corridorWidth/2,0.25,0.1,0.1,PhysicalObjectType.WALLBUTTON));
 		}
+		
+		buttons.add(createWall(simulator,-corridorWidth/2,-0.25,0.1,0.1,PhysicalObjectType.WALLBUTTON));
+		buttons.add(createWall(simulator,corridorWidth/2,0.25,0.1,0.1,PhysicalObjectType.WALLBUTTON));
 	}
 	
 	private void  calculateDropRate(double percentage) {

@@ -2,6 +2,8 @@ package simulation.robot.sensors;
 
 import java.awt.Color;
 import java.util.Arrays;
+
+import net.jafama.FastMath;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
@@ -39,7 +41,7 @@ public class RobotColorSensor extends ConeTypeSensor {
 				(sensorInfo.getAngle()>(-openingAngle))){
 			double distance=(sensorInfo.getDistance());	
 			//return (currentMaxDistance - distance) / currentMaxDistance * (openingAngle - Math.abs(sensorInfo.getAngle())) / openingAngle;
-			return	1.0/(1+distance*distance)*Math.cos((sensorInfo.getAngle())*r);
+			return	1.0/(1+distance*distance)*FastMath.cosQuick((sensorInfo.getAngle())*r);
 //			double distance=sensorInfo.getDistance();	
 //			return 1/distance/distance*Math.cos((sensorInfo.getAngle())*r);
 		}

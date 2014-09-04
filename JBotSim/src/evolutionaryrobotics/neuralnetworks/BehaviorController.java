@@ -1,14 +1,11 @@
 package evolutionaryrobotics.neuralnetworks;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
-
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
-import simulation.robot.actuators.TwoWheelActuator;
 import simulation.robot.behaviors.Behavior;
 import simulation.util.Arguments;
 
@@ -58,10 +55,12 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 			
 			neuralNetwork.controlStep(time);
 			
-			//Feed these first. The chosen network should be the first to act.
-			//This will not work correctly if some of the behavior primitive networks activate
-			//some actuator that others do... I'm relying on the last controller to override the
-			//actuator values.
+			/*
+			 * Feed these first. The chosen network should be the first to act.
+			 * This will not work correctly if some of the behavior primitive networks activate
+			 * some actuator that others do... I'm relying on the last controller to override the
+			 * actuator values.
+			*/
 			if(keepFeeding) {
 				for(int i = 0 ; i < subControllers.size() ; i++) {
 					if(i != currentSubNetwork) {

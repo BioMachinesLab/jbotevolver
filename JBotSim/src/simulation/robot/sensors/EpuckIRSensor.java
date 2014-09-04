@@ -3,7 +3,9 @@ package simulation.robot.sensors;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+
 import mathutils.Vector2d;
+import net.jafama.FastMath;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.GeometricInfo;
@@ -179,8 +181,8 @@ public class EpuckIRSensor extends ConeTypeSensor {
 			double orientation = angles[sensorNumber] + robot.getOrientation();
 			
 			sensorPositions[sensorNumber].set(
-					Math.cos(orientation) * robot.getRadius() + robot.getPosition().getX(),
-					Math.sin(orientation) * robot.getRadius() + robot.getPosition().getY()
+					FastMath.cosQuick(orientation) * robot.getRadius() + robot.getPosition().getX(),
+					FastMath.sinQuick(orientation) * robot.getRadius() + robot.getPosition().getY()
 				);
 			
 			double alpha = (this.fullOpeningAngle)/(numberOfRays-1);
@@ -188,8 +190,8 @@ public class EpuckIRSensor extends ConeTypeSensor {
 			for(int i = 0 ; i < numberOfRays ; i++) {
 				
 				cones[sensorNumber][i].set(
-						Math.cos(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPositions[sensorNumber].getX(),
-						Math.sin(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPositions[sensorNumber].getY()
+						FastMath.cosQuick(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPositions[sensorNumber].getX(),
+						FastMath.sinQuick(orientation - openingAngle + alpha*i)* REAL_RANGE + sensorPositions[sensorNumber].getY()
 					 );
 			}
 		}
@@ -222,7 +224,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 					rayPositions[sensorNumber][i][1] = cone;
 				
 				Vector2d intersection = null;
-				intersection = w.intersectsWithLineSegment(sensorPositions[sensorNumber], cone, Math.toRadians(cutoffAngle));
+				intersection = w.intersectsWithLineSegment(sensorPositions[sensorNumber], cone, FastMath.toRadians(cutoffAngle));
 				
 //				if(sensorNumber == 3 && i == 1) {
 //					System.out.println(source.getObject().getId());
@@ -243,7 +245,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 						
 						if((minimumDistances[sensorNumber][i] == 0 || distance < minimumDistances[sensorNumber][i]) && inputValue > rayReadings[sensorNumber][i]) {
 							rayPositions[sensorNumber][i][1] = intersection;
-							rayReadings[sensorNumber][i] = Math.max(inputValue, rayReadings[sensorNumber][i]);
+							rayReadings[sensorNumber][i] = FastMath.max(inputValue, rayReadings[sensorNumber][i]);
 						}
 					}
 				}
@@ -270,7 +272,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 			}
 		
 			for(int i = 0 ; i < numberOfRays ; i++)
-				rayReadings[sensorNumber][i] = Math.max(inputValue, rayReadings[sensorNumber][i]);
+				rayReadings[sensorNumber][i] = FastMath.max(inputValue, rayReadings[sensorNumber][i]);
 		}
 		return inputValue;
 	}
@@ -370,7 +372,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	
 	protected void oldCalculateSourceContributions(PhysicalObjectDistance source) {
 		for(int j=0; j<numberOfSensors; j++){
-			readings[j] = Math.max(calculateContributionToSensor(j, source), readings[j]);
+			readings[j] = FastMath.max(calculateContributionToSensor(j, source), readings[j]);
 		}
 	}
 	
@@ -431,7 +433,7 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	                double currentDistance = (distanceBefore-distanceAfter)*(linearization)+distanceAfter;
 	                
 	                double currentValue = 1.0-currentDistance/distances[sensorAverages.length-1];
-	                currentValue = Math.min(currentValue,1);
+	                currentValue = FastMath.min(currentValue,1);
 
 	                return currentValue;
 	            }
@@ -444,9 +446,9 @@ public class EpuckIRSensor extends ConeTypeSensor {
 	protected GeometricInfo getSensorGeometricInfo(int sensorNumber,
 			Vector2d source) {
 		double orientation = angles[sensorNumber] + robot.getOrientation();
-		sensorPosition.set(Math.cos(orientation) * robot.getRadius()
+		sensorPosition.set(FastMath.cosQuick(orientation) * robot.getRadius()
 				+ robot.getPosition().getX(),
-				Math.sin(orientation) * robot.getRadius()
+				FastMath.sinQuick(orientation) * robot.getRadius()
 						+ robot.getPosition().getY());
 
 		GeometricInfo sensorInfo = geoCalc.getGeometricInfoBetweenPoints(sensorPosition, 

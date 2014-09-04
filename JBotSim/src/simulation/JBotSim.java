@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
 
+import net.jafama.FastMath;
 import controllers.Controller;
 import simulation.robot.Robot;
 import simulation.util.Arguments;

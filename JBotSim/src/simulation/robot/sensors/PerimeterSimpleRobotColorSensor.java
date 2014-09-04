@@ -1,5 +1,6 @@
 package simulation.robot.sensors;
 
+import net.jafama.FastMath;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.GeometricInfo;
@@ -24,9 +25,9 @@ public class PerimeterSimpleRobotColorSensor extends SimpleRobotColorSensor {
 	protected GeometricInfo getSensorGeometricInfo(int sensorNumber,
 			PhysicalObjectDistance source) {
 		double orientation = angles[sensorNumber] + robot.getOrientation();
-		sensorPosition.set(Math.cos(orientation) * robot.getRadius()
+		sensorPosition.set(FastMath.cosQuick(orientation) * robot.getRadius()
 				+ robot.getPosition().getX(),
-				Math.sin(orientation) * robot.getRadius()
+				FastMath.sinQuick(orientation) * robot.getRadius()
 						+ robot.getPosition().getY());
 		// sensorPosition.set(robot.getPosition().getX(),
 		// robot.getPosition().getY());
