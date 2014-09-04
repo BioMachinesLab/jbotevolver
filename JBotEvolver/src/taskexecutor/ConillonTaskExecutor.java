@@ -2,11 +2,14 @@ package taskexecutor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import result.Result;
 import simulation.util.Arguments;
 import tasks.Task;
 import client.Client;
+import net.jafama.FastMath;
 import comm.ClientPriority;
+
 import evolutionaryrobotics.JBotEvolver;
 
 public class ConillonTaskExecutor extends TaskExecutor {
@@ -20,6 +23,7 @@ public class ConillonTaskExecutor extends TaskExecutor {
 		super(jBotEvolver, args);
 		this.jBotEvolver = jBotEvolver;
 		this.args = args;
+		FastMath.sinQuick(1);//Make sure that Jafama has been initialized
 	}
 
 	private void connect() {

@@ -3,16 +3,19 @@ package evolutionaryrobotics.populations;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
 
-import comm.FileProvider;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import simulation.util.Factory;
+
+import comm.FileProvider;
+
+import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 /**
  * Super-class for populations/evolutionary algorithms.
@@ -365,9 +368,27 @@ public abstract class Population implements Serializable {
 		FileInputStream fis = new FileInputStream(populationFile);
 		GZIPInputStream gzipIn = new GZIPInputStream(fis);
 		ObjectInputStream in = new ObjectInputStream(gzipIn);
-		Population population = (Population) in.readObject();
-		in.close();
-		return population;
+		try {
+			Population population = (Population) in.readObject();
+			in.close();
+			return population;
+		} catch(OptionalDataException e) {
+			System.err.println("There was a problem opening "+f.getName()+"! Opening previous population file...");
+			String load = args.getArgumentAsString("load");
+			int i;
+			for(i = load.length() - 1 ; i >= 0 ; i--) {
+				char c = load.charAt(i);
+				if(c < '0' || c > '9')
+					break;
+			}
+			
+			int gen = (Integer.parseInt(load.substring(i+1))-1);
+			if(gen < 0)
+				throw new RuntimeException("First generation is broken!");
+			String prev = load.substring(0,i+1) + gen;
+			args.setArgument("load", prev);
+			return loadPopulationFromFile(args);
+		}
 	}
 	
 	private static Population loadSpecificPopulationFromFile(Arguments args, String name) throws Exception{

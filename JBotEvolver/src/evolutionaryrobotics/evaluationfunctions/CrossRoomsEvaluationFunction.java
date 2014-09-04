@@ -12,6 +12,7 @@ public class CrossRoomsEvaluationFunction extends EvaluationFunction {
 	private boolean awardBest = false;
 	private boolean debug = false;
 	private double startingX = 0;
+	private boolean kill = false;
 
 	public CrossRoomsEvaluationFunction(Arguments arguments) {
 		super(arguments);
@@ -20,6 +21,7 @@ public class CrossRoomsEvaluationFunction extends EvaluationFunction {
 		punishCollision = arguments.getArgumentAsIntOrSetDefault("punishcollision", 1) == 1;
 		awardBest = arguments.getArgumentAsIntOrSetDefault("awardbest", 0) == 1;
 		debug = arguments.getArgumentAsIntOrSetDefault("debug", 0) == 1;
+		kill = arguments.getArgumentAsIntOrSetDefault("kill", 1) == 1;
 	}
 
 	@Override
@@ -48,7 +50,8 @@ public class CrossRoomsEvaluationFunction extends EvaluationFunction {
 			if(punishCollision && percentage < 0.5){
 				fitness=-1;
 			}
-			simulator.stopSimulation();
+			if(punishCollision || kill)
+				simulator.stopSimulation();
 		}
 		
 		if(percentage > 0.85) {
