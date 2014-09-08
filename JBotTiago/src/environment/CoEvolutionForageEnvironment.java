@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
 
+import net.jafama.FastMath;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
@@ -91,7 +92,7 @@ public class CoEvolutionForageEnvironment extends Environment {
 	private Vector2d newRandomPosition() {
 		double radius = random.nextDouble() * (width/3);
 		double angle = random.nextDouble() * 2 * Math.PI;
-		return new Vector2d(radius * Math.cos(angle), radius * Math.sin(angle));
+		return new Vector2d(radius * FastMath.cosQuick(angle), radius * FastMath.sinQuick(angle));
 	}
 
 	@Override

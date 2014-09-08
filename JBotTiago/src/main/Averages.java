@@ -7,6 +7,8 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+import net.jafama.FastMath;
+
 public class Averages {
 	
 	public static void main(String[] args) {
@@ -88,10 +90,10 @@ public class Averages {
 							values[i]/=number;
 							
 							for (int j = 0; j < realVals[i].length; j++) {
-								deviation[i] += Math.pow((realVals[i][j]-values[i]),2);
+								deviation[i] += FastMath.powQuick((realVals[i][j]-values[i]),2);
 							}
 							deviation[i] /= number;
-							deviation[i] = Math.sqrt(deviation[i]);
+							deviation[i] = FastMath.sqrtQuick(deviation[i]);
 							
 						}
 						if(average)

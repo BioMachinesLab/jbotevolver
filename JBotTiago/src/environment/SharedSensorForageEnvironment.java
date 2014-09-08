@@ -3,6 +3,7 @@ package environment;
 import java.util.LinkedList;
 import java.util.Random;
 
+import net.jafama.FastMath;
 import mathutils.Vector2d;
 import sensors.IntruderSensor;
 import simulation.Simulator;
@@ -163,7 +164,7 @@ public class SharedSensorForageEnvironment extends Environment {
 	private Vector2d newRandomPosition() {
 		double radius = random.nextDouble() * (width/5) + height/4;
 		double angle = random.nextDouble() * 2 * Math.PI;
-		return new Vector2d(radius * Math.cos(angle), radius * Math.sin(angle));
+		return new Vector2d(radius * FastMath.cosQuick(angle), radius * FastMath.sinQuick(angle));
 	}
 
 	@Override

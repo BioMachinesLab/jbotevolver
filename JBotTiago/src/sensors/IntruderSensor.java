@@ -3,6 +3,7 @@ package sensors;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import net.jafama.FastMath;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricCalculator;
@@ -162,8 +163,8 @@ public class IntruderSensor extends ConeTypeSensor {
 		if(!estimatedIntruders.contains(obj)){
 			double alpha = robot.getOrientation() - orientation;
 			
-			double x = robot.getPosition().x + (Math.cos(alpha) * (metersAhead + robot.getRadius()));
-			double y = robot.getPosition().y + (Math.sin(alpha) * (metersAhead + robot.getRadius()));
+			double x = robot.getPosition().x + (FastMath.cosQuick(alpha) * (metersAhead + robot.getRadius()));
+			double y = robot.getPosition().y + (FastMath.sinQuick(alpha) * (metersAhead + robot.getRadius()));
 			
 			if(estimatedValue == null){
 				estimatedValue = new Vector2d(x, y);

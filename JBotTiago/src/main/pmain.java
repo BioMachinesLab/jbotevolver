@@ -1,5 +1,6 @@
 package main;
 
+import net.jafama.FastMath;
 import evolutionaryrobotics.PostEvaluation;
 
 public class pmain {
@@ -70,8 +71,8 @@ public class pmain {
 		double stdDeviation = 0;
 		
 		for(double d : values)
-			stdDeviation+=Math.pow(d-avg,2);
+			stdDeviation+=FastMath.powQuick(d-avg,2);
 		
-		return Math.sqrt(stdDeviation/(double)values.length);
+		return FastMath.sqrtQuick(stdDeviation/(double)values.length);
 	}
 }
