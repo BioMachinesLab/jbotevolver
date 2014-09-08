@@ -88,7 +88,7 @@ public class PostEvaluation {
 			
 			if (jBotEvolver.getArguments().get("--executor") != null) {
 				if(localEvaluation)
-					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, new Arguments("classname=SequentialTaskExecutor",true));
+					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, new Arguments("classname=ParallelTaskExecutor",true));
 				else
 					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
 				taskExecutor.prepareArguments(jBotEvolver.getArguments());
