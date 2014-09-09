@@ -131,14 +131,14 @@ public class ERNEATPopulation extends Population implements Serializable{
 		final CompoundOperator weightMutation = new CompoundOperator();
 		
 		if(continuousNetwork) {
-			weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
-			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
-		} else {
 			weightMutation.getComponents().add(0.45,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
 			weightMutation.getComponents().add(0.05,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
 			
 			weightMutation.getComponents().add(0.45,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutatePerturbNeuronDecay(0.1)));
 			weightMutation.getComponents().add(0.05,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutateResetNeuronDecay()));
+		} else {
+			weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
+			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
 		}
 		
 		weightMutation.getComponents().finalizeStructure();
@@ -223,7 +223,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 		this.worstFitness = Double.MAX_VALUE;
 		this.bestFitness = Double.MIN_VALUE;
 		this.avgFitness = 0.0;
-
+		
 		for(NEATNetwork key : this.stats.keySet()){
 			TaskStatistics stats = this.stats.get(key);
 			double objectiveValue = stats.get(objectiveKey);
@@ -231,7 +231,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 			this.worstFitness = Math.min(objectiveValue, worstFitness);
 			avgFitness += objectiveValue;
 		}
-
+		
 		this.avgFitness /= this.stats.size();
 	}
 

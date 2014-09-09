@@ -585,6 +585,9 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable,
 		
 		int count = 1;
 		
+		//TODO this might not be efficient
+		calculateScore(bestGenome);
+		
 		for (final Species species : getPopulation().getSpecies()) {
 			int numToSpawn = species.getOffspringCount();
 			// Add elite genomes directly

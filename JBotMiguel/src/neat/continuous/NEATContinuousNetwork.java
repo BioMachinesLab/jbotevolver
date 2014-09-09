@@ -65,12 +65,20 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 		// bias
 		this.postActivation[0] = 1.0;
 		
+		try{
+		
+			int index = 0;
+			
 		for(NEATNeuronGene gene : neurons) {
 			if(gene instanceof NEATContinuousNeuronGene) {
 				NEATContinuousNeuronGene continuousGene = (NEATContinuousNeuronGene)gene;
 				double decay = FastMath.powQuick(10, (-1.0 + (tau * ((continuousGene).getDecay()) + 10.0) / 20));
-				decays[(int)continuousGene.getId()] = decay;
+				decays[index] = decay;
 			}
+			index++;
+		}
+		}catch(Exception e)  {
+			e.printStackTrace();
 		}
 		
 	}
