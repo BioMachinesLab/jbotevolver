@@ -72,9 +72,13 @@ public class NEATGenerationalEvolution extends Evolution {
 
 		print("GOING TO EVOLVE.\n");
 		while(!population.evolutionDone()) {
+			
+			String fitness = (""+population.getHighestFitness());
+			
+			fitness = fitness.substring(0,Math.min(6,fitness.length()));
 
 			taskExecutor.setDescription(output+" "+
-					population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations());
+					population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations()+" "+fitness);
 
 			population.evolvePopulation(jBotEvolver, taskExecutor);
 			

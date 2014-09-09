@@ -1,26 +1,31 @@
-package neat;
+package neat.continuous;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import neat.NEATNetworkController;
+
 import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
-import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
-import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
+import org.encog.neural.neat.training.NEATNeuronGene;
+
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 
-public class NEATNetworkController extends NeuralNetworkController implements VariableLengthEvolvableController<NEATNetwork> {
-
-	public NEATNetworkController(Simulator simulator, Robot robot, Arguments args) {
+public class NEATContinuousNetworkController extends NEATNetworkController {
+	
+	public NEATContinuousNetworkController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
 	}
 	
 	@Override
 	public void setNeuralNetwork(NeuralNetwork network) {
-		ERNEATNetwork wrapper = (ERNEATNetwork)network;
-		NEATNetwork copyNetwork = createCopyNetwork(wrapper.getNEATNetwork());
-		((ERNEATNetwork)this.neuralNetwork).setNEATNetwork(copyNetwork);
+		ERNEATContinuousNetwork wrapper = (ERNEATContinuousNetwork)network;
+		NEATContinuousNetwork copyNetwork = (NEATContinuousNetwork)createCopyNetwork(wrapper.getNEATNetwork());
+		((ERNEATContinuousNetwork)this.neuralNetwork).setNEATNetwork(copyNetwork);
 		
 		if(printWeights) {
 			double[] weights = neuralNetwork.getWeights();
@@ -34,15 +39,20 @@ public class NEATNetworkController extends NeuralNetworkController implements Va
 		}
 	}
 
-	public static synchronized NEATNetwork createCopyNetwork(NEATNetwork neatNetwork) {
+	public static synchronized NEATNetwork createCopyNetwork(NEATNetwork net) {
+		
+		NEATContinuousNetwork neatNetwork = (NEATContinuousNetwork)net;
+		
 		//get
 		NEATLink[] originalLinks = neatNetwork.getLinks();
 		ActivationFunction[] originalFunctions = neatNetwork.getActivationFunctions();
+		List<NEATNeuronGene> originalNeurons = neatNetwork.getNeurons();
 		
 		//initialise
 		int inputs = neatNetwork.getInputCount(), outputs = neatNetwork.getOutputCount();
 		ArrayList<NEATLink> links = new ArrayList<NEATLink>(originalLinks.length);
 		ActivationFunction[] functions = new ActivationFunction[originalFunctions.length];
+		ArrayList<NEATNeuronGene> neurons = new ArrayList<NEATNeuronGene>();
 		
 		//copy/clone
 		for(int i = 0; i < originalLinks.length; i++){
@@ -55,7 +65,12 @@ public class NEATNetworkController extends NeuralNetworkController implements Va
 			functions[i] = original.clone();
 		}
 		
-		return new NEATNetwork(inputs, outputs, links, functions);
+		for(int i = 0 ; i < originalNeurons.size() ; i++){
+			NEATNeuronGene original = originalNeurons.get(i);
+			neurons.add(new NEATNeuronGene(original));
+		}
+		
+		return new NEATContinuousNetwork(inputs, outputs, links, functions,neurons);
 	}
 	
 	@Override
@@ -71,32 +86,10 @@ public class NEATNetworkController extends NeuralNetworkController implements Va
 			System.out.println(w);
 		}
 		
-		NEATNetwork net = ERNEATNetwork.getNetworkByWeights(weights);
+		NEATContinuousNetwork net = ERNEATContinuousNetwork.getNetworkByWeights(weights);
 		
-		((ERNEATNetwork)this.neuralNetwork).setNEATNetwork(net);
+		((ERNEATContinuousNetwork)this.neuralNetwork).setNEATNetwork(net);
 		reset();
 	}
-	
-	@Override
-	public void begin() {
-	}
 
-	@Override
-	public void controlStep(double time) {
-		neuralNetwork.controlStep(time);
-	}
-
-	@Override
-	public void end() {
-	}
-
-	@Override
-	public void reset() {
-		super.reset();
-		neuralNetwork.reset();
-	}
-
-	public NeuralNetwork getNeuralNetwork() {
-		return neuralNetwork;
-	}
 }

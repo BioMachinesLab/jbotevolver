@@ -7,14 +7,14 @@ public class SimpleObjectiveResult extends Result {
 	protected int resultId;
 	protected int resultSample;
 	protected double fitness;
-	protected int netHash;
+	protected long threadId;
 	
-	public SimpleObjectiveResult(int resultId, int resultSample, double fitness, int netHash) {
+	public SimpleObjectiveResult(int resultId, int resultSample, double fitness, long threadId) {
 		super();
 		this.resultId = resultId;
 		this.resultSample = resultSample;
 		this.fitness = fitness;
-		this.netHash = netHash;
+		this.threadId = threadId;
 	}
 
 	public double getFitness() {
@@ -29,7 +29,7 @@ public class SimpleObjectiveResult extends Result {
 		return this.resultId;
 	}
 	
-	public int getNetHash() {
-		return netHash;
+	public long getThreadId() {
+		return threadId;
 	}
 }

@@ -3,6 +3,6 @@ package neat;
 
 public interface VariableLengthEvolvableController<E> {
 
-	public void setNetwork(E setNetwork);
-
+	public void setNNWeights(double[] weights);
+	public double[] getNNWeights();
 }

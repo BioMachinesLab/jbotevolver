@@ -22,7 +22,8 @@ public class CrossSpecialDoor5EvaluationFunction extends EvaluationFunction {
 	private boolean doorClosed = false;
 	private boolean kill = false;
 	private double penaltyMultiplier = 1;
-	private boolean time = true;;
+	private boolean time = true;
+	private boolean ignoreDoors = false;
 
 	public CrossSpecialDoor5EvaluationFunction(Arguments arguments) {
 		super(arguments);
@@ -31,6 +32,7 @@ public class CrossSpecialDoor5EvaluationFunction extends EvaluationFunction {
 		kill = arguments.getArgumentAsIntOrSetDefault("kill",0) == 1;
 		penaltyMultiplier = arguments.getArgumentAsDoubleOrSetDefault("penalty",1);
 		time = arguments.getArgumentAsIntOrSetDefault("time", 0) == 1;
+		ignoreDoors = arguments.getArgumentAsIntOrSetDefault("ignoredoors", 0) == 1;
 	}
 
 	@Override
@@ -43,7 +45,6 @@ public class CrossSpecialDoor5EvaluationFunction extends EvaluationFunction {
 		fitness = 0;
 		
 		ArrayList<Robot> robots = simulator.getRobots();
-		TwoRoomsMultiEnvironment env = (TwoRoomsMultiEnvironment)simulator.getEnvironment();
 		
 		double leftX = Double.MAX_VALUE;
 		double rightX = -Double.MAX_VALUE;
@@ -85,12 +86,18 @@ public class CrossSpecialDoor5EvaluationFunction extends EvaluationFunction {
 		if(!allInside && bonusAmount > 0)
 			bonus+=bonusAmount;
 		
-		if(!allInside && env.isFirstDoorClosed() && env.doorsOpen) {
-			simulator.stopSimulation();
-		}
+		if(!ignoreDoors) {
+			
+			TwoRoomsMultiEnvironment env = (TwoRoomsMultiEnvironment)simulator.getEnvironment();
 		
-		if(!doorClosed && !allCrossed && !env.doorsOpen) {
-			simulator.stopSimulation();
+			if(!allInside && env.isFirstDoorClosed() && env.doorsOpen) {
+				simulator.stopSimulation();
+			}
+			
+			if(!doorClosed && !allCrossed && !env.doorsOpen) {
+				simulator.stopSimulation();
+			}
+		
 		}
 		
 		if(allCrossed) {

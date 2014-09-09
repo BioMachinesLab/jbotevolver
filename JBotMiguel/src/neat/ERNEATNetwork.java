@@ -1,13 +1,16 @@
 package neat;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
+import org.encog.engine.network.activation.ActivationFunction;
+import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
+import org.encog.ml.data.MLData;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.util.EngineArray;
 
 import simulation.util.Arguments;
-
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
@@ -16,30 +19,34 @@ import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 public class ERNEATNetwork extends NeuralNetwork {
 
 	private static final long serialVersionUID = 1L;
-	protected org.encog.neural.neat.NEATNetwork network;
-	//protected MLData inputs;
+	protected NEATNetwork network;
 
 	public ERNEATNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments){
 		this.create(inputs, outputs);
+	}
+	
+	public ERNEATNetwork(NEATNetwork network){
+		this.network = network;
+		
+		inputNeuronStates  = new double[network.getInputCount()];
+		outputNeuronStates = new double[network.getOutputCount()];
+		
+		reset();
 	}
 
 	@Override
 	public void create(Vector<NNInput> inputs, Vector<NNOutput> outputs) {
 		super.create(inputs, outputs);
-		//this.inputs = new BasicMLData(super.inputNeuronStates);
-		//System.out.println("CREATED");
-		//setupNetwork();
+	}
+	
+	@Override
+	public void setWeights(double[] weights) {
+		network = getNetworkByWeights(weights);
 	}
 
 	@Override
-	protected double[] propagateInputs(double[] inputValues) {
-		//inputs.setData(inputValues);
-		//return network.compute(inputs).getData();
-
-		return this.processInputs(inputValues);
-	}
-
-	public double[] processInputs(double[] input) {
+	protected double[] propagateInputs(double[] input) {
+		
 		double[] result = new double[network.getOutputCount()];
 
 		double[] preActivation = network.getPreActivation();
@@ -49,12 +56,11 @@ public class ERNEATNetwork extends NeuralNetwork {
 		// copy input
 		EngineArray.arrayCopy(input, 0, postActivation, 1, network.getInputCount());
 
-		// 1 activatio cycles
-		//for(int i = 0; i < network.getActivationCycles(); i++){
+		// 1 activation cycles
 		for (int j = 0; j < links.length; j++) {
 			preActivation[links[j].getToNeuron()] += postActivation[links[j].getFromNeuron()] * links[j].getWeight();
 		}
-		//}
+		
 		for (int j = network.getOutputIndex(); j < preActivation.length; j++) {
 			postActivation[j] = preActivation[j];
 			network.getActivationFunctions()[j].activationFunction(postActivation, j, 1);
@@ -67,10 +73,9 @@ public class ERNEATNetwork extends NeuralNetwork {
 		return result;
 	}
 
+
 	@Override
 	public void reset() {
-		EngineArray.fill(network.getPreActivation(), 0.0);
-		EngineArray.fill(network.getPostActivation(), 0.0);
 		network.getPostActivation()[0] = 1.0;
 	}
 
@@ -79,11 +84,71 @@ public class ERNEATNetwork extends NeuralNetwork {
 	}
 
 	public void setNEATNetwork(NEATNetwork newNetwork) {
-		//System.out.println("SETTING NET");
 		this.network = newNetwork;
 	}
 
 	public void controlStep(double time) {
 		super.controlStep(time);
+	}
+	
+	@Override
+	public double[] getWeights() {
+		return ERNEATNetwork.getWeights(this.getNEATNetwork());
+	}
+	
+	public static double[] getWeights(NEATNetwork network) {
+		int inputs = network.getInputCount();
+		int outputs = network.getOutputCount();
+		int nLinks = network.getLinks().length;
+		int nActivations = network.getActivationFunctions().length;
+		
+		double[] weights = new double[4+3*nLinks];
+		weights[0] = inputs;
+		weights[1] = outputs;
+		weights[2] = nLinks;
+		weights[3] = nActivations;
+		
+		for(int i = 0 ; i < nLinks ; i++) {
+			int pos = 4+3*i;
+			NEATLink link = network.getLinks()[i];
+
+			weights[pos++] = link.getFromNeuron();
+			weights[pos++] = link.getToNeuron();
+			weights[pos++] = link.getWeight();
+		}
+		
+		for(int i = 0 ; i < nActivations ; i++) {
+			//If it breaks here, it's because we don't always have SteepenedSigmoids!!
+			ActivationSteepenedSigmoid link = (ActivationSteepenedSigmoid)network.getActivationFunctions()[i];
+		}
+		
+		return weights;
+	}
+
+	public static NEATNetwork getNetworkByWeights(double[] weights) {
+		
+		int inputs = (int)weights[0];
+		int outputs = (int)weights[1];
+		int nLinks = (int)weights[2];
+		int nActivations = (int)weights[3];
+		
+		ArrayList<NEATLink> links = new ArrayList<NEATLink>();
+		ActivationFunction[] activations = new ActivationFunction[nActivations];
+		
+		for(int i = 0 ; i < nLinks ; i++) {
+			int pos = 4+3*i;
+
+			int from = (int) weights[pos++];
+			int to = (int) weights[pos++];
+			double weight = weights[pos++];
+			
+			links.add(new NEATLink(from, to, weight));
+		}
+		
+		for(int i = 0 ; i < nActivations ; i++) {
+			activations[i]=new ActivationSteepenedSigmoid();
+		}
+		
+		return new NEATNetwork(inputs, outputs, links, activations);
 	}
 }

@@ -11,9 +11,11 @@ import org.encog.neural.neat.NEATNetwork;
 
 import simulation.Simulator;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 import taskexecutor.tasks.JBotEvolverTask;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 
 public class NEATGenerationalTask extends JBotEvolverTask {
 
@@ -21,56 +23,66 @@ public class NEATGenerationalTask extends JBotEvolverTask {
 	protected Random random;
 	private JBotEvolver jBotEvolver;
 	protected MLMethod method;
-	protected SingleObjective objective;
+	protected Arguments objectiveArgs;
 	protected double fitness = 0;
-	protected int netHash;
+	protected long threadId;
+	protected int nSamples = 1;
+	protected int objectiveId = 1;
 
-	public NEATGenerationalTask(JBotEvolver jBotEvolver, int sampleNumber, 
-			SingleObjective objective, MLMethod method, long seed, int hash) {
+	public NEATGenerationalTask(JBotEvolver jBotEvolver, int sampleNumber, Arguments objectiveArgs, MLMethod method, long seed, long threadId, int nSamples) {
 		super(jBotEvolver);
 		this.sampleNumber = sampleNumber;
 		this.method = method;
 		this.jBotEvolver = jBotEvolver;
-		this.objective = objective;
+		this.objectiveArgs = objectiveArgs;
 		this.random = new Random(seed);
-		this.netHash = hash;
+		this.threadId = threadId;
+		this.nSamples = nSamples;
+		objectiveId = objectiveArgs.getArgumentAsIntOrSetDefault("id", 1);
 	}
-
+	
 	@Override
 	public void run() {
-
-		Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
-		simulator.setFileProvider(getFileProvider());
-
-		jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", sampleNumber);
-
-		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
-		//extended jbotevolver specific method
-		setMLControllers(robots, method);
-		simulator.addRobots(robots);
-
-		EvaluationFunction eval = objective.getEvaluationFunction();
-		//System.out.println(eval.getClass());
-		simulator.addCallback(eval);
-		simulator.simulate();
 		
-		this.fitness = eval.getFitness();
+		for(int i = 0 ; i < nSamples ; i++) {
+			
+			Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
+			simulator.setFileProvider(getFileProvider());
+	
+			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
+	
+			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
+			//extended jbotevolver specific method
+			setMLControllers(robots, method);
+			simulator.addRobots(robots);
+	
+			EvaluationFunction eval;
+			
+			eval = EvaluationFunction.getEvaluationFunction(objectiveArgs);
+			
+			simulator.addCallback(eval);
+			simulator.simulate();
+			
+			this.fitness+= eval.getFitness();
+		}
+		
+		if(nSamples > 1)
+			fitness/=nSamples;
 	}
 	
 	private void setMLControllers(ArrayList<Robot> robots, MLMethod method) {
 		for(Robot r : robots) {
-			NEATNetworkController controller = (NEATNetworkController) r.getController();
-			NEATNetwork network = (NEATNetwork) method;
-			controller.setNetwork(network);
+			NeuralNetworkController controller = (NeuralNetworkController) r.getController();
+			ERNEATNetwork wrapper = (ERNEATNetwork)controller.getNeuralNetwork();
+			wrapper.setNEATNetwork((NEATNetwork)method);
+			controller.setNeuralNetwork(wrapper);
+			controller.reset();
 		}
 	}
 
 	@Override
 	public Result getResult() {
-		/*if(finalScore < 0)
-			finalScore = 0;*/
-		//System.out.println("RESULT FITNESS: " + this.fitness + "; " + this.sampleNumber);
-		SimpleObjectiveResult fr = new SimpleObjectiveResult(objective.getId(), this.sampleNumber, this.fitness, this.netHash);
+		SimpleObjectiveResult fr = new SimpleObjectiveResult(objectiveId, this.sampleNumber, this.fitness, this.threadId);
 		return fr;
 	}
 }

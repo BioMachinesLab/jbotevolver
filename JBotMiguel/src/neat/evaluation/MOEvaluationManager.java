@@ -205,7 +205,7 @@ public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 
 	private int createSimulationTasks(SingleObjective objective,
 			NEATNetwork net) {
-		for(int i = 0; i < this.numberOfSamples; i++){
+		/*for(int i = 0; i < this.numberOfSamples; i++){
 			int hash = net.hashCode();
 			NEATNetwork taskNet = createTaskNet(net);
 			SingleObjective taskObjective = createTaskObjective(objective);
@@ -214,7 +214,7 @@ public class MOEvaluationManager extends MOEvaluation<NEATNetwork> {
 					new JBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), 
 					i, taskObjective, taskNet, 
 					generationalSeed+i,hash));
-		}
+		}*/
 		
 		return this.numberOfSamples;
 	

@@ -11,6 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import neat.NEATGenerationalTask;
 import neat.NEATNetworkController;
 import neat.SimpleObjectiveResult;
+import neat.continuous.NEATContinuousNetwork;
+import neat.continuous.NEATContinuousNetworkController;
 
 import org.encog.ml.MLMethod;
 import org.encog.neural.neat.NEATNetwork;
@@ -29,7 +31,7 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 
 	protected int numberOfSamples;
 	protected long generationalSeed;
-	protected SingleObjective objective;
+//	protected SingleObjective objective;
 	protected Arguments objectiveArgs;
 	protected int objectiveId = 0;
 	protected transient JBotEvolver evolver;
@@ -37,10 +39,11 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 	protected final String OBJECTIVE_KEY_PREFIX = "o";
 	private boolean supressMessages = false;
 	
-	private Map<Integer,Stack<SimpleObjectiveResult>> synchronizedMap = Collections.synchronizedMap(new HashMap<Integer,Stack<SimpleObjectiveResult>>());
+	private Map<Long,Stack<SimpleObjectiveResult>> synchronizedMap = Collections.synchronizedMap(new HashMap<Long,Stack<SimpleObjectiveResult>>());
 	private int asked = 0;
 	private int getResult = 0;
 	private int printed = 0;
+	boolean aggregateSamples = false;
 	private Lock lock = new ReentrantLock();
 	
 	public SOEvaluationManager(Arguments args) {
@@ -52,12 +55,13 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		int objectiveId = 1;
 		Arguments objectiveArgs = arguments.get("--evaluation");
 		this.objectiveArgs = objectiveArgs;
-		this.objective = (SingleObjective) EvaluationFunction.getEvaluationFunction(objectiveArgs);
-		objective.setId(objectiveId);
-		objective.setKey(OBJECTIVE_KEY_PREFIX + objectiveId);
+//		this.objective = (SingleObjective) EvaluationFunction.getEvaluationFunction(objectiveArgs);
+//		objective.setId(objectiveId);
+//		objective.setKey(OBJECTIVE_KEY_PREFIX + objectiveId);
 		
 		Arguments evolutionArgs = arguments.get("--evolution");
 		supressMessages = evolutionArgs.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
+		aggregateSamples = arguments.get("--evolution").getArgumentAsIntOrSetDefault("aggregatesamples", 0) == 1;
 	}
 
 	@Override
@@ -73,7 +77,6 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 	@Override
 	public double calculateScore(MLMethod method) {
 		double result = evaluateNetwork((org.encog.neural.neat.NEATNetwork) method);
-//		System.out.println(method.hashCode()+" "+result);
 		return result;
 	}
 
@@ -81,12 +84,13 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		ArrayList<SimpleObjectiveResult> results = new ArrayList<SimpleObjectiveResult>();
 		
 		int totalTasksSubmitted = submitTasksForExecution(net);
-		int hash = net.hashCode();
+		long threadId = Thread.currentThread().getId();
 		
-		//get the results.
+		//get the results
 		while(totalTasksSubmitted > 0) {
 			
-			SimpleObjectiveResult result = getResultFromMap(hash);
+			SimpleObjectiveResult result = getResultFromMap(threadId);
+			
 			if(result != null){
 				totalTasksSubmitted--;
 				results.add(result);
@@ -103,19 +107,18 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 				}
 				if(getNewResult) {
 					result = (SimpleObjectiveResult) taskExecutor.getResult();
-//					System.out.println("### "+result.getFitness());
-					if(result.getNetHash() == net.hashCode()) {
+					if(result.getThreadId() == threadId) {
 						totalTasksSubmitted--;
 						results.add(result);
 						print("!");
 					} else {
-						addToMap(result.getNetHash(), result);
+						addToMap(result.getThreadId(), result);
 					}
 				}
 			}
 		}
 				
-		//process the results.
+		//process the results
 		TaskStatistics stats = processTasksResults(results);
 		this.statsManager.addControllerStatistics(net, stats);
 		
@@ -136,9 +139,6 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 
 		stats.put(OBJECTIVE_KEY_PREFIX+1, fitness);
 		
-//		System.out.println("fitness: "+fitness);
-//		System.out.println(++networks);
-		
 		return stats;
 	}
 	
@@ -150,34 +150,35 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 
 	private int submitTasksForExecution(NEATNetwork net) {
 		
-		for(int i = 0; i < this.numberOfSamples; i++){
+		Arguments objectiveArgs = getObjectiveArgs();
+		int separateSamples = aggregateSamples ? 1 : numberOfSamples;
+		int aggregateSamples = this.aggregateSamples ? numberOfSamples : 1;
+		
+		long threadId = Thread.currentThread().getId();
+		
+		for(int i = 0; i < separateSamples; i++){
 			
-			SingleObjective obj = createTaskObjective();
-			
-			int hash = net.hashCode();
 			NEATNetwork taskNet = createTaskNet(net);
-			this.taskExecutor.addTask(new NEATGenerationalTask(
-					new JBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), 
-					i, obj, taskNet, generationalSeed+i, hash));
+			this.taskExecutor.addTask(new NEATGenerationalTask(new JBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), i, objectiveArgs, taskNet, generationalSeed+i, threadId, aggregateSamples));
 			print(".");
 		}
 		
 		synchronized (this) {
-			asked+=numberOfSamples;
+			asked+= separateSamples;
 		}
 		
-		return numberOfSamples;
+		return separateSamples;
 	}
 	
-	private SingleObjective createTaskObjective() {
+	private Arguments getObjectiveArgs() {
 		Arguments objectiveArgs = this.evolver.getArguments().get("--evaluation");
-		SingleObjective taskObjective = (SingleObjective) EvaluationFunction.getEvaluationFunction(objectiveArgs);
-		taskObjective.setId(objective.getId());
-		
-		return taskObjective;
+		return objectiveArgs;
 	}
 
 	private NEATNetwork createTaskNet(NEATNetwork net) {
+		if(net instanceof NEATContinuousNetwork) {
+			return NEATContinuousNetworkController.createCopyNetwork(net);
+		}
 		return NEATNetworkController.createCopyNetwork(net);
 	}
 
@@ -196,12 +197,12 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 	
 	@Override
 	public double getFitness() {
-		if(objective != null)
-			return objective.getFitness();
+//		if(objective != null)
+//			return objective.getFitness();
 		return 0;
 	}
 	
-	public SimpleObjectiveResult getResultFromMap(int key) {
+	public SimpleObjectiveResult getResultFromMap(long key) {
 		
 		synchronized (synchronizedMap) {
 			
@@ -216,7 +217,7 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		}
 	}
 	
-	public void addToMap(int key, SimpleObjectiveResult value) {
+	public void addToMap(long key, SimpleObjectiveResult value) {
 		synchronized (synchronizedMap) {
 			if (synchronizedMap.containsKey(key)) {
 				synchronizedMap.get(key).add(value);
