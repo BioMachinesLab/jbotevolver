@@ -646,8 +646,8 @@ public class GraphPlotter extends JFrame implements Updatable {
 			
 			for(int i = 0 ; i < valuesList.size() ; i++) {
 				double[][] currentValues = valuesList.get(i);
-				double[][] newValues = new double[(int)currentStep][2];
-				for(int j = 0 ; j < currentStep ; j++) {
+				double[][] newValues = new double[(int)currentStep+1][2];
+				for(int j = 0 ; j < currentStep+1 ; j++) {
 					newValues[j][0] = currentValues[j][0];
 					newValues[j][1] = currentValues[j][1];
 				}
@@ -719,7 +719,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 						p.addPlot(s);
 					}
 			
-					p.set("xrange", "[0:"+(currentStep-1)+"]");
+					p.set("xrange", "[0:"+(currentStep)+"]");
 					p.set("border", "3");
 					(new Plotter(p)).start();
 				}
