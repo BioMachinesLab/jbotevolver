@@ -26,6 +26,7 @@ package neat.evolution;
 
 import java.util.Random;
 import java.util.concurrent.Callable;
+
 import org.encog.EncogError;
 import org.encog.ml.MLMethod;
 import org.encog.ml.ea.exception.EARuntimeError;
@@ -33,6 +34,7 @@ import org.encog.ml.ea.genome.Genome;
 import org.encog.ml.ea.opp.EvolutionaryOperator;
 import org.encog.ml.ea.species.Species;
 import org.encog.ml.ea.train.basic.BasicEA;
+import org.encog.neural.neat.NEATNetwork;
 
 /**
  * A worker thread for an Evolutionary Algorithm.
@@ -88,8 +90,7 @@ public class EAWorkerJBot implements Callable<Object> {
 	 * @return The chosen parent.
 	 */
 	private Genome chooseParent() {
-		final int idx = this.train.getSelection().performSelection(this.rnd,
-				this.species);
+		final int idx = this.train.getSelection().performSelection(this.rnd, this.species);
 		return this.species.getMembers().get(idx);
 	}
 
@@ -100,7 +101,6 @@ public class EAWorkerJBot implements Callable<Object> {
 	public Object call() {
 		boolean success = false;
 		int tries = this.train.getMaxOperationErrors();
-		
 		do {
 			try {
 				// choose an evolutionary operation (i.e. crossover or a type of
@@ -150,7 +150,6 @@ public class EAWorkerJBot implements Callable<Object> {
 							.getPopulation());
 					
 				}
-
 				// process the new child
 				for (Genome child : this.children) {
 					if (child != null) {
@@ -159,10 +158,14 @@ public class EAWorkerJBot implements Callable<Object> {
 							child.setBirthGeneration(this.train.getIteration());
 							this.train.calculateScore(child);
 							
+							//TODO
+//							get hashcode again and start comparing gen by gen
+							
 							if (!this.train.addChild(child)) {
 								return null;
 							}
 							success = true;
+							break;
 						}
 					}
 				}

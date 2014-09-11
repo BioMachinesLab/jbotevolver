@@ -6,8 +6,10 @@ import java.util.List;
 import neat.NEATNetworkController;
 
 import org.encog.engine.network.activation.ActivationFunction;
+import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
+import org.encog.neural.neat.NEATNeuronType;
 import org.encog.neural.neat.training.NEATNeuronGene;
 
 import simulation.Simulator;
@@ -46,7 +48,7 @@ public class NEATContinuousNetworkController extends NEATNetworkController {
 		//get
 		NEATLink[] originalLinks = neatNetwork.getLinks();
 		ActivationFunction[] originalFunctions = neatNetwork.getActivationFunctions();
-		List<NEATNeuronGene> originalNeurons = neatNetwork.getNeurons();
+		Neuron[] originalNeurons = neatNetwork.getNeurons();
 		
 		//initialise
 		int inputs = neatNetwork.getInputCount(), outputs = neatNetwork.getOutputCount();
@@ -65,9 +67,14 @@ public class NEATContinuousNetworkController extends NEATNetworkController {
 			functions[i] = original.clone();
 		}
 		
-		for(int i = 0 ; i < originalNeurons.size() ; i++){
-			NEATNeuronGene original = originalNeurons.get(i);
-			neurons.add(new NEATNeuronGene(original));
+		for(int i = 0 ; i < originalNeurons.length ; i++){
+			Neuron original = originalNeurons[i];
+			if(original.isDecayNeuron()) {
+				neurons.add(new NEATContinuousNeuronGene(NEATNeuronType.values()[original.getType()],new ActivationSteepenedSigmoid(),original.getId(),original.getInnovationId(),original.getDecay()));
+			} else {
+				neurons.add(new NEATNeuronGene(NEATNeuronType.values()[original.getType()],new ActivationSteepenedSigmoid(),original.getId(),original.getInnovationId()));
+			}
+			
 		}
 		
 		return new NEATContinuousNetwork(inputs, outputs, links, functions,neurons);

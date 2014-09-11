@@ -74,13 +74,6 @@ public class ERNEATPopulation extends Population implements Serializable{
 		numberOfGenerations = arguments.getArgumentAsIntOrSetDefault("generations",100);
 		numberOfSamplesPerChromosome = arguments.getArgumentAsIntOrSetDefault("samples",10);
 		
-		/**
-		 * compatibility with encog requires the field "--population" 
-		 * to indicate the number of inputs and the number of outputs
-		 */
-		numberInputs = arguments.getArgumentAsIntOrSetDefault("inputs", 1);
-		numberOutputs = arguments.getArgumentAsIntOrSetDefault("outputs", 1);
-		
 		addNodeRate = arguments.getArgumentAsDoubleOrSetDefault("addnoderate", addNodeRate);
 		mutateLinkRate = arguments.getArgumentAsDoubleOrSetDefault("mutatelinkrate", mutateLinkRate);
 	}
@@ -131,11 +124,13 @@ public class ERNEATPopulation extends Population implements Serializable{
 		final CompoundOperator weightMutation = new CompoundOperator();
 		
 		if(continuousNetwork) {
-			weightMutation.getComponents().add(0.45,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
-			weightMutation.getComponents().add(0.05,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
+			weightMutation.getComponents().add(0.9*0.5,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
+			weightMutation.getComponents().add(0.1*0.5,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
 			
-			weightMutation.getComponents().add(0.45,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutatePerturbNeuronDecay(0.1)));
-			weightMutation.getComponents().add(0.05,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutateResetNeuronDecay()));
+			weightMutation.getComponents().add(0.9*0.5,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutatePerturbNeuronDecay(0.1)));
+			weightMutation.getComponents().add(0.1*0.5,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutateResetNeuronDecay()));
+//			weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
+//			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
 		} else {
 			weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
 			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
@@ -186,17 +181,6 @@ public class ERNEATPopulation extends Population implements Serializable{
 	}
 
 	public void evolvePopulation(JBotEvolver jBotEvolver, TaskExecutor taskExecutor) {
-//		if(evaluator == null) {
-//			//resuming
-//			this.evaluator = MOEvaluation.getEvaluationFunction(
-//					jBotEvolver.getArguments().get("--evaluation"));
-//			evaluator.setupObjectives(jBotEvolver.getArguments());
-//			trainer.setEvaluator(evaluator);
-//		}
-		
-//		if(trainer == null) {
-//			trainer = constructPopulationTrainer();
-//		}
 		
 		generationsElapsed++;
 		//System.out.println("GENERATION " + generationsElapsed);
@@ -206,8 +190,8 @@ public class ERNEATPopulation extends Population implements Serializable{
 		trainer.setRandomNumberFactory(new JBotEvolverRandomFactory(getGenerationRandomSeed()));
 		
 		evaluator.setupEvolution(jBotEvolver, taskExecutor, this.numberOfSamplesPerChromosome,this.generationRandomSeed);
-		trainer.iteration();
 		population.setRandomNumberFactory(new JBotEvolverRandomFactory(generationRandomSeed));
+		trainer.iteration();
 		
 	}
 

@@ -20,6 +20,8 @@ public class ERNEATNetwork extends NeuralNetwork {
 
 	private static final long serialVersionUID = 1L;
 	protected NEATNetwork network;
+	protected double[] preActivation;
+	protected double[] postActivation;
 
 	public ERNEATNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments){
 		this.create(inputs, outputs);
@@ -45,32 +47,49 @@ public class ERNEATNetwork extends NeuralNetwork {
 	}
 
 	@Override
-	protected double[] propagateInputs(double[] input) {
+	//TODO this is protected
+	public double[] propagateInputs(double[] input) {
 		
 		double[] result = new double[network.getOutputCount()];
 
-		double[] preActivation = network.getPreActivation();
-		preActivation[0] = 1.0;
-		double[] postActivation = network.getPostActivation();
+		preActivation = network.getPreActivation();
+		postActivation = network.getPostActivation();
+		
+		// clear from previous
+		EngineArray.fill(preActivation, 0.0);
+		EngineArray.fill(postActivation, 0.0);
+
+		//bias neuron is always the first
+		postActivation[0] = 1.0;
+		
 		NEATLink[] links = network.getLinks();
 		// copy input
 		EngineArray.arrayCopy(input, 0, postActivation, 1, network.getInputCount());
 
-		// 1 activation cycles
-		for (int j = 0; j < links.length; j++) {
-			preActivation[links[j].getToNeuron()] += postActivation[links[j].getFromNeuron()] * links[j].getWeight();
-		}
-		
-		for (int j = network.getOutputIndex(); j < preActivation.length; j++) {
-			postActivation[j] = preActivation[j];
-			network.getActivationFunctions()[j].activationFunction(postActivation, j, 1);
-			preActivation[j] = 0.0F;
+		//TODO why?
+		// 1 activation cycle
+		for(int i = 0 ; i < 2 ; i++) {
+			internalCompute(links);
 		}
 
 		// copy output
 		EngineArray.arrayCopy(postActivation, network.getOutputIndex(), result, 0, network.getOutputCount());
 
 		return result;
+	}
+	
+	private void internalCompute(NEATLink[] links) {
+		for (int j = 0; j < links.length; j++) {
+			this.preActivation[links[j].getToNeuron()] += this.postActivation[links[j]
+					.getFromNeuron()] * links[j].getWeight();
+		}
+
+		for (int j = network.getOutputIndex(); j < this.preActivation.length; j++) {
+			this.postActivation[j] = this.preActivation[j];
+			network.getActivationFunctions()[j].activationFunction(this.postActivation,
+					j, 1);
+			this.preActivation[j] = 0.0F;
+		}
 	}
 
 

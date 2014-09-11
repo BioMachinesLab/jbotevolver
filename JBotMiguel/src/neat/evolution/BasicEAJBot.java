@@ -26,13 +26,16 @@ package neat.evolution;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import neat.evaluation.CalculateScoreAsynchronous;
+import neat.evaluation.EvaluationResult;
+
 import org.encog.Encog;
 import org.encog.EncogError;
 import org.encog.EncogShutdownTask;
@@ -62,6 +65,7 @@ import org.encog.ml.ea.species.Speciation;
 import org.encog.ml.ea.species.Species;
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
 import org.encog.ml.genetic.GeneticError;
+import org.encog.neural.neat.training.NEATGenome;
 import org.encog.util.concurrency.MultiThreadable;
 import org.encog.util.logging.EncogLogging;
 
@@ -69,8 +73,7 @@ import org.encog.util.logging.EncogLogging;
  * Provides a basic implementation of a multi-threaded Evolutionary Algorithm.
  * The EA works from a score function.
  */
-public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable,
-		EncogShutdownTask, Serializable {
+public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, EncogShutdownTask, Serializable {
 
 	/**
 	 * The serial id.
@@ -353,6 +356,33 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable,
 		g.setScore(score);
 		g.setAdjustedScore(score);
 	}
+	
+	public void submitEvaluation(Genome g, int evalId) {
+		// try rewrite
+		this.rules.rewrite(g);
+
+		// decode
+		final MLMethod phenotype = getCODEC().decode(g);
+		double score;
+
+		// deal with invalid decode
+		if (phenotype == null) {
+			if (getBestComparator().shouldMinimize()) {
+				score = Double.POSITIVE_INFINITY;
+			} else {
+				score = Double.NEGATIVE_INFINITY;
+			}
+		} else {
+			if (phenotype instanceof MLContext) {
+				((MLContext) phenotype).clearContext();
+			}
+			((CalculateScoreAsynchronous)getScoreFunction()).submitEvaluation(phenotype, evalId);
+		}
+	}
+	
+	public EvaluationResult getEvaluationResult() {
+		return ((CalculateScoreAsynchronous)getScoreFunction()).getEvaluationResult();
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -565,8 +595,10 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable,
 	 */
 	@Override
 	public void iteration() {
+		
 		if (this.actualThreadCount == -1) {
 			preIteration();
+			
 		}
 		if (getPopulation().getSpecies().size() == 0) {
 			throw new EncogError("Population is empty, there are no species.");
@@ -583,10 +615,19 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable,
 			threadList = new ArrayList<Callable<Object>>();
 		this.threadList.clear();
 		
-		int count = 1;
+		int count = population.getPopulationSize() - 1;
 		
 		//TODO this might not be efficient
 		calculateScore(bestGenome);
+		
+		int elitesEvaluated = 0;
+		Genome[] elitesToEvaluate = new Genome[(int)(getPopulation().getPopulationSize()*getEliteRate())];
+		
+		submitEvaluation(bestGenome, 0);
+		elitesToEvaluate[0] = bestGenome;
+		elitesEvaluated++;
+		
+		final EAWorkerSequential worker = new EAWorkerSequential(this, new Random(getRandomNumberFactory().factor().nextLong()));
 		
 		for (final Species species : getPopulation().getSpecies()) {
 			int numToSpawn = species.getOffspringCount();
@@ -597,9 +638,16 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable,
 				for (int i = 0; i < eliteCount; i++) {
 					final Genome eliteGenome = species.getMembers().get(i);
 					if (getOldBestGenome() != eliteGenome) {
+						
 						numToSpawn--;
+						submitEvaluation(eliteGenome, elitesEvaluated);
+						elitesToEvaluate[elitesEvaluated] = eliteGenome;
+						elitesEvaluated++;
+						
 						if (!addChild(eliteGenome)) {
 							break;
+						} else {
+							count--;
 						}
 					}
 				}
@@ -609,21 +657,29 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable,
 			 * Added a new condition to the while, used a different constructor of EAWorker, and used a counter to stop creating new children
 			 * @miguelduarte42
 			 */
-			while (numToSpawn-- > 0 && count < getPopulation().getPopulationSize()) {
-				final EAWorkerJBot worker = new EAWorkerJBot(this, species, new Random(getRandomNumberFactory().factor().nextLong()+count));
-				count++;
-				this.threadList.add(worker);
+			
+			int children = 0;
+
+			while(numToSpawn > 0 && count > 0) {
+				children++;
+				numToSpawn--;
+				count--;
 			}
+			
+			if(children > 0)
+				worker.addSpecies(species, children);
 		}
-		// run all threads and wait for them to finish
-		try {
-			if(taskExecutor == null) {
-				this.taskExecutor = Executors.newFixedThreadPool(this.actualThreadCount);
-			}
-			this.taskExecutor.invokeAll(this.threadList);
-		} catch (final InterruptedException e) {
-			EncogLogging.log(e);
+		
+		while(elitesEvaluated-- > 0) {
+			EvaluationResult result = getEvaluationResult();
+			double fitness = result.getFitness();
+			int index = result.getEvalId();				
+			elitesToEvaluate[index].setScore(fitness);
+			elitesToEvaluate[index].setAdjustedScore(fitness);
 		}
+		
+		worker.run();
+		
 		// handle any errors that might have happened in the threads
 		if (this.reportedError != null && !getShouldIgnoreExceptions()) {
 			throw new GeneticError(this.reportedError);
@@ -665,9 +721,9 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable,
 	 * use.
 	 */
 	private void preIteration() {
-
+		
 		this.speciation.init(this);
-
+		
 		// find out how many threads to use
 		if (this.threadCount == 0) {
 			this.actualThreadCount = Runtime.getRuntime().availableProcessors();
@@ -699,18 +755,20 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable,
 		// (for reload)
 		// if there is an empty population, the constructor would have blow
 		final List<Genome> list = getPopulation().flatten();
-
+		
 		int idx = 0;
 		do {
 			this.bestGenome = list.get(idx++);
 		} while (idx < list.size()
 				&& (Double.isInfinite(this.bestGenome.getScore()) || Double
 						.isNaN(this.bestGenome.getScore())));
-
+		
+		
 		getPopulation().setBestGenome(this.bestGenome);
-
+		
 		// speciate
 		final List<Genome> genomes = getPopulation().flatten();
+		
 		this.speciation.performSpeciation(genomes);
 		
 		// purge invalid genomes

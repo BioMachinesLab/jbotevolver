@@ -11,7 +11,7 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 
-public abstract class SOEvaluation<E> extends NEATEvaluation implements CalculateScore, Serializable {
+public abstract class SOEvaluation<E> extends NEATEvaluation implements CalculateScore, CalculateScoreAsynchronous,Serializable {
 
 	public SOEvaluation(Arguments args) {
 		super(args);

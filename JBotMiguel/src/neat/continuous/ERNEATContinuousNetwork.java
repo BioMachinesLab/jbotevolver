@@ -3,9 +3,7 @@ package neat.continuous;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
-
 import neat.ERNEATNetwork;
-
 import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.neural.neat.NEATLink;
@@ -13,17 +11,15 @@ import org.encog.neural.neat.NEATNetwork;
 import org.encog.neural.neat.NEATNeuronType;
 import org.encog.neural.neat.training.NEATNeuronGene;
 import org.encog.util.EngineArray;
-
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
-
 public class ERNEATContinuousNetwork extends ERNEATNetwork {
 
 	private static final long serialVersionUID = 1L;
-	private NEATContinuousNetwork network;
 	private double[] states;
+	private double[] currentStates;
 
 	public ERNEATContinuousNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments){
 		super(inputs, outputs, arguments);
@@ -31,70 +27,96 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 	
 	public ERNEATContinuousNetwork(NEATContinuousNetwork network){
 		super(network);
-		NEATContinuousNetwork net = (NEATContinuousNetwork)getNEATNetwork();
-		this.network = net;
 		states = network.getStates();
+		currentStates = new double[states.length];
 	}
 
 	@Override
-	protected double[] propagateInputs(double[] input) {
+	//TODO protected
+	public double[] propagateInputs(double[] input) {
 		
 		double[] result = new double[network.getOutputCount()];
-
-		double[] preActivation = network.getPreActivation();
-		double[] postActivation = network.getPostActivation();
 		
-		postActivation[0] = 1.0;
+		preActivation = network.getPreActivation();
+		postActivation = network.getPostActivation();
+		
+		EngineArray.fill(this.preActivation, 0.0);
+		EngineArray.fill(this.postActivation, 0.0);
+		this.postActivation[0] = 1.0;
 		
 		NEATLink[] links = network.getLinks();
 		// copy input
 		EngineArray.arrayCopy(input, 0, postActivation, 1, network.getInputCount());
 		
-		double[] decays = network.getDecays();
+		loadStates();
 		
-		//Load states
-		for(int i = 0 ; i < decays.length ; i++) {
-			if(decays[i] != 0) {
-				preActivation[i] = states[i];
-			}
+		for(int i = 0 ; i < 1 ; i++) {
+			internalCompute(links);
 		}
 		
-		//Decay
-		for(int i = 0 ; i < decays.length ; i++) {
-			if(decays[i] != 0) {
-				preActivation[i]*= network.getTimeStep()/decays[i];
-			}
-		}
-
-		// 1 activation cycles
-		for (int j = 0; j < links.length; j++) {
-			preActivation[links[j].getToNeuron()] += postActivation[links[j].getFromNeuron()] * links[j].getWeight();
-		}
+		saveStates();
 		
-		for (int j = network.getOutputIndex(); j < preActivation.length; j++) {
-			postActivation[j] = preActivation[j];
-			network.getActivationFunctions()[j].activationFunction(postActivation, j, 1);
-			preActivation[j] = 0.0F;
-		}
-		
-		//Save states
-		for(int i = 0 ; i < decays.length ; i++) {
-			if(decays[i] != 0) {
-				//first postActivation is bias
-				states[i] = postActivation[i+1];
-			}
-		}
-
 		// copy output
 		EngineArray.arrayCopy(postActivation, network.getOutputIndex(), result, 0, network.getOutputCount());
 
 		return result;
 	}
 	
+	private void internalCompute(NEATLink[] links) {
+		
+		double[] currentDecayValue = new double[states.length];
+		double[] decays = ((NEATContinuousNetwork)network).getDecays();
+		
+		for(int i = 0 ; i < decays.length ; i++) {
+			if(decays[i] != 0) {
+				preActivation[i] = -states[i];
+				currentDecayValue[i] = ((NEATContinuousNetwork)network).getTimeStep()/decays[i];
+			}
+		}
+		
+		for (int j = 0; j < links.length; j++) {
+			this.preActivation[links[j].getToNeuron()] += this.postActivation[links[j].getFromNeuron()] * links[j].getWeight();
+		}
+		
+		//apply decay to current value
+		for(int j = 0 ; j < preActivation.length; j++) {
+			double decay = ((NEATContinuousNetwork)network).getTimeStep()/decays[j];
+			if(decay != 0) {
+				preActivation[j] = states[j] + preActivation[j]*decay; 
+			}
+		}
+
+		//activate the neurons
+		for (int j = network.getOutputIndex(); j < this.preActivation.length; j++) {
+			this.postActivation[j] = this.preActivation[j];
+			network.getActivationFunctions()[j].activationFunction(this.postActivation, j, 1);
+			//save neuron states for use in the next iteration
+			currentStates[j] = preActivation[j];
+			this.preActivation[j] = 0.0F;
+		}
+	}
+	
+	private void loadStates() {
+		for(int i = network.getInputCount() ; i < ((NEATContinuousNetwork)network).getDecays().length ; i++) {
+			if(((NEATContinuousNetwork)network).getDecays()[i] != 0) {
+				preActivation[i] = states[i];
+			}
+		}
+	}
+	
+	private void saveStates() {
+		for(int i = 0 ; i < ((NEATContinuousNetwork)network).getDecays().length ; i++) {
+			if(((NEATContinuousNetwork)network).getDecays()[i] != 0) {
+				states[i] = postActivation[i];
+				currentStates[i] = 0;
+			}
+		}
+	}
+	
 
 	@Override
 	public void reset() {
-		network.resetStates();
+		((NEATContinuousNetwork)network).resetStates();
 	}
 
 	public NEATNetwork getNEATNetwork() {
@@ -105,7 +127,7 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 	public void setNEATNetwork(NEATNetwork newNetwork) {
 		super.setNEATNetwork(newNetwork);
 		this.network = (NEATContinuousNetwork)newNetwork;
-		states = network.getStates();
+		states = ((NEATContinuousNetwork)network).getStates();
 	}
 
 	public void controlStep(double time) {
@@ -117,11 +139,10 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 		return ERNEATContinuousNetwork.getWeights(this.getNEATNetwork());
 	}
 	
-	//TODO
 	public static double[] getWeights(NEATContinuousNetwork network) {
 		int inputs = network.getInputCount();
 		int outputs = network.getOutputCount();
-		int nNeurons = network.getNeurons().size();
+		int nNeurons = network.getNumberOfNeurons();
 		int nLinks = network.getLinks().length;
 		int nActivations = network.getActivationFunctions().length;
 		
@@ -133,16 +154,16 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 		weights[4] = nActivations;
 		
 		for(int i = 0 ; i < nNeurons ; i++) {
-			int pos = 5+4*i;
-			NEATNeuronGene neuron = network.getNeurons().get(i);
+			int pos = 5 + 4*i;
+			Neuron neuron = network.getNeurons()[i];
 
-			weights[pos++] = neuron.getNeuronType().ordinal();
+			weights[pos++] = neuron.getType();
 			weights[pos++] = neuron.getId();
 			weights[pos++] = neuron.getInnovationId();
 			
 			double decay = 0;
-			if(neuron instanceof NEATContinuousNeuronGene)
-				decay = ((NEATContinuousNeuronGene)neuron).getDecay();
+			if(neuron.isDecayNeuron())
+				decay = neuron.getDecay();
 			
 			weights[pos++] = decay;
 		}
@@ -177,7 +198,7 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 		List<NEATNeuronGene> neurons = new ArrayList<NEATNeuronGene>(nNeurons);
 		
 		for(int i = 0 ; i < nNeurons ; i++) {
-			int pos = 5+4*i;
+			int pos = 5 + 4*i;
 
 			double type = weights[pos++];
 			double neuronId = weights[pos++];
