@@ -50,7 +50,7 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 		
 		loadStates();
 		
-		for(int i = 0 ; i < 1 ; i++) {
+		for(int i = 0 ; i < 10 ; i++) {
 			internalCompute(links);
 		}
 		
@@ -59,18 +59,21 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 		// copy output
 		EngineArray.arrayCopy(postActivation, network.getOutputIndex(), result, 0, network.getOutputCount());
 
+		System.out.println();
+		System.out.println();
+		
 		return result;
 	}
 	
 	private void internalCompute(NEATLink[] links) {
 		
-		double[] currentDecayValue = new double[states.length];
+		System.out.println("\n\n");
+		
 		double[] decays = ((NEATContinuousNetwork)network).getDecays();
 		
 		for(int i = 0 ; i < decays.length ; i++) {
 			if(decays[i] != 0) {
 				preActivation[i] = -states[i];
-				currentDecayValue[i] = ((NEATContinuousNetwork)network).getTimeStep()/decays[i];
 			}
 		}
 		
@@ -78,18 +81,33 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 			this.preActivation[links[j].getToNeuron()] += this.postActivation[links[j].getFromNeuron()] * links[j].getWeight();
 		}
 		
+		//TODO debug
+		System.out.println("PreActivation");
+		for (int j = 0; j < preActivation.length; j++) {
+			System.out.print(preActivation[j]+" ");
+		}
+		
+		
+		System.out.println();
+		System.out.println("decay");
 		//apply decay to current value
 		for(int j = 0 ; j < preActivation.length; j++) {
-			double decay = ((NEATContinuousNetwork)network).getTimeStep()/decays[j];
+			double decay = ((NEATContinuousNetwork)network).getDecays()[j];
 			if(decay != 0) {
-				preActivation[j] = states[j] + preActivation[j]*decay; 
+				decay = ((NEATContinuousNetwork)network).getTimeStep()/decay;
+				System.out.print(decay+" ");
+				if(decay != 0) {
+					preActivation[j] = states[j] + preActivation[j]*decay; 
+				}
 			}
 		}
 
 		//activate the neurons
+		System.out.println("\nPostActivation");
 		for (int j = network.getOutputIndex(); j < this.preActivation.length; j++) {
 			this.postActivation[j] = this.preActivation[j];
 			network.getActivationFunctions()[j].activationFunction(this.postActivation, j, 1);
+			System.out.print(postActivation[j]+" ");
 			//save neuron states for use in the next iteration
 			currentStates[j] = preActivation[j];
 			this.preActivation[j] = 0.0F;
@@ -107,7 +125,7 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 	private void saveStates() {
 		for(int i = 0 ; i < ((NEATContinuousNetwork)network).getDecays().length ; i++) {
 			if(((NEATContinuousNetwork)network).getDecays()[i] != 0) {
-				states[i] = postActivation[i];
+				states[i] = currentStates[i];
 				currentStates[i] = 0;
 			}
 		}

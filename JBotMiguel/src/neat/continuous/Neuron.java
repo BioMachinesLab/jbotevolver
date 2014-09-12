@@ -4,11 +4,11 @@ import java.io.Serializable;
 
 class Neuron implements Serializable{
 	
-	private int type;
-	private boolean decayNeuron;
-	private double decay;
-	private long innovationId;
-	private long id;
+	private int type = 0;
+	private boolean decayNeuron = false;
+	private double decay = 0;
+	private long innovationId = 0;
+	private long id = 0;
 	
 	public Neuron(long id, int type, long innovationId) {
 		this.id = id;

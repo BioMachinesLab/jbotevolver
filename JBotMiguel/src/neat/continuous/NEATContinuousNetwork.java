@@ -73,7 +73,6 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 				NEATContinuousNeuronGene continuousGene = (NEATContinuousNeuronGene)gene;
 				
 				double decay = FastMath.powQuick(10, (-1.0 + (tau * ((continuousGene).getDecay()) + 10.0) / 20));
-				System.out.println("decay: "+decay);
 				decays[index] = decay;
 				
 				backupNeurons[index] = new Neuron(gene.getId(), gene.getNeuronType().ordinal(), decay, gene.getInnovationId());
