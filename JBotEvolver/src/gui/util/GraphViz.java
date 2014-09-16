@@ -80,27 +80,27 @@ public class GraphViz
    /**
     * The dir. where temporary files will be created.
     */
-   private static String TEMP_DIR = System.getProperty("user.dir")+"/graphviz";
+	protected static String TEMP_DIR = System.getProperty("user.dir")+"/graphviz";
 
    /**
     * Where is your dot program located? It will be called externally.
     */
-   private static String DOT; 
+   protected static String DOT; 
 
    /**
     * The source of the graph written in dot language.
     */
-	private StringBuilder graph = new StringBuilder();
+	protected StringBuilder graph = new StringBuilder();
 	
-	private int input = 0;
-	private int hidden = 0;
-	private int output = 0;
+	protected int input = 0;
+	protected int hidden = 0;
+	protected int output = 0;
 	
-	private NeuralNetwork network = null;
+	protected NeuralNetwork network = null;
 	
-	private ImageShower imageShower = null;
+	protected ImageShower imageShower = null;
 	
-    private String type = "png";
+	protected String type = "png";
 
    /**
     * Constructor: creates a new GraphViz object that will contain
@@ -139,8 +139,10 @@ public class GraphViz
 	   setupNetwork();
    }
    
-   private void setupNetwork() {
+   protected void setupNetwork() {
 	   this.graph = new StringBuilder();
+	   
+	   addln(start_graph());
 	   
 	   if(network != null) {
 		   this.input = network.getNumberOfInputNeurons();
@@ -149,11 +151,12 @@ public class GraphViz
 		   if(network.getClass().equals(CTRNNMultilayer.class)) {
 			   CTRNNMultilayer multilayer = (CTRNNMultilayer)network;
 			   this.hidden = multilayer.getHiddenStates().length;
+			   
+			   createNodes();
+			   connectNetwork();
 		   }
 	   }
-	   addln(start_graph());
-	   createNodes();
-	   connectNetwork();
+	   
 	   addln(end_graph());
    }
    
@@ -244,7 +247,10 @@ public class GraphViz
 	   this.network = n;
 	   setupNetwork();
 	   if(imageShower != null) {
-		   imageShower.changeImage(this.getGraph(this.getDotSource()));
+		   BufferedImage img = this.getGraph(this.getDotSource());
+		   imageShower.changeImage(img);
+		   if(img != null)
+			   imageShower.setSize(img.getWidth(),img.getHeight());
 	   }
    }
    
@@ -292,11 +298,10 @@ public class GraphViz
    {
       File dot;
       byte[] img_stream = null;
-   
       try {
     	 long time = System.currentTimeMillis();
          dot = writeDotSourceToFile(dot_source);
-         System.out.println("time "+(System.currentTimeMillis()-time));
+//         System.out.println("time "+(System.currentTimeMillis()-time));
          if (dot != null)
          {
             img_stream = get_img_stream(dot, type);
@@ -305,7 +310,7 @@ public class GraphViz
             return image;
          }
          return null;
-      } catch (java.io.IOException ioe) { return null; }
+      } catch (Exception ioe) { return null; }
    }
 
    /**
@@ -360,7 +365,7 @@ public class GraphViz
          
          p.waitFor();
          
-         System.out.println("wait "+(System.currentTimeMillis()-time));
+//         System.out.println("wait "+(System.currentTimeMillis()-time));
 
          FileInputStream in = new FileInputStream(img.getAbsolutePath());
          img_stream = new byte[in.available()];
@@ -368,24 +373,19 @@ public class GraphViz
          // Close it if we need to
          if( in != null ) in.close();
          
-         System.out.println("read "+(System.currentTimeMillis()-time));
+//         System.out.println("read "+(System.currentTimeMillis()-time));
 
 //         if (img.delete() == false) 
 //            System.err.println("Warning: " + img.getAbsolutePath() + " could not be deleted!");
          
-         System.out.println("delete "+(System.currentTimeMillis()-time));
+//         System.out.println("delete "+(System.currentTimeMillis()-time));
       }
       catch (IOException ioe) {
          System.err.println("Error:    in I/O processing of tempfile in dir " + GraphViz.TEMP_DIR+"\n");
          System.err.println("       or in calling external command");
          ioe.printStackTrace();
       }
-      catch (InterruptedException ie) {
-         System.err.println("Error: the execution of the external program was interrupted");
-         ie.printStackTrace();
-      }
-      
-      System.out.println();
+      catch (InterruptedException ie) {}
       
       return img_stream;
    }
@@ -466,7 +466,9 @@ public class GraphViz
 	   
 	   @Override
 	   public Dimension getSize() {
-		   return new Dimension(img.getWidth(),img.getHeight()+20);
+		   if(img != null)
+			   return new Dimension(img.getWidth(),img.getHeight()+20);
+		   return new Dimension(1,1);
 	   }
    }
 }

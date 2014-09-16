@@ -465,8 +465,9 @@ public class ResultViewerGui extends Gui {
 		});
 		
 		if(enableDebugOptions) {
-			neuralNetworkCheckbox.addChangeListener(new ChangeListener() {
-				public void stateChanged(ChangeEvent arg0) {
+			neuralNetworkCheckbox.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent arg0) {
 					JCheckBox check = (JCheckBox)arg0.getSource();
 					showNeuralNetwork = check.isSelected();
 				}
@@ -598,8 +599,13 @@ public class ResultViewerGui extends Gui {
 			} catch(Exception e) {}
 			
 			if (simulationState == RUN) {
-				if(showNeuralNetwork)
-					graphViz.changeNeuralNetwork(((NeuralNetworkController)simulator.getEnvironment().getRobots().get(0).getController()).getNeuralNetwork());
+				if(showNeuralNetwork) {
+					if(graphViz != null)
+						graphViz.changeNeuralNetwork(((NeuralNetworkController)simulator.getEnvironment().getRobots().get(0).getController()).getNeuralNetwork());
+					else
+						graphViz = new GraphViz(((NeuralNetworkController)simulator.getEnvironment().getRobots().get(0).getController()).getNeuralNetwork());
+						
+				}
 			}
 		}else if(simulateUntil <= simulator.getTime()){
 			simulateUntil = 0;
