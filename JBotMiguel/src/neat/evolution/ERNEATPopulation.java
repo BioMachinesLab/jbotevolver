@@ -143,9 +143,9 @@ public class ERNEATPopulation extends Population implements Serializable{
 		result.addOperation(0.2, new NEATCrossoverJBot());
 		
 		
-		if(continuousNetwork)
+		if(continuousNetwork) {
 			result.addOperation(addNodeRate, new NEATMutateAddContinuousNode());
-		else {
+		}else {
 			result.addOperation(addNodeRate, new NEATMutateAddNodeJBot());
 		}
 		

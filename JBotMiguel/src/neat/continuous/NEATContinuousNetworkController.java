@@ -1,17 +1,13 @@
 package neat.continuous;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import neat.NEATNetworkController;
-
 import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.neural.neat.NEATNeuronType;
 import org.encog.neural.neat.training.NEATNeuronGene;
-
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -66,17 +62,14 @@ public class NEATContinuousNetworkController extends NEATNetworkController {
 			ActivationFunction original = originalFunctions[i];
 			functions[i] = original.clone();
 		}
-		
 		for(int i = 0 ; i < originalNeurons.length ; i++){
 			Neuron original = originalNeurons[i];
 			if(original.isDecayNeuron()) {
-				neurons.add(new NEATContinuousNeuronGene(NEATNeuronType.values()[original.getType()],new ActivationSteepenedSigmoid(),original.getId(),original.getInnovationId(),original.getDecay()));
+				neurons.add(new NEATContinuousNeuronGene(NEATNeuronType.values()[original.getType()],new ActivationSteepenedSigmoid(),original.getId(),original.getInnovationId(),original.getDecay(),original.getBias()));
 			} else {
 				neurons.add(new NEATNeuronGene(NEATNeuronType.values()[original.getType()],new ActivationSteepenedSigmoid(),original.getId(),original.getInnovationId()));
 			}
-			
 		}
-		
 		return new NEATContinuousNetwork(inputs, outputs, links, functions,neurons);
 	}
 	

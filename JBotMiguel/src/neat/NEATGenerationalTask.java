@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import result.Result;
+import neat.continuous.NEATContinuousNetwork;
 import neat.evaluation.SingleObjective;
 
 import org.encog.ml.MLMethod;

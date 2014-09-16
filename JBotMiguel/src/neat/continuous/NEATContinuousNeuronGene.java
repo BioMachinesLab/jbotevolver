@@ -7,10 +7,12 @@ import org.encog.neural.neat.training.NEATNeuronGene;
 public class NEATContinuousNeuronGene extends NEATNeuronGene{
 	
 	private double decay;
+	private double bias;
 	
-	public NEATContinuousNeuronGene(final NEATNeuronType type, ActivationFunction theActivationFunction, final long id, final long innovationID, double decay) {
+	public NEATContinuousNeuronGene(final NEATNeuronType type, ActivationFunction theActivationFunction, final long id, final long innovationID, double decay, double bias) {
 		super(type,theActivationFunction,id,innovationID);
 		this.decay = decay;
+		this.bias = bias;
 	}
 	
 	public double getDecay() {
@@ -21,6 +23,14 @@ public class NEATContinuousNeuronGene extends NEATNeuronGene{
 		this.decay = decay;
 	}
 	
+	public double getBias() {
+		return bias;
+	}
+	
+	public void setBias(double bias) {
+		this.bias = bias;
+	}
+	
 	@Override
 	public void copy(final NEATNeuronGene gene) {
 		final NEATNeuronGene other = gene;
@@ -28,6 +38,7 @@ public class NEATContinuousNeuronGene extends NEATNeuronGene{
 		if(other instanceof NEATContinuousNeuronGene) {
 			final NEATContinuousNeuronGene otherContinuous = (NEATContinuousNeuronGene)gene;
 			this.decay = otherContinuous.decay;
+			this.bias = otherContinuous.bias;
 		}
 	}
 	
@@ -40,6 +51,8 @@ public class NEATContinuousNeuronGene extends NEATNeuronGene{
 		result.append(this.getNeuronType());
 		result.append(", decay=");
 		result.append(this.getDecay());
+		result.append(", bias=");
+		result.append(this.getBias());
 		result.append("]");
 		return result.toString();
 	}

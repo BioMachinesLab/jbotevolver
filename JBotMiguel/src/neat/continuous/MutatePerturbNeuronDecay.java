@@ -27,9 +27,11 @@ public class MutatePerturbNeuronDecay implements MutateDecayWeight,Serializable 
 
 	@Override
 	public void mutateWeight(final Random rnd, final NEATContinuousNeuronGene neuronGene, final double weightRange) {
-		final double delta = rnd.nextGaussian() * this.sigma;
-		double w = neuronGene.getDecay() + delta;
+		double w = neuronGene.getDecay() + rnd.nextGaussian() * this.sigma;
+		double b = neuronGene.getBias() + rnd.nextGaussian() * this.sigma;
 		w = NEATPopulation.clampWeight(w, weightRange);
+		b = NEATPopulation.clampWeight(b, weightRange);
 		neuronGene.setDecay(w);
+		neuronGene.setBias(b);
 	}
 }

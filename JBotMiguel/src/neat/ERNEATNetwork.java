@@ -74,6 +74,7 @@ public class ERNEATNetwork extends NeuralNetwork {
 
 		// copy output
 		EngineArray.arrayCopy(postActivation, network.getOutputIndex(), result, 0, network.getOutputCount());
+		EngineArray.arrayCopy(postActivation, network.getOutputIndex(), outputNeuronStates, 0, network.getOutputCount());
 
 		return result;
 	}

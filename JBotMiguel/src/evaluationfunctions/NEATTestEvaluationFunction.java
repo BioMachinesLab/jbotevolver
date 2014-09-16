@@ -12,6 +12,7 @@ public class NEATTestEvaluationFunction extends EvaluationFunction{
 	double timeToMove = 0;
 	double targetTime = 0;
 	double percentage = 0;
+	double bonus = 0;
 
 	public NEATTestEvaluationFunction(Arguments args) {
 		super(args);
@@ -28,7 +29,6 @@ public class NEATTestEvaluationFunction extends EvaluationFunction{
 		double[] inputs = cn.getInputNeuronStates();
 		double time = simulator.getTime();
 		
-		double bonus = 0;
 		
 		if(time == 0) {
 			timeToMove = (int)(simulator.getRandom().nextDouble()*30+30);
@@ -47,15 +47,18 @@ public class NEATTestEvaluationFunction extends EvaluationFunction{
 		percentage = time/env.getSteps();
 		
 		if(time < targetTime && time > 1) {
-			if(outputs[0] < 0.5) { //bad network
+			if(outputs[0] <= 0.5) { //bad network
 				simulator.stopSimulation();
 			}
 		}
 		
-		if(time > targetTime) {
-			if(outputs[0] < 0.5) { //good network
-				bonus = 1;
+		if(time >= targetTime) {
+			
+			if(outputs[0] <= 0.5) { //good network
+				bonus+= 1;
 				simulator.stopSimulation();
+			} else {
+//				bonus+=(1-outputs[0])/simulator.getEnvironment().getSteps();
 			}
 		}
 		

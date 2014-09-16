@@ -2,11 +2,14 @@ package neat.continuous;
 
 import java.io.Serializable;
 
-class Neuron implements Serializable{
+public class Neuron implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 	
 	private int type = 0;
 	private boolean decayNeuron = false;
 	private double decay = 0;
+	private double bias;
 	private long innovationId = 0;
 	private long id = 0;
 	
@@ -16,9 +19,10 @@ class Neuron implements Serializable{
 		this.innovationId = innovationId;
 	}
 	
-	public Neuron(long id, int type, double decay, long innovationId) {
+	public Neuron(long id, int type, double decay, double bias, long innovationId) {
 		this(id, type,innovationId);
 		this.decay = decay;
+		this.bias = bias;
 		this.decayNeuron = true;
 	}
 	
@@ -40,6 +44,10 @@ class Neuron implements Serializable{
 	
 	public long getInnovationId() {
 		return innovationId;
+	}
+
+	public double getBias() {
+		return bias;
 	}
 	
 }

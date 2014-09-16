@@ -51,7 +51,7 @@ public class NEATMutateAddLinkJBot extends NEATMutateAddLink implements Serializ
 		while ((countTrysToAddLink--) > 0) {
 			final NEATNeuronGene neuron1 = chooseRandomNeuron(target, true, rnd);
 			final NEATNeuronGene neuron2 = chooseRandomNeuron(target, false, rnd);
-
+			
 			if (neuron1 == null || neuron2 == null) {
 				return;
 			}
@@ -64,20 +64,23 @@ public class NEATMutateAddLinkJBot extends NEATMutateAddLink implements Serializ
 					&& (neuron2.getNeuronType() != NEATNeuronType.Bias)
 					&& (neuron2.getNeuronType() != NEATNeuronType.Input)) {
 
-				if ( ((NEATPopulation)getOwner().getPopulation()).getActivationCycles() != 1
-						|| neuron1.getNeuronType() != NEATNeuronType.Output) {
+				//TODO changed this line
+				if ( /*((NEATPopulation)getOwner().getPopulation()).getActivationCycles() != 1
+						||*/ neuron1.getNeuronType() != NEATNeuronType.Output) {
 					neuron1ID = neuron1.getId();
 					neuron2ID = neuron2.getId();
+					
 					break;
 				}
 			}
+			
 		}
 
 		// did we fail to find a link
 		if ((neuron1ID < 0) || (neuron2ID < 0)) {
 			return;
 		}
-
+		
 		double r = ((NEATPopulation) target.getPopulation()).getWeightRange();
 		createLink(target, neuron1ID, neuron2ID,
 				RangeRandomizer.randomize(rnd, -r, r));

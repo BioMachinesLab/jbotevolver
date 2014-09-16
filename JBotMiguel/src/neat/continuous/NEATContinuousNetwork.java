@@ -1,19 +1,18 @@
 package neat.continuous;
 
 import java.io.Serializable;
+import java.io.ObjectInputStream.GetField;
 import java.util.List;
 
 import net.jafama.FastMath;
 
 import org.encog.engine.network.activation.ActivationFunction;
-import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.ml.MLError;
 import org.encog.ml.MLRegression;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
-import org.encog.neural.neat.NEATNeuronType;
 import org.encog.neural.neat.training.NEATNeuronGene;
 import org.encog.util.EngineArray;
 
@@ -35,7 +34,10 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 	private final double[] postActivation;
 
 	private double[] decays;
+	private double[] bias;
+	
 	private double[] states;
+	private double[] currentStates;
 	private double timeStep = 0.2;
 	private double tau      = 2.5;
 	private int numberOfNeurons = 0;
@@ -55,10 +57,11 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 		this.postActivation = new double[neuronCount];
 		this.decays = new double[neuronCount];
 		this.states = new double[neuronCount];
+		this.currentStates = new double[neuronCount];
 		this.numberOfNeurons = neuronCount;
-		
 		backupNeurons = new Neuron[neuronCount];
 		states = new double[neuronCount];
+		bias = new double[neuronCount];
 		
 		// bias
 		this.postActivation[0] = 1.0;
@@ -66,16 +69,17 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 		int index = 0;
 		
 		try{
-		
+			
 		for(NEATNeuronGene gene : neurons) {
 			
 			if(gene instanceof NEATContinuousNeuronGene) {
 				NEATContinuousNeuronGene continuousGene = (NEATContinuousNeuronGene)gene;
 				
-				double decay = FastMath.powQuick(10, (-1.0 + (tau * ((continuousGene).getDecay()) + 10.0) / 20));
+				double decay = FastMath.powQuick(10, (-1.0 + (tau * ((continuousGene).getDecay() + 10.0) / 20)));
 				decays[index] = decay;
+				bias[index] = continuousGene.getBias();
 				
-				backupNeurons[index] = new Neuron(gene.getId(), gene.getNeuronType().ordinal(), decay, gene.getInnovationId());
+				backupNeurons[index] = new Neuron(gene.getId(), gene.getNeuronType().ordinal(), decay, bias[index], gene.getInnovationId());
 			} else {
 				backupNeurons[index] = new Neuron(gene.getId(), gene.getNeuronType().ordinal(), gene.getInnovationId());
 			}
@@ -85,7 +89,7 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 			e.printStackTrace();
 		}
 	}
-
+	
 	/**
 	 * Compute the output from this synapse.
 	 * 
@@ -105,20 +109,74 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 		// copy input
 		EngineArray.arrayCopy(input.getData(), 0, this.postActivation, 1, this.getInputCount());
 		
-//		loadStates();
-//		calculateDecay();
-
-		// iterate through the network activationCycles times
-//		for (int i = 0; i < this.activationCycles; ++i) {
-		internalCompute();
-//		}
-
-//		saveStates();
+		for(int i = 0 ; i < 4 ; i++) {
+			internalCompute(false);
+		}
+		
+		saveStates();
 		
 		// copy output
 		EngineArray.arrayCopy(this.postActivation, this.getOutputIndex(), result.getData(), 0, this.getOutputCount());
 		
 		return result;
+	}
+	
+	public double[] compute(double[] input) {
+		
+		MLData data = new BasicMLData(input);
+		return compute(data).getData();
+	}
+	
+	private void saveStates() {
+		for(int i = getOutputIndex() ; i < getDecays().length ; i++) {
+			states[i] = currentStates[i];
+			currentStates[i] = 0;
+		}
+	}
+	
+	/**
+	 * Perform one activation cycle.
+	 */
+	private void internalCompute(boolean print) {
+		double[] decays = getDecays();
+		
+		for(int i = 0 ; i < decays.length ; i++) {
+			if(decays[i] != 0) {
+				preActivation[i] = -states[i];
+			}
+		}
+		
+		for (int j = 0; j < getLinks().length; j++) {
+			this.preActivation[getLinks()[j].getToNeuron()] += this.postActivation[getLinks()[j].getFromNeuron()] * getLinks()[j].getWeight();
+		}
+		
+		for(int j = getOutputIndex() ; j < preActivation.length; j++) {
+			double decay = getDecays()[j];
+			if(decay != 0) {
+				decay = getTimeStep()/decay;
+				//apply decay
+				preActivation[j] = states[j] + preActivation[j]*decay;
+				//save neuron state
+				currentStates[j] = preActivation[j];
+				//add bias for activation
+				preActivation[j]+= bias[j];
+			} else {
+				preActivation[j] = states[j] + preActivation[j];
+			}
+		}
+		
+		//activate the neurons
+		for (int j = getOutputIndex(); j < this.preActivation.length; j++) {
+			this.postActivation[j] = this.preActivation[j];
+			
+			getActivationFunctions()[j].activationFunction(this.postActivation, j, 1);
+			
+			if(j-getOutputIndex() < getOutputCount()){
+				currentStates[j] = postActivation[j];
+			}
+			//save neuron states for use in the next iteration
+			this.preActivation[j] = 0.0F;
+		}
 	}
 
 	/**
@@ -127,52 +185,12 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 	public double[] getPostActivation() {
 		return this.postActivation;
 	}
-
+	
 	/**
 	 * @return The pre-activation values, used to feed the neurons.
 	 */
 	public double[] getPreActivation() {
 		return this.preActivation;
-	}
-	
-	private void loadStates() {
-		for(int i = 0 ; i < decays.length ; i++) {
-			if(decays[i] != 0) {
-				preActivation[i] = states[i];
-			}
-		}
-	}
-	
-	private void saveStates() {
-		for(int i = 0 ; i < decays.length ; i++) {
-			if(decays[i] != 0) {
-				states[i] = postActivation[i];
-			}
-		}
-	}
-
-	private void calculateDecay() {
-		for(int i = 0 ; i < decays.length ; i++) {
-			if(decays[i] != 0) {
-				preActivation[i]*= timeStep/decays[i];
-			}
-		}
-	}
-	
-	/**
-	 * Perform one activation cycle.
-	 */
-	private void internalCompute() {
-		for (int j = 0; j < this.getLinks().length; j++) {
-			this.preActivation[this.getLinks()[j].getToNeuron()] += this.postActivation[this.getLinks()[j]
-					.getFromNeuron()] * this.getLinks()[j].getWeight();
-		}
-
-		for (int j = this.getOutputIndex(); j < this.preActivation.length; j++) {
-			this.postActivation[j] = this.preActivation[j];
-			this.getActivationFunctions()[j].activationFunction(this.postActivation, j, 1);
-			this.preActivation[j] = 0.0F;
-		}
 	}
 	
 	public double[] getDecays() {

@@ -1,7 +1,9 @@
 package neat.continuous;
 
 import java.util.Random;
+
 import org.encog.engine.network.activation.ActivationFunction;
+import org.encog.mathutil.randomize.Randomizer;
 import org.encog.mathutil.randomize.RangeRandomizer;
 import org.encog.ml.ea.genome.Genome;
 import org.encog.neural.neat.NEATNeuronType;
@@ -13,8 +15,9 @@ import org.encog.neural.neat.training.opp.NEATMutateAddNode;
 
 public class NEATMutateAddContinuousNode extends NEATMutateAddNode{
 	
+	private static double decayRange = 2.0;
+	
 	public void performOperation(final Random rnd, final Genome[] parents, final int parentIndex, final Genome[] offspring, final int offspringIndex) {
-		
 		final NEATGenome target = obtainGenome(parents, parentIndex, offspring, offspringIndex);
 		int countTrysToFindOldLink = getOwner().getMaxTries();
 
@@ -24,36 +27,39 @@ public class NEATMutateAddContinuousNode extends NEATMutateAddNode{
 		NEATLinkGene splitLink = null;
 
 		final int sizeBias = ((NEATGenome)parents[0]).getInputCount() + ((NEATGenome)parents[0]).getOutputCount() + 10;
-
 		// if there are not at least
 		int upperLimit;
 		if (target.getLinksChromosome().size() < sizeBias) {
+			// choose a link, use the square root to prefer the older links
 			upperLimit = target.getNumGenes() - 1 - (int) Math.sqrt(target.getNumGenes());
 		} else {
 			upperLimit = target.getNumGenes() - 1;
 		}
-
-		while ((countTrysToFindOldLink--) > 0) {
-			// choose a link, use the square root to prefer the older links
-			final int i = (int) RangeRandomizer.randomize(rnd, 0, upperLimit + 1);
-			final NEATLinkGene link = target.getLinksChromosome().get(i);
-
-			// get the from neuron
-			final long fromNeuron = link.getFromNeuronID();
-
-			if ((link.isEnabled())
-					&& (target.getNeuronsChromosome()
-							.get(getElementPos(target, fromNeuron))
-							.getNeuronType() != NEATNeuronType.Bias)) {
-				splitLink = link;
-				break;
+		
+		do{
+		
+			while ((countTrysToFindOldLink--) > 0) {
+				
+				final int i = (int) RangeRandomizer.randomize(rnd, 0, upperLimit + 1);
+				final NEATLinkGene link = target.getLinksChromosome().get(i);
+	
+				// get the from neuron
+				final long fromNeuron = link.getFromNeuronID();
+				if ((link.isEnabled()) && (target.getNeuronsChromosome().get(getElementPos(target, fromNeuron)).getNeuronType() != NEATNeuronType.Bias)) {
+					splitLink = link;
+					break;
+				}
 			}
-		}
-
+			
+			if(splitLink == null) {
+				upperLimit++;
+				countTrysToFindOldLink = getOwner().getMaxTries();
+			}
+		} while(upperLimit <= target.getNumGenes() - 1 && splitLink == null);
+			
 		if (splitLink == null) {
 			return;
 		}
-
 		splitLink.setEnabled(false);
 
 		final long from = splitLink.getFromNeuronID();
@@ -64,14 +70,14 @@ public class NEATMutateAddContinuousNode extends NEATMutateAddNode{
 		// add the splitting neuron
 		final ActivationFunction af = ((NEATPopulation)getOwner().getPopulation()).getActivationFunctions().pick(new Random(rnd.nextLong()));
 		
-		double decay = rnd.nextDouble()*(2*pop.getWeightRange()) - pop.getWeightRange();
+		double decay = rnd.nextDouble()*(2*decayRange) - decayRange;
+		double bias = rnd.nextDouble()*(2*decayRange) - decayRange;
 
-		target.getNeuronsChromosome().add(new NEATContinuousNeuronGene(NEATNeuronType.Hidden, af, innovation.getNeuronID(), innovation.getInnovationID(),decay));
+		target.getNeuronsChromosome().add(new NEATContinuousNeuronGene(NEATNeuronType.Hidden, af, innovation.getNeuronID(), innovation.getInnovationID(),decay,bias));
 
 		// add the other two sides of the link
 		createLink(target, from, innovation.getNeuronID(), splitLink.getWeight());
-		createLink(target, innovation.getNeuronID(), to, pop.getWeightRange());
-		
+		createLink(target, innovation.getNeuronID(), to, 1);
 		target.sortGenes();
 	}
 
