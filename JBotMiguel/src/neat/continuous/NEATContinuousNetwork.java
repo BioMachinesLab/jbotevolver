@@ -174,7 +174,6 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 			if(j-getOutputIndex() < getOutputCount()){
 				currentStates[j] = postActivation[j];
 			}
-			//save neuron states for use in the next iteration
 			this.preActivation[j] = 0.0F;
 		}
 	}

@@ -56,7 +56,7 @@ public class GraphVizExtended extends GraphViz {
 	   
 	   NEATNetwork net = ((ERNEATNetwork)network).getNEATNetwork();
 	   
-	   result+="size=\"13,13\"; ranksep=\"2.2 equally\"";
+	   result+="size=\"23,23\"; ranksep=\"2.2 equally\"";
 	   
 	   result+="{rank=same;";
 	   for(int i = 0 ; i < net.getInputCount()+1 ; i++) {

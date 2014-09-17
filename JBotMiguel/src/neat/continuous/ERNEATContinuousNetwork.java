@@ -3,7 +3,9 @@ package neat.continuous;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+
 import neat.ERNEATNetwork;
+
 import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.neural.neat.NEATLink;
@@ -11,6 +13,7 @@ import org.encog.neural.neat.NEATNetwork;
 import org.encog.neural.neat.NEATNeuronType;
 import org.encog.neural.neat.training.NEATNeuronGene;
 import org.encog.util.EngineArray;
+
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
@@ -25,6 +28,7 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 	
 	public ERNEATContinuousNetwork(NEATContinuousNetwork network){
 		super(network);
+		
 	}
 
 	@Override
@@ -59,22 +63,31 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 		return ERNEATContinuousNetwork.getWeights(this.getNEATNetwork());
 	}
 	
-	public static double[] getWeights(NEATContinuousNetwork network) {
+	@Override
+	public void setWeights(double[] weights) {
+		network = getNetworkByWeights(weights);
+	}
+	
+	public static double[] getWeights(NEATNetwork net) {
+		
+		NEATContinuousNetwork network = (NEATContinuousNetwork)net;
+		
 		int inputs = network.getInputCount();
 		int outputs = network.getOutputCount();
 		int nNeurons = network.getNumberOfNeurons();
 		int nLinks = network.getLinks().length;
 		int nActivations = network.getActivationFunctions().length;
 		
-		double[] weights = new double[4+3*nLinks];
-		weights[0] = inputs;
-		weights[1] = outputs;
-		weights[2] = nNeurons;
-		weights[3] = nLinks;
-		weights[4] = nActivations;
+		int pos = 0;
+		
+		double[] weights = new double[5+5*nLinks+3*nLinks];
+		weights[pos++] = inputs;
+		weights[pos++] = outputs;
+		weights[pos++] = nNeurons;
+		weights[pos++] = nLinks;
+		weights[pos++] = nActivations;
 		
 		for(int i = 0 ; i < nNeurons ; i++) {
-			int pos = 5 + 4*i;
 			Neuron neuron = network.getNeurons()[i];
 
 			weights[pos++] = neuron.getType();
@@ -88,13 +101,11 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 				bias = neuron.getBias();
 			}
 			
-			
 			weights[pos++] = decay;
 			weights[pos++] = bias;
 		}
 		
 		for(int i = 0 ; i < nLinks ; i++) {
-			int pos = 5 + nNeurons*5 + 3*i;
 			NEATLink link = network.getLinks()[i];
 
 			weights[pos++] = link.getFromNeuron();
@@ -111,19 +122,20 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 	}
 
 	public static NEATContinuousNetwork getNetworkByWeights(double[] weights) {
+try {
+		int pos = 0;
 		
-		int inputs = (int)weights[0];
-		int outputs = (int)weights[1];
-		int nNeurons = (int)weights[2];
-		int nLinks = (int)weights[3];
-		int nActivations = (int)weights[4];
+		int inputs = (int)weights[pos++];
+		int outputs = (int)weights[pos++];
+		int nNeurons = (int)weights[pos++];
+		int nLinks = (int)weights[pos++];
+		int nActivations = (int)weights[pos++];
 		
 		ArrayList<NEATLink> links = new ArrayList<NEATLink>();
 		ActivationFunction[] activations = new ActivationFunction[nActivations];
 		List<NEATNeuronGene> neurons = new ArrayList<NEATNeuronGene>(nNeurons);
 		
 		for(int i = 0 ; i < nNeurons ; i++) {
-			int pos = 5 + 5*i;
 
 			double type = weights[pos++];
 			double neuronId = weights[pos++];
@@ -142,7 +154,6 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 		}
 		
 		for(int i = 0 ; i < nLinks ; i++) {
-			int pos = 5 + nNeurons*5 + 3*i;
 
 			int from = (int) weights[pos++];
 			int to = (int) weights[pos++];
@@ -156,5 +167,9 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 		}
 		
 		return new NEATContinuousNetwork(inputs, outputs, links, activations, neurons);
+} catch(Exception e) {
+	e.printStackTrace();
+}
+return null;
 	}
 }

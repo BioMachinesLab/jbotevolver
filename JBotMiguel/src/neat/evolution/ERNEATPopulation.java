@@ -11,6 +11,7 @@ import neat.continuous.ERNEATContinuousNetwork;
 import neat.continuous.MutatePerturbNeuronDecay;
 import neat.continuous.MutateResetNeuronDecay;
 import neat.continuous.NEATContinuousCODEC;
+import neat.continuous.NEATContinuousNetwork;
 import neat.continuous.NEATMutateAddContinuousNode;
 import neat.continuous.NEATMutateNeuronDecays;
 import neat.continuous.SelectContinuousProportion;
@@ -141,7 +142,6 @@ public class ERNEATPopulation extends Population implements Serializable{
 		
 		result.addOperation(0.8, weightMutation);
 		result.addOperation(0.2, new NEATCrossoverJBot());
-		
 		
 		if(continuousNetwork) {
 			result.addOperation(addNodeRate, new NEATMutateAddContinuousNode());
@@ -305,6 +305,10 @@ public class ERNEATPopulation extends Population implements Serializable{
 	@Override
 	public Chromosome getBestChromosome() {
 		NEATNetwork net = (NEATNetwork)population.getCODEC().decode(population.getBestGenome());
+		
+		if(net instanceof NEATContinuousNetwork)
+			return new Chromosome(ERNEATContinuousNetwork.getWeights(net), 1);
+		
 		return new Chromosome(ERNEATNetwork.getWeights(net), 1);
 	}
 

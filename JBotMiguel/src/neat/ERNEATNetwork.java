@@ -3,6 +3,8 @@ package neat;
 import java.util.ArrayList;
 import java.util.Vector;
 
+import neat.continuous.NEATContinuousNetwork;
+
 import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.ml.data.MLData;
