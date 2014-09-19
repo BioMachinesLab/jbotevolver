@@ -25,7 +25,7 @@ public class ERNEATNetwork extends NeuralNetwork {
 	protected NEATNetwork network;
 	protected double[] preActivation;
 	protected double[] postActivation;
-	protected double[] previousPostActivations;
+	protected double[] previousPreActivations;
 
 	public ERNEATNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments){
 		this.create(inputs, outputs);
@@ -53,8 +53,8 @@ public class ERNEATNetwork extends NeuralNetwork {
 	//TODO this is protected
 	public double[] propagateInputs(double[] input) {
 		
-		if(previousPostActivations == null)
-			previousPostActivations = new double[network.getPostActivation().length];
+		if(previousPreActivations == null)
+			previousPreActivations = new double[network.getPostActivation().length];
 		
 		double[] result = new double[network.getOutputCount()];
 
@@ -73,14 +73,27 @@ public class ERNEATNetwork extends NeuralNetwork {
 		EngineArray.arrayCopy(input, 0, postActivation, 1, network.getInputCount());
 
 		boolean keepComputing;
-//		int i = 0;
-		/*Keep computing all the internal connections until
-		 *every contributions taken into account*/
+		int i = 0;
+		//Keep computing all the internal connections until
+		//every contributions taken into account
 		do{
-//			i++;
+			i++;
 			internalCompute(network.getLinks());
-			keepComputing = !Arrays.equals(postActivation,previousPostActivations);
-			previousPostActivations = postActivation.clone();
+			keepComputing = false;
+			
+			for(int j = 0 ; j < network.getOutputCount() ; j++) {
+				if(preActivation[network.getOutputIndex()+j] != previousPreActivations[network.getOutputIndex()+j]) {
+					keepComputing = true;
+					break;
+				}
+			}
+			
+			//avoid possible infinite loops if the
+			//states never stabilize due to rounding issues
+			if(i > 1000)
+				break;
+			
+			previousPreActivations = preActivation.clone();
 		} while(keepComputing);
 
 		// copy output
@@ -91,6 +104,11 @@ public class ERNEATNetwork extends NeuralNetwork {
 	}
 	
 	private void internalCompute(NEATLink[] links) {
+		
+		for(int i = 0 ; i < preActivation.length ;i++) {
+			this.preActivation[i] = 0.0F;
+		}
+		
 		for (int j = 0; j < links.length; j++) {
 			this.preActivation[links[j].getToNeuron()] += this.postActivation[links[j]
 					.getFromNeuron()] * links[j].getWeight();
@@ -100,7 +118,10 @@ public class ERNEATNetwork extends NeuralNetwork {
 			this.postActivation[j] = this.preActivation[j];
 			network.getActivationFunctions()[j].activationFunction(this.postActivation,
 					j, 1);
-			this.preActivation[j] = 0.0F;
+			//bring down the pre activations to the 5th decimal place
+			//in order to prevent excessive loops of the internal computation
+			//function due to tiny variations caused by rounding issues
+			preActivation[j] = ((int)(preActivation[j ]*100000.0))/100000.0;
 		}
 	}
 

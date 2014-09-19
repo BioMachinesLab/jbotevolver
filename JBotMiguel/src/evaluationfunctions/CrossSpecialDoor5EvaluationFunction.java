@@ -65,7 +65,6 @@ public class CrossSpecialDoor5EvaluationFunction extends EvaluationFunction {
 					bonusAmount+= 1.0/robots.size()/steps; 
 				}
 			}
-			
 			if(r.isInvolvedInCollison()) {
 				penalty-= penaltyMultiplier/robots.size()/steps;
 				if(kill)

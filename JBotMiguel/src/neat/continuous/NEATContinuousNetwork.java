@@ -40,7 +40,7 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 	private double[] states;
 	private double[] currentStates;
 	
-	private double[] previousPostActivations;
+	private double[] previousPreActivations;
 	
 	private double timeStep = 0.2;
 	private double tau      = 2.5;
@@ -66,7 +66,7 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 		this.backupNeurons = new Neuron[neuronCount];
 		this.states = new double[neuronCount];
 		this.bias = new double[neuronCount];
-		this.previousPostActivations = new double[neuronCount];
+		this.previousPreActivations = new double[neuronCount];
 		
 		int index = 0;
 		
@@ -112,17 +112,29 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 		EngineArray.arrayCopy(input.getData(), 0, this.postActivation, 1, this.getInputCount());
 		
 		boolean keepComputing;
-//		int i = 0;
-		/*Keep computing all the internal connections until
-		 *every contributions taken into account*/
+		int i = 0;
+		//Keep computing all the internal connections until
+		//every contributions taken into account
 		do{
-//			i++;
+			i++;
 			internalCompute();
-			keepComputing = !Arrays.equals(postActivation,previousPostActivations);
-			previousPostActivations = postActivation.clone();
+			keepComputing = false;
+			
+			for(int j = 0 ; j < getOutputCount() ; j++) {
+				if(preActivation[getOutputIndex()+j] != previousPreActivations[getOutputIndex()+j]) {
+					keepComputing = true;
+					break;
+				}
+			}
+			
+			//avoid possible infinite loops if the
+			//states never stabilize due to rounding issues
+			if(i > 1000)
+				break;
+			
+			previousPreActivations = preActivation.clone();
 		} while(keepComputing);
-//		System.out.println(i);
-		
+
 		saveStates();
 		
 		// copy output
@@ -151,14 +163,19 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 		double[] decays = getDecays();
 		
 		for(int i = 0 ; i < decays.length ; i++) {
+			this.preActivation[i] = 0.0F;
 			if(decays[i] != 0) {
 				preActivation[i] = -states[i];
 			}
 		}
-		
+		int contributions = 0;
 		for (int j = 0; j < getLinks().length; j++) {
+			if(this.postActivation[getLinks()[j].getFromNeuron()] * getLinks()[j].getWeight() != 0) {
+				contributions++;
+			}
 			this.preActivation[getLinks()[j].getToNeuron()] += this.postActivation[getLinks()[j].getFromNeuron()] * getLinks()[j].getWeight();
 		}
+//		System.out.println(contributions);
 		
 		for(int j = getOutputIndex() ; j < preActivation.length; j++) {
 			double decay = getDecays()[j];
@@ -181,10 +198,14 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 			
 			getActivationFunctions()[j].activationFunction(this.postActivation, j, 1);
 			
+			//bring down the pre activations to the 5th decimal place
+			//in order to prevent excessive loops of the internal computation
+			//function due to tiny variations caused by rounding issues
+			preActivation[j] = ((int)(preActivation[j ]*100000.0))/100000.0;
+			
 			if(j-getOutputIndex() < getOutputCount()){
 				currentStates[j] = postActivation[j];
 			}
-			this.preActivation[j] = 0.0F;
 		}
 	}
 

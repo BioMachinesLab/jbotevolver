@@ -270,6 +270,191 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void iteration() {
+		
+		if (this.actualThreadCount == -1) {
+			preIteration();
+			
+		}
+		if (getPopulation().getSpecies().size() == 0) {
+			throw new EncogError("Population is empty, there are no species.");
+		}
+
+		this.iteration++;
+
+		// Clear new population to just best genome.
+		this.newPopulation.clear();
+		this.newPopulation.add(this.bestGenome);
+		this.oldBestGenome = this.bestGenome;
+		// execute species in parallel
+		if(threadList == null)
+			threadList = new ArrayList<Callable<Object>>();
+		this.threadList.clear();
+		
+		int count = population.getPopulationSize() - 1;
+		
+		//TODO this might not be efficient
+		calculateScore(bestGenome);
+		
+		int elitesEvaluated = 0;
+		Genome[] elitesToEvaluate = new Genome[(int)(getPopulation().getPopulationSize()*getEliteRate())];
+		
+		submitEvaluation(bestGenome, 0);
+		elitesToEvaluate[0] = bestGenome;
+		elitesEvaluated++;
+		
+		final EAWorkerSequential worker = new EAWorkerSequential(this, new Random(getRandomNumberFactory().factor().nextLong()));
+		
+		for (final Species species : getPopulation().getSpecies()) {
+			int numToSpawn = species.getOffspringCount();
+			// Add elite genomes directly
+			if (species.getMembers().size() > 5) {
+				final int idealEliteCount = (int) (species.getMembers().size() * getEliteRate());
+				final int eliteCount = Math.min(numToSpawn, idealEliteCount);
+				for (int i = 0; i < eliteCount; i++) {
+					final Genome eliteGenome = species.getMembers().get(i);
+					if (getOldBestGenome() != eliteGenome && elitesEvaluated < elitesToEvaluate.length) {
+						
+						numToSpawn--;
+						submitEvaluation(eliteGenome, elitesEvaluated);
+						elitesToEvaluate[elitesEvaluated] = eliteGenome;
+						elitesEvaluated++;
+						
+						if (!addChild(eliteGenome)) {
+							break;
+						} else {
+							count--;
+						}
+					}
+				}
+			}
+			// now add one task for each offspring that each species is allowed
+			/**
+			 * Added a new condition to the while, used a different constructor of EAWorker, and used a counter to stop creating new children
+			 * @miguelduarte42
+			 */
+			
+			int children = 0;
+
+			while(numToSpawn > 0 && count > 0) {
+				children++;
+				numToSpawn--;
+				count--;
+			}
+			
+			if(children > 0)
+				worker.addSpecies(species, children);
+		}
+		
+		while(elitesEvaluated-- > 0) {
+			EvaluationResult result = getEvaluationResult();
+			double fitness = result.getFitness();
+			int index = result.getEvalId();				
+			elitesToEvaluate[index].setScore(fitness);
+			elitesToEvaluate[index].setAdjustedScore(fitness);
+		}
+		
+		worker.run();
+		
+		// handle any errors that might have happened in the threads
+		if (this.reportedError != null && !getShouldIgnoreExceptions()) {
+			throw new GeneticError(this.reportedError);
+		}
+
+		// validate, if requested
+		if (isValidationMode()) {
+			if (this.oldBestGenome != null
+					&& !this.newPopulation.contains(this.oldBestGenome)) {
+				throw new EncogError(
+						"The top genome died, this should never happen!!");
+			}
+
+			if (this.bestGenome != null
+					&& this.oldBestGenome != null
+					&& getBestComparator().isBetterThan(this.oldBestGenome,
+							this.bestGenome)) {
+				throw new EncogError(
+						"The best genome's score got worse, this should never happen!! Went from "
+								+ this.oldBestGenome.getScore() + " to "
+								+ this.bestGenome.getScore());
+			}
+		}
+		this.speciation.performSpeciation(this.newPopulation);
+        // purge invalid genomes
+        this.population.purgeInvalidGenomes();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void performShutdownTask() {
+		finishTraining();
+	}
+
+	/**
+	 * Called before the first iteration. Determine the number of threads to
+	 * use.
+	 */
+	private void preIteration() {
+		
+		this.speciation.init(this);
+		
+		// find out how many threads to use
+		if (this.threadCount == 0) {
+			this.actualThreadCount = Runtime.getRuntime().availableProcessors();
+		} else {
+			this.actualThreadCount = this.threadCount;
+		}
+		
+		// score the initial population
+		final ParallelScore pscore = new ParallelScore(getPopulation(),
+				getCODEC(), new ArrayList<AdjustScore>(), getScoreFunction(),
+				this.actualThreadCount);
+		pscore.setThreadCount(this.actualThreadCount);
+		pscore.process();
+		this.actualThreadCount = pscore.getThreadCount();
+		
+		// start up the thread pool
+		if (this.actualThreadCount == 1) {
+			this.taskExecutor = Executors.newSingleThreadScheduledExecutor();
+		} else {
+			this.taskExecutor = Executors.newFixedThreadPool(this.actualThreadCount);
+		}
+
+		// register for shutdown
+		Encog.getInstance().addShutdownTask(this);
+
+		// just pick the first genome with a valid score as best, it will be
+		// updated later.
+		// also most populations are sorted this way after training finishes
+		// (for reload)
+		// if there is an empty population, the constructor would have blow
+		final List<Genome> list = getPopulation().flatten();
+		
+		int idx = 0;
+		do {
+			this.bestGenome = list.get(idx++);
+		} while (idx < list.size()
+				&& (Double.isInfinite(this.bestGenome.getScore()) || Double
+						.isNaN(this.bestGenome.getScore())));
+		
+		
+		getPopulation().setBestGenome(this.bestGenome);
+		
+		// speciate
+		final List<Genome> genomes = getPopulation().flatten();
+		
+		this.speciation.performSpeciation(genomes);
+		
+		// purge invalid genomes
+        this.population.purgeInvalidGenomes();
+	}
+	
+	/**
 	 * Add a child to the next iteration.
 	 * 
 	 * @param genome
@@ -591,191 +776,6 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void iteration() {
-		
-		if (this.actualThreadCount == -1) {
-			preIteration();
-			
-		}
-		if (getPopulation().getSpecies().size() == 0) {
-			throw new EncogError("Population is empty, there are no species.");
-		}
-
-		this.iteration++;
-
-		// Clear new population to just best genome.
-		this.newPopulation.clear();
-		this.newPopulation.add(this.bestGenome);
-		this.oldBestGenome = this.bestGenome;
-		// execute species in parallel
-		if(threadList == null)
-			threadList = new ArrayList<Callable<Object>>();
-		this.threadList.clear();
-		
-		int count = population.getPopulationSize() - 1;
-		
-		//TODO this might not be efficient
-		calculateScore(bestGenome);
-		
-		int elitesEvaluated = 0;
-		Genome[] elitesToEvaluate = new Genome[(int)(getPopulation().getPopulationSize()*getEliteRate())];
-		
-		submitEvaluation(bestGenome, 0);
-		elitesToEvaluate[0] = bestGenome;
-		elitesEvaluated++;
-		
-		final EAWorkerSequential worker = new EAWorkerSequential(this, new Random(getRandomNumberFactory().factor().nextLong()));
-		
-		for (final Species species : getPopulation().getSpecies()) {
-			int numToSpawn = species.getOffspringCount();
-			// Add elite genomes directly
-			if (species.getMembers().size() > 5) {
-				final int idealEliteCount = (int) (species.getMembers().size() * getEliteRate());
-				final int eliteCount = Math.min(numToSpawn, idealEliteCount);
-				for (int i = 0; i < eliteCount; i++) {
-					final Genome eliteGenome = species.getMembers().get(i);
-					if (getOldBestGenome() != eliteGenome && elitesEvaluated < elitesToEvaluate.length) {
-						
-						numToSpawn--;
-						submitEvaluation(eliteGenome, elitesEvaluated);
-						elitesToEvaluate[elitesEvaluated] = eliteGenome;
-						elitesEvaluated++;
-						
-						if (!addChild(eliteGenome)) {
-							break;
-						} else {
-							count--;
-						}
-					}
-				}
-			}
-			// now add one task for each offspring that each species is allowed
-			/**
-			 * Added a new condition to the while, used a different constructor of EAWorker, and used a counter to stop creating new children
-			 * @miguelduarte42
-			 */
-			
-			int children = 0;
-
-			while(numToSpawn > 0 && count > 0) {
-				children++;
-				numToSpawn--;
-				count--;
-			}
-			
-			if(children > 0)
-				worker.addSpecies(species, children);
-		}
-		
-		while(elitesEvaluated-- > 0) {
-			EvaluationResult result = getEvaluationResult();
-			double fitness = result.getFitness();
-			int index = result.getEvalId();				
-			elitesToEvaluate[index].setScore(fitness);
-			elitesToEvaluate[index].setAdjustedScore(fitness);
-		}
-		
-		worker.run();
-		
-		// handle any errors that might have happened in the threads
-		if (this.reportedError != null && !getShouldIgnoreExceptions()) {
-			throw new GeneticError(this.reportedError);
-		}
-
-		// validate, if requested
-		if (isValidationMode()) {
-			if (this.oldBestGenome != null
-					&& !this.newPopulation.contains(this.oldBestGenome)) {
-				throw new EncogError(
-						"The top genome died, this should never happen!!");
-			}
-
-			if (this.bestGenome != null
-					&& this.oldBestGenome != null
-					&& getBestComparator().isBetterThan(this.oldBestGenome,
-							this.bestGenome)) {
-				throw new EncogError(
-						"The best genome's score got worse, this should never happen!! Went from "
-								+ this.oldBestGenome.getScore() + " to "
-								+ this.bestGenome.getScore());
-			}
-		}
-		this.speciation.performSpeciation(this.newPopulation);
-        // purge invalid genomes
-        this.population.purgeInvalidGenomes();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void performShutdownTask() {
-		finishTraining();
-	}
-
-	/**
-	 * Called before the first iteration. Determine the number of threads to
-	 * use.
-	 */
-	private void preIteration() {
-		
-		this.speciation.init(this);
-		
-		// find out how many threads to use
-		if (this.threadCount == 0) {
-			this.actualThreadCount = Runtime.getRuntime().availableProcessors();
-		} else {
-			this.actualThreadCount = this.threadCount;
-		}
-		
-		// score the initial population
-		final ParallelScore pscore = new ParallelScore(getPopulation(),
-				getCODEC(), new ArrayList<AdjustScore>(), getScoreFunction(),
-				this.actualThreadCount);
-		pscore.setThreadCount(this.actualThreadCount);
-		pscore.process();
-		this.actualThreadCount = pscore.getThreadCount();
-		
-		// start up the thread pool
-		if (this.actualThreadCount == 1) {
-			this.taskExecutor = Executors.newSingleThreadScheduledExecutor();
-		} else {
-			this.taskExecutor = Executors.newFixedThreadPool(this.actualThreadCount);
-		}
-
-		// register for shutdown
-		Encog.getInstance().addShutdownTask(this);
-
-		// just pick the first genome with a valid score as best, it will be
-		// updated later.
-		// also most populations are sorted this way after training finishes
-		// (for reload)
-		// if there is an empty population, the constructor would have blow
-		final List<Genome> list = getPopulation().flatten();
-		
-		int idx = 0;
-		do {
-			this.bestGenome = list.get(idx++);
-		} while (idx < list.size()
-				&& (Double.isInfinite(this.bestGenome.getScore()) || Double
-						.isNaN(this.bestGenome.getScore())));
-		
-		
-		getPopulation().setBestGenome(this.bestGenome);
-		
-		// speciate
-		final List<Genome> genomes = getPopulation().flatten();
-		
-		this.speciation.performSpeciation(genomes);
-		
-		// purge invalid genomes
-        this.population.purgeInvalidGenomes();
-	}
-
-	/**
 	 * Called by a thread to report an error.
 	 * 
 	 * @param t
@@ -929,9 +929,5 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 	 */
 	public void setMaxOperationErrors(int maxOperationErrors) {
 		this.maxOperationErrors = maxOperationErrors;
-	}
-	
-	
-
+	}	
 }
-
