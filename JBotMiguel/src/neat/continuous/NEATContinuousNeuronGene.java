@@ -4,7 +4,7 @@ import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.neural.neat.NEATNeuronType;
 import org.encog.neural.neat.training.NEATNeuronGene;
 
-public class NEATContinuousNeuronGene extends NEATNeuronGene{
+public class NEATContinuousNeuronGene extends NEATNeuronGene {
 	
 	private double decay;
 	private double bias;
@@ -13,6 +13,12 @@ public class NEATContinuousNeuronGene extends NEATNeuronGene{
 		super(type,theActivationFunction,id,innovationID);
 		this.decay = decay;
 		this.bias = bias;
+	}
+	
+	public NEATContinuousNeuronGene(NEATContinuousNeuronGene other) {
+		super(other);
+		this.decay = other.decay;
+		this.bias = other.bias;
 	}
 	
 	public double getDecay() {

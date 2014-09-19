@@ -74,7 +74,6 @@ public class NEATMutateAddContinuousNode extends NEATMutateAddNode{
 		double bias = rnd.nextDouble()*(2*decayRange) - decayRange;
 
 		target.getNeuronsChromosome().add(new NEATContinuousNeuronGene(NEATNeuronType.Hidden, af, innovation.getNeuronID(), innovation.getInnovationID(),decay,bias));
-
 		// add the other two sides of the link
 		createLink(target, from, innovation.getNeuronID(), splitLink.getWeight());
 		createLink(target, innovation.getNeuronID(), to, 1);

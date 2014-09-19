@@ -637,7 +637,7 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 				final int eliteCount = Math.min(numToSpawn, idealEliteCount);
 				for (int i = 0; i < eliteCount; i++) {
 					final Genome eliteGenome = species.getMembers().get(i);
-					if (getOldBestGenome() != eliteGenome) {
+					if (getOldBestGenome() != eliteGenome && elitesEvaluated < elitesToEvaluate.length) {
 						
 						numToSpawn--;
 						submitEvaluation(eliteGenome, elitesEvaluated);

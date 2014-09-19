@@ -1,6 +1,7 @@
 package neat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Vector;
 
 import neat.continuous.NEATContinuousNetwork;
@@ -24,6 +25,7 @@ public class ERNEATNetwork extends NeuralNetwork {
 	protected NEATNetwork network;
 	protected double[] preActivation;
 	protected double[] postActivation;
+	protected double[] previousPostActivations;
 
 	public ERNEATNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments){
 		this.create(inputs, outputs);
@@ -31,7 +33,6 @@ public class ERNEATNetwork extends NeuralNetwork {
 	
 	public ERNEATNetwork(NEATNetwork network){
 		this.network = network;
-		
 		inputNeuronStates  = new double[network.getInputCount()];
 		outputNeuronStates = new double[network.getOutputCount()];
 		
@@ -52,6 +53,9 @@ public class ERNEATNetwork extends NeuralNetwork {
 	//TODO this is protected
 	public double[] propagateInputs(double[] input) {
 		
+		if(previousPostActivations == null)
+			previousPostActivations = new double[network.getPostActivation().length];
+		
 		double[] result = new double[network.getOutputCount()];
 
 		preActivation = network.getPreActivation();
@@ -68,11 +72,16 @@ public class ERNEATNetwork extends NeuralNetwork {
 		// copy input
 		EngineArray.arrayCopy(input, 0, postActivation, 1, network.getInputCount());
 
-		//TODO why?
-		// 1 activation cycle
-		for(int i = 0 ; i < 2 ; i++) {
-			internalCompute(links);
-		}
+		boolean keepComputing;
+//		int i = 0;
+		/*Keep computing all the internal connections until
+		 *every contributions taken into account*/
+		do{
+//			i++;
+			internalCompute(network.getLinks());
+			keepComputing = !Arrays.equals(postActivation,previousPostActivations);
+			previousPostActivations = postActivation.clone();
+		} while(keepComputing);
 
 		// copy output
 		EngineArray.arrayCopy(postActivation, network.getOutputIndex(), result, 0, network.getOutputCount());
@@ -98,7 +107,7 @@ public class ERNEATNetwork extends NeuralNetwork {
 
 	@Override
 	public void reset() {
-		network.getPostActivation()[0] = 1.0;
+		
 	}
 
 	public NEATNetwork getNEATNetwork() {
@@ -148,7 +157,6 @@ public class ERNEATNetwork extends NeuralNetwork {
 	}
 
 	public static NEATNetwork getNetworkByWeights(double[] weights) {
-		
 		int inputs = (int)weights[0];
 		int outputs = (int)weights[1];
 		int nLinks = (int)weights[2];

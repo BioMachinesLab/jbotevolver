@@ -68,8 +68,13 @@ public class NEATContinuousGenome extends NEATGenome implements Cloneable, Seria
 
 		// copy neurons
 		for (final NEATNeuronGene oldGene : other.getNeuronsChromosome()) {
-			final NEATNeuronGene newGene = new NEATNeuronGene(oldGene);
-			this.neuronsList.add(newGene);
+			if(oldGene instanceof NEATContinuousNeuronGene) {
+				final NEATNeuronGene newGene = new NEATContinuousNeuronGene((NEATContinuousNeuronGene)oldGene);
+				this.neuronsList.add(newGene);
+			} else {
+				final NEATNeuronGene newGene = new NEATNeuronGene(oldGene);
+				this.neuronsList.add(newGene);
+			}
 		}
 
 		// copy links

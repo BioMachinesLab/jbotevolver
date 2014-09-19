@@ -2,6 +2,7 @@ package neat.continuous;
 
 import java.io.Serializable;
 import java.io.ObjectInputStream.GetField;
+import java.util.Arrays;
 import java.util.List;
 
 import net.jafama.FastMath;
@@ -38,6 +39,9 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 	
 	private double[] states;
 	private double[] currentStates;
+	
+	private double[] previousPostActivations;
+	
 	private double timeStep = 0.2;
 	private double tau      = 2.5;
 	private int numberOfNeurons = 0;
@@ -52,19 +56,17 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 		super(inputNeuronCount,outputNeuronCount,connectionArray,theActivationFunctions);
 
 		final int neuronCount = theActivationFunctions.length;
-
+		
 		this.preActivation = new double[neuronCount];
 		this.postActivation = new double[neuronCount];
 		this.decays = new double[neuronCount];
 		this.states = new double[neuronCount];
 		this.currentStates = new double[neuronCount];
 		this.numberOfNeurons = neuronCount;
-		backupNeurons = new Neuron[neuronCount];
-		states = new double[neuronCount];
-		bias = new double[neuronCount];
-		
-		// bias
-		this.postActivation[0] = 1.0;
+		this.backupNeurons = new Neuron[neuronCount];
+		this.states = new double[neuronCount];
+		this.bias = new double[neuronCount];
+		this.previousPostActivations = new double[neuronCount];
 		
 		int index = 0;
 		
@@ -109,9 +111,17 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 		// copy input
 		EngineArray.arrayCopy(input.getData(), 0, this.postActivation, 1, this.getInputCount());
 		
-		for(int i = 0 ; i < 4 ; i++) {
-			internalCompute(false);
-		}
+		boolean keepComputing;
+//		int i = 0;
+		/*Keep computing all the internal connections until
+		 *every contributions taken into account*/
+		do{
+//			i++;
+			internalCompute();
+			keepComputing = !Arrays.equals(postActivation,previousPostActivations);
+			previousPostActivations = postActivation.clone();
+		} while(keepComputing);
+//		System.out.println(i);
 		
 		saveStates();
 		
@@ -137,7 +147,7 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 	/**
 	 * Perform one activation cycle.
 	 */
-	private void internalCompute(boolean print) {
+	private void internalCompute() {
 		double[] decays = getDecays();
 		
 		for(int i = 0 ; i < decays.length ; i++) {

@@ -28,7 +28,6 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 	
 	public ERNEATContinuousNetwork(NEATContinuousNetwork network){
 		super(network);
-		
 	}
 
 	@Override
@@ -69,7 +68,6 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 	}
 	
 	public static double[] getWeights(NEATNetwork net) {
-		
 		NEATContinuousNetwork network = (NEATContinuousNetwork)net;
 		
 		int inputs = network.getInputCount();
@@ -122,7 +120,6 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 	}
 
 	public static NEATContinuousNetwork getNetworkByWeights(double[] weights) {
-try {
 		int pos = 0;
 		
 		int inputs = (int)weights[pos++];
@@ -167,9 +164,5 @@ try {
 		}
 		
 		return new NEATContinuousNetwork(inputs, outputs, links, activations, neurons);
-} catch(Exception e) {
-	e.printStackTrace();
-}
-return null;
 	}
 }

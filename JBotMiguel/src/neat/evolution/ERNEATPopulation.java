@@ -88,8 +88,9 @@ public class ERNEATPopulation extends Population implements Serializable{
 		numberInputs = network.getNumberOfInputNeurons();
 		numberOutputs = network.getNumberOfOutputNeurons();
 		
-		if(network instanceof ERNEATContinuousNetwork)
+		if(network instanceof ERNEATContinuousNetwork) {
 			continuousNetwork = true;
+		}
 		
 		randomNumberGenerator = new Random(Integer.parseInt(jBotEvolver.getArguments().get("--random-seed").getCompleteArgumentString()));
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());

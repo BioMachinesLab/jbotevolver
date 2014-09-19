@@ -4,6 +4,7 @@ import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import gui.util.GraphViz;
 import neat.ERNEATNetwork;
+import neat.continuous.NEATContinuousNetwork;
 
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
@@ -56,12 +57,13 @@ public class GraphVizExtended extends GraphViz {
 	   
 	   NEATNetwork net = ((ERNEATNetwork)network).getNEATNetwork();
 	   
-	   result+="size=\"23,23\"; ranksep=\"2.2 equally\"";
+	   result+="size=\"18,18\"; ranksep=\"2.2 equally\"";
 	   
 	   result+="{rank=same;";
 	   for(int i = 0 ; i < net.getInputCount()+1 ; i++) {
 		   double state = ((int)(net.getPostActivation()[i]*100))/100.0;
 		   result+=i+" [label=\""+i+"\n("+state+")\"] ";
+		   System.out.println("graph.addNode("+i+");");
 	   }
 	   result+=";}";
 	   
@@ -69,9 +71,19 @@ public class GraphVizExtended extends GraphViz {
 	   if(hidden > 0) {
 		   result+="{rank=same;";
 		   for(int i = 0 ; i < hidden ; i++) {
+			   String text = "";
+			   
 			   int id = (net.getOutputCount()+net.getOutputIndex()+i);
+			   
+			   if(net instanceof NEATContinuousNetwork) {
+				   NEATContinuousNetwork cnet = (NEATContinuousNetwork)net;
+				   if(cnet.getNeurons()[id].isDecayNeuron())
+					   text=" c";
+			   }
+			   
 			   double state = ((int)(net.getPostActivation()[id]*100))/100.0;
-			   result+=id+" [label=\""+id+"\n("+state+")\"] ";
+			   result+=id+" [label=\""+id+"\n("+state+text+")\"] ";
+			   System.out.println("graph.addNode("+id+");");
 		   }
 		   result+=";}";
 	   }
@@ -81,6 +93,7 @@ public class GraphVizExtended extends GraphViz {
 		   int id = i+net.getOutputIndex();
 		   double state = ((int)(net.getPostActivation()[id]*100))/100.0;
 		   result+=id+" [label=\""+id+"\n("+state+")\"] ";
+		   System.out.println("graph.addNode("+id+");");
 	   }
 	   result+=";}";
 	   
@@ -95,7 +108,7 @@ public class GraphVizExtended extends GraphViz {
 		   int from = l.getFromNeuron();
 		   int to = l.getToNeuron();
 		   double w = ((int)(l.getWeight()*100))/100.0;
-		   
+		   System.out.println("graph.addLink("+from+","+to+");");
 		   addln(from+" -> "+to+" [label=\" "+w+"\", "
 		   		+ (w < 0 ? "arrowhead = empty, color = \"red\", " : "color = \"green\", ")
 		   		+ "penwidth = "+Math.max(Math.abs((int)Math.round(w)),1)
