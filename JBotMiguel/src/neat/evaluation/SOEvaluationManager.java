@@ -39,7 +39,7 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 	private int getResult = 0;
 	private Lock lock = new ReentrantLock();
 	
-	private HashMap<Integer,NEATNetwork> networksEvaluated = new HashMap<Integer, NEATNetwork>();
+	private HashMap<Integer, MLMethod> networksEvaluated = new HashMap<Integer, MLMethod>();
 	
 	public SOEvaluationManager(Arguments args) {
 		super(args);
@@ -66,14 +66,14 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 
 	@Override
 	public double calculateScore(MLMethod method) {
-		double result = evaluateNetwork((NEATNetwork) method);
+		double result = evaluateNetwork(method);
 		return result;
 	}
 	
 	@Override
 	public void submitEvaluation(MLMethod method, int evalId) {
-		submitTasksForExecution((NEATNetwork) method, evalId, false);
-		networksEvaluated.put(evalId, (NEATNetwork) method);
+		submitTasksForExecution(method, evalId, false);
+		networksEvaluated.put(evalId, method);
 	}
 	
 	@Override
@@ -89,14 +89,14 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		results.add(result);
 		TaskStatistics stats = processTasksResults(results);
 		
-		NEATNetwork net = networksEvaluated.get(er.getEvalId());
+		MLMethod net = networksEvaluated.get(er.getEvalId());
 		networksEvaluated.remove(er.getEvalId());
 		
 		this.statsManager.addControllerStatistics(net, stats);
 		return er;
 	}
 
-	protected double evaluateNetwork(NEATNetwork net) {
+	protected double evaluateNetwork(MLMethod net) {
 		ArrayList<SimpleObjectiveResult> results = new ArrayList<SimpleObjectiveResult>();
 		
 		int totalTasksSubmitted = submitTasksForExecution(net, 0, true);
@@ -136,6 +136,7 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 				
 		//process the results
 		TaskStatistics stats = processTasksResults(results);
+
 		this.statsManager.addControllerStatistics(net, stats);
 
 		return stats.get(OBJECTIVE_KEY_PREFIX+1);
@@ -163,7 +164,7 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		return this.OBJECTIVE_KEY_PREFIX + id;
 	}
 
-	private int submitTasksForExecution(NEATNetwork net, int evalId, boolean useThreadId) {
+	private int submitTasksForExecution(MLMethod net, int evalId, boolean useThreadId) {
 		
 		Arguments objectiveArgs = getObjectiveArgs();
 		int separateSamples = 1;
@@ -173,8 +174,7 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		
 		for(int i = 0; i < separateSamples; i++){
 			
-			NEATNetwork taskNet = createTaskNet(net);
-			this.taskExecutor.addTask(new NEATGenerationalTask(new JBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), i, objectiveArgs, taskNet, generationalSeed+i, useThreadId ? threadId : evalId, aggregateSamples));
+			this.taskExecutor.addTask(new NEATGenerationalTask(new JBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), i, objectiveArgs, net, generationalSeed+i, useThreadId ? threadId : evalId, aggregateSamples));
 			print(".");
 		}
 		
@@ -188,13 +188,6 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 	private Arguments getObjectiveArgs() {
 		Arguments objectiveArgs = this.evolver.getArguments().get("--evaluation");
 		return objectiveArgs;
-	}
-
-	private NEATNetwork createTaskNet(NEATNetwork net) {
-		if(net instanceof NEATContinuousNetwork) {
-			return NEATContinuousNetworkController.createCopyNetwork(net);
-		}
-		return NEATNetworkController.createCopyNetwork(net);
 	}
 
 	public void setupEvolution(JBotEvolver jBotEvolver,

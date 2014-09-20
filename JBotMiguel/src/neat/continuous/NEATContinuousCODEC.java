@@ -71,7 +71,6 @@ public class NEATContinuousCODEC implements GeneticCODEC, Serializable {
 		
 		final NEATContinuousNetwork network = new NEATContinuousNetwork(neatGenome.getInputCount(), neatGenome.getOutputCount(), links, afs, neurons);
 
-		network.setActivationCycles(pop.getActivationCycles());
 		return network;
 	}
 

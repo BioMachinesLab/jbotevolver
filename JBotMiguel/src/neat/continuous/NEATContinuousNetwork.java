@@ -168,14 +168,10 @@ public class NEATContinuousNetwork extends NEATNetwork implements MLRegression, 
 				preActivation[i] = -states[i];
 			}
 		}
-		int contributions = 0;
+
 		for (int j = 0; j < getLinks().length; j++) {
-			if(this.postActivation[getLinks()[j].getFromNeuron()] * getLinks()[j].getWeight() != 0) {
-				contributions++;
-			}
 			this.preActivation[getLinks()[j].getToNeuron()] += this.postActivation[getLinks()[j].getFromNeuron()] * getLinks()[j].getWeight();
 		}
-//		System.out.println(contributions);
 		
 		for(int j = getOutputIndex() ; j < preActivation.length; j++) {
 			double decay = getDecays()[j];

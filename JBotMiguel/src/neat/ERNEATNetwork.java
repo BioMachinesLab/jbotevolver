@@ -1,14 +1,12 @@
 package neat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Vector;
-
-import neat.continuous.NEATContinuousNetwork;
 
 import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
-import org.encog.ml.data.MLData;
+import org.encog.ml.MLMethod;
+import org.encog.ml.MLRegression;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.util.EngineArray;
@@ -19,7 +17,7 @@ import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 
-public class ERNEATNetwork extends NeuralNetwork {
+public class ERNEATNetwork extends WrapperNetwork{
 
 	private static final long serialVersionUID = 1L;
 	protected NEATNetwork network;
@@ -131,12 +129,13 @@ public class ERNEATNetwork extends NeuralNetwork {
 		
 	}
 
-	public NEATNetwork getNEATNetwork() {
+	public NEATNetwork getNetwork() {
 		return network;
 	}
 
-	public void setNEATNetwork(NEATNetwork newNetwork) {
-		this.network = newNetwork;
+	@Override
+	public void setNetwork(MLMethod newNetwork) {
+		this.network = (NEATNetwork)newNetwork;
 	}
 
 	public void controlStep(double time) {
@@ -145,7 +144,7 @@ public class ERNEATNetwork extends NeuralNetwork {
 	
 	@Override
 	public double[] getWeights() {
-		return ERNEATNetwork.getWeights(this.getNEATNetwork());
+		return ERNEATNetwork.getWeights(this.getNetwork());
 	}
 	
 	public static double[] getWeights(NEATNetwork network) {

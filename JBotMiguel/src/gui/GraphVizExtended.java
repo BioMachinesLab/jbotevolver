@@ -1,10 +1,16 @@
 package gui;
 
+import java.util.ArrayList;
+
 import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import gui.util.GraphViz;
 import neat.ERNEATNetwork;
 import neat.continuous.NEATContinuousNetwork;
+import neat.layerered.ANNNeuron;
+import neat.layerered.ANNSynapse;
+import neat.layerered.LayeredANN;
+import neat.layerered.LayeredNeuralNetwork;
 
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
@@ -48,14 +54,55 @@ public class GraphVizExtended extends GraphViz {
 			   createNEATNetwork();
 			   connectNEATNetwork();
 		   }
+		   
+		   if(network instanceof LayeredNeuralNetwork) {
+			   createLayeredNetwork();
+			   connectLayeredNetwork();
+		   }
 	   }
 	   addln(end_graph());
+	   System.out.println(graph);
+   }
+   
+   protected void createLayeredNetwork() {
+	   String result = "node [shape=circle,fixedsize=true,width=0.9];";
+	   
+	   LayeredANN net = ((LayeredNeuralNetwork)network).getNetwork();
+	   
+	   result+="size=\"18,18\"; ranksep=\"2.2 equally\"";
+	   
+	   for(int i = 0 ; i < net.getNumberOfLayers() ; i++) {
+		   result+="{rank=same;";
+		   
+		   for(ANNNeuron n : net.getLayer(i).getNeurons()) {
+			   double state = n.getActivationValue();
+			   result+=n.getId()+" [label=\""+n.getId()+"\"] ";//"\n("+state+")"
+		   }
+		   
+		   result+=";}";
+	   }
+	   
+	   addln(result);
+   }
+   
+   protected void connectLayeredNetwork() {
+	   ArrayList<ANNSynapse> links = ((LayeredNeuralNetwork)network).getNetwork().getAllSynapses();
+	   
+	   for(ANNSynapse l : links) {
+		   long from = l.getFromNeuron();
+		   long to = l.getToNeuron();
+		   double w = ((int)(l.getWeight()*100))/100.0;
+		   addln(from+" -> "+to+" [label=\" "+w+"\", "
+		   		+ (w < 0 ? "arrowhead = empty, color = \"red\", " : "color = \"green\", ")
+		   		+ "penwidth = "+Math.max(Math.abs((int)Math.round(w)),1)
+		   		+ "];");
+	   }
    }
    
    protected void createNEATNetwork() {
 	   String result = "node [shape=circle,fixedsize=true,width=0.9];";
 	   
-	   NEATNetwork net = ((ERNEATNetwork)network).getNEATNetwork();
+	   NEATNetwork net = ((ERNEATNetwork)network).getNetwork();
 	   
 	   result+="size=\"18,18\"; ranksep=\"2.2 equally\"";
 	   
@@ -63,7 +110,6 @@ public class GraphVizExtended extends GraphViz {
 	   for(int i = 0 ; i < net.getInputCount()+1 ; i++) {
 		   double state = ((int)(net.getPostActivation()[i]*100))/100.0;
 		   result+=i+" [label=\""+i+"\n("+state+")\"] ";
-		   System.out.println("graph.addNode("+i+");");
 	   }
 	   result+=";}";
 	   
@@ -83,7 +129,6 @@ public class GraphVizExtended extends GraphViz {
 			   
 			   double state = ((int)(net.getPostActivation()[id]*100))/100.0;
 			   result+=id+" [label=\""+id+"\n("+state+text+")\"] ";
-			   System.out.println("graph.addNode("+id+");");
 		   }
 		   result+=";}";
 	   }
@@ -93,7 +138,6 @@ public class GraphVizExtended extends GraphViz {
 		   int id = i+net.getOutputIndex();
 		   double state = ((int)(net.getPostActivation()[id]*100))/100.0;
 		   result+=id+" [label=\""+id+"\n("+state+")\"] ";
-		   System.out.println("graph.addNode("+id+");");
 	   }
 	   result+=";}";
 	   
@@ -102,13 +146,12 @@ public class GraphVizExtended extends GraphViz {
    
    protected void connectNEATNetwork() {
 	   
-	   NEATLink[] links = ((ERNEATNetwork)network).getNEATNetwork().getLinks();
+	   NEATLink[] links = ((ERNEATNetwork)network).getNetwork().getLinks();
 	   
 	   for(NEATLink l : links) {
 		   int from = l.getFromNeuron();
 		   int to = l.getToNeuron();
 		   double w = ((int)(l.getWeight()*100))/100.0;
-		   System.out.println("graph.addLink("+from+","+to+");");
 		   addln(from+" -> "+to+" [label=\" "+w+"\", "
 		   		+ (w < 0 ? "arrowhead = empty, color = \"red\", " : "color = \"green\", ")
 		   		+ "penwidth = "+Math.max(Math.abs((int)Math.round(w)),1)

@@ -3,8 +3,14 @@ package neat.evolution;
 import java.io.Serializable;
 import java.util.Random;
 
+import neat.ERNEATNetwork;
+import neat.continuous.ERNEATContinuousNetwork;
 import neat.continuous.FactorNEATContinuousGenome;
 import neat.continuous.NEATContinuousCODEC;
+import neat.layerered.LayeredNEATCODEC;
+import neat.layerered.LayeredNeuralNetwork;
+import neat.layerered.continuous.LayeredContinuousNEATCODEC;
+import neat.layerered.continuous.LayeredContinuousNeuralNetwork;
 
 import org.encog.ml.MLError;
 import org.encog.ml.MLRegression;
@@ -28,7 +34,7 @@ import org.encog.neural.neat.training.NEATInnovationList;
  */
 public class NEATEncogPopulation extends NEATPopulation implements Serializable, MLError, MLRegression {
 	
-	private boolean continuous = false;;
+	private Class networkClass;
 
 	public NEATEncogPopulation() {
 
@@ -37,9 +43,9 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 	public NEATEncogPopulation(final int inputCount, final int outputCount, final int populationSize) {
 		super(inputCount, outputCount, populationSize);
 	}
-	public NEATEncogPopulation(final int inputCount, final int outputCount, final int populationSize, boolean continuous) {
+	public NEATEncogPopulation(final int inputCount, final int outputCount, final int populationSize, Class networkClass) {
 		this(inputCount, outputCount, populationSize);
-		this.continuous = continuous;
+		this.networkClass = networkClass;
 	}
 
 	public NEATEncogPopulation(final Substrate theSubstrate, final int populationSize) {
@@ -49,14 +55,32 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 	public void reset() {
 		// create the genome factory
 		if (isHyperNEAT()) {
+			
 			setCODEC(new HyperNEATCODEC());
 			setGenomeFactory(new FactorHyperNEATGenome());
-		} else if(continuous){
-			setCODEC(new NEATContinuousCODEC());
-			setGenomeFactory(new FactorNEATContinuousGenome());
-		} else {
+			
+		} else if(networkClass.equals(ERNEATNetwork.class)){
+			
 			setCODEC(new NEATCODEC());
 			setGenomeFactory(new FactorNEATGenome());
+			
+		} else if(networkClass.equals(ERNEATContinuousNetwork.class)){
+			
+			setCODEC(new NEATContinuousCODEC());
+			setGenomeFactory(new FactorNEATContinuousGenome());
+			
+		} else if(networkClass.equals(LayeredNeuralNetwork.class)) {
+			
+			setCODEC(new LayeredNEATCODEC());
+			setGenomeFactory(new FactorNEATGenome());
+			
+		} else if(networkClass.equals(LayeredContinuousNeuralNetwork.class)) {
+			
+			setCODEC(new LayeredContinuousNEATCODEC());
+			setGenomeFactory(new FactorNEATContinuousGenome());
+			
+		} else {
+			throw new RuntimeException("Unknown type of network!");
 		}
 
 		// create the new genomes

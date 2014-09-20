@@ -2,18 +2,20 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import neat.continuous.ERNEATContinuousNetwork;
+import neat.continuous.NEATContinuousCODEC;
+import neat.continuous.NEATContinuousGenome;
 import neat.continuous.NEATContinuousNetwork;
 import neat.continuous.NEATContinuousNeuronGene;
+import neat.layerered.LayeredANN;
+import neat.layerered.continuous.LayeredContinuousNEATCODEC;
 
 import org.encog.engine.network.activation.ActivationFunction;
-import org.encog.engine.network.activation.ActivationLinear;
 import org.encog.engine.network.activation.ActivationSigmoid;
-import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
+import org.encog.ml.MLMethod;
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
-import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNeuronType;
+import org.encog.neural.neat.training.NEATLinkGene;
 import org.encog.neural.neat.training.NEATNeuronGene;
 
 
@@ -26,11 +28,11 @@ public class NEATTEst {
 		//3 O
 		//4 H  (4-3)
 		
-		List<NEATLink> list = new ArrayList<NEATLink>();
+		List<NEATLinkGene> list = new ArrayList<NEATLinkGene>();
 		
-		list.add(new NEATLink(1, 3, -3.3549357832289295));
-		list.add(new NEATLink(3, 2, -2.3484578414079236));
-		list.add(new NEATLink(3, 3, -0.1598904751499151));
+		list.add(new NEATLinkGene(1, 3, true, 1, -3.3549357832289295));
+		list.add(new NEATLinkGene(3, 2, true, 2,-2.3484578414079236));
+		list.add(new NEATLinkGene(3, 3, true, 2,-0.1598904751499151));
 		
 		
 		ActivationFunction[] af = new ActivationFunction[4];
@@ -46,11 +48,15 @@ public class NEATTEst {
 		neurons.add(new NEATNeuronGene(NEATNeuronType.Output, new ActivationSigmoid(), 2, 2));
 		neurons.add(new NEATContinuousNeuronGene(NEATNeuronType.Hidden, new ActivationSigmoid(), 3, 3, 0.15682641189774638, -8.016385371818051E-4));
 		
-		//TODO check how big the decay can be! change in initial pop and mutations
+		NEATContinuousGenome g = new NEATContinuousGenome(neurons, list, 1, 1);
 		
-		NEATContinuousNetwork nOriginal = new NEATContinuousNetwork(1, 1, list, af, neurons);
+		NEATContinuousCODEC neatcodec = new NEATContinuousCODEC();
+		LayeredContinuousNEATCODEC cod = new LayeredContinuousNEATCODEC();
 		
-		ERNEATContinuousNetwork jbotNetwork = new ERNEATContinuousNetwork(nOriginal);
+		LayeredANN layered = (LayeredANN)cod.decode(g);
+		NEATContinuousNetwork continuous = (NEATContinuousNetwork)neatcodec.decode(g);
+		
+//		ERNEATContinuousNetwork jbotNetwork = new ERNEATContinuousNetwork(nOriginal);
 		
 		for(int i = 0 ; i < 50 ; i++) {
 			
@@ -61,8 +67,8 @@ public class NEATTEst {
 			} else
 				input.add(0,0.8535898384267142);
 			
-			double[] o = jbotNetwork.propagateInputs(input.getData());
-			System.out.print(i+" "+o[0]);
+			double[] o = continuous.compute(input.getData());
+			System.out.println(i+" "+o[0]);
 		}
 	}
 

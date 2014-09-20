@@ -19,8 +19,8 @@ public class NEATNetworkController extends NeuralNetworkController implements Va
 	@Override
 	public void setNeuralNetwork(NeuralNetwork network) {
 		ERNEATNetwork wrapper = (ERNEATNetwork)network;
-		NEATNetwork copyNetwork = createCopyNetwork(wrapper.getNEATNetwork());
-		((ERNEATNetwork)this.neuralNetwork).setNEATNetwork(copyNetwork);
+		NEATNetwork copyNetwork = createCopyNetwork(wrapper.getNetwork());
+		((ERNEATNetwork)this.neuralNetwork).setNetwork(copyNetwork);
 		
 		if(printWeights) {
 			double[] weights = neuralNetwork.getWeights();
@@ -73,7 +73,7 @@ public class NEATNetworkController extends NeuralNetworkController implements Va
 		
 		NEATNetwork net = ERNEATNetwork.getNetworkByWeights(weights);
 		
-		((ERNEATNetwork)this.neuralNetwork).setNEATNetwork(net);
+		((ERNEATNetwork)this.neuralNetwork).setNetwork(net);
 		reset();
 	}
 	

@@ -23,7 +23,7 @@ public class NEATContinuousNetworkController extends NEATNetworkController {
 	public void setNeuralNetwork(NeuralNetwork network) {
 		ERNEATContinuousNetwork wrapper = (ERNEATContinuousNetwork)network;
 		NEATContinuousNetwork copyNetwork = (NEATContinuousNetwork)createCopyNetwork(wrapper.getNEATNetwork());
-		((ERNEATContinuousNetwork)this.neuralNetwork).setNEATNetwork(copyNetwork);
+		((ERNEATContinuousNetwork)this.neuralNetwork).setNetwork(copyNetwork);
 		
 		if(printWeights) {
 			double[] weights = neuralNetwork.getWeights();
@@ -88,7 +88,7 @@ public class NEATContinuousNetworkController extends NEATNetworkController {
 		
 		NEATContinuousNetwork net = ERNEATContinuousNetwork.getNetworkByWeights(weights);
 		
-		((ERNEATContinuousNetwork)this.neuralNetwork).setNEATNetwork(net);
+		((ERNEATContinuousNetwork)this.neuralNetwork).setNetwork(net);
 		reset();
 	}
 

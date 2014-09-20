@@ -8,11 +8,11 @@ import neat.ERNEATNetwork;
 
 import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
+import org.encog.ml.MLMethod;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.neural.neat.NEATNeuronType;
 import org.encog.neural.neat.training.NEATNeuronGene;
-import org.encog.util.EngineArray;
 
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
@@ -49,8 +49,8 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 	}
 
 	@Override
-	public void setNEATNetwork(NEATNetwork newNetwork) {
-		super.setNEATNetwork(newNetwork);
+	public void setNetwork(MLMethod newNetwork) {
+		super.setNetwork(newNetwork);
 	}
 
 	public void controlStep(double time) {

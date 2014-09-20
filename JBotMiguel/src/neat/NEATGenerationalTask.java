@@ -74,8 +74,8 @@ public class NEATGenerationalTask extends JBotEvolverTask {
 	private void setMLControllers(ArrayList<Robot> robots, MLMethod method) {
 		for(Robot r : robots) {
 			NeuralNetworkController controller = (NeuralNetworkController) r.getController();
-			ERNEATNetwork wrapper = (ERNEATNetwork)controller.getNeuralNetwork();
-			wrapper.setNEATNetwork((NEATNetwork)method);
+			WrapperNetwork wrapper = (WrapperNetwork)controller.getNeuralNetwork();
+			wrapper.setNetwork(method);
 			controller.setNeuralNetwork(wrapper);
 			controller.reset();
 		}
