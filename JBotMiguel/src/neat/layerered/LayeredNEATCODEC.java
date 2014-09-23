@@ -40,7 +40,6 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		LayeredANN net = createNetFromStructure(synapses, neurons);
 		
 		return net;
@@ -63,7 +62,6 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 
 	public LayeredANN createNetFromStructure(ArrayList<ANNSynapse> s,
 			ArrayList<ANNNeuron> n) {
-		
 		ArrayList<ANNSynapse> synapses = getCopySynapses(s);
 		ArrayList<ANNNeuron> neurons = getCopyNeurons(n);
 		

@@ -34,6 +34,8 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 	protected final String OBJECTIVE_KEY_PREFIX = "o";
 	private boolean supressMessages = false;
 	
+	private boolean positiveFitness = true;
+	
 	private Map<Long,Stack<SimpleObjectiveResult>> synchronizedMap = Collections.synchronizedMap(new HashMap<Long,Stack<SimpleObjectiveResult>>());
 	private int asked = 0;
 	private int getResult = 0;
@@ -44,6 +46,7 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 	public SOEvaluationManager(Arguments args) {
 		super(args);
 		this.objectiveId = args.getArgumentAsInt("objectiveid");
+		this.positiveFitness = args.getArgumentAsIntOrSetDefault("positivefitness", 1) == 1;
 	}
 	
 	public void setupObjectives(HashMap<String, Arguments> arguments) {
@@ -83,6 +86,9 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		
 		double fitness = result.getFitness();
 		fitness = ((int)(fitness*100)/100.0);
+		
+		if(positiveFitness)
+			fitness = Math.max(0, fitness);
 		
 		EvaluationResult er = new EvaluationResult((int)result.getThreadId(), fitness);
 		ArrayList<SimpleObjectiveResult> results = new ArrayList<SimpleObjectiveResult>();
@@ -153,6 +159,9 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		fitness /= (double)results.size();
 		fitness = ((int)(fitness*100)/100.0);
 //		objective.setScore(fitness);
+		
+		if(positiveFitness)
+			fitness = Math.max(0, fitness);
 
 		stats.put(OBJECTIVE_KEY_PREFIX+1, fitness);
 		return stats;

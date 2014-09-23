@@ -37,7 +37,7 @@ public class LayeredContinuousNeuralNetwork extends LayeredNeuralNetwork {
 		int nNeurons = network.getAllNeurons().size();
 		int nSynapses = network.getAllSynapses().size();
 		
-		double[] weights = new double[2 + 2*nNeurons + 4*nSynapses];
+		double[] weights = new double[2 + 4*nNeurons + 4*nSynapses];
 		int pos = 0;
 		weights[pos++] = nNeurons;
 		weights[pos++] = nSynapses;
@@ -91,7 +91,9 @@ public class LayeredContinuousNeuralNetwork extends LayeredNeuralNetwork {
 			
 			if(decay != 0 || bias != 0) {
 				neuron = new ANNNeuronContinuous(id, type, new ActivationSteepenedSigmoid(), decay, bias);
-			} else {
+			} else if(type == ANNNeuron.OUTPUT_NEURON){
+				neuron = new ANNOutputNeuron(id, type, new ActivationSteepenedSigmoid());
+			} else { 
 				neuron = new ANNNeuron(id, type, new ActivationSteepenedSigmoid());
 			}
 			
@@ -99,7 +101,6 @@ public class LayeredContinuousNeuralNetwork extends LayeredNeuralNetwork {
 		}
 		
 		for(int i = 0 ; i < nSynapses ; i++) {
-			
 			long innovationNumber = (long)weights[pos++];
 			double weight = weights[pos++];
 			int from = (int)weights[pos++];
@@ -109,6 +110,7 @@ public class LayeredContinuousNeuralNetwork extends LayeredNeuralNetwork {
 			
 			synapses.add(synapse);
 		}
+		
 		
 		return new LayeredContinuousNEATCODEC().createNetFromStructure(synapses,neurons);
 	}

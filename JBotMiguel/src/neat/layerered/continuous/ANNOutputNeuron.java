@@ -15,7 +15,6 @@ public class ANNOutputNeuron extends ANNNeuron {
 	public void step() {
 		if(this.type == ANNNeuron.INPUT_NEURON || this.type == ANNNeuron.BIAS_NEURON)
 			return;
-		
 		//a neuron that performs a weighted sum of the inputs
 		double currentActivation = 0;
 		
@@ -32,6 +31,19 @@ public class ANNOutputNeuron extends ANNNeuron {
 		this.activation = value[0];
 
 		state = activation;
+	}
+	
+	@Override
+	public ANNNeuron shallowCopy() {
+		ANNNeuron copy = new ANNOutputNeuron(this.id, this.type, this.activationFunction.clone());
+		copy.setNeuronDepth(depth);
+		
+		return copy;
+	}
+	@Override
+	public void reset() {
+		super.reset();
+		this.state = 0;
 	}
 
 }

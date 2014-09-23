@@ -323,12 +323,12 @@ public class ERNEATPopulation extends Population implements Serializable{
 	public Chromosome getBestChromosome() {
 		MLMethod net = population.getCODEC().decode(population.getBestGenome());
 
-		if(net instanceof NEATContinuousNetwork)
+		if(population.getCODEC() instanceof NEATContinuousCODEC)
 			return new Chromosome(ERNEATContinuousNetwork.getWeights((NEATContinuousNetwork)net), 1);
-		if(net instanceof LayeredNeuralNetwork)
-			return new Chromosome(LayeredNeuralNetwork.getWeights((LayeredANN)net), 1);
-		if(net instanceof LayeredContinuousNeuralNetwork)
+		if(population.getCODEC() instanceof LayeredContinuousNEATCODEC)
 			return new Chromosome(LayeredContinuousNeuralNetwork.getWeights((LayeredANN)net), 1);
+		if(population.getCODEC() instanceof LayeredNEATCODEC)
+			return new Chromosome(LayeredNeuralNetwork.getWeights((LayeredANN)net), 1);
 		
 		return new Chromosome(ERNEATNetwork.getWeights((NEATNetwork)net), 1);
 	}

@@ -18,7 +18,7 @@ public class CrossSpecialDoor5EvaluationFunction extends EvaluationFunction {
 	private double bonus = 0;
 	private double penalty = 0;
 	private double totalDistance = 0;
-	private Vector2d target = new Vector2d(-0.5,0);
+	private Vector2d target = new Vector2d(-1,0);
 	private boolean doorClosed = false;
 	private boolean kill = false;
 	private double penaltyMultiplier = 1;

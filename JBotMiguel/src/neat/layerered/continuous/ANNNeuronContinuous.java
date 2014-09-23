@@ -23,6 +23,7 @@ public class ANNNeuronContinuous extends ANNNeuron {
 	}
 
 	public void step() {
+		
 		if(this.type == ANNNeuron.INPUT_NEURON || this.type == ANNNeuron.BIAS_NEURON)
 			return;
 		double currentActivation = 0;
@@ -58,6 +59,12 @@ public class ANNNeuronContinuous extends ANNNeuron {
 	
 	public double getDecay() {
 		return decay;
+	}
+	
+	@Override
+	public void reset() {
+		super.reset();
+		this.state = 0;
 	}
 	
 	public double getBias() {

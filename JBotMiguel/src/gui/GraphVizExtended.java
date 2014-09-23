@@ -61,7 +61,7 @@ public class GraphVizExtended extends GraphViz {
 		   }
 	   }
 	   addln(end_graph());
-	   System.out.println(graph);
+//	   System.out.println(graph);
    }
    
    protected void createLayeredNetwork() {
@@ -75,8 +75,8 @@ public class GraphVizExtended extends GraphViz {
 		   result+="{rank=same;";
 		   
 		   for(ANNNeuron n : net.getLayer(i).getNeurons()) {
-			   double state = n.getActivationValue();
-			   result+=n.getId()+" [label=\""+n.getId()+"\"] ";//"\n("+state+")"
+			   double state = ((int)(n.getActivationValue()*100.0))/100.0;
+			   result+=n.getId()+" [label=\""+n.getId()+"\n("+state+")\"] ";
 		   }
 		   
 		   result+=";}";
