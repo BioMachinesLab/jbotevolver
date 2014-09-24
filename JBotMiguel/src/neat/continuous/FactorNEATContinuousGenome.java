@@ -12,6 +12,13 @@ import org.encog.neural.neat.training.NEATNeuronGene;
 
 public class FactorNEATContinuousGenome extends FactorNEATGenome implements Serializable{
 	
+	private static final long serialVersionUID = 856389357122003004L;
+	protected boolean bootstrap;
+	
+	public FactorNEATContinuousGenome(boolean boostrap) {
+		this.bootstrap = boostrap;
+	}
+	
 	@Override
 	public NEATGenome factor() {
 		return new NEATContinuousGenome();
@@ -42,8 +49,7 @@ public class FactorNEATContinuousGenome extends FactorNEATGenome implements Seri
 	public NEATGenome factor(final Random rnd, final NEATPopulation pop,
 			final int inputCount, final int outputCount,
 			final double connectionDensity) {
-		return new NEATContinuousGenome(rnd, pop, inputCount, outputCount,
-				connectionDensity);
+		return new NEATContinuousGenome(rnd, pop, inputCount, outputCount, connectionDensity, bootstrap);
 	}
 
 }

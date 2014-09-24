@@ -59,6 +59,7 @@ import evolutionaryrobotics.populations.Population;
 
 public class ERNEATPopulation extends Population implements Serializable{
 
+	private static final long serialVersionUID = 5093899312027130856L;
 	protected int populationSize;
 	protected int numberOfGenerations;
 	protected int numberOfSamplesPerChromosome;
@@ -79,6 +80,8 @@ public class ERNEATPopulation extends Population implements Serializable{
 	protected double mutateLinkRate = 0.1;
 	
 	protected Class networkClass;
+	
+	protected boolean bootstrap = false;
 
 	public ERNEATPopulation(Arguments arguments) {
 		super(arguments);
@@ -88,6 +91,8 @@ public class ERNEATPopulation extends Population implements Serializable{
 		
 		addNodeRate = arguments.getArgumentAsDoubleOrSetDefault("addnoderate", addNodeRate);
 		mutateLinkRate = arguments.getArgumentAsDoubleOrSetDefault("mutatelinkrate", mutateLinkRate);
+		
+		bootstrap = arguments.getArgumentAsIntOrSetDefault("bootstrap", 0) == 1;
 	}
 
 	public void createRandomPopulation(JBotEvolver jBotEvolver) {
@@ -104,7 +109,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 		randomNumberGenerator = new Random(Integer.parseInt(jBotEvolver.getArguments().get("--random-seed").getCompleteArgumentString()));
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 		
-		population = new NEATEncogPopulation(numberInputs, numberOutputs, populationSize, networkClass);
+		population = new NEATEncogPopulation(numberInputs, numberOutputs, populationSize, networkClass, bootstrap);
 		
 		population.setInitialConnectionDensity(1.0);// not required, but speeds training
 		population.setRandomNumberFactory(new JBotEvolverRandomFactory(generationRandomSeed));

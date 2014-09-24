@@ -127,6 +127,19 @@ public class NEATContinuousGenome extends NEATGenome implements Cloneable, Seria
 	public NEATContinuousGenome(final Random rnd, final NEATPopulation pop,
 			final int inputCount, final int outputCount,
 			double connectionDensity) {
+		initNoBootstrap(rnd, pop, inputCount, outputCount, connectionDensity);
+	}
+	
+	public NEATContinuousGenome(final Random rnd, final NEATPopulation pop,
+			final int inputCount, final int outputCount, double connectionDensity, boolean bootstrap) {
+		if(!bootstrap) {
+			initNoBootstrap(rnd, pop, inputCount, outputCount, connectionDensity);
+		} else {
+			initBootstrap(rnd, pop, inputCount, outputCount, connectionDensity);
+		}
+	}
+	
+	protected void initNoBootstrap(Random rnd, NEATPopulation pop, int inputCount, int outputCount, double connectionDensity) {
 		setAdjustedScore(0);
 		this.inputCount = inputCount;
 		this.outputCount = outputCount;
@@ -173,12 +186,192 @@ public class NEATContinuousGenome extends NEATGenome implements Cloneable, Seria
 				}
 			}
 		}
-
 	}
+	
+	protected void initBootstrap(Random rnd, NEATPopulation pop, int inputCount, int outputCount, double connectionDensity) {
+		setAdjustedScore(0);
+		this.inputCount = inputCount;
+		this.outputCount = outputCount;
+		// get the activation function
+		ActivationFunction af = pop.getActivationFunctions().pickFirst();
 
-	public NEATContinuousGenome() {
-		// TODO Auto-generated constructor stub
+		//NEURONS
+		
+		// first bias
+		int innovationID = 0;
+		NEATNeuronGene biasGene = new NEATNeuronGene(NEATNeuronType.Bias, af,
+				inputCount, innovationID++);
+		this.neuronsList.add(biasGene);
+
+		// then inputs
+		for (int i = 0; i < inputCount; i++) {
+			NEATNeuronGene gene = new NEATNeuronGene(NEATNeuronType.Input, af,
+					i, innovationID++);
+			this.neuronsList.add(gene);
+		}
+		
+		// then outputs
+		for (int i = 0; i < outputCount; i++) {
+			NEATNeuronGene gene = new NEATNeuronGene(NEATNeuronType.Output, af,
+					i + inputCount + 1, innovationID++);
+			this.neuronsList.add(gene);
+			
+		}
+		
+		// then hidden
+		int hiddenCount = 0;
+		int maxHidden = Math.max(inputCount,outputCount);
+		
+		for (int i = 0 ; i < maxHidden ; i++) {
+			if(rnd.nextDouble() < connectionDensity) {
+				double decay = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+				double bias = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+				int id = i + inputCount + outputCount + 1;
+				NEATContinuousNeuronGene gene = new NEATContinuousNeuronGene(NEATNeuronType.Hidden,
+						af,id, innovationID++, decay, bias);
+				this.neuronsList.add(gene);
+				hiddenCount++;
+			}
+		}
+		
+		//CONNECTIONS
+		
+		//B > all
+		
+		int currentConnections = 0;
+		
+		for(int i = inputCount + 1 ; i < neuronsList.size() ; i++ ) {
+			if(rnd.nextDouble() < connectionDensity) {
+				long fromID = getBiasId();	
+				long toID = this.neuronsList.get(i).getId();
+				double w = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+				NEATLinkGene linkGene = new NEATLinkGene(fromID, toID, true, innovationID++, w);
+				this.linksList.add(linkGene);
+				currentConnections++;
+			}
+		}
+		
+		if(currentConnections == 0) {
+			long bias = getBiasId();
+			long chosenNeuron = neuronsList.get((int)((rnd.nextDouble()*(neuronsList.size() - 1 - inputCount) + 1 + inputCount))).getId();
+			double w = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+			NEATLinkGene linkGene = new NEATLinkGene(bias, chosenNeuron, true, innovationID++, w);
+			this.linksList.add(linkGene);
+		}
+		
+		//I > H
+		if(hiddenCount > 0) {
+			for(int i = 0 ; i < inputCount ; i++) {
+				
+				currentConnections = 0;
+				long fromID = getInputId(i);
+				
+				for(int j = 0 ; j < hiddenCount ; j++) {				
+					if(rnd.nextDouble() < connectionDensity) {
+						
+						long toID = getHiddenId(j);
+						double w = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+						NEATLinkGene linkGene = new NEATLinkGene(fromID, toID, true, innovationID++, w);
+						this.linksList.add(linkGene);
+						currentConnections++;
+					}
+				}
+
+				if(currentConnections == 0) {
+					long toID = getHiddenId((int)(rnd.nextDouble()*hiddenCount));
+					double w = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+					NEATLinkGene linkGene = new NEATLinkGene(fromID, toID, true, innovationID++, w);
+					this.linksList.add(linkGene);
+				}
+			}
+		}
+		
+		//H > H
+		//not necessary to force inter-neuron connections in the hidden layer
+		for(int i = 0 ; i < hiddenCount ; i++) {
+			for(int j = 0 ; j < hiddenCount ; j++) {
+				if(rnd.nextDouble() < connectionDensity) {
+					long fromID = getHiddenId(i);
+					long toID = getHiddenId(j);
+					double w = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+					NEATLinkGene linkGene = new NEATLinkGene(fromID, toID, true, innovationID++, w);
+					this.linksList.add(linkGene);
+				}
+			}
+		}
+		
+		//H > O
+		if(hiddenCount > 0) {
+			for(int i = 0 ; i < hiddenCount ; i++) {
+				
+				currentConnections = 0;
+				long fromID = getHiddenId(i);
+				
+				for(int j = 0 ; j < outputCount ; j++) {
+					if(rnd.nextDouble() < connectionDensity) {
+						long toID = getOutputId(j);
+						double w = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+						NEATLinkGene linkGene = new NEATLinkGene(fromID, toID, true, innovationID++, w);
+						this.linksList.add(linkGene);
+						currentConnections++;
+					}
+				}
+
+				if(currentConnections == 0) {
+					long toID = getOutputId((int)(rnd.nextDouble()*outputCount));
+					double w = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+					NEATLinkGene linkGene = new NEATLinkGene(fromID, toID, true, innovationID++, w);
+					this.linksList.add(linkGene);
+				}
+			}
+		}
+		
+		//I > O
+		if(hiddenCount == 0) {
+			for (int i = 0; i < inputCount ; i++) {
+				
+				currentConnections = 0;
+				long fromID = getInputId(i);
+				
+				for (int j = 0; j < outputCount; j++) {
+					if (rnd.nextDouble() < connectionDensity) {
+						long toID = getOutputId(j);
+						double w = RangeRandomizer.randomize(rnd,
+								-pop.getWeightRange(), pop.getWeightRange());
+						NEATLinkGene gene = new NEATLinkGene(fromID, toID, true,
+								innovationID++, w);
+						this.linksList.add(gene);
+						currentConnections++;
+					}
+				}
+				
+				if(hiddenCount == 0 && currentConnections == 0) {
+					long toID = getOutputId((int)(rnd.nextDouble()*outputCount));
+					double w = RangeRandomizer.randomize(rnd, -pop.getWeightRange(), pop.getWeightRange());
+					NEATLinkGene linkGene = new NEATLinkGene(fromID, toID, true, innovationID++, w);
+					this.linksList.add(linkGene);
+				}
+			}
+		}
 	}
+	
+	private long getBiasId() {
+		return neuronsList.get(0).getId();
+	}
+	
+	private long getInputId(int index) {
+		return this.neuronsList.get(index + 1).getId();
+	}
+	
+	private long getOutputId(int index) {
+		return this.neuronsList.get(index + inputCount + 1).getId();
+	}
+	
+	private long getHiddenId(int index) {
+		return this.neuronsList.get(index + inputCount + outputCount + 1).getId();
+	}
+	
+	public NEATContinuousGenome() {}
 
 	/**
 	 * @return The number of input neurons.

@@ -50,6 +50,10 @@ public class LayeredNeuralNetwork extends WrapperNetwork {
 	
 	public void setNetwork(MLMethod network) {
 		this.network = (LayeredANN)network;
+		/*int n = this.network.getAllNeurons().size();
+		int s = this.network.getAllSynapses().size();
+		int h = n-getNumberOfInputNeurons()-getNumberOfOutputNeurons();
+		System.out.println(n+" "+h+" "+s);*/
 	}
 	
 	@Override

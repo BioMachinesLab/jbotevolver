@@ -58,6 +58,7 @@ public class LayeredANN implements MLRegression, MLError, Serializable  {
 		}
 		catch(IndexOutOfBoundsException e){
 			System.out.println("c1 - n2");
+			e.printStackTrace();
 		}
 		//loop
 		for(ANNLayer layer : layers)
