@@ -67,16 +67,14 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		
 		if(simulator.getEnvironment().getMovableObjects().size()>0){
 			
-			if(simulator.getEnvironment().getMovableObjects().size()>0){
-				for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
-					switch(m.getType()){	
-						case NEST:
-							drawNest(graphics, (Nest)m);
-							break;
-						case LIGHTPOLE:
-							drawLightPole(graphics, (LightPole)m);
-							break;
-					}
+			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
+				switch(m.getType()){	
+					case NEST:
+						drawNest(graphics, (Nest)m);
+						break;
+					case LIGHTPOLE:
+						drawLightPole(graphics, (LightPole)m);
+						break;
 				}
 			}
 			
