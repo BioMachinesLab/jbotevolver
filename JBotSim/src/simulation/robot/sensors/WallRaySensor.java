@@ -26,12 +26,13 @@ public class WallRaySensor extends ConeTypeSensor {
 	protected Random random;
 	protected Vector2d[][] cones;
 	protected Vector2d[] sensorPositions;
-	protected double minimumDistances[][];
 	protected double cutoffAngle = 90;
 	
 	protected double closestDistance;
 	
 	public Vector2d[][][] rayPositions;
+	
+	private boolean seeRays;
 	
 	public WallRaySensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);
@@ -39,6 +40,7 @@ public class WallRaySensor extends ConeTypeSensor {
 		
 		numberOfRays = args.getArgumentAsIntOrSetDefault("numberofrays", numberOfRays);
 		cutoffAngle = args.getArgumentAsDoubleOrSetDefault("cutoffangle", cutoffAngle);
+		seeRays = args.getArgumentAsIntOrSetDefault("seerays", 0) == 1;
 		
 		if(numberOfRays%2 == 0)
 			numberOfRays++;
@@ -54,14 +56,14 @@ public class WallRaySensor extends ConeTypeSensor {
 			for(int j = 0 ; j < numberOfRays ; j++)
 				cones[i][j] = new Vector2d();
 		}
-		minimumDistances = new double[numberOfSensors][numberOfRays];
 	}
 	
 	private void updateCones() {
 		
 		try {
-			rayPositions = new Vector2d[numberOfSensors][numberOfRays][2];
-			minimumDistances = new double[numberOfSensors][numberOfRays];
+			
+			if(seeRays)
+				rayPositions = new Vector2d[numberOfSensors][numberOfRays][2];
 			
 			for(int sensorNumber = 0 ; sensorNumber < numberOfSensors ; sensorNumber++) {
 				double orientation = angles[sensorNumber] + robot.getOrientation();
@@ -108,9 +110,11 @@ public class WallRaySensor extends ConeTypeSensor {
 			for(int i = 0 ; i < numberOfRays ; i++) {
 				Vector2d cone = cones[sensorNumber][i];
 				
-				rayPositions[sensorNumber][i][0] = sensorPositions[sensorNumber];
-				if(rayPositions[sensorNumber][i][1] == null)
-					rayPositions[sensorNumber][i][1] = cone;
+				if(seeRays){
+					rayPositions[sensorNumber][i][0] = sensorPositions[sensorNumber];
+					if(rayPositions[sensorNumber][i][1] == null)
+						rayPositions[sensorNumber][i][1] = cone;
+				}
 				
 				Vector2d intersection = null;
 				intersection = w.intersectsWithLineSegment(sensorPositions[sensorNumber], cone, FastMath.toRadians(cutoffAngle));
@@ -124,8 +128,10 @@ public class WallRaySensor extends ConeTypeSensor {
 					if(distance < range) {
 						inputValue = (range-distance)/range;
 						
-						if((minimumDistances[sensorNumber][i] == 0 || distance < minimumDistances[sensorNumber][i]) && inputValue > rayReadings[sensorNumber][i]) {
-							rayPositions[sensorNumber][i][1] = intersection;
+						if(inputValue > rayReadings[sensorNumber][i]) {
+							if(seeRays)
+								rayPositions[sensorNumber][i][1] = intersection;
+							
 							rayReadings[sensorNumber][i] = Math.max(inputValue, rayReadings[sensorNumber][i]);
 						}
 					}

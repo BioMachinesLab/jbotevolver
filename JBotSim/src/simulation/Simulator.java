@@ -26,7 +26,7 @@ import comm.FileProvider;
 
 public class Simulator implements Serializable {
 
-	private static int maxNumberRobots = 100000;
+	public static int maxNumberRobots = 100000;
 	protected Double time = Double.valueOf(0);
 	protected double timeDelta = 0.1;
 	protected Environment environment;

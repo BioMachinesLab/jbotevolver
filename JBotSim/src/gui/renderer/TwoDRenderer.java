@@ -66,19 +66,20 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		drawBackground();
 		
 		if(simulator.getEnvironment().getMovableObjects().size()>0){
-			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
-				switch(m.getType()){	
-					case NEST:
-						drawNest(graphics, (Nest)m);
-						break;
-					case LIGHTPOLE:
-						drawLightPole(graphics, (LightPole)m);
-						break;
+			
+			if(simulator.getEnvironment().getMovableObjects().size()>0){
+				for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
+					switch(m.getType()){	
+						case NEST:
+							drawNest(graphics, (Nest)m);
+							break;
+						case LIGHTPOLE:
+							drawLightPole(graphics, (LightPole)m);
+							break;
+					}
 				}
 			}
-		}
-
-		if(simulator.getEnvironment().getMovableObjects().size()>0){
+			
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
 				switch(m.getType()){
 				case PREY:
@@ -98,6 +99,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					break;
 				}
 			}
+			
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
 				switch(m.getType()){
 				case ROBOT:
@@ -202,7 +204,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		int x = (int) (transformX(nest.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(nest.getPosition().getY()) - circleDiameter / 2);
 
-		graphics.setColor(Color.LIGHT_GRAY);
+		graphics.setColor(nest.getColor());
 		graphics.fillOval(x, y, circleDiameter, circleDiameter);
 		graphics.setColor(Color.BLACK);
 		
@@ -231,7 +233,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		int y = (int) (transformY(prey.getPosition().getY()) - circleDiameter / 2);
 
 		if(prey.isEnabled()){
-			graphics.setColor(Color.CYAN);
+			graphics.setColor(prey.getColor());
 		} else {
 			graphics.setColor(Color.gray);
 		}

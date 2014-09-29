@@ -1,5 +1,7 @@
 package simulation.physicalobjects;
 
+import java.awt.Color;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
@@ -8,6 +10,7 @@ import simulation.robot.Robot;
 public class Prey extends MovableObject {
 
 	private Robot holder;
+	private Color color;
 
 	public Prey(Simulator simulator,  String name, double x, double y, double angle, double mass, double radius) {
 		super(simulator,name, x, y, angle, mass, PhysicalObjectType.PREY, null);
@@ -17,6 +20,7 @@ public class Prey extends MovableObject {
 	public Prey(Simulator simulator, String name, Vector2d position, int angle,
 			double mass, double radius) {
 		this(simulator, name, position.x, position.y, angle, mass, radius);
+		color = Color.CYAN;
 	}
 
 	
@@ -32,7 +36,6 @@ public class Prey extends MovableObject {
 	public Robot getHolder(){
 		return holder;
 	}
-
 	
 	@Override
 	public void teleportTo(Vector2d position) {
@@ -47,6 +50,14 @@ public class Prey extends MovableObject {
 		} else {
 			return holder.getPosition();
 		}
+	}
+	
+	public Color getColor() {
+		return color;
+	}
+	
+	public void setColor(Color color) {
+		this.color = color;
 	}
 
 	@Override
