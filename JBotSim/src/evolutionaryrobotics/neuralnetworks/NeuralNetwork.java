@@ -82,8 +82,8 @@ public abstract class NeuralNetwork implements Serializable{
 		//			System.out.println("ERROR - all zeros in the inputs");
 		//		}
 		outputNeuronStates = propagateInputs(inputNeuronStates);
-		int currentOutputValue = 0;		
-
+		int currentOutputValue = 0;
+		
 		for (NNOutput o : outputs) {
 			for (int j = 0; j < o.getNumberOfOutputValues(); j++) {
 				o.setValue(j, outputNeuronStates[currentOutputValue++]);				

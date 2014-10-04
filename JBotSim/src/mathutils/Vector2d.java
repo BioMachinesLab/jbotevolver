@@ -1,8 +1,10 @@
 package mathutils;
 
+import java.io.Serializable;
+
 import net.jafama.FastMath;
 
-public class Vector2d extends Point2d {
+public class Vector2d extends Point2d implements Serializable {
 
 	private double ay;
 	private double ax;

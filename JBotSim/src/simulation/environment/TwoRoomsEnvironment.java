@@ -50,6 +50,8 @@ public class TwoRoomsEnvironment extends Environment {
 	protected int postEvalPreyCount = 0;
 	protected int startingRoom = 0;
 	
+	protected boolean allPrey = false;
+	
 	protected Simulator simulator;
 	
 	protected Prey[] preys;
@@ -83,7 +85,8 @@ public class TwoRoomsEnvironment extends Environment {
 		
 		realButton = arguments.getArgumentAsIntOrSetDefault("realbutton", 0) == 1;
 		
-		allowMultipleOpening = arguments.getArgumentAsIntOrSetDefault("allowmultipleopening", 0) == 1; 
+		allowMultipleOpening = arguments.getArgumentAsIntOrSetDefault("allowmultipleopening", 0) == 1;
+		allPrey = arguments.getArgumentAsIntOrSetDefault("allprey", 0) == 1; 
 		
 		if(postEval)
 			calculateDropRate(arguments.getArgumentAsDoubleOrSetDefault("postevaldroprate", 0));
@@ -101,6 +104,16 @@ public class TwoRoomsEnvironment extends Environment {
 		for(int i = 0 ; i < preys.length ; i++) {
 			preys[i] = new Prey(simulator, "p", new Vector2d(0,-3), 0, 1, 0.03);
 			addMovableObject(preys[i]);
+			
+			if(allPrey) {
+				double sign = 1;
+				if(random.nextDouble() > 0.5 && bothRooms)
+					sign*=-1;
+				
+				if(startingRoom != 0)
+					sign = startingRoom;
+				addPrey((preyRandom.nextDouble()*(arenaWidth-0.2-0.2)+corridorWidth/2+0.2)*sign,(preyRandom.nextDouble()*(arenaHeight-0.2-0.2)-arenaHeight/2+0.2));
+			}
 		}
 		
 		placeRobots();
@@ -114,8 +127,11 @@ public class TwoRoomsEnvironment extends Environment {
 			
 			if(startingRoom != 0)
 				sign = startingRoom;
+			
+			double randX = random.nextDouble();
+			double randY = random.nextDouble();
 
-			robots.get(0).teleportTo(new Vector2d((random.nextDouble()*(arenaWidth-0.2-0.2)+corridorWidth/2+0.2)*sign,random.nextDouble()*(arenaHeight-0.2-0.2)-arenaHeight/2+0.2));
+			robots.get(0).teleportTo(new Vector2d((randX*(arenaWidth-0.2)+corridorWidth/2+0.1)*sign,randY*(arenaHeight-0.2-0.1)-arenaHeight/2+0.1));
 			
 			double orientation = robots.get(0).getOrientation()+(random.nextDouble()*2-1)*this.randomizeOrientation;
 			robots.get(0).setOrientation(orientation);

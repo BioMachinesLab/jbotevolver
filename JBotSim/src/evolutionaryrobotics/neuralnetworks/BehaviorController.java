@@ -168,4 +168,5 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 	public int getNumberOfSwitches() {
 		return switches;
 	}
+	
 }

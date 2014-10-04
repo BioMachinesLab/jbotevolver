@@ -35,10 +35,10 @@ public class CTRNNMultilayer extends NeuralNetwork {
 		// Update delta state of hidden layer from inputs:
 	    for(int i = 0; i < numberOfHiddenNodes; i++) {
 	        hiddenDeltaStates[i] = -hiddenStates[i];
-	      
+	        
 	        for (int j = 0; j < numberOfInputNeurons; j++) {
 	            // weight * sigmoid(state)
-	            hiddenDeltaStates[i] += inputToHiddenWeights[i * numberOfInputNeurons + j] * inputValues[j] ;	  
+	            hiddenDeltaStates[i] += inputToHiddenWeights[i * numberOfInputNeurons + j] * inputValues[j];
 	        }	  
 	    }
 
