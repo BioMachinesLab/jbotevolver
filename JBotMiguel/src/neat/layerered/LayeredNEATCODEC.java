@@ -79,6 +79,11 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 		/*System.out.println("L: " + layers.length + 
 				"; l1: " + layers[0].getNeurons().size() + 
 				"; l2: " + layers[1].getNeurons().size());*/
+		
+		if(layers[layers.length-1].isHiddenLayer()) {
+			throw new NeuralNetworkError("Last layer is not output layer!");
+		}
+		
 		return new LayeredANN(layers);
 	}
 
@@ -120,7 +125,7 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 					depth = Integer.MAX_VALUE;
 				}
 				//disconnected piece? convention = 2nd layer
-				else if(n.getIncomingConnections().isEmpty()){
+				else if(n.getIncomingConnections().isEmpty()  || (n.getIncomingNeurons().size() == 1 && n.getIncomingNeurons().get(0).getId() == n.getId())){
 					depth = Integer.MAX_VALUE - 1;
 					n.setNeuronDepth(depth);
 				}
@@ -130,7 +135,12 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 					}
 				}
 			}
-			if(!ids.contains(depth))
+			
+			if(depth == Integer.MAX_VALUE && n.getType() == ANNNeuron.HIDDEN_NEURON) {
+				throw new NeuralNetworkError("Hidden neuron in the input layer!");
+			}
+			
+			if(depth != -1 && !ids.contains(depth))
 				ids.add(depth);
 		}
 		return ids;
@@ -140,6 +150,7 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 	public void assignNeuronDepth(ArrayList<ANNNeuron> neurons, int depth) {
 		for (int i = 0; i < neurons.size(); i++) {
 			ANNNeuron neuron = neurons.get(i);
+			
 			if (neuron.getType() == ANNNeuron.OUTPUT_NEURON) {
 				if (neuron.getNeuronDepth() == -1) {
 					neuron.setNeuronDepth(0);
@@ -155,7 +166,7 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 			} else if (neuron.getType() == ANNNeuron.INPUT_NEURON
 					|| neuron.getType() == ANNNeuron.BIAS_NEURON) {
 				neuron.setNeuronDepth(Integer.MAX_VALUE);
-			}
+			} 
 		}
 	}
 

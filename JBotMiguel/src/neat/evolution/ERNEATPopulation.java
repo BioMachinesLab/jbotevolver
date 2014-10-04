@@ -77,22 +77,28 @@ public class ERNEATPopulation extends Population implements Serializable{
 	protected double bestFitness, worstFitness, avgFitness;
 	
 	protected double addNodeRate = 0.02;
-	protected double mutateLinkRate = 0.1;
+	protected double addLinkRate = 0.1;
+	protected double mutateLinkWeightRate = 0.8;
+	protected double mutateDecayRate = 0.4;
+	protected double crossoverRate = 0.2;
 	
 	protected Class networkClass;
 	
-	protected boolean bootstrap = false;
+	protected int bootstrap = 0;
 
 	public ERNEATPopulation(Arguments arguments) {
 		super(arguments);
-		populationSize = arguments.getArgumentAsIntOrSetDefault("size",50);
+		populationSize = arguments.getArgumentAsIntOrSetDefault("size",100);
 		numberOfGenerations = arguments.getArgumentAsIntOrSetDefault("generations",100);
 		numberOfSamplesPerChromosome = arguments.getArgumentAsIntOrSetDefault("samples",10);
 		
 		addNodeRate = arguments.getArgumentAsDoubleOrSetDefault("addnoderate", addNodeRate);
-		mutateLinkRate = arguments.getArgumentAsDoubleOrSetDefault("mutatelinkrate", mutateLinkRate);
+		addLinkRate = arguments.getArgumentAsDoubleOrSetDefault("addlinkrate", addLinkRate);
+		mutateLinkWeightRate = arguments.getArgumentAsDoubleOrSetDefault("mutatelinkweightrate", mutateLinkWeightRate);
+		mutateDecayRate = arguments.getArgumentAsDoubleOrSetDefault("mutatedecayrate", mutateDecayRate);
+		crossoverRate = arguments.getArgumentAsDoubleOrSetDefault("crossoverrate", crossoverRate);
 		
-		bootstrap = arguments.getArgumentAsIntOrSetDefault("bootstrap", 0) == 1;
+		bootstrap = arguments.getArgumentAsIntOrSetDefault("bootstrap", 0);
 	}
 
 	public void createRandomPopulation(JBotEvolver jBotEvolver) {
@@ -141,23 +147,37 @@ public class ERNEATPopulation extends Population implements Serializable{
 		boolean continuousNetwork = networkClass.equals(LayeredContinuousNeuralNetwork.class) || networkClass.equals(NEATContinuousNetwork.class);
 		
 		if(continuousNetwork) {
-			weightMutation.getComponents().add(0.9*0.5,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
-			weightMutation.getComponents().add(0.1*0.5,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
+			weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
+			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
 			
-			weightMutation.getComponents().add(0.9*0.5,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutatePerturbNeuronDecay(0.1)));
-			weightMutation.getComponents().add(0.1*0.5,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutateResetNeuronDecay()));
-//			weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
-//			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
+			weightMutation.getComponents().finalizeStructure();
+			result.setChampMutation(weightMutation);
+			
+			result.addOperation(mutateLinkWeightRate, weightMutation);
+			
+			final CompoundOperator decayMutation = new CompoundOperator();
+			
+			decayMutation.getComponents().add(0.9,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutatePerturbNeuronDecay(0.1)));
+			decayMutation.getComponents().add(0.1,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutateResetNeuronDecay()));
+			
+			decayMutation.getComponents().finalizeStructure();
+
+			result.addOperation(mutateDecayRate, decayMutation);
+			
+			//weightMutation.getComponents().add(0.9*0.5,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutatePerturbNeuronDecay(0.1)));
+			//weightMutation.getComponents().add(0.1*0.5,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutateResetNeuronDecay()));
+			
 		} else {
 			weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
 			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
+			weightMutation.getComponents().finalizeStructure();
+			result.setChampMutation(weightMutation);
+			
+			result.addOperation(mutateLinkWeightRate, weightMutation);
 		}
 		
-		weightMutation.getComponents().finalizeStructure();
-		result.setChampMutation(weightMutation);
 		
-		result.addOperation(0.8, weightMutation);
-		result.addOperation(0.2, new NEATCrossoverJBot());
+		result.addOperation(crossoverRate, new NEATCrossoverJBot());
 		
 		if(continuousNetwork) {
 			result.addOperation(addNodeRate, new NEATMutateAddContinuousNode());
@@ -165,7 +185,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 			result.addOperation(addNodeRate, new NEATMutateAddNodeJBot());
 		}
 		
-		result.addOperation(mutateLinkRate, new NEATMutateAddLinkJBot());
+		result.addOperation(addLinkRate, new NEATMutateAddLinkJBot());
 		
 		result.getOperators().finalizeStructure();
 		

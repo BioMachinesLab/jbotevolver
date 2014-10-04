@@ -46,7 +46,7 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 	public SOEvaluationManager(Arguments args) {
 		super(args);
 		this.objectiveId = args.getArgumentAsInt("objectiveid");
-		this.positiveFitness = args.getArgumentAsIntOrSetDefault("positivefitness", 1) == 1;
+		this.positiveFitness = args.getArgumentAsIntOrSetDefault("positivefitness", 0) == 1;
 	}
 	
 	public void setupObjectives(HashMap<String, Arguments> arguments) {

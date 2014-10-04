@@ -33,8 +33,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import neat.continuous.NEATContinuousGenome;
 import neat.evaluation.CalculateScoreAsynchronous;
 import neat.evaluation.EvaluationResult;
+import neat.evaluation.MinimumScoreAdjuster;
 
 import org.encog.Encog;
 import org.encog.EncogError;
@@ -66,6 +68,7 @@ import org.encog.ml.ea.species.Species;
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
 import org.encog.ml.genetic.GeneticError;
 import org.encog.neural.neat.training.NEATGenome;
+import org.encog.neural.neat.training.species.OriginalNEATSpeciation;
 import org.encog.util.concurrency.MultiThreadable;
 import org.encog.util.logging.EncogLogging;
 
@@ -382,6 +385,9 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 								+ this.bestGenome.getScore());
 			}
 		}
+		
+		adjustScores(this.newPopulation);
+
 		this.speciation.performSpeciation(this.newPopulation);
         // purge invalid genomes
         this.population.purgeInvalidGenomes();
@@ -444,14 +450,29 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 		
 		
 		getPopulation().setBestGenome(this.bestGenome);
-		
+
 		// speciate
 		final List<Genome> genomes = getPopulation().flatten();
+		
+		adjustScores(genomes);
 		
 		this.speciation.performSpeciation(genomes);
 		
 		// purge invalid genomes
         this.population.purgeInvalidGenomes();
+	}
+	
+	private void adjustScores(List<Genome> genomes) {
+		double minFitness = 0;
+		
+		for(Genome g : genomes)
+			minFitness = Math.min(g.getScore(),minFitness);
+		
+		adjusters.clear();
+		adjusters.add(new MinimumScoreAdjuster(minFitness));
+		
+		for(Genome g : genomes)
+			calculateScoreAdjustment(g, adjusters);
 	}
 	
 	/**

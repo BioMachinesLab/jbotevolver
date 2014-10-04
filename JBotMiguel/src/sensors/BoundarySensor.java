@@ -1,7 +1,5 @@
 package sensors;
 
-import java.awt.Color;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.Line;
@@ -47,7 +45,7 @@ public class BoundarySensor extends WallRaySensor {
 					if(distance < range) {
 						inputValue = (range-distance)/range;
 						
-						if((minimumDistances[sensorNumber][i] == 0 || distance < minimumDistances[sensorNumber][i]) && inputValue > rayReadings[sensorNumber][i]) {
+						if(inputValue > rayReadings[sensorNumber][i]) {
 							rayPositions[sensorNumber][i][1] = intersection;
 							rayReadings[sensorNumber][i] = Math.max(inputValue, rayReadings[sensorNumber][i]);
 						}

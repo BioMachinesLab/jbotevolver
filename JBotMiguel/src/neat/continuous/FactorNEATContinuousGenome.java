@@ -13,9 +13,9 @@ import org.encog.neural.neat.training.NEATNeuronGene;
 public class FactorNEATContinuousGenome extends FactorNEATGenome implements Serializable{
 	
 	private static final long serialVersionUID = 856389357122003004L;
-	protected boolean bootstrap;
+	protected int bootstrap;
 	
-	public FactorNEATContinuousGenome(boolean boostrap) {
+	public FactorNEATContinuousGenome(int boostrap) {
 		this.bootstrap = boostrap;
 	}
 	

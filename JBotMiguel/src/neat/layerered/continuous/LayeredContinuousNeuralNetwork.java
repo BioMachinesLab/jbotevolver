@@ -50,9 +50,11 @@ public class LayeredContinuousNeuralNetwork extends LayeredNeuralNetwork {
 			double decay = 0;
 			double bias = 0;
 			
-			if(neuron instanceof ANNNeuronContinuous) {
+			if(neuron.getType() == ANNNeuron.HIDDEN_NEURON) {
 				decay =((ANNNeuronContinuous)neuron).getDecay();
 				bias =((ANNNeuronContinuous)neuron).getBias();
+			} else if(neuron.getType() == ANNNeuron.OUTPUT_NEURON) {
+				bias =((ANNOutputNeuron)neuron).getBias();
 			}
 			
 			weights[pos++] = decay;
@@ -89,10 +91,10 @@ public class LayeredContinuousNeuralNetwork extends LayeredNeuralNetwork {
 			
 			ANNNeuron neuron;
 			
-			if(decay != 0 || bias != 0) {
+			if(type == ANNNeuron.HIDDEN_NEURON) {
 				neuron = new ANNNeuronContinuous(id, type, new ActivationSteepenedSigmoid(), decay, bias);
 			} else if(type == ANNNeuron.OUTPUT_NEURON){
-				neuron = new ANNOutputNeuron(id, type, new ActivationSteepenedSigmoid());
+				neuron = new ANNOutputNeuron(id, type, new ActivationSteepenedSigmoid(),bias);
 			} else { 
 				neuron = new ANNNeuron(id, type, new ActivationSteepenedSigmoid());
 			}

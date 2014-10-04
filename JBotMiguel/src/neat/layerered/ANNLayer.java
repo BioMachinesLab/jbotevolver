@@ -3,8 +3,11 @@ package neat.layerered;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import neat.layerered.continuous.ANNNeuronContinuous;
+
 public class ANNLayer implements Serializable {
 
+	private static final long serialVersionUID = -4535259753222438787L;
 	protected int id;
 	protected ArrayList<ANNNeuron> layerNeurons;
 	
@@ -38,5 +41,13 @@ public class ANNLayer implements Serializable {
 
 	public ArrayList<ANNNeuron> getNeurons() {
 		return this.layerNeurons;
+	}
+	
+	public boolean isHiddenLayer() {
+		for(ANNNeuron n : this.layerNeurons) {
+			if(!(n.getType() == ANNNeuron.HIDDEN_NEURON))
+				return false;
+		}
+		return true;
 	}
 }

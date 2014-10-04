@@ -36,7 +36,7 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 	
 	private static final long serialVersionUID = -4688694377130370508L;
 	private Class networkClass;
-	private boolean bootstrap;
+	private int bootstrap;
 
 	public NEATEncogPopulation() {
 
@@ -45,7 +45,7 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 	public NEATEncogPopulation(final int inputCount, final int outputCount, final int populationSize) {
 		super(inputCount, outputCount, populationSize);
 	}
-	public NEATEncogPopulation(final int inputCount, final int outputCount, final int populationSize, Class networkClass, boolean bootstrap) {
+	public NEATEncogPopulation(final int inputCount, final int outputCount, final int populationSize, Class networkClass, int bootstrap) {
 		this(inputCount, outputCount, populationSize);
 		this.networkClass = networkClass;
 		this.bootstrap = bootstrap;
@@ -95,33 +95,86 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 
 		final Random rnd = getRandomNumberFactory().factor();
 
-		// create one default species
-		final BasicSpecies defaultSpecies = new BasicSpecies();
-		defaultSpecies.setPopulation(this);
-
 		// create the initial population
 		
-		if(bootstrap) {
-			for (int i = 0; i < getPopulationSize(); i++) {
-				double density = 1.0/getPopulationSize()*i;
-				final Genome genome = getGenomeFactory().factor(new Random(rnd.nextLong()), this,
-						getInputCount(), getOutputCount(),
-						density);
-				defaultSpecies.add(genome);
+		if(bootstrap > 0) {
+			
+			if(bootstrap == 3) {
+				int nHidden = 11;
+				
+				//Innovations List manual init
+				NEATInnovationList innovationList = new NEATInnovationList();
+				innovationList.setPopulation(this);
+				setInnovations(innovationList);
+				
+				//bias
+				innovationList.findInnovation(assignGeneID());
+				
+				// input neurons
+				for (int i = 0; i < getInputCount(); i++) {
+					innovationList.findInnovation(assignGeneID());
+				}
+
+				// output neurons
+				for (int i = 0; i < getOutputCount(); i++) {
+					innovationList.findInnovation(assignGeneID());
+				}
+				
+				for (int i = 0; i <= nHidden; i++) {
+					
+					// create one default species
+					final BasicSpecies species = new BasicSpecies();
+					species.setPopulation(this);
+					
+					int numberofChildren = getPopulationSize()/(nHidden+1);
+					
+					final Genome genome = getGenomeFactory().factor(new Random(rnd.nextLong()), this, getInputCount(), getOutputCount(), i);
+					
+					for(int j = 0 ; j < numberofChildren ; j++) {
+						species.add(getGenomeFactory().factor(genome));
+					}
+					
+					species.setLeader(species.getMembers().get(0));
+					getSpecies().add(species);
+				}
+				
+				/*	} else {
+				 //TODO careful because here the innovations are not set...
+				// create one default species
+				final BasicSpecies defaultSpecies = new BasicSpecies();
+				defaultSpecies.setPopulation(this);
+				
+				for (int i = 0; i < getPopulationSize(); i++) {
+					double density = 1.0/getPopulationSize()*i;
+					final Genome genome = getGenomeFactory().factor(new Random(rnd.nextLong()), this,
+							getInputCount(), getOutputCount(),
+							density);
+					defaultSpecies.add(genome);
+				}
+				 
+				defaultSpecies.setLeader(defaultSpecies.getMembers().get(0));
+				getSpecies().add(defaultSpecies);
+*/
 			}
 		} else {
+			// create one default species
+			final BasicSpecies defaultSpecies = new BasicSpecies();
+			defaultSpecies.setPopulation(this);
+			
 			for (int i = 0; i < getPopulationSize(); i++) {
 				final Genome genome = getGenomeFactory().factor(new Random(rnd.nextLong()), this,
 						getInputCount(), getOutputCount(),
 						getInitialConnectionDensity());
 				defaultSpecies.add(genome);
 			}
+			defaultSpecies.setLeader(defaultSpecies.getMembers().get(0));
+			getSpecies().add(defaultSpecies);
+			
+			// create initial innovations
+			setInnovations(new NEATInnovationList(this));
+			
 		}
-		defaultSpecies.setLeader(defaultSpecies.getMembers().get(0));
-		getSpecies().add(defaultSpecies);
-
-		// create initial innovations
-		setInnovations(new NEATInnovationList(this));
+		
 	}
 
 }

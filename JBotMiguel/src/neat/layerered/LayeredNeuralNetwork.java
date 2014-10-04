@@ -14,10 +14,14 @@ import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 public class LayeredNeuralNetwork extends WrapperNetwork {
 	
+	private static final long serialVersionUID = -8907155044322731524L;
 	protected LayeredANN network;
 	
 	public LayeredNeuralNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments){
 		this.create(inputs, outputs);
+		if(outputs.size() == 1) {
+//			System.out.println("whaat");
+		}
 	}
 	
 	public LayeredNeuralNetwork(LayeredANN network){

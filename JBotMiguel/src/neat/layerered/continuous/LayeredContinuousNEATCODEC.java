@@ -34,7 +34,8 @@ public class LayeredContinuousNEATCODEC extends LayeredNEATCODEC {
 			
 			ANNNeuron newNeuron;
 			if(newNeuronType == ANNNeuron.OUTPUT_NEURON) {
-				newNeuron = new ANNOutputNeuron(neuronGene.getId(), newNeuronType, neuronGene.getActivationFunction());
+				NEATContinuousNeuronGene continuousGene = (NEATContinuousNeuronGene)neuronGene;
+				newNeuron = new ANNOutputNeuron(continuousGene.getId(), newNeuronType, continuousGene.getActivationFunction(),continuousGene.getBias());
 			} else if(neuronGene instanceof NEATContinuousNeuronGene) {
 				NEATContinuousNeuronGene continuousGene = (NEATContinuousNeuronGene)neuronGene;
 				newNeuron = new ANNNeuronContinuous(neuronGene.getId(), newNeuronType, neuronGene.getActivationFunction(),continuousGene.getDecay(),continuousGene.getBias());

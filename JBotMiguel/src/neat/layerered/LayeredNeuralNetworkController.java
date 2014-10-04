@@ -16,10 +16,7 @@ public class LayeredNeuralNetworkController extends NeuralNetworkController{
 	public void setNeuralNetwork(NeuralNetwork network) {
 		LayeredNeuralNetwork wrapper = (LayeredNeuralNetwork)network;
 		
-		LayeredANN copyNetwork =
-				new LayeredNEATCODEC().createNetFromStructure(
-						wrapper.getNetwork().getAllSynapses(),
-						wrapper.getNetwork().getAllNeurons());
+		LayeredANN copyNetwork = wrapper.getNetwork().copy();
 		
 		((LayeredNeuralNetwork)this.neuralNetwork).setNetwork(copyNetwork);
 		
