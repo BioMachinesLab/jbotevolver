@@ -27,6 +27,10 @@ package gui.util;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -35,9 +39,11 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+
 import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
 import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 
@@ -101,6 +107,8 @@ public class GraphViz
 	protected ImageShower imageShower = null;
 	
 	protected String type = "png";
+	
+	protected int resolutionHeight = 0;
 
    /**
     * Constructor: creates a new GraphViz object that will contain
@@ -121,6 +129,9 @@ public class GraphViz
 	   
 	   if(!dir.exists())
 		   dir.mkdir();
+	   
+	   GraphicsDevice gd = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+	   resolutionHeight = gd.getDisplayMode().getHeight() - 100;
    }
    
    public GraphViz(NeuralNetwork network) {
@@ -249,14 +260,14 @@ public class GraphViz
 	   if(imageShower != null) {
 		   BufferedImage img = this.getGraph(this.getDotSource());
 		   imageShower.changeImage(img);
-		   if(img != null)
-			   imageShower.setSize(img.getWidth(),img.getHeight());
 	   }
    }
    
    public void show() {
-	   if(imageShower == null)
+	   if(imageShower == null) {
 		   imageShower = new ImageShower(this.getGraph(this.getDotSource()));
+	   }
+	   imageShower.setVisible(true);
    }
 
    /**
@@ -443,7 +454,7 @@ public class GraphViz
 	   
 	   public void changeImage(BufferedImage img) {
 		   panel.setImage(img);
-//		   setSize(panel.getSize());
+		   setSize(panel.getSize());
 		   this.repaint();
 	   }
    }
@@ -451,24 +462,45 @@ public class GraphViz
    public class ImagePanel extends JPanel {
 	   
 	   private BufferedImage img;
+	   private Dimension d = new Dimension(1,1);
 	   
 	   public ImagePanel(BufferedImage img) {
-		   this.img = img;
+		   setImage(img);
 	   }
 	   
 	   public void setImage(BufferedImage img) {
+		   
+		   if(img != null)
+			   d = new Dimension(img.getWidth(),img.getHeight()+20);
+		   
+		   if(img != null && img.getHeight() > resolutionHeight) {
+			   img = resizeImg(img);
+		   }
+		   
 		   this.img = img;
 	   }
 	   
+	   public BufferedImage resizeImg(BufferedImage before) {
+		   int w = before.getWidth();
+		   int h = before.getHeight();
+		   BufferedImage after = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		   AffineTransform at = new AffineTransform();
+		   at.scale(resolutionHeight/(double)h,resolutionHeight/(double)h);
+		   AffineTransformOp scaleOp = 
+		      new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+		   after = scaleOp.filter(before, after);
+		   d = new Dimension((int)(resolutionHeight/(double)h*before.getWidth()), (int)(resolutionHeight/(double)h*before.getHeight())+20);
+		   return after;
+	   }
+	   
 	   public void paintComponent(Graphics g) {
-	        g.drawImage(img, 0, 0, null);
+		   if(img != null)
+			   g.drawImage(img, 0, 0, null);
 	   }
 	   
 	   @Override
 	   public Dimension getSize() {
-		   if(img != null)
-			   return new Dimension(img.getWidth(),img.getHeight()+20);
-		   return new Dimension(1,1);
+		   return d;
 	   }
    }
 }

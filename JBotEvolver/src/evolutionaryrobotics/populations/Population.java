@@ -368,11 +368,14 @@ public abstract class Population implements Serializable {
 		FileInputStream fis = new FileInputStream(populationFile);
 		GZIPInputStream gzipIn = new GZIPInputStream(fis);
 		ObjectInputStream in = new ObjectInputStream(gzipIn);
+		
 		try {
-			Population population = (Population) in.readObject();
+			Object obj = in.readObject();
+			Population population = (Population) obj;
 			in.close();
 			return population;
 		} catch(OptionalDataException e) {
+			e.printStackTrace();
 			System.err.println("There was a problem opening "+f.getName()+"! Opening previous population file...");
 			String load = args.getArgumentAsString("load");
 			int i;
@@ -383,7 +386,7 @@ public abstract class Population implements Serializable {
 			}
 			
 			int gen = (Integer.parseInt(load.substring(i+1))-1);
-			if(gen < 0)
+			if(gen == 0)
 				throw new RuntimeException("First generation is broken!");
 			String prev = load.substring(0,i+1) + gen;
 			args.setArgument("load", prev);
