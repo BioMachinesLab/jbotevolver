@@ -672,6 +672,8 @@ public class ResultViewerGui extends Gui {
 			line = reader.readLine();
 		}
 		
+		reader.close();
+		
 		return new PostEvaluationData(setupName, Integer.valueOf(number) ,chromosomeFitness, overall);
 	}
 	
