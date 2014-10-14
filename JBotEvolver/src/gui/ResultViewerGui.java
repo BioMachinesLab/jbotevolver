@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Random;
+import java.util.Scanner;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -78,6 +80,7 @@ public class ResultViewerGui extends Gui {
 	protected JButton     pauseButton = new JButton("Pause");
 	protected JButton		plotButton = new JButton("Plot Graph");
 	protected JButton		shiftButton = new JButton("Set");
+	protected JButton		newRandomSeedButton = new JButton("New Random Seed");
 
 	protected JSlider playPosition = new JSlider(0,100);
 	protected JSlider sleepSlider = new JSlider(0,100);
@@ -134,7 +137,7 @@ public class ResultViewerGui extends Gui {
 		
 		frame = new JFrame("Result Viewer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1200, 830);
+		frame.setSize(1200, 860);
 	
 		frame.getContentPane().add(initBottomPanel(), BorderLayout.SOUTH);	
 		frame.getContentPane().add(initRightWrapperPanel(), BorderLayout.EAST);
@@ -170,6 +173,7 @@ public class ResultViewerGui extends Gui {
 		treeWrapper.add(compareFitnessButton);
 		treeWrapper.add(plotFitnessButton);
 		treeWrapper.add(argumentsPanel);
+		treeWrapper.add(newRandomSeedButton);
 		
 		fitnessSummary.setPreferredSize(new Dimension(200, 20));
 
@@ -480,6 +484,35 @@ public class ResultViewerGui extends Gui {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				compareFitness();
+			}
+		});
+		
+		newRandomSeedButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				int newRandomSeed = new Random().nextInt(Integer.MAX_VALUE);
+				
+				if(extraArguments.getText().isEmpty()){
+					extraArguments.setText("--random-seed " + newRandomSeed);
+				}else{
+					String finalText = "";
+					boolean findSeedText = false;
+					Scanner scanner = new Scanner(extraArguments.getText());
+					while(scanner.hasNextLine()){
+						String line = scanner.nextLine();
+						if(line.startsWith("--random-seed")){
+							finalText += "--random-seed " + newRandomSeed + "\n";
+							findSeedText = true;
+						}else{
+							finalText += line + "\n";
+						}
+					}
+					scanner.close();
+					if(!findSeedText){
+						finalText += "--random-seed " + newRandomSeed + "\n";
+					}
+					extraArguments.setText(finalText);
+				}
 			}
 		});
 		
