@@ -8,6 +8,7 @@ import gui.util.Editor;
 import gui.util.GraphPlotter;
 import gui.util.GraphViz;
 import gui.util.NetworkViewer;
+import gui.util.PostEvaluationData;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -17,11 +18,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Scanner;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -35,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
@@ -84,6 +92,7 @@ public class ResultViewerGui extends Gui {
 	protected JButton	loadButton	= new JButton("Load");
 	protected JButton editButton = new JButton("Edit");
 	protected JButton plotFitnessButton = new JButton("Plot Fitness");
+	protected JButton compareFitnessButton = new JButton("Compare Fitness");
 
 	static final int RUN         = 2;
 	static final int PAUSED      = 3;
@@ -158,6 +167,7 @@ public class ResultViewerGui extends Gui {
 		treeWrapper.add(fileTree);
 		treeWrapper.add(editButton);
 		treeWrapper.add(loadButton);
+		treeWrapper.add(compareFitnessButton);
 		treeWrapper.add(plotFitnessButton);
 		treeWrapper.add(argumentsPanel);
 
@@ -464,6 +474,13 @@ public class ResultViewerGui extends Gui {
 			}
 		});
 		
+		compareFitnessButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				compareFitness();
+			}
+		});
+		
 		if(enableDebugOptions) {
 			neuralNetworkCheckbox.addActionListener(new ActionListener() {
 				@Override
@@ -523,6 +540,102 @@ public class ResultViewerGui extends Gui {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	protected void compareFitness(){
+		TreePath[] selectedFiles = fileTree.getSelectedFilesPaths();
+		String parentpath = "";
+		File f;
+		String result = "";
+		
+		for (TreePath treePath : selectedFiles) {
+			String path = "";
+			
+			if(treePath.getParentPath() == null){
+				path = treePath.getLastPathComponent().toString();
+			}else{
+				if(parentpath.equals("")){
+					parentpath = treePath.getParentPath().toString().replace("[", "");
+					parentpath = parentpath.replace("]", "");
+				}
+				
+				path = parentpath + "/" + treePath.getLastPathComponent();
+			}
+			ArrayList<PostEvaluationData> postInformations = getInformationFromPostEvaluation(path);
+			for (PostEvaluationData postEvaluationData : postInformations) {
+				result+= postEvaluationData.toString() + "\n\n";
+			}
+		}
+		
+		JFrame comparisonFrame = new JFrame("Setups Comparison");
+		JTextArea comparisonArea = new JTextArea(result);
+		comparisonArea.setEditable(false);
+		JScrollPane comparisonScrollPane = new JScrollPane(comparisonArea);
+		comparisonFrame.getContentPane().add(comparisonScrollPane);
+		comparisonFrame.setSize(480, 300);
+		comparisonFrame.setLocationRelativeTo(null);
+		comparisonFrame.setVisible(true);
+		
+	}
+	
+	protected ArrayList<PostEvaluationData> getInformationFromPostEvaluation(String folder) {
+		File f = new File(folder+"/post.txt");
+		ArrayList<PostEvaluationData> postDataList = new ArrayList<PostEvaluationData>();
+		
+		if(f.exists()){
+			try {
+				postDataList.add(getDataFromPost(f));
+				return postDataList;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} else {
+			String[] directories = (new File(folder)).list(new FilenameFilter() {
+				@Override
+				public boolean accept(File dir, String name) {
+					return (new File(dir,name)).isDirectory();
+				}
+			});
+			
+			if(directories != null){
+				for(String dir : directories){
+					postDataList.addAll(getInformationFromPostEvaluation(folder+"/"+dir));
+				}
+			}
+			return postDataList;
+		}
+		
+		return null;
+	}
+
+	private PostEvaluationData getDataFromPost(File f) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(f));
+		String line = reader.readLine();
+		
+		String[] splitSetupName = f.getAbsolutePath().split("/");
+		String setupName = splitSetupName[splitSetupName.length-2];
+		
+		String number = "";
+		double chromosomeFitness = 0;
+		double overall = 0;
+		
+		while (line != null) {
+			
+			if(line.contains("#")){
+				number = line.substring(line.indexOf(" "), line.length()).trim();
+			}else if(line.contains("Overall")){
+				overall = Double.valueOf(line.split(" ")[1]);
+			}else{
+				String[] splitString = line.split(" ");
+				if(splitString[0].equals(number)){
+					chromosomeFitness = Double.valueOf(splitString[1]);
+				}
+			}
+			
+			line = reader.readLine();
+		}
+		
+		return new PostEvaluationData(setupName, Integer.valueOf(number) ,chromosomeFitness, overall);
 	}
 
 	public void dispose() {
@@ -746,6 +859,10 @@ public class ResultViewerGui extends Gui {
 
 		public String getCurrentFilename() {
 			return currentFilename;
+		}
+		
+		public TreePath[] getSelectedFilesPaths(){
+			return tree.getSelectionPaths();
 		}
 
 		protected DefaultMutableTreeNode addNodes(DefaultMutableTreeNode curTop, File dir) {
