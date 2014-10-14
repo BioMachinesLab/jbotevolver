@@ -23,7 +23,7 @@ public class PostEvaluationData {
 	}
 	
 	public double getBestFitness() {
-		return bestFitnessNumber;
+		return bestFitness;
 	}
 	
 	public double getAverageFitness() {
