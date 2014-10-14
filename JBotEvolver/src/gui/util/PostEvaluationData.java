@@ -3,52 +3,40 @@ package gui.util;
 public class PostEvaluationData {
 
 	private String folder;
-	private int bestChromosomeNumber;
-	private double bestChromosomeFitness;
-	private double setupAverage;
+	private int bestFitnessNumber;
+	private double bestFitness;
+	private double averageFitness;
 	
-	public PostEvaluationData(String folder, int bestChromosomeNumber,double bestChromosomeFitness, double setupAverage) {
+	public PostEvaluationData(String folder, int bestFitnessNumber, double bestFitness, double averageFitness) {
 		this.folder = folder;
-		this.bestChromosomeNumber = bestChromosomeNumber;
-		this.bestChromosomeFitness = bestChromosomeFitness;
-		this.setupAverage = setupAverage;
+		this.bestFitnessNumber = bestFitnessNumber;
+		this.bestFitness = ((int)(bestFitness*100))/100.0;
+		this.averageFitness = ((int)(averageFitness*100))/100.0;
 	}
 
 	public String getFolder() {
 		return folder;
 	}
 	
-	public int getBestChromosomeNumber() {
-		return bestChromosomeNumber;
+	public int getBestFitnessNumber() {
+		return bestFitnessNumber;
 	}
 	
-	public double getBestChromosomeFitness() {
-		return bestChromosomeFitness;
+	public double getBestFitness() {
+		return bestFitnessNumber;
 	}
 	
-	public double getSetupAverage() {
-		return setupAverage;
+	public double getAverageFitness() {
+		return averageFitness;
 	}
 	
 	public void setFolder(String folder) {
 		this.folder = folder;
 	}
 	
-	public void setBestChromosomeNumber(int bestChromosomeNumber) {
-		this.bestChromosomeNumber = bestChromosomeNumber;
-	}
-	
-	public void setBestChromosomeFitness(double bestChromosomeFitness) {
-		this.bestChromosomeFitness = bestChromosomeFitness;
-	}
-	
-	public void setSetupAverage(double setupAverage) {
-		this.setupAverage = setupAverage;
-	}
-	
 	@Override
 	public String toString() {
-		return folder + "\nBest: " + bestChromosomeNumber + ", Fitness: " + bestChromosomeFitness + ", Average: " + setupAverage;
+		return folder + "\nBest: " + bestFitnessNumber + ", Fitness: " + bestFitness + ", Average: " + averageFitness;
 	}
 	
 }

@@ -93,6 +93,8 @@ public class ResultViewerGui extends Gui {
 	protected JButton editButton = new JButton("Edit");
 	protected JButton plotFitnessButton = new JButton("Plot Fitness");
 	protected JButton compareFitnessButton = new JButton("Compare Fitness");
+	
+	protected JLabel fitnessSummary = new JLabel("");
 
 	static final int RUN         = 2;
 	static final int PAUSED      = 3;
@@ -135,7 +137,7 @@ public class ResultViewerGui extends Gui {
 		
 		frame = new JFrame("Result Viewer");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1200, 790);
+		frame.setSize(1200, 830);
 	
 		frame.getContentPane().add(initBottomPanel(), BorderLayout.SOUTH);	
 		frame.getContentPane().add(initRightWrapperPanel(), BorderLayout.EAST);
@@ -156,7 +158,7 @@ public class ResultViewerGui extends Gui {
 		fileTree = new FileTree(new File("."));
 
 		JPanel argumentsPanel = new JPanel(new BorderLayout());
-		argumentsPanel.setPreferredSize(new Dimension(230,240));
+		argumentsPanel.setPreferredSize(new Dimension(230,250));
 		argumentsPanel.add(new JLabel("Extra arguments"),BorderLayout.NORTH);
 		argumentsPanel.add(new JScrollPane(extraArguments),BorderLayout.CENTER);
 		
@@ -165,11 +167,14 @@ public class ResultViewerGui extends Gui {
 
 		treeWrapper.add(currentFileTextField);
 		treeWrapper.add(fileTree);
+		treeWrapper.add(fitnessSummary);
 		treeWrapper.add(editButton);
 		treeWrapper.add(loadButton);
 		treeWrapper.add(compareFitnessButton);
 		treeWrapper.add(plotFitnessButton);
 		treeWrapper.add(argumentsPanel);
+		
+		fitnessSummary.setPreferredSize(new Dimension(200, 20));
 
 		treeWrapper.setBorder(BorderFactory.createTitledBorder("Experiments"));
 
@@ -254,7 +259,7 @@ public class ResultViewerGui extends Gui {
 		fitnessTextField.setPreferredSize(new Dimension(100, 20));
 		fitnessTextField.setHorizontalAlignment(JTextField.RIGHT);
 		bottomPanel.add(fitnessTextField);
-
+		
 		bottomPanel.setBorder(BorderFactory.createTitledBorder("Status"));
 
 		return bottomPanel;
@@ -568,13 +573,14 @@ public class ResultViewerGui extends Gui {
 		}
 		
 		JFrame comparisonFrame = new JFrame("Setups Comparison");
-		JTextArea comparisonArea = new JTextArea(result);
+		JTextArea comparisonArea = new JTextArea(result.trim());
 		comparisonArea.setEditable(false);
 		JScrollPane comparisonScrollPane = new JScrollPane(comparisonArea);
 		comparisonFrame.getContentPane().add(comparisonScrollPane);
-		comparisonFrame.setSize(480, 300);
-		comparisonFrame.setLocationRelativeTo(null);
+		comparisonFrame.pack();
+		comparisonFrame.setLocationRelativeTo(frame);
 		comparisonFrame.setVisible(true);
+		
 		
 	}
 	
@@ -855,6 +861,25 @@ public class ResultViewerGui extends Gui {
 				treeWrapper.revalidate();
 				frame.invalidate();
 			}catch(Exception e){e.printStackTrace();}
+			
+			updateFitnessSummary(dir);
+		}
+		
+		public void updateFitnessSummary(String dir) {
+			
+			try {
+				File f = new File(dir+"/post.txt");
+				
+				if(f.exists()) {
+					PostEvaluationData d = getDataFromPost(f);
+					fitnessSummary.setText("Run: "+d.getBestFitnessNumber()+"; Best: "+d.getBestFitness()+"; Average: "+d.getAverageFitness());
+				} else {
+					fitnessSummary.setText("");
+				}
+			
+			}catch(IOException e) {
+				e.printStackTrace();
+			}
 		}
 
 		public String getCurrentFilename() {
