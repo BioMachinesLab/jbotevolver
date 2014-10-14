@@ -32,8 +32,10 @@ public class SharedPreyForageEnvironment extends Environment {
 	private boolean blind;
 	private boolean half_blind;
 	private boolean placed;
+	private boolean closePreys;
 	private double preyLocation;
 	private double preyLocationRadius;
+	private boolean twoClusters;
 	
 	public SharedPreyForageEnvironment(Simulator simulator, Arguments args) {
 		super(simulator, args);
@@ -45,8 +47,11 @@ public class SharedPreyForageEnvironment extends Environment {
 		numberOfPreys = args.getArgumentIsDefined("numberofpreys") ? args.getArgumentAsInt("numberofpreys") : 20;
 		blind = args.getArgumentAsIntOrSetDefault("blindrobots", 0) == 1;
 		half_blind = args.getArgumentAsIntOrSetDefault("halfblindrobots", 0) == 1;
-		preyLocation = args.getArgumentAsDoubleOrSetDefault("preylocation", 0.8);
+		closePreys = args.getArgumentAsIntOrSetDefault("closepreys", 0) == 1;
 		preyLocationRadius = args.getArgumentAsDoubleOrSetDefault("preylocationradius", 1);
+		twoClusters = args.getArgumentAsIntOrSetDefault("twoclusters", 0) == 1;
+		
+		preyLocation = getRandomNumberBetween(0.5, (getWidth()/2-1));
 	}
 
 	@Override
@@ -54,8 +59,31 @@ public class SharedPreyForageEnvironment extends Environment {
 		super.setup(simulator);
 		
 		int randomOption = random.nextInt(4);
-		for (int i = 0; i < numberOfPreys; i++) {
-			addPrey(new Prey(simulator, "Prey " + i, newRandomPosition(randomOption), 0, PREY_MASS, PREY_RADIUS));
+		int randomOption2 = 0;
+		
+		if(twoClusters){
+			
+			int halfNumberOfPreys = numberOfPreys/2;
+			
+			for (int i = 0; i < halfNumberOfPreys; i++) {
+				addPrey(new Prey(simulator, "Prey " + i, newRandomPosition(randomOption), 0, PREY_MASS, PREY_RADIUS));
+			}
+
+			do{
+				randomOption2 = random.nextInt(4);
+			}while(randomOption == randomOption2);
+			
+			for (int i = halfNumberOfPreys; i < numberOfPreys; i++) {
+				addPrey(new Prey(simulator, "Prey " + i, newRandomPosition(randomOption2), 0, PREY_MASS, PREY_RADIUS));
+			}
+			
+		}else{
+			for (int i = 0; i < numberOfPreys; i++) {
+				if(closePreys)
+					addPrey(new Prey(simulator, "Prey " + i, newRandomPosition(randomOption), 0, PREY_MASS, PREY_RADIUS));
+				else
+					addPrey(new Prey(simulator, "Prey " + i, newRandomPosition(), 0, PREY_MASS, PREY_RADIUS));
+			}
 		}
 		
 		// Parede do mapa
@@ -106,7 +134,6 @@ public class SharedPreyForageEnvironment extends Environment {
 	}
 
 	private Vector2d newRandomPosition(int option) {
-	
 		switch (option) {
 			case 0:
 				return new Vector2d(preyLocation + (random.nextDouble()*preyLocationRadius), preyLocation + (random.nextDouble()*preyLocationRadius));
@@ -132,19 +159,20 @@ public class SharedPreyForageEnvironment extends Environment {
 			}
 		}
 		
-		if(preysCaught % 4 != 0)
+		if(preysCaught % numberOfPreys != 0)
 			placed = false;
 		
-		if(preysCaught % 4 == 0 && !placed){
-			int randomOption = random.nextInt(4);
-			for (Prey p : getPrey()) {
-				p.teleportTo(newRandomPosition(randomOption));
-			}
-			placed = true;
+		if(preysCaught % numberOfPreys == 0 && !placed){
+			preyLocation = getRandomNumberBetween(0.5, (getWidth()/2-1));
+			placePreys();
 		}
 		
 	}
 
+	private double getRandomNumberBetween(double min, double max){
+		return random.nextDouble()*(max-min) + min;
+	}
+	
 	public int getPreysCaught() {
 		return preysCaught;
 	}
@@ -153,8 +181,35 @@ public class SharedPreyForageEnvironment extends Environment {
 		return nest;
 	}
 
-	private void placePrey(Prey prey) {
-		prey.teleportTo(newRandomPosition());
+	private void placePreys() {
+		int randomOption = random.nextInt(4);
+		int randomOption2 = 0;
+		
+		if(twoClusters){
+			int halfNumberOfPreys = numberOfPreys/2;
+			
+			for (int i = 0; i < halfNumberOfPreys; i++) {
+				getPrey().get(i).teleportTo(newRandomPosition(randomOption));
+			}
+				
+			do{
+				randomOption2 = random.nextInt(4);
+			}while(randomOption == randomOption2);
+			
+			for (int i = halfNumberOfPreys; i < numberOfPreys; i++) {
+				getPrey().get(i).teleportTo(newRandomPosition(randomOption2));
+			}
+			placed = true;
+			
+		}else{
+			for (Prey p : getPrey()) {
+				if(closePreys)
+					p.teleportTo(newRandomPosition(randomOption));
+				else
+					p.teleportTo(newRandomPosition());
+			}
+			placed = true;
+		}
 	}
 	
 }
