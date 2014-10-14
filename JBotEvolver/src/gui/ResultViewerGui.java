@@ -20,7 +20,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -28,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Scanner;
 import java.util.Vector;
 
 import javax.swing.AbstractAction;
@@ -42,14 +40,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
-import javax.swing.JTextArea;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
@@ -550,8 +547,7 @@ public class ResultViewerGui extends Gui {
 	protected void compareFitness(){
 		TreePath[] selectedFiles = fileTree.getSelectedFilesPaths();
 		String parentpath = "";
-		File f;
-		String result = "";
+		ArrayList<PostEvaluationData> postsInformations = new ArrayList<PostEvaluationData>();
 		
 		for (TreePath treePath : selectedFiles) {
 			String path = "";
@@ -566,22 +562,24 @@ public class ResultViewerGui extends Gui {
 				
 				path = parentpath + "/" + treePath.getLastPathComponent();
 			}
-			ArrayList<PostEvaluationData> postInformations = getInformationFromPostEvaluation(path);
-			for (PostEvaluationData postEvaluationData : postInformations) {
-				result+= postEvaluationData.toString() + "\n\n";
-			}
+			postsInformations.addAll(getInformationFromPostEvaluation(path));
 		}
 		
 		JFrame comparisonFrame = new JFrame("Setups Comparison");
-		JTextArea comparisonArea = new JTextArea(result.trim());
-		comparisonArea.setEditable(false);
-		JScrollPane comparisonScrollPane = new JScrollPane(comparisonArea);
+		PostEvaluationTableModel postsModel = new PostEvaluationTableModel(postsInformations);
+		JTable comparisonTable = new JTable(postsModel);
+		JScrollPane comparisonScrollPane = new JScrollPane(comparisonTable);
 		comparisonFrame.getContentPane().add(comparisonScrollPane);
 		comparisonFrame.pack();
 		comparisonFrame.setLocationRelativeTo(frame);
 		comparisonFrame.setVisible(true);
 		
+		comparisonTable.getColumn("Folder").setPreferredWidth(250);
+		comparisonTable.getColumn("Best").setPreferredWidth(1);
+		comparisonTable.getColumn("Fitness").setPreferredWidth(1);
+		comparisonTable.getColumn("Average").setPreferredWidth(1);
 		
+		postsModel.fireTableDataChanged();
 	}
 	
 	protected ArrayList<PostEvaluationData> getInformationFromPostEvaluation(String folder) {
@@ -643,7 +641,7 @@ public class ResultViewerGui extends Gui {
 		
 		return new PostEvaluationData(setupName, Integer.valueOf(number) ,chromosomeFitness, overall);
 	}
-
+	
 	public void dispose() {
 		frame.setVisible(false);
 	}
@@ -1009,4 +1007,57 @@ public class ResultViewerGui extends Gui {
 			sim.simulate();
 		}
 	}
+	
+	class PostEvaluationTableModel extends AbstractTableModel {
+
+		private static final long serialVersionUID = 1L;
+		private ArrayList<PostEvaluationData> postDataList;
+
+		public PostEvaluationTableModel(ArrayList<PostEvaluationData> postDataList) {
+			this.postDataList = postDataList;
+		}
+		
+		@Override
+		public int getColumnCount() {
+			return 4;
+		}
+
+		@Override
+		public int getRowCount() {
+			return postDataList.size();
+		}
+
+		public String getColumnName(int x) {
+			switch (x) {
+			case 0:
+				return "Folder";
+			case 1:
+				return "Best";
+			case 2:
+				return "Fitness";
+			case 3:
+				return "Average";
+			}
+			return "Unknown";
+		}
+
+		@Override
+		public Object getValueAt(int y, int x) {
+			PostEvaluationData postData = postDataList.get(y);
+			
+			switch (x) {
+			case 0:
+				return postData.getFolder();
+			case 1:
+				return postData.getBestFitnessNumber();
+			case 2:
+				return postData.getBestFitness();
+			case 3:
+				return postData.getAverageFitness();
+			}
+			return "Unknown";
+		}
+
+	}
+	
 }
