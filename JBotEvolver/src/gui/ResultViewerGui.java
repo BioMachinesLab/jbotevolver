@@ -648,8 +648,13 @@ public class ResultViewerGui extends Gui {
 	private PostEvaluationData getDataFromPost(File f) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(f));
 		String line = reader.readLine();
+		String[] splitSetupName;
 		
-		String[] splitSetupName = f.getAbsolutePath().split("/");
+		if (System.getProperty("os.name").contains("Windows")) {
+			splitSetupName = f.getAbsolutePath().replace("\\", "/").split("/");
+		}else{
+			splitSetupName = f.getAbsolutePath().split("/");
+		}
 		String setupName = splitSetupName[splitSetupName.length-2];
 		
 		String number = "";
