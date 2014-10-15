@@ -513,6 +513,7 @@ public class ResultViewerGui extends Gui {
 					}
 					extraArguments.setText(finalText);
 				}
+				loadButton.doClick();
 			}
 		});
 		
