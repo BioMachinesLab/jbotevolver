@@ -4,8 +4,10 @@ import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RadialGradientPaint;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Point2D;
 
 import mathutils.Vector2d;
 import net.jafama.FastMath;
@@ -173,21 +175,31 @@ public class TwoDRendererDebug extends TwoDRenderer {
 								int x3 = transformX(xi-cutOff);
 								int y3 = transformY(yi+cutOff);
 								
-								int gx1 = transformX(robot.getPosition().getX()+(robot.getRadius()+range)*FastMath.cosQuick(angle + robot.getOrientation()));
-								int gy1 = transformY(robot.getPosition().getY()+(robot.getRadius()+range)*FastMath.sinQuick(angle + robot.getOrientation()));
+								int gx1 = transformX(xi+range*FastMath.cosQuick(angle + robot.getOrientation() + openingAngle/2.0));
+								int gy1 = transformY(yi+range*FastMath.sinQuick(angle + robot.getOrientation() + openingAngle/2.0));
+								int gx2 = transformX(xi+range*FastMath.cosQuick(angle + robot.getOrientation() - openingAngle/2.0));
+								int gy2 = transformY(yi+range*FastMath.sinQuick(angle + robot.getOrientation() - openingAngle/2.0));
 								
 								int a1 = (int)(FastMath.round(FastMath.toDegrees(angle + robot.getOrientation() - openingAngle/2)));
 								
 								Graphics2D graphics2D = (Graphics2D) graphics.create();
 
-								GradientPaint gp = new GradientPaint(x1, y1,Color.darkGray , gx1, gy1, Color.lightGray, false);
+								if(cutOff > 0){
+									Point2D p = new Point2D.Double(x1, y1);
+									float radius = FastMath.round(cutOff*scale);
+									float[] dist = {0.0f, 1.0f};
+									Color[] colors = {Color.DARK_GRAY, Color.LIGHT_GRAY};
+									RadialGradientPaint rgp = new RadialGradientPaint(p, radius, dist, colors);
+									graphics2D.setPaint(rgp);
+									
+//									graphics2D.setColor(Color.LIGHT_GRAY);
+									graphics2D.fillArc(x3, y3, (int)FastMath.round(cutOff*2*scale), (int)(FastMath.round(cutOff*2*scale)), a1, (int)FastMath.round(FastMath.toDegrees(openingAngle)));
+								}
+								
 								graphics2D.setColor(Color.BLACK);
-								graphics2D.fillArc(x2, y2, (int)FastMath.round(range*2*scale), (int)(FastMath.round(range*2*scale)), a1, (int)FastMath.round(FastMath.toDegrees(openingAngle)));   
-								
-								graphics2D.setPaint(gp);
-//								graphics2D.setColor(Color.LIGHT_GRAY);
-								graphics2D.fillArc(x3, y3, (int)FastMath.round(cutOff*2*scale), (int)(FastMath.round(cutOff*2*scale)), a1, (int)FastMath.round(FastMath.toDegrees(openingAngle)));
-								
+								graphics2D.drawArc(x2, y2, (int)FastMath.round(range*2*scale), (int)(FastMath.round(range*2*scale)), a1, (int)FastMath.round(FastMath.toDegrees(openingAngle)));
+								graphics2D.drawLine(x1, y1, gx1, gy1);
+								graphics2D.drawLine(x1, y1, gx2, gy2);
 							}
 						}
 					}

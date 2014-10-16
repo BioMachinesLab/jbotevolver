@@ -46,6 +46,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected boolean evolvableRange = false;
 	protected boolean evolvableOpeningAngle = false;
 	protected boolean eyes = false;
+	protected boolean eyesFrontBack = false;
 	protected boolean epuckSensorsPosition = false;
 	
 	protected double initialRange = 0;
@@ -74,6 +75,7 @@ public abstract class ConeTypeSensor extends Sensor {
 		
 		angleposition = args.getArgumentAsDoubleOrSetDefault("forcesensorposition", -1);
 		eyes = args.getArgumentAsIntOrSetDefault("eyes", 0) == 1;
+		eyesFrontBack = args.getArgumentAsIntOrSetDefault("eyesfront&back", 0) == 1;
 		eyesAngle = args.getArgumentAsIntOrSetDefault("eyesangle", eyesAngle);
 		epuckSensorsPosition = args.getArgumentAsIntOrSetDefault("epucksensorsposition", 0) == 1;
 
@@ -85,6 +87,9 @@ public abstract class ConeTypeSensor extends Sensor {
 		if(eyes){
 			angles[0]= FastMath.toRadians(eyesAngle);
 			angles[1]= FastMath.toRadians(360-eyesAngle);
+		}else if(eyesFrontBack){
+			angles[0]= FastMath.toRadians(0);
+			angles[1]= FastMath.toRadians(180);
 		}else if(epuckSensorsPosition){
 			angles[0]= FastMath.toRadians(17);
 			angles[1]= FastMath.toRadians(90);
