@@ -16,7 +16,7 @@ public class PreyPickerActuator extends Actuator {
 
 	public static final float NOISESTDEV = 0.05f;
 
-	private enum PickerStatus {
+	public enum PickerStatus {
 		OFF, PICK, DROP
 	}
 
@@ -150,7 +150,10 @@ public class PreyPickerActuator extends Actuator {
 	public boolean getCanCarryMorePreys() {
 		return preyCarried == null;
 	}
-
+	
+	public PickerStatus getStatus() {
+		return status;
+	}
 	
 	@Override
 	public String toString() {

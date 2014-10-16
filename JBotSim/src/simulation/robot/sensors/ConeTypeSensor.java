@@ -50,6 +50,7 @@ public abstract class ConeTypeSensor extends Sensor {
 	
 	protected double initialRange = 0;
 	protected double initialOpeningAngle = 0;
+	protected int eyesAngle = 15;
 	
 	public ConeTypeSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id, robot, args);
@@ -73,6 +74,7 @@ public abstract class ConeTypeSensor extends Sensor {
 		
 		angleposition = args.getArgumentAsDoubleOrSetDefault("forcesensorposition", -1);
 		eyes = args.getArgumentAsIntOrSetDefault("eyes", 0) == 1;
+		eyesAngle = args.getArgumentAsIntOrSetDefault("eyesangle", eyesAngle);
 		epuckSensorsPosition = args.getArgumentAsIntOrSetDefault("epucksensorsposition", 0) == 1;
 
 		cutOff = range;
@@ -81,8 +83,8 @@ public abstract class ConeTypeSensor extends Sensor {
 		this.angles 		= new double[numberOfSensors];
 		
 		if(eyes){
-			angles[0]= FastMath.toRadians(15);
-			angles[1]= FastMath.toRadians(345);
+			angles[0]= FastMath.toRadians(eyesAngle);
+			angles[1]= FastMath.toRadians(360-eyesAngle);
 		}else if(epuckSensorsPosition){
 			angles[0]= FastMath.toRadians(17);
 			angles[1]= FastMath.toRadians(90);

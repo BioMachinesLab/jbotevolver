@@ -1,14 +1,19 @@
 package gui.renderer;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RadialGradientPaint;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 import mathutils.Point2d;
 import mathutils.Vector2d;
+import net.jafama.FastMath;
+import simulation.physicalobjects.GroundBand;
 import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.Line;
 import simulation.physicalobjects.Nest;
@@ -75,6 +80,10 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					case LIGHTPOLE:
 						drawLightPole(graphics, (LightPole)m);
 						break;
+				}
+				
+				if(m instanceof GroundBand) {
+					drawGroundBand((GroundBand)m);
 				}
 			}
 			
@@ -155,6 +164,41 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 			(int) (w*scale), 
 			(int) (h*scale)
 		);
+	}
+	
+	public void drawGroundBand(GroundBand gb) {
+		
+		double xi = gb.getPosition().getX();
+		double yi = gb.getPosition().getY();
+		
+		double outerRadius = gb.getOuterRadius();
+		double innerRadius = gb.getInnerRadius();
+		int endOrientation = (int)Math.toDegrees(gb.getEndOrientation());
+		int startOrientation = (int)Math.toDegrees(gb.getStartOrientation());
+		
+		float diff = (float)(innerRadius/outerRadius);
+
+		int outerWidth = (int)(outerRadius*2*scale);
+		int innerWidth = (int)(innerRadius*2*scale);
+		
+		int totalOrientation = endOrientation-startOrientation;
+		
+		Graphics2D graphics2D = (Graphics2D) graphics.create();
+		
+		Point2D p = new Point2D.Double(transformX(xi), transformY(yi));
+		float radius = outerWidth/2;
+	    float[] dist = {0.0f, diff, 1.0f};
+	    Color[] colors = {Color.BLACK, Color.BLACK, Color.WHITE};
+		if(radius > 0) {
+			RadialGradientPaint rgp = new RadialGradientPaint(p, radius, dist, colors);
+	
+			graphics2D.setPaint(rgp);
+			graphics2D.fillArc(transformX(xi-outerRadius), transformY(yi+outerRadius), outerWidth, outerWidth, startOrientation, totalOrientation);   
+			
+			graphics2D.setColor(Color.WHITE);
+			graphics2D.fillOval(transformX(xi-innerRadius), transformY(yi+innerRadius), innerWidth, innerWidth);
+		}
+		
 	}
 
     public void drawWall(Wall m) {
