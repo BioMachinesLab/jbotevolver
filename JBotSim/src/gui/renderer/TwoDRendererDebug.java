@@ -186,7 +186,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 
 								if(cutOff > 0){
 									Point2D p = new Point2D.Double(x1, y1);
-									float radius = FastMath.round(cutOff*scale);
+									float radius = (float) (cutOff*scale);
 									float[] dist = {0.0f, 1.0f};
 									Color[] colors = {Color.DARK_GRAY, Color.LIGHT_GRAY};
 									RadialGradientPaint rgp = new RadialGradientPaint(p, radius, dist, colors);
