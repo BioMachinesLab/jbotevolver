@@ -25,6 +25,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	private boolean wallRay;
 	private int coneSensorId;
 	private String coneClass = "";
+	private int robotId;
 
 	public TwoDRendererDebug(Arguments args) {
 		super(args);
@@ -32,7 +33,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		wallRay = args.getArgumentAsIntOrSetDefault("wallray", 0)==1;
 		coneSensorId = args.getArgumentAsIntOrSetDefault("conesensorid",-1);
 		coneClass = args.getArgumentAsStringOrSetDefault("coneclass","");
-		
+		robotId = args.getArgumentAsIntOrSetDefault("robotid",-1);
 		
 	}
 	
@@ -151,6 +152,8 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	}
 
 	protected void drawCones(Graphics graphics, Robot robot){
+		if(robotId != -1 && robot.getId() != robotId)
+			return;
 		if(!robot.getDescription().equals("prey")){
 			if(coneSensorId >= 0 || !coneClass.isEmpty()){	
 				for(Sensor s : robot.getSensors()){
