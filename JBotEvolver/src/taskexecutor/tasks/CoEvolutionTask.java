@@ -40,12 +40,12 @@ public class CoEvolutionTask extends JBotEvolverTask {
 	public void run() {
 		
 		for (int i = 0; i < samples; i++) {
+			
+			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
+			
 			Simulator simulator = jBotEvolver.createSimulator(new Random(random
 					.nextLong()));
 			simulator.setFileProvider(getFileProvider());
-
-			jBotEvolver.getArguments().get("--environment")
-					.setArgument("fitnesssample", i);
 
 			ArrayList<Robot> robots = jBotEvolver.createCoEvolutionRobots(simulator);
 

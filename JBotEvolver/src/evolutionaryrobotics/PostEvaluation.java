@@ -94,6 +94,8 @@ public class PostEvaluation {
 				taskExecutor.prepareArguments(jBotEvolver.getArguments());
 				taskExecutor.start();
 			}
+			
+			taskExecutor.setTotalNumberOfTasks((maxTrial-startTrial)*fitnesssamples*samples);
 		
 			for(int i = startTrial ; i <= maxTrial ; i++) {
 				if(singleEvaluation)

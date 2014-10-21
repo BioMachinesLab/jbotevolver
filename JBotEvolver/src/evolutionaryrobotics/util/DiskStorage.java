@@ -139,6 +139,12 @@ public class DiskStorage implements Serializable{
 
 		}
 	}
+	
+	public void updateFitnessOnly(Population population) {
+		if (outputDirectory != null) {
+			updateFitnessLog(population);
+		}
+	}
 
 	public void savePopulation(Population population)
 			throws IOException {

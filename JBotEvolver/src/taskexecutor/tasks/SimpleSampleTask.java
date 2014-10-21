@@ -31,10 +31,10 @@ public class SimpleSampleTask extends JBotEvolverTask {
 	@Override
 	public void run() {
 		
+		jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
+		
 		Simulator simulator = jBotEvolver.createSimulator(new Random(randomSeed));
 		simulator.setFileProvider(getFileProvider());
-		
-		jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
 		
 		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 		jBotEvolver.setChromosome(robots, chromosome);
