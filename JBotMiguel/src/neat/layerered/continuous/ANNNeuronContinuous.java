@@ -24,6 +24,9 @@ public class ANNNeuronContinuous extends ANNNeuron {
 	}
 
 	public void step() {
+		
+//		print("Hidden Neuron "+id);
+		
 		if(this.type == ANNNeuron.INPUT_NEURON || this.type == ANNNeuron.BIAS_NEURON || this.type == ANNNeuron.OUTPUT_NEURON)
 			throw new NeuralNetworkError("This is an hidden neuron, not a different type of neuron!");
 		
@@ -31,13 +34,18 @@ public class ANNNeuronContinuous extends ANNNeuron {
 		
 		for(int i = 0; i < this.incomingSynapses.size(); i++){
 			deltaState += incomingSynapses.get(i).getWeight() * incomingNeurons.get(i).getActivationValue();
+//			print("Incoming weight ("+incomingSynapses.get(i).getWeight()+") with activation ("+incomingNeurons.get(i).getActivationValue()+") from neuron "+incomingNeurons.get(i).getId());
 		}
 		state+= deltaState*calculatedDecay;
 		
 		//activate
-		double[] value = new double[]{state + bias};
-		activationFunction.activationFunction(value, 0, 1);
-		this.activation = value[0];
+//		double[] value = new double[]{state + bias};
+//		activationFunction.activationFunction(value, 0, 1);
+//		this.activation = value[0];
+		
+		activation = ((1.0)/(FastMath.expQuick(-(state + bias)) + 1.0 ));
+		
+//		print("# activation: "+activation+" ; state: "+state);
 	}
 
 	public double getActivationValue() {

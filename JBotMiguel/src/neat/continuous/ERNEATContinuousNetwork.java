@@ -9,6 +9,8 @@ import neat.ERNEATNetwork;
 import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.ml.MLMethod;
+import org.encog.ml.ea.codec.GeneticCODEC;
+import org.encog.ml.ea.genome.GenomeFactory;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.neural.neat.NEATNeuronType;
@@ -164,5 +166,15 @@ public class ERNEATContinuousNetwork extends ERNEATNetwork {
 		}
 		
 		return new NEATContinuousNetwork(inputs, outputs, links, activations, neurons);
+	}
+	
+	@Override
+	public GeneticCODEC getCODEC() {
+		return new NEATContinuousCODEC();
+	}
+	
+	@Override
+	public GenomeFactory getGenomeFactory() {
+		return new FactorNEATContinuousGenome();
 	}
 }

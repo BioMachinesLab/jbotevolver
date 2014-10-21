@@ -24,9 +24,9 @@ public class NEATGenerationalEvolution extends Evolution {
 	protected boolean supressMessages = false;
 	protected DiskStorage diskStorage;
 	protected String output = "";
+	protected int saveEveryGeneration = 1;
 	
 	protected final String STATISTICS_FILENAME = "statistics";
-
 
 	public NEATGenerationalEvolution(JBotEvolver jBotEvolver,
 			TaskExecutor taskExecutor, Arguments args) {
@@ -56,6 +56,8 @@ public class NEATGenerationalEvolution extends Evolution {
 				System.exit(-1);
 			}
 		}
+		
+		saveEveryGeneration = args.getArgumentAsIntOrSetDefault("saveeverygeneration", 1);
 	}
 
 	@Override
@@ -69,6 +71,10 @@ public class NEATGenerationalEvolution extends Evolution {
 
 //		taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations() - 
 //				population.getNumberOfCurrentGeneration())*population.getPopulationSize() * population.getNumberOfObjectives());
+		
+		int numberOfTasks = (population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize();
+		
+		taskExecutor.setTotalNumberOfTasks(numberOfTasks);
 
 		print("GOING TO EVOLVE.\n");
 		while(!population.evolutionDone()) {
@@ -93,7 +99,10 @@ public class NEATGenerationalEvolution extends Evolution {
 			
 			try {
 				
-				diskStorage.savePopulation(population);
+				if(population.getNumberOfCurrentGeneration() % saveEveryGeneration == 0)
+					diskStorage.savePopulation(population);
+				else
+					diskStorage.updateFitnessOnly(population);
 				//this.storeGenerationStatistics();
 			} catch(Exception e) {e.printStackTrace();}
 			

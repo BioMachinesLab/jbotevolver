@@ -2,6 +2,6 @@ import evolutionaryrobotics.EvolverMain;
 
 public class EMain {
 	public static void main(String[] args) throws Exception {
-		new EvolverMain(new String[]{"cross_arbitrator.conf"});
+		new EvolverMain(new String[]{"groundband.conf"});
 	}
 }

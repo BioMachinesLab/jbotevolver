@@ -2,16 +2,7 @@ package neat.evolution;
 
 import java.io.Serializable;
 import java.util.Random;
-
-import neat.ERNEATNetwork;
-import neat.continuous.ERNEATContinuousNetwork;
-import neat.continuous.FactorNEATContinuousGenome;
-import neat.continuous.NEATContinuousCODEC;
-import neat.layerered.LayeredNEATCODEC;
-import neat.layerered.LayeredNeuralNetwork;
-import neat.layerered.continuous.LayeredContinuousNEATCODEC;
-import neat.layerered.continuous.LayeredContinuousNeuralNetwork;
-
+import neat.WrapperNetwork;
 import org.encog.ml.MLError;
 import org.encog.ml.MLRegression;
 import org.encog.ml.ea.genome.Genome;
@@ -19,10 +10,7 @@ import org.encog.ml.ea.species.BasicSpecies;
 import org.encog.neural.hyperneat.FactorHyperNEATGenome;
 import org.encog.neural.hyperneat.HyperNEATCODEC;
 import org.encog.neural.hyperneat.substrate.Substrate;
-import org.encog.neural.neat.FactorNEATGenome;
-import org.encog.neural.neat.NEATCODEC;
 import org.encog.neural.neat.NEATPopulation;
-import org.encog.neural.neat.training.NEATGenome;
 import org.encog.neural.neat.training.NEATInnovationList;
 
 /**
@@ -35,7 +23,7 @@ import org.encog.neural.neat.training.NEATInnovationList;
 public class NEATEncogPopulation extends NEATPopulation implements Serializable, MLError, MLRegression {
 	
 	private static final long serialVersionUID = -4688694377130370508L;
-	private Class networkClass;
+	private WrapperNetwork network;
 	private int bootstrap;
 
 	public NEATEncogPopulation() {
@@ -45,9 +33,9 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 	public NEATEncogPopulation(final int inputCount, final int outputCount, final int populationSize) {
 		super(inputCount, outputCount, populationSize);
 	}
-	public NEATEncogPopulation(final int inputCount, final int outputCount, final int populationSize, Class networkClass, int bootstrap) {
+	public NEATEncogPopulation(final int inputCount, final int outputCount, final int populationSize, WrapperNetwork network, int bootstrap) {
 		this(inputCount, outputCount, populationSize);
-		this.networkClass = networkClass;
+		this.network = network;
 		this.bootstrap = bootstrap;
 	}
 
@@ -58,34 +46,13 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 	public void reset() {
 		// create the genome factory
 		if (isHyperNEAT()) {
-			
 			setCODEC(new HyperNEATCODEC());
 			setGenomeFactory(new FactorHyperNEATGenome());
-			
-		} else if(networkClass.equals(ERNEATNetwork.class)){
-			
-			setCODEC(new NEATCODEC());
-			setGenomeFactory(new FactorNEATGenome());
-			
-		} else if(networkClass.equals(ERNEATContinuousNetwork.class)){
-			
-			setCODEC(new NEATContinuousCODEC());
-			setGenomeFactory(new FactorNEATContinuousGenome(bootstrap));
-			
-		} else if(networkClass.equals(LayeredNeuralNetwork.class)) {
-			
-			setCODEC(new LayeredNEATCODEC());
-			setGenomeFactory(new FactorNEATGenome());
-			
-		} else if(networkClass.equals(LayeredContinuousNeuralNetwork.class)) {
-			
-			setCODEC(new LayeredContinuousNEATCODEC());
-			setGenomeFactory(new FactorNEATContinuousGenome(bootstrap));
-			
 		} else {
-			throw new RuntimeException("Unknown type of network!");
+			setCODEC(network.getCODEC());
+			setGenomeFactory(network.getGenomeFactory());
 		}
-
+		
 		// create the new genomes
 		getSpecies().clear();
 
@@ -172,9 +139,6 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 			
 			// create initial innovations
 			setInnovations(new NEATInnovationList(this));
-			
 		}
-		
 	}
-
 }

@@ -6,13 +6,15 @@ import java.util.Vector;
 import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.ml.MLMethod;
-import org.encog.ml.MLRegression;
+import org.encog.ml.ea.codec.GeneticCODEC;
+import org.encog.ml.ea.genome.GenomeFactory;
+import org.encog.neural.neat.FactorNEATGenome;
+import org.encog.neural.neat.NEATCODEC;
 import org.encog.neural.neat.NEATLink;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.util.EngineArray;
 
 import simulation.util.Arguments;
-import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
@@ -23,7 +25,6 @@ public class ERNEATNetwork extends WrapperNetwork{
 	protected NEATNetwork network;
 	protected double[] preActivation;
 	protected double[] postActivation;
-	protected double[] previousPreActivations;
 
 	public ERNEATNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments){
 		this.create(inputs, outputs);
@@ -48,11 +49,7 @@ public class ERNEATNetwork extends WrapperNetwork{
 	}
 
 	@Override
-	//TODO this is protected
-	public double[] propagateInputs(double[] input) {
-		
-		if(previousPreActivations == null)
-			previousPreActivations = new double[network.getPostActivation().length];
+	protected double[] propagateInputs(double[] input) {
 		
 		double[] result = new double[network.getOutputCount()];
 
@@ -66,33 +63,12 @@ public class ERNEATNetwork extends WrapperNetwork{
 		//bias neuron is always the first
 		postActivation[0] = 1.0;
 		
-		NEATLink[] links = network.getLinks();
 		// copy input
 		EngineArray.arrayCopy(input, 0, postActivation, 1, network.getInputCount());
 
-		boolean keepComputing;
-		int i = 0;
-		//Keep computing all the internal connections until
-		//every contributions taken into account
-		do{
-			i++;
+		for(int j = 0 ; j < 4 ; j++) {
 			internalCompute(network.getLinks());
-			keepComputing = false;
-			
-			for(int j = 0 ; j < network.getOutputCount() ; j++) {
-				if(preActivation[network.getOutputIndex()+j] != previousPreActivations[network.getOutputIndex()+j]) {
-					keepComputing = true;
-					break;
-				}
-			}
-			
-			//avoid possible infinite loops if the
-			//states never stabilize due to rounding issues
-			if(i > 1000)
-				break;
-			
-			previousPreActivations = preActivation.clone();
-		} while(keepComputing);
+		}
 
 		// copy output
 		EngineArray.arrayCopy(postActivation, network.getOutputIndex(), result, 0, network.getOutputCount());
@@ -119,7 +95,6 @@ public class ERNEATNetwork extends WrapperNetwork{
 			//bring down the pre activations to the 5th decimal place
 			//in order to prevent excessive loops of the internal computation
 			//function due to tiny variations caused by rounding issues
-			preActivation[j] = ((int)(preActivation[j ]*100000.0))/100000.0;
 		}
 	}
 
@@ -200,5 +175,15 @@ public class ERNEATNetwork extends WrapperNetwork{
 		}
 		
 		return new NEATNetwork(inputs, outputs, links, activations);
+	}
+	
+	@Override
+	public GeneticCODEC getCODEC() {
+		return new NEATCODEC();
+	}
+	
+	@Override
+	public GenomeFactory getGenomeFactory() {
+		return new FactorNEATGenome();
 	}
 }

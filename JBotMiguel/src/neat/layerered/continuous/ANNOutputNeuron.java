@@ -4,6 +4,7 @@ import org.encog.engine.network.activation.ActivationFunction;
 import org.encog.neural.NeuralNetworkError;
 
 import neat.layerered.ANNNeuron;
+import net.jafama.FastMath;
 
 public class ANNOutputNeuron extends ANNNeuron {
 	
@@ -16,22 +17,30 @@ public class ANNOutputNeuron extends ANNNeuron {
 	}
 	
 	public void step() {
+		
+		print("Output Neuron "+id);
+		
 		if(this.type == ANNNeuron.INPUT_NEURON || this.type == ANNNeuron.BIAS_NEURON || this.type == ANNNeuron.HIDDEN_NEURON)
 			throw new NeuralNetworkError("This is an output neuron, not a different type of neuron!");
 		
 		//a neuron that performs a weighted sum of the inputs
 		
 		for(int i = 0; i < this.incomingSynapses.size(); i++){
-			state += incomingSynapses.get(i).getWeight() 
-					* incomingNeurons.get(i).getActivationValue();
+			state += incomingSynapses.get(i).getWeight() * incomingNeurons.get(i).getActivationValue();
+//			print("Incoming weight ("+incomingSynapses.get(i).getWeight()+") with activation ("+incomingNeurons.get(i).getActivationValue()+") from neuron "+incomingNeurons.get(i).getId());
 		}
 		
+//		print("pre_activation ("+state+") + bias ("+bias+")");
+		
 		//activate
-		double[] value = new double[]{state + bias};
-		activationFunction.activationFunction(value, 0, 1);
-		state = value[0];
+//		double[] value = new double[]{state + bias};
+//		activationFunction.activationFunction(value, 0, 1);
+//		state = value[0];
+		
+		state = ((1.0)/(FastMath.expQuick(-(state + bias)) + 1.0 ));
 
 		activation = state;
+//		print("# activation: "+activation);
 	}
 	
 	@Override

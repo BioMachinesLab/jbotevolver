@@ -4,14 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Random;
-
 import neat.ERNEATNetwork;
 import neat.JBotEvolverRandomFactory;
 import neat.WrapperNetwork;
 import neat.continuous.ERNEATContinuousNetwork;
-import neat.continuous.FactorNEATContinuousGenome;
 import neat.continuous.MutatePerturbNeuronDecay;
-import neat.continuous.MutateResetNeuronDecay;
 import neat.continuous.NEATContinuousCODEC;
 import neat.continuous.NEATContinuousNetwork;
 import neat.continuous.NEATMutateAddContinuousNode;
@@ -27,24 +24,16 @@ import neat.layerered.continuous.LayeredContinuousNeuralNetwork;
 import neat.mutations.NEATCrossoverJBot;
 import neat.mutations.NEATMutateAddLinkJBot;
 import neat.mutations.NEATMutateAddNodeJBot;
-
 import org.encog.ml.MLMethod;
 import org.encog.ml.ea.genome.Genome;
 import org.encog.ml.ea.opp.CompoundOperator;
 import org.encog.ml.ea.opp.selection.TruncationSelection;
-import org.encog.neural.hyperneat.FactorHyperNEATGenome;
-import org.encog.neural.hyperneat.HyperNEATCODEC;
-import org.encog.neural.neat.FactorNEATGenome;
-import org.encog.neural.neat.NEATCODEC;
 import org.encog.neural.neat.NEATNetwork;
 import org.encog.neural.neat.NEATPopulation;
-import org.encog.neural.neat.training.NEATGenome;
 import org.encog.neural.neat.training.opp.NEATMutateWeights;
 import org.encog.neural.neat.training.opp.links.MutatePerturbLinkWeight;
-import org.encog.neural.neat.training.opp.links.MutateResetLinkWeight;
 import org.encog.neural.neat.training.opp.links.SelectProportion;
 import org.encog.neural.neat.training.species.OriginalNEATSpeciation;
-
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -53,7 +42,6 @@ import controllers.Controller;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
-import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import evolutionaryrobotics.populations.Population;
 
@@ -69,9 +57,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 	protected int generationsElapsed = 0;
 
 	protected TrainEAJBot trainer;
-
 	protected NEATEvaluation evaluator;
-
 	protected Map<MLMethod, TaskStatistics> stats;
 
 	protected double bestFitness, worstFitness, avgFitness;
@@ -82,7 +68,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 	protected double mutateDecayRate = 0.4;
 	protected double crossoverRate = 0.2;
 	
-	protected Class networkClass;
+	protected WrapperNetwork network;
 	
 	protected int bootstrap = 0;
 
@@ -106,16 +92,14 @@ public class ERNEATPopulation extends Population implements Serializable{
 		Simulator sim = jBotEvolver.createSimulator();
 		Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots"));
 		NeuralNetworkController c =(NeuralNetworkController)Controller.getController(sim, r, jBotEvolver.getArguments().get("--controllers"));
-		NeuralNetwork network = c.getNeuralNetwork();
+		network = (WrapperNetwork)c.getNeuralNetwork();
 		numberInputs = network.getNumberOfInputNeurons();
 		numberOutputs = network.getNumberOfOutputNeurons();
-		
-		networkClass = network.getClass();
 		
 		randomNumberGenerator = new Random(Integer.parseInt(jBotEvolver.getArguments().get("--random-seed").getCompleteArgumentString()));
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 		
-		population = new NEATEncogPopulation(numberInputs, numberOutputs, populationSize, networkClass, bootstrap);
+		population = new NEATEncogPopulation(numberInputs, numberOutputs, populationSize, network, bootstrap);
 		
 		population.setInitialConnectionDensity(1.0);// not required, but speeds training
 		population.setRandomNumberFactory(new JBotEvolverRandomFactory(generationRandomSeed));
@@ -144,32 +128,33 @@ public class ERNEATPopulation extends Population implements Serializable{
 		
 		final CompoundOperator weightMutation = new CompoundOperator();
 		
-		boolean continuousNetwork = networkClass.equals(LayeredContinuousNeuralNetwork.class) || networkClass.equals(NEATContinuousNetwork.class);
+		boolean continuousNetwork = network instanceof LayeredContinuousNeuralNetwork || network instanceof ERNEATContinuousNetwork;
 		
 		if(continuousNetwork) {
-			weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
-			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
+			System.out.println("####### Continuous Network");
+			weightMutation.getComponents().add(0.5,new NEATMutateWeights(new SelectProportion(0.1),new MutatePerturbLinkWeight(1)));
+			weightMutation.getComponents().add(0.5,new NEATMutateNeuronDecays(new SelectContinuousProportion(0.1),new MutatePerturbNeuronDecay(1)));
+			
+//			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(selection),new MutateResetLinkWeight()));
 			
 			weightMutation.getComponents().finalizeStructure();
 			result.setChampMutation(weightMutation);
 			
 			result.addOperation(mutateLinkWeightRate, weightMutation);
 			
-			final CompoundOperator decayMutation = new CompoundOperator();
+	/*		final CompoundOperator decayMutation = new CompoundOperator();
 			
-			decayMutation.getComponents().add(0.9,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutatePerturbNeuronDecay(0.1)));
-			decayMutation.getComponents().add(0.1,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutateResetNeuronDecay()));
+			weightMutation.getComponents().add(0.9,new NEATMutateNeuronDecays(new SelectContinuousProportion(selection),new MutatePerturbNeuronDecay(1)));
+			decayMutation.getComponents().add(0.1,new NEATMutateNeuronDecays(new SelectContinuousProportion(selection),new MutateResetNeuronDecay()));
 			
 			decayMutation.getComponents().finalizeStructure();
 
-			result.addOperation(mutateDecayRate, decayMutation);
-			
-			//weightMutation.getComponents().add(0.9*0.5,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutatePerturbNeuronDecay(0.1)));
-			//weightMutation.getComponents().add(0.1*0.5,new NEATMutateNeuronDecays(new SelectContinuousProportion(1),new MutateResetNeuronDecay()));
-			
+			result.addOperation(mutateDecayRate, decayMutation);*/
+
 		} else {
-			weightMutation.getComponents().add(0.9,new NEATMutateWeights(new SelectProportion(1),new MutatePerturbLinkWeight(0.1)));
-			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(1),new MutateResetLinkWeight()));
+			System.out.println("####### Discrete Network");
+			weightMutation.getComponents().add(1.0,new NEATMutateWeights(new SelectProportion(0.1),new MutatePerturbLinkWeight(1)));
+//			weightMutation.getComponents().add(0.1,new NEATMutateWeights(new SelectProportion(selection),new MutateResetLinkWeight()));
 			weightMutation.getComponents().finalizeStructure();
 			result.setChampMutation(weightMutation);
 			
@@ -181,7 +166,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 		
 		if(continuousNetwork) {
 			result.addOperation(addNodeRate, new NEATMutateAddContinuousNode());
-		}else {
+		} else {
 			result.addOperation(addNodeRate, new NEATMutateAddNodeJBot());
 		}
 		
@@ -189,17 +174,7 @@ public class ERNEATPopulation extends Population implements Serializable{
 		
 		result.getOperators().finalizeStructure();
 		
-		if(networkClass.equals(ERNEATNetwork.class)){
-			result.setCODEC(new NEATCODEC());
-		} else if(networkClass.equals(ERNEATContinuousNetwork.class)){
-			result.setCODEC(new NEATContinuousCODEC());
-		} else if(networkClass.equals(LayeredNeuralNetwork.class)) {
-			result.setCODEC(new LayeredNEATCODEC());
-		} else if(networkClass.equals(LayeredContinuousNeuralNetwork.class)) {
-			result.setCODEC(new LayeredContinuousNEATCODEC());
-		} else {
-			throw new RuntimeException("Unknown type of network!");
-		}
+		result.setCODEC(network.getCODEC());
 		
 		return result;
 	}
@@ -235,7 +210,6 @@ public class ERNEATPopulation extends Population implements Serializable{
 		evaluator.setupEvolution(jBotEvolver, taskExecutor, this.numberOfSamplesPerChromosome,this.generationRandomSeed);
 		population.setRandomNumberFactory(new JBotEvolverRandomFactory(generationRandomSeed));
 		trainer.iteration();
-		
 	}
 
 	public void updateStatistics() {
@@ -280,7 +254,6 @@ public class ERNEATPopulation extends Population implements Serializable{
 	public int getNumberOfSpecies() {
 		return this.population.getSpecies().size();
 	}
-
 
 	public void resetStatistics() {
 		this.stats.clear();
@@ -335,13 +308,11 @@ public class ERNEATPopulation extends Population implements Serializable{
 	@Override
 	public void setEvaluationResult(Chromosome chromosome, double fitness) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void setEvaluationResultForId(int pos, double fitness) {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -381,12 +352,4 @@ public class ERNEATPopulation extends Population implements Serializable{
 		// TODO Auto-generated method stub
 
 	}
-
-
-
-	/**
-	 * end of not methods not used.
-	 */
-
-
 }

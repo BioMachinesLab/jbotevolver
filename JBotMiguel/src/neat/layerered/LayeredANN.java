@@ -44,9 +44,11 @@ public class LayeredANN implements MLRegression, MLError, Serializable  {
 	}
 
 	public double[] compute(final double[] inputValues){
+		
+//		print("\n\nCOMPUTE");
 
 		ArrayList<ANNNeuron> inputNeurons = layers[0].getNeurons();
-
+		
 		//inputs		
 		int biasIndex, biasOffset;
 		biasIndex = this.inputCount;
@@ -56,13 +58,17 @@ public class LayeredANN implements MLRegression, MLError, Serializable  {
 			for(int i = 0; i < inputValues.length; i++){
 				ANNNeuron n = inputNeurons.get(i + biasOffset);
 				if(n.getType() == ANNNeuron.HIDDEN_NEURON) {
-					System.out.println(n.getNeuronDepth()+" "+Integer.MAX_VALUE);
 					throw new NeuralNetworkError("Hidden neuron in the input layer!");
 				}
 				n.setActivationValue(inputValues[i]);
+//				print("INPUT "+i+": "+inputValues[i]);
 			}
 			//bias
+			if(inputNeurons.get(biasIndex).getType() != ANNNeuron.BIAS_NEURON) {
+				throw new NeuralNetworkError("Got the wrong neuron! We need a BIAS neuron!");
+			}
 			inputNeurons.get(biasIndex).setActivationValue(1.0);
+//			print("BIAS: 1.0");
 		}
 		catch(ArrayIndexOutOfBoundsException e){
 			System.out.println("c1 - n");
@@ -175,5 +181,11 @@ public class LayeredANN implements MLRegression, MLError, Serializable  {
 			copyLayerNeurons.add(copyNeuron);
 		}
 		return new ANNLayer(originalLayer.getLayerId(), copyLayerNeurons);
+	}
+	
+	private void print(String s) {
+		boolean b = true;
+		if(!b)
+			System.out.println(s);
 	}
 }

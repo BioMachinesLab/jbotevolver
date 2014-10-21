@@ -2,17 +2,24 @@ package neat.layerered.continuous;
 
 import java.util.ArrayList;
 import java.util.Vector;
+
+import neat.continuous.FactorNEATContinuousGenome;
 import neat.layerered.ANNNeuron;
 import neat.layerered.ANNSynapse;
 import neat.layerered.LayeredANN;
 import neat.layerered.LayeredNeuralNetwork;
+
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
+import org.encog.ml.ea.codec.GeneticCODEC;
+import org.encog.ml.ea.genome.GenomeFactory;
+
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 public class LayeredContinuousNeuralNetwork extends LayeredNeuralNetwork {
 	
+	private static final long serialVersionUID = 4943572345259106717L;
 	protected double[] outputStates;
 	
 	public LayeredContinuousNeuralNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments){
@@ -94,7 +101,7 @@ public class LayeredContinuousNeuralNetwork extends LayeredNeuralNetwork {
 			if(type == ANNNeuron.HIDDEN_NEURON) {
 				neuron = new ANNNeuronContinuous(id, type, new ActivationSteepenedSigmoid(), decay, bias);
 			} else if(type == ANNNeuron.OUTPUT_NEURON){
-				neuron = new ANNOutputNeuron(id, type, new ActivationSteepenedSigmoid(),bias);
+				neuron = new ANNOutputNeuron(id, type, new ActivationSteepenedSigmoid(), bias);
 			} else { 
 				neuron = new ANNNeuron(id, type, new ActivationSteepenedSigmoid());
 			}
@@ -115,5 +122,15 @@ public class LayeredContinuousNeuralNetwork extends LayeredNeuralNetwork {
 		
 		
 		return new LayeredContinuousNEATCODEC().createNetFromStructure(synapses,neurons);
+	}
+	
+	@Override
+	public GeneticCODEC getCODEC() {
+		return new LayeredContinuousNEATCODEC();
+	}
+	
+	@Override
+	public GenomeFactory getGenomeFactory() {
+		return new FactorNEATContinuousGenome();
 	}
 }

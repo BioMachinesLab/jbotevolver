@@ -7,6 +7,11 @@ import neat.WrapperNetwork;
 
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.ml.MLMethod;
+import org.encog.ml.ea.codec.GeneticCODEC;
+import org.encog.ml.ea.genome.GenomeFactory;
+import org.encog.ml.factory.method.NEATFactory;
+import org.encog.neural.neat.FactorNEATGenome;
+import org.encog.neural.neat.NEATCODEC;
 
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
@@ -19,9 +24,6 @@ public class LayeredNeuralNetwork extends WrapperNetwork {
 	
 	public LayeredNeuralNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments){
 		this.create(inputs, outputs);
-		if(outputs.size() == 1) {
-//			System.out.println("whaat");
-		}
 	}
 	
 	public LayeredNeuralNetwork(LayeredANN network){
@@ -124,5 +126,15 @@ public class LayeredNeuralNetwork extends WrapperNetwork {
 		}
 		
 		return new LayeredNEATCODEC().createNetFromStructure(synapses,neurons);
+	}
+	
+	@Override
+	public GeneticCODEC getCODEC() {
+		return new LayeredNEATCODEC();
+	}
+	
+	@Override
+	public GenomeFactory getGenomeFactory() {
+		return new FactorNEATGenome();
 	}
 }

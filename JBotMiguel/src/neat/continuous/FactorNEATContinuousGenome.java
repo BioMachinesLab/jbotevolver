@@ -15,13 +15,13 @@ public class FactorNEATContinuousGenome extends FactorNEATGenome implements Seri
 	private static final long serialVersionUID = 856389357122003004L;
 	protected int bootstrap;
 	
-	public FactorNEATContinuousGenome(int boostrap) {
-		this.bootstrap = boostrap;
-	}
-	
 	@Override
 	public NEATGenome factor() {
 		return new NEATContinuousGenome();
+	}
+	
+	public void setBootstrap(int bootstrap) {
+		this.bootstrap = bootstrap;
 	}
 
 	/**

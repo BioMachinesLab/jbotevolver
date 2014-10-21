@@ -9,6 +9,10 @@ import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
 
 public class ANNNeuron implements Comparable<ANNNeuron>,Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6360423776617088039L;
 	protected ActivationFunction activationFunction;
 	protected double activation = 0;
 	protected long id;
@@ -112,5 +116,13 @@ public class ANNNeuron implements Comparable<ANNNeuron>,Serializable {
 		copy.setNeuronDepth(depth);
 		
 		return copy;
+	}
+	
+	protected void print(String s) {
+		boolean b = true;
+		
+		if(!b) {
+			System.out.println(s);
+		}
 	}
 }
