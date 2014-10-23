@@ -5,7 +5,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JBotSim"/>
 	<classpathentry kind="lib" path="JavaPlot.jar"/>
 	<classpathentry kind="lib" path="commons-io-2.2.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/BaseClient"/>
 	<classpathentry kind="lib" path="/JBotSim/jafama.jar"/>
+	<classpathentry kind="lib" path="/JBotSim/BaseClient.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
