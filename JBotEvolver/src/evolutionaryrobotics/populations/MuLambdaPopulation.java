@@ -9,6 +9,7 @@ import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 /**
  * Implements a [mu, lambda] evolutionary algorithm with rank-based selection
@@ -21,6 +22,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	protected int genomelength;
+	@ArgumentsAnnotation(name="size", defaultValue="50")
 	protected int populationSize;
 	protected int currentGeneration;
 	protected Chromosome bestChromosome;
@@ -43,7 +45,8 @@ public class MuLambdaPopulation extends Population implements Serializable {
 		populationSize = arguments.getArgumentAsIntOrSetDefault("size",50);
 		numberOfGenerations = arguments.getArgumentAsIntOrSetDefault("generations",100);
 		numberOfSamplesPerChromosome = arguments.getArgumentAsIntOrSetDefault("samples",3);
-
+		mutationRate = arguments.getArgumentAsDoubleOrSetDefault("mutationrate", 0.1);
+		
 		genomelength = arguments.getArgumentAsInt("genomelength");
 		
 		fixedInitialPopulation = arguments.getArgumentAsIntOrSetDefault("fixedinitialpopulation", 0) == 1;

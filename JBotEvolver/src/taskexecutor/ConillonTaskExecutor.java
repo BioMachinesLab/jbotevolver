@@ -5,11 +5,11 @@ import java.util.HashMap;
 
 import result.Result;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import tasks.Task;
 import client.Client;
 import net.jafama.FastMath;
 import comm.ClientPriority;
-
 import evolutionaryrobotics.JBotEvolver;
 
 public class ConillonTaskExecutor extends TaskExecutor {
@@ -19,6 +19,13 @@ public class ConillonTaskExecutor extends TaskExecutor {
 	private Arguments args;
 	private boolean connected = false;
 
+	@ArgumentsAnnotation(name="serverport", defaultValue="0")
+	private int serverPort;
+	@ArgumentsAnnotation(name="codeport", defaultValue="0")
+	private int codePort;
+	@ArgumentsAnnotation(name="server", defaultValue="evolve.dcti.iscte.pt")
+	private String serverName;
+	
 	public ConillonTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
 		super(jBotEvolver, args);
 		this.jBotEvolver = jBotEvolver;
@@ -30,9 +37,9 @@ public class ConillonTaskExecutor extends TaskExecutor {
 		ClientPriority priority = getPriority(args
 				.getArgumentAsIntOrSetDefault("priority", 10));
 
-		int serverPort = args.getArgumentAsIntOrSetDefault("serverport", 0);
-		int codePort = args.getArgumentAsIntOrSetDefault("codeport", 0);
-		String serverName = args.getArgumentAsStringOrSetDefault("server",
+		serverPort = args.getArgumentAsIntOrSetDefault("serverport", 0);
+		codePort = args.getArgumentAsIntOrSetDefault("codeport", 0);
+		serverName = args.getArgumentAsStringOrSetDefault("server",
 				"evolve.dcti.iscte.pt");
 		
 		String desc = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();

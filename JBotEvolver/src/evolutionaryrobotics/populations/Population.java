@@ -11,10 +11,9 @@ import java.util.zip.GZIPInputStream;
 
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import simulation.util.Factory;
-
 import comm.FileProvider;
-
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 /**
@@ -27,7 +26,9 @@ public abstract class Population implements Serializable {
 	private static final long serialVersionUID = 5558128741655037815L;
 	
 	protected long generationRandomSeed;
+	@ArgumentsAnnotation(name="samples", defaultValue="3")
 	protected int numberOfSamplesPerChromosome;
+	@ArgumentsAnnotation(name="generations", defaultValue="100")
 	protected int numberOfGenerations    = 100;
 
 	protected boolean enableIncreasingSamplesPerChromosome = false;
@@ -39,6 +40,7 @@ public abstract class Population implements Serializable {
 	protected int     increaseStartStepsPerSample;
 	protected int     increaseMaxStepsPerSample;
 	protected double  increaseAdditionalSamplesPerGeneration;
+	@ArgumentsAnnotation(name="mutationrate", defaultValue="0.1")
 	protected double  mutationRate;
 	
 	protected double  fitnessThreshold                                 = 0;
