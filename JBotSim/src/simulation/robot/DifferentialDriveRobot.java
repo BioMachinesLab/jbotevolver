@@ -6,6 +6,7 @@ import simulation.Simulator;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class DifferentialDriveRobot extends Robot {
 	/**
@@ -25,6 +26,7 @@ public class DifferentialDriveRobot extends Robot {
 	/**
 	 * Distance between the wheels of the robot.
 	 */
+	@ArgumentsAnnotation(name="distancewheels", defaultValue = "0.05")
 	protected double distanceBetweenWheels = 0.05;
 	
 	protected int stopTimestep = 0;

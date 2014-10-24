@@ -6,22 +6,32 @@ import simulation.Simulator;
 import simulation.robot.Epuck;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class ClutteredMazeEnvironment extends TMazeEnvironment {
 	
+	@ArgumentsAnnotation(name="exitwidth", defaultValue="0.15")
 	private double exitWidth = 0.15;
 	private double arenaWidth = 0;
 	private double arenaHeight = 0;
+	@ArgumentsAnnotation(name="objects", defaultValue="3")
 	private int objects = 3;
+	@ArgumentsAnnotation(name="objectwidth", defaultValue="0.25")
 	private double objectWidth = 0.15+0.1;
 	private Vector2d exitPosition;
 	
+	@ArgumentsAnnotation(name="maxwidth", defaultValue="1")
 	private double maxWidth = 1;
+	@ArgumentsAnnotation(name="maxheight", defaultValue="1")
 	private double maxHeight = 1;
+	@ArgumentsAnnotation(name="minwidth", defaultValue="1")
 	private double minWidth = 1;
+	@ArgumentsAnnotation(name="minheight", defaultValue="1")
 	private double minHeight = 1;
 	
+	@ArgumentsAnnotation(name="randomizemazey", values={"0","1"}, defaultValue="")
 	private boolean randomizeMazeY = false;
+	@ArgumentsAnnotation(name="extrarobot", values={"0","1"}, defaultValue="")
 	private boolean extraRobot = false;
 
 	public ClutteredMazeEnvironment(Simulator simulator, Arguments arguments) {

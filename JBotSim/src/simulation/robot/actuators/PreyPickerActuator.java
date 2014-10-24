@@ -11,6 +11,7 @@ import simulation.physicalobjects.Prey;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class PreyPickerActuator extends Actuator {
 
@@ -20,9 +21,11 @@ public class PreyPickerActuator extends Actuator {
 		OFF, PICK, DROP
 	}
 
+	@ArgumentsAnnotation(name="maxpickdistance", defaultValue="0.1")
 	private double maxPickDistance;
 	private PickerStatus status = PickerStatus.OFF;
 	private Vector2d temp = new Vector2d();
+	@ArgumentsAnnotation(name="stoprobot", help="Set to 1 to force robot to stop to pick up something.", values={"0","1"})
 	private boolean stopRobot;
 	private Random random;
 	private Prey preyCarried;

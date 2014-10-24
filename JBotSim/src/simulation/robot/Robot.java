@@ -14,6 +14,7 @@ import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import simulation.util.Factory;
 import controllers.Controller;
 
@@ -48,15 +49,38 @@ public class Robot extends MovableObject {
 	 */
 	protected double[]      bodyColor  = new double[3];
 	
+	@ArgumentsAnnotation(name="description", defaultValue = "robot")
 	protected String description = "";
-
+	@ArgumentsAnnotation(name="radius", defaultValue = "0.05")
+	private double radius;
+	@ArgumentsAnnotation(name="diameter", defaultValue = "0.1")
+	private double diameter;
+	@ArgumentsAnnotation(name = "relativex", defaultValue = "0")
+	private double relativeX;
+	@ArgumentsAnnotation(name = "relativey", defaultValue = "0")
+	private double relativeY;
+	@ArgumentsAnnotation(name = "x", defaultValue = "0")
+	private double x;
+	@ArgumentsAnnotation(name = "y", defaultValue = "0")
+	private double y;
+	@ArgumentsAnnotation(name = "color", values={"black","blue","cyan","dark gray","gray"
+			,"green","light gray","magneta","orange","pink","red","white","yellow"})
+	private Color color;
+	@ArgumentsAnnotation(name="numberOfRobots", defaultValue = "1")
+	private static int numberOfRobots;
+	@ArgumentsAnnotation(name="variablenumber", values={"0","1"})
+	private static int variableNumber;
+	
 	public static final int REDINDEX   = 0;
 	public static final int GREENINDEX = 1;
 	public static final int BLUEINDEX  = 2;
 	
+	@ArgumentsAnnotation(name="ignoredisabledsensors", values={"0","1"})
 	protected boolean ignoreDisabledSensors = false;
 	
+	@ArgumentsAnnotation(name="specialwallcollisions", values={"0","1"})
 	protected boolean specialWallCollisions = false;
+	@ArgumentsAnnotation(name="ignorerobottorobotcollisions", values={"0","1"})
 	protected boolean ignoreRobotToRobotCollisions = false;
 	
 	protected LinkedList<PhysicalObject> collidingObjects = new LinkedList<PhysicalObject>();
@@ -75,23 +99,22 @@ public class Robot extends MovableObject {
 	public Robot(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		
-		double relativeX = args.getArgumentAsDoubleOrSetDefault("relativex",0);
-		double relativeY = args.getArgumentAsDoubleOrSetDefault("relativey",0);
-		double radius = args.getArgumentAsDoubleOrSetDefault("radius",0.05);
-		double diameter = args.getArgumentAsDoubleOrSetDefault("diameter",radius*2);
+		relativeX = args.getArgumentAsDoubleOrSetDefault("relativex",0);
+		relativeY = args.getArgumentAsDoubleOrSetDefault("relativey",0);
+		radius = args.getArgumentAsDoubleOrSetDefault("radius",0.05);
+		diameter = args.getArgumentAsDoubleOrSetDefault("diameter",radius*2);
 		ignoreDisabledSensors = args.getArgumentAsIntOrSetDefault("ignoredisabledsensors",0) == 1; 
 		ignoreRobotToRobotCollisions = args.getArgumentAsIntOrSetDefault("ignorerobottorobotcollisions",0) == 1; 
 		if(diameter != radius*2)
 			radius = diameter/2;
 		this.shape = new CircularShape(simulator, name + "CollisionObject", this, relativeX, relativeY, diameter, diameter/2);
-		
+
 		this.description = args.getArgumentAsStringOrSetDefault("description", "robot");
 		
-		double x = args.getArgumentAsDoubleOrSetDefault("x",0);
-		double y = args.getArgumentAsDoubleOrSetDefault("y",0);
+		x = args.getArgumentAsDoubleOrSetDefault("x",0);
+		y = args.getArgumentAsDoubleOrSetDefault("y",0);
 		setPosition(x, y);
-		
-		Color color;
+
 		try {
 		    Field field = Color.class.getField(args.getArgumentAsStringOrSetDefault("color", "black"));
 		    color = (Color)field.get(null);
@@ -378,8 +401,8 @@ public class Robot extends MovableObject {
 	}
 	
 	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
-		int numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
-		int variableNumber = arguments.getArgumentAsIntOrSetDefault("variablenumber", 0);
+		numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+		variableNumber = arguments.getArgumentAsIntOrSetDefault("variablenumber", 0);
 		
 		if(variableNumber == 1) {
 			numberOfRobots = simulator.getRandom().nextInt(numberOfRobots) + 1;

@@ -4,11 +4,13 @@ import java.util.Vector;
 
 import net.jafama.FastMath;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 
 public class MulitlayerPerceptron extends NeuralNetwork {
+	@ArgumentsAnnotation(name="hiddennodes", defaultValue="5")
 	int numberOfHiddenNodes    = 5;
 	double[] hiddenNeuronStates;
 	

@@ -5,6 +5,7 @@ import java.awt.Color;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class RobotRGBColorActuator extends Actuator {
 
@@ -22,10 +23,13 @@ public class RobotRGBColorActuator extends Actuator {
 	boolean controlGreen = false;
 	boolean controlBlue  = false;
 	
+	@ArgumentsAnnotation(name="mode", values={"","R","G","B"})
+	private String modeStr;
+	
 	public RobotRGBColorActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
 		if (args.getArgumentIsDefined("mode")) {
-			String modeStr = args.getArgumentAsString("mode");
+			modeStr = args.getArgumentAsString("mode");
 			
 			if (modeStr.contains("r") || modeStr.contains("R"))
 				controlRed = true;

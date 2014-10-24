@@ -8,6 +8,7 @@ import java.util.Vector;
 
 import net.jafama.FastMath;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
@@ -15,6 +16,7 @@ public class CTRNNMultilayer extends NeuralNetwork {
     protected double    timeStep = 0.2;
     protected double    tau      = 2.5;
     
+    @ArgumentsAnnotation(name="hiddennodes", defaultValue="5")
 	protected int       numberOfHiddenNodes;
 	protected double[]  hiddenDeltaStates;
 	protected double[]  hiddenStates;

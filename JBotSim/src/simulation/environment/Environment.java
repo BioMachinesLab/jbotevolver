@@ -1,10 +1,12 @@
 package simulation.environment;
 
 import gui.renderer.Renderer;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricCalculator;
@@ -16,6 +18,7 @@ import simulation.physicalobjects.collisionhandling.SimpleCollisionManager;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CollisionManager;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import simulation.util.Factory;
 
 public abstract class Environment implements KeyListener, Serializable {
@@ -32,8 +35,11 @@ public abstract class Environment implements KeyListener, Serializable {
 	protected ArrayList<PhysicalObject> teleported = new ArrayList<PhysicalObject>(MAXOBJECTS);
 	
 	protected CollisionManager collisionManager;
+	@ArgumentsAnnotation(name="width", defaultValue="4")
 	protected double height;
+	@ArgumentsAnnotation(name="height", defaultValue="4")
 	protected double width;
+	@ArgumentsAnnotation(name="steps", defaultValue="0")
 	protected int steps;
 	
 	protected boolean setup = false;

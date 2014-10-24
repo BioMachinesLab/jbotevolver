@@ -17,6 +17,7 @@ import simulation.physicalobjects.checkers.AllowObstacleChecker;
 import simulation.physicalobjects.checkers.AllowedObjectsChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public abstract class ConeTypeSensor extends Sensor {
 
@@ -24,14 +25,18 @@ public abstract class ConeTypeSensor extends Sensor {
 	public static final int DEFAULT_RANGE = 1;
 
 	protected ClosePhysicalObjects closeObjects;
+	@ArgumentsAnnotation(name = "range", defaultValue = "1")
 	protected double 			   range;
 	protected double			   cutOff;
 	protected double[]             readings;
 	protected double[] 			   angles;
 	protected double[] 			   originalAngles;
+	@ArgumentsAnnotation(name = "forcesensorposition", help="Value of the angle for the robot sensor.", defaultValue = "1")
 	protected double               angleposition;
+	@ArgumentsAnnotation(name = "numbersensors", defaultValue = "1")
 	protected int 				   numberOfSensors;
 	protected Vector2d 			   sensorPosition 	= new Vector2d();
+	@ArgumentsAnnotation(name = "angle", defaultValue = "90")
 	protected double 			   openingAngle = 90;
 
 	protected Environment env;
@@ -40,17 +45,24 @@ public abstract class ConeTypeSensor extends Sensor {
 	protected Random random;
 	
 	protected ClosePhysicalObjects closeObstacles;
+	@ArgumentsAnnotation(name = "checkobstacles", values={"0","1"})
 	protected boolean checkObstacles = false;
 	protected double[] obstacleReadings;
 	
+	@ArgumentsAnnotation(name = "evolvablerange", values={"0","1"})
 	protected boolean evolvableRange = false;
+	@ArgumentsAnnotation(name = "evolvableangle", values={"0","1"})
 	protected boolean evolvableOpeningAngle = false;
+	@ArgumentsAnnotation(name = "eyes", values={"0","1"})
 	protected boolean eyes = false;
+	@ArgumentsAnnotation(name = "eyesfront&back", help="Set to 1 to place one sensor on the front of the robot and another on the back.", values={"0","1"})
 	protected boolean eyesFrontBack = false;
+	@ArgumentsAnnotation(name = "epucksensorsposition", values={"0","1"})
 	protected boolean epuckSensorsPosition = false;
 	
 	protected double initialRange = 0;
 	protected double initialOpeningAngle = 0;
+	@ArgumentsAnnotation(name = "eyesangle", help="Value of the distance between the two front sensors of the robot.", defaultValue = "15")
 	protected int eyesAngle = 15;
 	
 	public ConeTypeSensor(Simulator simulator, int id, Robot robot, Arguments args) {

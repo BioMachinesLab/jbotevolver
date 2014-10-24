@@ -1,10 +1,12 @@
 package simulation.robot.actuators;
 
 import java.util.Random;
+
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class TwoWheelActuator extends Actuator {
 
@@ -13,6 +15,7 @@ public class TwoWheelActuator extends Actuator {
 	private double leftSpeed = 0;
 	private double rightSpeed = 0;
 	private Random random;
+	@ArgumentsAnnotation(name="maxspeed", defaultValue = "0.1")
 	protected double maxSpeed;
 	
 	public TwoWheelActuator(Simulator simulator, int id, Arguments arguments) {
