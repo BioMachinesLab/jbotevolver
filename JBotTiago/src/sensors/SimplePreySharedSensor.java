@@ -14,6 +14,7 @@ import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.sensors.SimplePreySensor;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import utils.SensorEstimation;
 
 public class SimplePreySharedSensor extends SimplePreySensor {
@@ -24,6 +25,8 @@ public class SimplePreySharedSensor extends SimplePreySensor {
 	private LinkedList<SensorEstimation> sensorEstimations;
 	private ArrayList<Robot> robots;
 	private PreyPickerActuator picker;
+	@ArgumentsAnnotation(name="shareoneprey", values={"0","1"}, help="Allow robot to share information when only sensing one prey")
+	private boolean shareOnePrey;
 
 	public SimplePreySharedSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
@@ -34,14 +37,15 @@ public class SimplePreySharedSensor extends SimplePreySensor {
 		robots = simulator.getRobots();
 		geometricCalculator = new GeometricCalculator();
 		sensorEstimations = new LinkedList<SensorEstimation>();
+		
+		shareOnePrey = args.getArgumentAsIntOrSetDefault("shareoneprey", 0)==1;
 	}
 
 	@Override
 	public void update(double time, ArrayList<PhysicalObject> teleported) {
 
 		if (simulator.getTime() == 0) {
-			picker = (PreyPickerActuator) robot
-					.getActuatorByType(PreyPickerActuator.class);
+			picker = (PreyPickerActuator) robot.getActuatorByType(PreyPickerActuator.class);
 		}
 
 		clearEstimationFromCloseRobots();
@@ -97,12 +101,14 @@ public class SimplePreySharedSensor extends SimplePreySensor {
 
 	private void sendEstimationToCloseRobots() {
 		for (Robot r : robots) {
-			SharedSensor sharedSensor = (SharedSensor) ((Robot) r)
-					.getSensorByType(SharedSensor.class);
-			if (sharedSensor == null || !picker.isCarryingPrey()
-					&& sensorEstimations.size() == 1)
-				return;
-			sharedSensor.addEstimation(this.robot.getId(), sensorEstimations);
+			SharedSensor sharedSensor = (SharedSensor) ((Robot) r).getSensorByType(SharedSensor.class);
+			if(shareOnePrey)
+				sharedSensor.addEstimation(this.robot.getId(), sensorEstimations);
+			else{
+				if (sharedSensor == null || !picker.isCarryingPrey() && sensorEstimations.size() == 1)
+					return;
+				sharedSensor.addEstimation(this.robot.getId(), sensorEstimations);
+			}
 
 		}
 	}

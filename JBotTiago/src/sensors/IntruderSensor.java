@@ -15,6 +15,7 @@ import simulation.robot.Robot;
 import simulation.robot.actuators.RobotRGBColorActuator;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class IntruderSensor extends ConeTypeSensor {
 	
@@ -23,10 +24,12 @@ public class IntruderSensor extends ConeTypeSensor {
 	private LinkedList<PhysicalObject> estimatedIntruders;
 	private PhysicalObject[] robotsCloseToPrey;
 	private ArrayList<Robot> robots;
+	@ArgumentsAnnotation(name="sharewith", help="Number of robots that will receive information", defaultValue="3")
 	private int numberOfRecivingRobots;
 	private Simulator simulator;
 	private GeometricCalculator geometricCalculator;
 	private int preyId;
+	@ArgumentsAnnotation(name="changecolor", help="Set to 1 to let the robot change is body color when seeing a prey.", values={"0","1"})
 	private boolean changeColor;
 	
 	public IntruderSensor(Simulator simulator, int id, Robot robot,

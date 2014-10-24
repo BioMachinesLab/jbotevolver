@@ -5,9 +5,11 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class ShareWithActuator extends Actuator {
 
+	@ArgumentsAnnotation(name="idsensor", help="Id of the sensor that will share information.", defaultValue="1")
 	private int idSensor;
 	private double shareWith = 1;
 	private int maxShareWith;

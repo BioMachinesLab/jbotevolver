@@ -5,6 +5,7 @@ import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class ChangeSensorActuator extends Actuator {
 	
@@ -14,11 +15,16 @@ public class ChangeSensorActuator extends Actuator {
 	private double maxRange;
 	private double maxOpeningAngle;
 	private ConeTypeSensor sensor;
+	@ArgumentsAnnotation(name="idsensor", help="Id of the sensor that will share information.", defaultValue="1")
 	private int idSensor;
+	@ArgumentsAnnotation(name="changerange", help="Set to 1 to let the robot change the range of the selected sensor.", values={"0","1"})
 	private boolean changeRange;
+	@ArgumentsAnnotation(name="changeangle", help="Set to 1 to let the robot change the openning angle of the selected sensor.", values={"0","1"})
 	private boolean changeAngle;
+	@ArgumentsAnnotation(name="changeorientation", help="Set to 1 to let the robot change the orientation of the selected sensor.", values={"0","1"})
 	private boolean changeOrientation;
 	private int numberOfOutputs;
+	@ArgumentsAnnotation(name="cutoff", help="Id of the sensor that will share information.", values={"0","1"})
 	private boolean cutOff;
 
 	public ChangeSensorActuator(Simulator simulator, int id, Arguments args) {
