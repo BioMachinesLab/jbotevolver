@@ -120,8 +120,17 @@ public class Arguments implements Serializable {
 				String[] split = strings.get(i).split("\\.");
 				names = ClassSearchUtils.searchFullNameInPath(split[split.length-1]);
 				
-				if (names.size() == 0)
-					throw new RuntimeException("Class not found "+ strings.get(i));
+				if (names.size() == 0) {
+					
+					if(strings.get(i).endsWith("NNInput")) {
+						//We're really sorry for this crappy code, but we needed this for legacy support :( authors: Miguel and Tiago
+						List<String> sensorinputnames = ClassSearchUtils.searchFullNameInPath("SensorNNInput");
+						strings.set(i, sensorinputnames.get(0));
+						continue;
+					} else {
+						throw new RuntimeException("Class not found "+ strings.get(i));
+					}
+				}
 			} else if (names.size() > 1) {
 				throw new RuntimeException("Multiple implementations of class: "+ strings.get(i) + " - " + names);
 			}
@@ -605,7 +614,7 @@ public class Arguments implements Serializable {
 	public static HashMap<String, Arguments> parseArgs(String[] args)
 			throws IOException, ClassNotFoundException {
 		String optionsFilename = null;
-
+		
 //		 for(String s : args)
 //			 System.out.println(s);
 
