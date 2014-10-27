@@ -10,7 +10,6 @@ public class Main {
 	
 	private LinkedList<Controller> controllers = new LinkedList<Controller>();
 	private String defaultArgs = "";
-	private HashMap<String,Arguments>  arguments = null;
 	private HashMap<String,String> globalVariables = new HashMap<String, String>();
 	private String folderName = null;
 	private int currentEvolutions = 0;
@@ -65,10 +64,6 @@ public class Main {
 			if(globalVariables.get("%maxevolutions") != null)
 				maxEvolutions = Integer.parseInt(globalVariables.get("%maxevolutions"));
 			
-			try {
-				arguments = Arguments.parseArgs(Arguments.readOptionsFromString(defaultArgs));
-			} catch(Exception e) {e.printStackTrace();}
-			
 			folderName = conf.split("\\.")[0];
 			
 			File folder = new File(folderName);
@@ -90,7 +85,7 @@ public class Main {
 				allEvolved = allEvolved && c.hasBeenEvolved();
 				if(!c.hasBeenEvolved() && c.readyToEvolve() && !c.isEvolving()) {
 					System.out.println("Evolving "+c.getName());
-					Evolution evo = new Evolution(this,c, arguments);
+					Evolution evo = new Evolution(this,c, defaultArgs);
 					evo.start();
 				}
 			}
@@ -217,7 +212,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		Main main = new Main(args);
-//		Main main = new Main(new String[]{"patrol_evolve_ea.conf"});
+//		Main main = new Main(new String[]{"groundband_auto.conf"});
 		main.execute();
 	}
 }

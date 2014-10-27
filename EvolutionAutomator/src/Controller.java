@@ -1,4 +1,6 @@
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.PrimitiveIterator;
 
 import simulation.util.Arguments;
 
@@ -16,26 +18,31 @@ public class Controller {
 		this.configuration = configuration;
 	}
 	
-	public void createArguments(HashMap<String, Arguments> defaultConfigs) {
+	public void createArguments(String defaultConfigs) {
 		
 		if(readyToEvolve()) {
 
-			args = new HashMap<String, Arguments>();
+			try {
+				args = Arguments.parseArgs(Arguments.readOptionsFromString(defaultConfigs+"\n"+configuration));
 			
-			String[] options = Arguments.readOptionsFromString(configuration);
 			
-			for(String argName : defaultConfigs.keySet())
-				args.put(argName, new Arguments(defaultConfigs.get(argName).getCompleteArgumentString()));
-			
-			for(int i = 0 ; i < options.length ; i+=2) {
-				args.put(options[i],Arguments.createOrPrependArguments(args.get(options[i]),options[i+1]));
+//				for(String argName : defaultConfigs.keySet())
+//				args.put(argName, new Arguments(defaultConfigs.get(argName).getCompleteArgumentString()));
+//			
+	//			for(int i = 0 ; i < options.length ; i+=2) {
+	//				args.put(options[i],Arguments.createOrPrependArguments(args.get(options[i]),options[i+1]));
+	//			}
+				
+				String[] options = Arguments.readOptionsFromString(configuration);
+				
+				this.skipEvolution = true;
+				
+				for(String option : options)
+					if(option.equals("--population"))
+						skipEvolution = false;
+			} catch(Exception e) {
+				e.printStackTrace();
 			}
-			
-			this.skipEvolution = true;
-			
-			for(String option : options)
-				if(option.equals("--population"))
-					skipEvolution = false;
 		}
 	}
 	
@@ -104,5 +111,9 @@ public class Controller {
 
 	public Arguments getArguments(String argName) {
 		return args.get(argName);
+	}
+
+	public HashMap<String, Arguments> getArguments() {
+		return args;
 	}
 }

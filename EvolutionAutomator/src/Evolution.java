@@ -12,11 +12,13 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 public class Evolution extends Thread {
 	
 	private Controller controller;
-	private HashMap<String, Arguments> defaultArgs;
+	private HashMap<String, Arguments> args;
+	private String defaultArgs;
 	private Main main;
 	private String outputFolder;
+	private int nTries = 3;
 	
-	public Evolution(Main main, Controller controller, HashMap<String, Arguments> arguments) {
+	public Evolution(Main main, Controller controller, String arguments) {
 		this.controller = controller;
 		this.defaultArgs = arguments;
 		this.main = main;
@@ -27,6 +29,7 @@ public class Evolution extends Thread {
 	public void run() {
 		
 		controller.createArguments(defaultArgs);
+		args = controller.getArguments();
 		
 		if(!controller.skipEvolution()) {
 			try {
@@ -48,6 +51,11 @@ public class Evolution extends Thread {
 				
 			} catch (Exception e) {
 				e.printStackTrace();
+				if(nTries > 0) {
+					nTries--;
+					this.run();
+					return;
+				}
 			}
 		}
 		main.evolutionFinished(controller.getName());
@@ -72,6 +80,8 @@ public class Evolution extends Thread {
 	}
 	
 	private int runPostEvaluation() throws Exception {
+		
+		Thread.sleep(2000); //wait to make sure that all files have been written to the disk
 		
 		File post = new File(outputFolder+"/post.txt");
 		
@@ -159,7 +169,7 @@ public class Evolution extends Thread {
 	}
 	
 	private void createConfigFile(String folderName, String configName) throws Exception {
-		createFile(folderName,configName,controller.getCompleteConfiguration());
+		createFile(folderName,configName,Arguments.beautifyString(controller.getCompleteConfiguration()));
 	}
 	
 	private void createFile(String folderName, String fileName, String contents) throws Exception {
