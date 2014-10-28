@@ -9,7 +9,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -72,6 +74,7 @@ public class Arguments implements Serializable {
 	 */
 	public Arguments(String unparsedArgumentString) {
 		parseString(unparsedArgumentString);
+		removeRepeated();
 	}
 	public Arguments(String unparsedArgumentString, boolean translateClasses) {
 		if(translateClasses) {
@@ -79,6 +82,25 @@ public class Arguments implements Serializable {
 //			System.out.println(unparsedArgumentString);
 		}
 		parseString(unparsedArgumentString);
+		removeRepeated();
+	}
+	
+	private void removeRepeated() {
+		Iterator<String> iArgs = arguments.iterator();
+		Iterator<String> iValues = values.iterator();
+		
+		ArrayList<String> found = new ArrayList<String>();
+		
+		while(iArgs.hasNext()) {
+			String current = iArgs.next();
+			iValues.next();
+			if(found.contains(current)) {
+				iArgs.remove();
+				iValues.remove();
+			}else {
+				found.add(current);
+			}
+		}
 	}
 	
 	public static String replaceAndGetArguments(String argName, String arg ,String by,List<String> removedStrings){
@@ -220,6 +242,7 @@ public class Arguments implements Serializable {
 				values.add(currentValue.toString());
 			}
 		}
+		
 	}
 
 	/**
@@ -737,7 +760,7 @@ public class Arguments implements Serializable {
 		
 		return result;
 	}
-
+	
 	public static String[] readOptionsFromFile(String filename)
 			throws IOException {
 		String oldString = readContentFromFile(filename);
@@ -859,4 +882,5 @@ public class Arguments implements Serializable {
 		
 		return newString;
 	}
+	
 }
