@@ -663,7 +663,6 @@ public class ResultViewerGui extends Gui {
 		double overall = 0;
 		
 		while (line != null) {
-			
 			if(line.contains("#")){
 				number = line.substring(line.indexOf(" "), line.length()).trim();
 			}else if(line.contains("Overall")){
@@ -671,7 +670,7 @@ public class ResultViewerGui extends Gui {
 			}else{
 				String[] splitString = line.split(" ");
 				if(splitString[0].equals(number)){
-					chromosomeFitness = Double.valueOf(splitString[1]);
+					chromosomeFitness = Double.valueOf(line.substring(line.indexOf("(")+1).split(" ")[0]);
 				}
 			}
 			
@@ -1017,7 +1016,7 @@ public class ResultViewerGui extends Gui {
 				break;
 			}
 		}
-		
+		 
 		if (renderer != null) {
 			renderer.enableInputMethods(true);
 			renderer.setSimulator(simulator);
