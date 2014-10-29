@@ -25,8 +25,12 @@ public class SimplePreySharedSensor extends SimplePreySensor {
 	private LinkedList<SensorEstimation> sensorEstimations;
 	private ArrayList<Robot> robots;
 	private PreyPickerActuator picker;
-	@ArgumentsAnnotation(name="shareoneprey", values={"0","1"}, help="Allow robot to share information when only sensing one prey")
+	@ArgumentsAnnotation(name="shareoneprey", values={"0","1"}, help="Allow robot to share information when only sensing one prey.")
 	private boolean shareOnePrey;
+	@ArgumentsAnnotation(name="sharewith", defaultValue="0", help="Number of robots that will receive information, where 0 means everyone.")
+	private int shareWith;
+	
+	private Robot[] robotsCloseToPrey;
 
 	public SimplePreySharedSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
@@ -37,8 +41,9 @@ public class SimplePreySharedSensor extends SimplePreySensor {
 		robots = simulator.getRobots();
 		geometricCalculator = new GeometricCalculator();
 		sensorEstimations = new LinkedList<SensorEstimation>();
-		
 		shareOnePrey = args.getArgumentAsIntOrSetDefault("shareoneprey", 0)==1;
+		shareWith = args.getArgumentAsIntOrSetDefault("sharewith", 0);
+		
 	}
 
 	@Override
@@ -100,16 +105,60 @@ public class SimplePreySharedSensor extends SimplePreySensor {
 	}
 
 	private void sendEstimationToCloseRobots() {
-		for (Robot r : robots) {
-			SharedSensor sharedSensor = (SharedSensor) ((Robot) r).getSensorByType(SharedSensor.class);
-			if(shareOnePrey)
-				sharedSensor.addEstimation(this.robot.getId(), sensorEstimations);
-			else{
-				if (sharedSensor == null || !picker.isCarryingPrey() && sensorEstimations.size() == 1)
-					return;
-				sharedSensor.addEstimation(this.robot.getId(), sensorEstimations);
+		if(shareWith == 0){
+			for (Robot r : robots) {
+				send(r);
 			}
+		}else{
+			robotsCloseToPrey = new Robot[shareWith];
+			calculateCloseRobots(this.robot);
+			for (Robot r : robotsCloseToPrey) {
+				send(r);
+			}
+			send(this.robot);
+		}
+		
+	}
 
+	private void send(Robot r) {
+		SharedSensor sharedSensor = (SharedSensor) ((Robot) r).getSensorByType(SharedSensor.class);
+		if (sharedSensor == null)
+			return;
+		if(shareOnePrey){
+			sharedSensor.addEstimation(this.robot.getId(), sensorEstimations);
+		}else{
+			if(!picker.isCarryingPrey() && sensorEstimations.size() == 1)
+				sharedSensor.addEstimation(this.robot.getId(), sensorEstimations);
+		}
+	}
+	
+	private void calculateCloseRobots(Robot sharingRobot) {
+		int count = 0;
+		int position = 0;
+		double biggerDistanceToPrey = 0;
+		
+		for (Robot r : robots) {
+			if (!r.getDescription().equals("prey") && r.getId() != this.robot.getId()) {
+				if(count < shareWith){
+					robotsCloseToPrey[count] = r;
+					count ++;
+				}else if(r.getDistanceBetween(sharingRobot.getPosition()) < biggerDistanceToPrey)
+					robotsCloseToPrey[position] = r;
+				 
+				double aux = 0;
+				
+				for (int j = 0; j < shareWith; j++) {
+					if(robotsCloseToPrey[j] != null){
+						double distanceToPrey = robotsCloseToPrey[j].getDistanceBetween(sharingRobot.getPosition());
+						if(distanceToPrey > aux){
+							aux = distanceToPrey;
+							position = j;
+						}
+					}
+				}
+				
+				biggerDistanceToPrey = aux;
+			}
 		}
 	}
 
