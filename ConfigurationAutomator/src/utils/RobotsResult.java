@@ -45,10 +45,15 @@ public class RobotsResult {
 	}
 	
 	public void edit(String key, String arguments) {
-		if(sensors.getArgumentIsDefined(key))
+		if(sensors.getArgumentIsDefined(key)) {
+			sensors.removeArgument(key);
 			sensors.setArgument(key, arguments);
-		if(actuators.getArgumentIsDefined(key))
+			sensors = recalculateIds(sensors);
+		}
+		if(actuators.getArgumentIsDefined(key)) {
 			actuators.setArgument(key, arguments);
+			actuators = recalculateIds(actuators);
+		}
 	}
 	
 	public void removeSensor(String key){

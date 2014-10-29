@@ -6,10 +6,10 @@ import javax.swing.JCheckBox;
 
 public class AutomatorOptionsAttribute {
 
-	String name;
-	Component component;
-	String defaultValue;
-	JCheckBox checkBox;
+	private String name;
+	private Component component;
+	private String defaultValue;
+	private JCheckBox checkBox;
 	
 	public AutomatorOptionsAttribute() { }
 	

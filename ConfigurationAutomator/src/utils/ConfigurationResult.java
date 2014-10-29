@@ -29,9 +29,9 @@ public class ConfigurationResult {
 		
 		for(String s : keys) {
 			if(arguments.get(s).getNumberOfArguments() > 1)
-				res+= s +"\n "+ Arguments.beautifyString(arguments.get(s) + "") + "\n\n";
+				res+= "--"+s +"\n "+ Arguments.beautifyString(arguments.get(s) + "") + "\n\n";
 			else
-				res+= s + " "+ arguments.get(s) + "\n\n";
+				res+= "--"+s + " "+ arguments.get(s) + "\n\n";
 		}
 		
 		return res;

@@ -48,7 +48,6 @@ import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 import taskexecutor.TaskExecutor;
-import utils.AutomatorOptions;
 import utils.AutomatorOptionsAttribute;
 import utils.ConfigurationResult;
 import utils.RobotsResult;
@@ -57,10 +56,12 @@ import controllers.Controller;
 public class ConfigurationAutomatorGui {
 	
 	private static final int OPTIONS_GRID_LAYOUT_SIZE = 15;
-	private String[] keys = {"--output","--robots", "--controllers", "--population", "--environment", "--executor", "--evolution", "--evaluation", "--random-seed"};
+	private String[] keys =
+		{"output","robots", "controllers", "population", "environment",
+			"executor","evolution", "evaluation", "random-seed"};
 
 	private JFrame frame;
-	private JFrame previewFrame = new JFrame("Preview");
+	private JFrame previewFrame;
 	
 	private Renderer renderer;
 	
@@ -97,7 +98,7 @@ public class ConfigurationAutomatorGui {
 	private DefaultListModel<String> sensorsActuatorsListModel;
 	private JList<String> sensorsActuatorsList;
 
-	private AutomatorOptions currentOptions;
+	private String currentOptions;
 	private String currentClassName;
 	
 	private String editedAttributeName;
@@ -127,6 +128,7 @@ public class ConfigurationAutomatorGui {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		
+		previewFrame = new JFrame("Preview");
 		previewFrame.setSize(800, 800);
 		previewFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		previewFrame.setVisible(false);
@@ -320,18 +322,18 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private void initListeners() {
-		outputTextField.getDocument().addDocumentListener(new TextFieldListener(outputTextField, AutomatorOptions.OUTPUT));
-		randomSeedTextField.getDocument().addDocumentListener(new TextFieldListener(randomSeedTextField, AutomatorOptions.RANDOM_SEED));
-		robotsClassNameComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Robot.class), AutomatorOptions.ROBOTS));
-		sensorsComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Sensor.class), AutomatorOptions.SENSORS));
-		actuatorsComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Actuator.class), AutomatorOptions.ACTUATORS));
-		controllersClassNameComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Controller.class), AutomatorOptions.CONTROLLERS));
-		networkComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(NeuralNetwork.class), AutomatorOptions.NETWORK));
-		populationClassNameComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Population.class), AutomatorOptions.POPULATION));
-		environmentClassNameComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Environment.class), AutomatorOptions.ENVIRONMENT));
-		executorClassNameComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(TaskExecutor.class), AutomatorOptions.EXECUTOR));
-		evolutionClassNameComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Evolution.class), AutomatorOptions.EVOLUTION));
-		evaluationClassNameComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(EvaluationFunction.class), AutomatorOptions.EVALUATION));
+		outputTextField.getDocument().addDocumentListener(new TextFieldListener(outputTextField, "output"));
+		randomSeedTextField.getDocument().addDocumentListener(new TextFieldListener(randomSeedTextField, "random-seed"));
+		robotsClassNameComboBox.addActionListener(new OptionsAtributesListener(Robot.class, "robots"));
+		sensorsComboBox.addActionListener(new OptionsAtributesListener(Sensor.class, "sensors"));
+		actuatorsComboBox.addActionListener(new OptionsAtributesListener(Actuator.class, "actuators"));
+		controllersClassNameComboBox.addActionListener(new OptionsAtributesListener(Controller.class, "controllers"));
+		networkComboBox.addActionListener(new OptionsAtributesListener(NeuralNetwork.class, "network"));
+		populationClassNameComboBox.addActionListener(new OptionsAtributesListener(Population.class, "population"));
+		environmentClassNameComboBox.addActionListener(new OptionsAtributesListener(Environment.class, "environment"));
+		executorClassNameComboBox.addActionListener(new OptionsAtributesListener(TaskExecutor.class, "executor"));
+		evolutionClassNameComboBox.addActionListener(new OptionsAtributesListener(Evolution.class, "evolution"));
+		evaluationClassNameComboBox.addActionListener(new OptionsAtributesListener(EvaluationFunction.class, "evaluation"));
 		
 		optionsButton.addActionListener(new ActionListener() {
 			@Override
@@ -385,7 +387,6 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private void amplifyPreview(Renderer renderer) {
-		System.out.println(renderer);
 		if(renderer != null){
 			previewFrame.getContentPane().add(renderer);
 			previewFrame.setVisible(true);
@@ -395,16 +396,17 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private void seeSensors() {
-		if(robotConfig.getCompleteArguments().getNumberOfArguments() > 0 && result.getArgument("--environment").getNumberOfArguments() > 0){
+		if(robotConfig.getCompleteArguments().getNumberOfArguments() > 0 && result.getArgument("environment").getNumberOfArguments() > 0){
 			try {
 				String extraRendererArguments = "conesensorid=";
 				
 				String selectedID = sensorsActuatorsList.getSelectedValue();
+						
 				if(selectedID != null && selectedID.contains("Sensor")){
 					String id = robotConfig.getSensor(selectedID).getArgumentAsString("id");
 					extraRendererArguments += id;
 				}else{
-					extraRendererArguments += 0;
+					extraRendererArguments += -1;
 				}
 				
 				showPreview(extraRendererArguments);
@@ -432,8 +434,8 @@ public class ConfigurationAutomatorGui {
 		});
 		
 		String[] args = Arguments.readOptionsFromString(
-				"--robots " + result.getArgument("--robots") + "\n" +
-				"--environment " + result.getArgument("--environment"));
+				"--robots " + result.getArgument("robots") + "\n" +
+				"--environment " + result.getArgument("environment"));
 		show(args);
 	}
 
@@ -498,17 +500,15 @@ public class ConfigurationAutomatorGui {
 		
 		String selectedID = sensorsActuatorsList.getSelectedValue();
 		
-		System.out.println("_REMOVE BUTTON_ "+selectedID);
-		
 		if(selectedID == null)
 			return;
 		
 		if(selectedID.contains("Sensor")) {
 			robotConfig.removeSensor(selectedID);
-			result.setArgument("--robots", robotConfig.getCompleteArguments());
+			result.setArgument("robots", robotConfig.getCompleteArguments());
 		} else if(selectedID.contains("Actuator")) {
 			robotConfig.removeActuator(selectedID);
-			result.setArgument("--robots", robotConfig.getCompleteArguments());
+			result.setArgument("robots", robotConfig.getCompleteArguments());
 		}
 		
 		updateSensorsActuatorsList();
@@ -518,7 +518,7 @@ public class ConfigurationAutomatorGui {
 	
 	private JComboBox<String> loadRobotsClassNamesToComboBox(Class<?> className) {
 		JComboBox<String> comboBox = new JComboBox<String>();
-		ArrayList<Class<?>> aux = findClassesContainingName(className);
+		ArrayList<Class<?>> aux = ClassLoadHelper.findClassesContainingName(className);
 		
 		comboBox.addItem("");
 		
@@ -528,69 +528,6 @@ public class ConfigurationAutomatorGui {
 		return comboBox;
 	}
 
-	public ArrayList<Class<?>> findClassesContainingName(Class<?> objectClass) {
-    	ArrayList<Class<?>> classes = new ArrayList<Class<?>>();
-    	
-        String classpath = System.getProperty("java.class.path");
-        String[] paths = classpath.split(System.getProperty("path.separator"));
-
-        for (String path : paths) {
-            File file = new File(path);
-            if (file.exists() && file.isDirectory()) {
-            	findClasses(file, objectClass,classes);
-            }
-        }
-        
-        return classes;
-    }
-
-	private void findClasses(File file, Class<?> objectClass, ArrayList<Class<?>> cls) {
-		try {
-			for (File f : file.listFiles()) {
-	    		if(f.isDirectory()){
-	    			findClasses(f, objectClass,cls);
-	    		}else{
-	    			if(f.getName().endsWith(".class")){
-	    				String path = "";
-	    				
-	    				if(System.getProperty("os.name").contains("Windows"))
-	    					path = f.getAbsolutePath().replace("\\", "/").split("/bin/")[1].replaceAll(".class", "").replaceAll("/", ".");
-	    				else
-	    					path = f.getAbsolutePath().split("/bin/")[1].replaceAll(".class", "").replaceAll("/", ".");
-	    				
-		    			Class<?> cl = Class.forName(path);
-		    			
-		    			boolean isAbstract = Modifier.isAbstract(cl.getModifiers());
-
-		    			if(!isAbstract && isIntanceOf(cl, objectClass)){
-		    				cls.add(cl);
-		    			}
-		    			
-	    			}
-	    		}
-	      	}
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private boolean isIntanceOf(Class<?> cls, Class<?> objectClass) {
-		
-		Class<?> superClass = cls.getSuperclass();
-		
-		if(superClass != null){			
-			if(superClass.equals(Object.class)){
-				return false;
-			}else if(superClass.equals(objectClass)){
-				return true;
-			}else{
-				return isIntanceOf(superClass, objectClass);
-			}
-		}
-		
-		return false;
-	}
-	
 	private void getOptionsFromPanel() {
 		
 		String arguments ="classname=" + currentClassName;
@@ -601,14 +538,13 @@ public class ConfigurationAutomatorGui {
 		
 		writeAttributes(arguments);
 		
-		seeSensors();
-		
 		updateSensorsActuatorsList();
 		
 		updateConfigurationText();
 		optionsAttributes.clear();
 		
 		cleanOptionsPanel();
+		seeSensors();
 	}
 	
 	private void updateSensorsActuatorsList() {
@@ -623,48 +559,37 @@ public class ConfigurationAutomatorGui {
 	
 	private void writeAttributes(String arguments) {
 		switch (currentOptions) {
-			case ROBOTS:
+			case "robots":
 				robotConfig.setAttributes(arguments);
-				result.setArgument("--robots",robotConfig.getCompleteArguments());
+				result.setArgument("robots",robotConfig.getCompleteArguments());
 				break;
-			case SENSORS:
+			case "sensors":
 				if(editedAttributeName.isEmpty())
 					robotConfig.addSensor(currentClassName, arguments);
-				else
+				else {
 					robotConfig.edit(editedAttributeName, arguments);
-				result.setArgument("--robots",robotConfig.getCompleteArguments());
+					editedAttributeName = "";
+				}
+				result.setArgument("robots",robotConfig.getCompleteArguments());
 				break;
-			case ACTUATORS:
+			case "actuators":
 				if(editedAttributeName.isEmpty())
 					robotConfig.addActuator(currentClassName, arguments);
-				else 
+				else {
 					robotConfig.edit(editedAttributeName, arguments);
-				result.setArgument("--robots",robotConfig.getCompleteArguments());
+					editedAttributeName = "";
+				}
+				result.setArgument("robots",robotConfig.getCompleteArguments());
 				break;
-			case CONTROLLERS:
-				result.setArgument("--controllers", new Arguments(arguments, false));
+			case "controllers":
+				result.setArgument("controllers", new Arguments(arguments, false));
 				break;
-			case NETWORK:
-				Arguments controllerArgs = result.getArgument("--controllers");
+			case "network":
+				Arguments controllerArgs = result.getArgument("controllers");
 				controllerArgs.setArgument("network", arguments + ",inputs=auto,outputs=auto");
 				break;
-			case POPULATION:
-				result.setArgument("--population", new Arguments(arguments, false));
-				break;
-			case ENVIRONMENT:
-				result.setArgument("--environment", new Arguments(arguments, false));
-				break;
-			case EXECUTOR:
-				result.setArgument("--executor", new Arguments(arguments, false));
-				break;
-			case EVOLUTION:
-				result.setArgument("--evolution", new Arguments(arguments, false));
-				break;
-			case EVALUATION:
-				result.setArgument("--evaluation", new Arguments(arguments, false));
-				break;
-		default:
-			System.err.println("The currentOption variable is not available for writeAttributes()!");
+			default:
+				result.setArgument(currentOptions, new Arguments(arguments, false));
 			break;
 		}
 	}
@@ -881,6 +806,7 @@ public class ConfigurationAutomatorGui {
 	private void editOptionPanelAttribute(){
 		try {
 			String attributeID = sensorsActuatorsList.getSelectedValue();
+			
 			if(attributeID != null){
 				Arguments args = null;
 				
@@ -900,7 +826,7 @@ public class ConfigurationAutomatorGui {
 				//Preencher com as opções existentes
 				ArrayList<AutomatorOptionsAttribute> optionsAttribute = getAttributesFromArgumentsString(args);
 				
-				fullFillOptionsPanel(findClassesContainingName(c), args.getArgumentAsString("classname"), optionsAttribute);
+				fullFillOptionsPanel(ClassLoadHelper.findClassesContainingName(c), args.getArgumentAsString("classname"), optionsAttribute);
 			}	
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -922,9 +848,9 @@ public class ConfigurationAutomatorGui {
 			} else {
 				currentClassName = val;
 				if(val.contains("Sensor")){
-					currentOptions = AutomatorOptions.SENSORS;
+					currentOptions = "sensors";
 				}else if(val.contains("Actuator")){
-					currentOptions = AutomatorOptions.ACTUATORS;
+					currentOptions = "actuators";
 				}else{
 					System.err.println("Error on the getAttributesFromArgumentsString(), attributeComplete[1] don't contain the word Sensor or Actuator");
 				}
@@ -938,10 +864,10 @@ public class ConfigurationAutomatorGui {
 		
 		private JComboBox<String> comboBox;
 		private ArrayList<Class<?>> classesList;
-		private AutomatorOptions selected;
+		private String selected;
 
-		public OptionsAtributesListener(ArrayList<Class<?>> classesList, AutomatorOptions selected) {
-			this.classesList = classesList;
+		public OptionsAtributesListener(Class<?> targetClass, String selected) {
+			classesList = ClassLoadHelper.findClassesContainingName(targetClass);
 			this.selected = selected;
 		}
 		
@@ -956,43 +882,27 @@ public class ConfigurationAutomatorGui {
 					currentClassName = (String)comboBox.getSelectedItem();
 					fullFillOptionsPanel(classesList, currentClassName, null);
 				}else{
-					switch (selected) {
-					case NETWORK:
-						result.getArgument("--controllers").removeArgument("network");;
-						break;
-					case POPULATION:
-						result.setArgument("--population", new Arguments(""));
-						break;
-					case ENVIRONMENT:
-						result.setArgument("--environment", new Arguments(""));
-						break;
-					case EXECUTOR:
-						result.setArgument("--executor", new Arguments(""));
-						break;
-					case EVOLUTION:
-						result.setArgument("--evolution", new Arguments(""));
-						break;
-					case EVALUATION:
-						result.setArgument("--evaluation", new Arguments(""));
-						break;
-					default:
-						break;
+					
+					if(selected.equals("network")) {
+						result.getArgument("controllers").removeArgument("network");
+					} else {
+						result.setArgument(selected, new Arguments(""));
 					}
+					
 					updateConfigurationText();
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
 		}
-		
 	}
 	
 	class TextFieldListener implements DocumentListener{
 
 		private JTextField textfield;
-		private AutomatorOptions option;
+		private String option;
 		
-		public TextFieldListener(JTextField textfield, AutomatorOptions option) {
+		public TextFieldListener(JTextField textfield, String option) {
 			this.textfield = textfield;
 			this.option = option;
 		}
@@ -1011,18 +921,7 @@ public class ConfigurationAutomatorGui {
 		public void changedUpdate(DocumentEvent e) { }
 		
 		public void updateTextfieldInformation(){
-			switch (option) {
-			case OUTPUT:
-				result.setArgument("--output", new Arguments(textfield.getText(),false));
-				break;
-			case RANDOM_SEED:
-				result.setArgument("--random-seed", new Arguments(textfield.getText(),false));
-				break;
-			default:
-				System.err.println("option variable received on the listener TextFieldListener is not supported");
-				break;
-			}
-			
+			result.setArgument(option, new Arguments(textfield.getText(),false));
 			updateConfigurationText();
 		}
 		
