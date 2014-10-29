@@ -104,7 +104,7 @@ public class ConfigurationAutomatorGui {
 	private int sensorId = 1;
 	private int actuatorId = 1;
 	
-	private boolean editedAttribute;
+	private String editedAttributeName;
 	
 	private RobotsResult robotsResult;
 	private ControllersResult controllersResult;
@@ -133,14 +133,15 @@ public class ConfigurationAutomatorGui {
 		
 	}
 
-	private Component initLeftWrapperPanel() {
+	private Component initCenterWrapperPanel() {
 		JPanel sidePanel = new JPanel(new BorderLayout());
 		
 		JPanel argumentsWrapper = new JPanel();
-		argumentsWrapper.setPreferredSize(new Dimension(450,450));
 		argumentsWrapper.setLayout(new BorderLayout());
 				
 		JPanel north = new JPanel(new BorderLayout());
+		JPanel subNorth = new JPanel(new BorderLayout());
+		
 		JPanel subPanelNorth = new JPanel(new GridLayout(1,1));
 		subPanelNorth.add(initOutputWrapperPanel()); // 1. Output
 
@@ -150,12 +151,14 @@ public class ConfigurationAutomatorGui {
 		JPanel subPanelNorth3 = new JPanel(new GridLayout(1,1));
 		subPanelNorth3.add(initControllersWrapperPanel()); // 3. Controllers
 		
-		north.add(subPanelNorth, BorderLayout.NORTH);
-		north.add(subPanelNorth2);
-		north.add(subPanelNorth3, BorderLayout.SOUTH);
+		subNorth.add(subPanelNorth, BorderLayout.NORTH);
+		subNorth.add(subPanelNorth2);
+		subNorth.add(subPanelNorth3, BorderLayout.SOUTH);
+		
+		north.add(subNorth, BorderLayout.NORTH);
+		north.add(initMiscWrapperPanel());
 		
 		argumentsWrapper.add(north, BorderLayout.NORTH);
-		argumentsWrapper.add(initMiscWrapperPanel());
 		argumentsWrapper.setBorder(BorderFactory.createTitledBorder("Arguments"));
 
 		sidePanel.add(argumentsWrapper, BorderLayout.NORTH);
@@ -167,8 +170,9 @@ public class ConfigurationAutomatorGui {
 		return sidePanel;
 	}
 	
-	private Component initCenterWrapperPanel() {
+	private Component initLeftWrapperPanel() {
 		JPanel fileContentWrapper = new JPanel();
+		fileContentWrapper.setPreferredSize(new Dimension(370,370));
 		fileContentWrapper.setLayout(new BorderLayout());
 		
 		JPanel resultContentWrapper = new JPanel(new BorderLayout());
@@ -197,13 +201,6 @@ public class ConfigurationAutomatorGui {
 		return fileContentWrapper;
 	}
 	
-	private JPanel createResultContentButtons() {
-		JPanel panel = new JPanel();
-		saveArgumentsFileButton = new JButton("Save to File");
-		panel.add(saveArgumentsFileButton);
-		return panel;
-	}
-
 	private Component initRightWrapperPanel() {
 		JPanel rightWrapper = new JPanel();
 		rightWrapper.setPreferredSize(new Dimension(410,frame.getHeight()));
@@ -378,6 +375,13 @@ public class ConfigurationAutomatorGui {
 
 	private void updateConfigurationText() {
 		configResult.setText(result.toString());
+	}
+	
+	private JPanel createResultContentButtons() {
+		JPanel panel = new JPanel();
+		saveArgumentsFileButton = new JButton("Save to File");
+		panel.add(saveArgumentsFileButton);
+		return panel;
 	}
 	
 	private void amplifyPreview() {
@@ -583,36 +587,38 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private void getOptionsFromPanel() {
-		if(editedAttribute){
-			jListRemoveButton.doClick();
-		}
-		
-		String arguments ="classname=" + currentClassName;
-		for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-			if(!arguments.isEmpty())
-				arguments+= "," + createAttributeString(attribute, false);
-		}
-		
-		writeAttributes(arguments);
-		
-		if(result.getRobots().isFilled() && !result.getArgument("--environment").equals("")){
-			try {
-				showPreview();
-			} catch (Exception e) {
-				e.printStackTrace();
+		if(!editedAttributeName.isEmpty()){
+			
+			//Neste caso é para editar o argumento que está em editedAttributeName
+			
+		}else{
+			String arguments ="classname=" + currentClassName;
+			for (AutomatorOptionsAttribute attribute : optionsAttributes) {
+				if(!arguments.isEmpty())
+					arguments+= "," + createAttributeString(attribute, false);
 			}
+			
+			writeAttributes(arguments);
+			
+			if(result.getRobots().isFilled() && !result.getArgument("--environment").equals("")){
+				try {
+					showPreview();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			
+			sensorsActuatorsListModel.clear();
+			for (String id : result.getRobots().getSensorIds()) {
+				sensorsActuatorsListModel.addElement(id);
+			}
+			for (String id : result.getRobots().getActuatorsIds()) {
+				sensorsActuatorsListModel.addElement(id);
+			}
+			updateConfigurationText();
+			optionsAttributes.clear();
+			cleanOptionsPanel();
 		}
-		
-		sensorsActuatorsListModel.clear();
-		for (String id : result.getRobots().getSensorIds()) {
-			sensorsActuatorsListModel.addElement(id);
-		}
-		for (String id : result.getRobots().getActuatorsIds()) {
-			sensorsActuatorsListModel.addElement(id);
-		}
-		updateConfigurationText();
-		optionsAttributes.clear();
-		cleanOptionsPanel();
 	}
 	
 	private void writeAttributes(String arguments) {
@@ -900,7 +906,7 @@ public class ConfigurationAutomatorGui {
 					System.err.println("Error on the editOptionPanelAttribute(), attributeID don't contain the word Sensor or Actuator");
 				}
 				
-				editedAttribute = true;
+				editedAttributeName = attributeID;
 				
 				//Preencher com as opções existentes
 				ArrayList<AutomatorOptionsAttribute> optionsAttribute = getAttributesFromArgumentsString(args);
@@ -957,7 +963,7 @@ public class ConfigurationAutomatorGui {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void actionPerformed(ActionEvent event) {
-			editedAttribute=false;
+			editedAttributeName="";
 			try {
 				currentOptions = selected;
 				comboBox = (JComboBox<String>) event.getSource();
