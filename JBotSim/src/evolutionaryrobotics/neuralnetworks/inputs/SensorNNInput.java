@@ -5,7 +5,6 @@ import simulation.robot.sensors.Sensor;
 
 public class SensorNNInput extends NNInput {
 
-	private Sensor sensor;
 	private ConeTypeSensor coneTypeSensor;
 	
 	public SensorNNInput(Sensor sensor) {
@@ -19,18 +18,18 @@ public class SensorNNInput extends NNInput {
 	
 	@Override
 	public int getNumberOfInputValues() {
-		return sensor == null ? coneTypeSensor.getNumberOfSensors() : 1;
+		return coneTypeSensor == null ? 1 : coneTypeSensor.getNumberOfSensors();
 	}
 
 	@Override
 	public double getValue(int index) {
-		if(sensor == null){
-			if(coneTypeSensor.isEnabled())
-				return coneTypeSensor.getSensorReading(index);
-			return 0;
-		}else{
+		if(coneTypeSensor == null){
 			if(sensor.isEnabled())
 				return sensor.getSensorReading(index);
+			return 0;
+		}else{
+			if(coneTypeSensor.isEnabled())
+				return coneTypeSensor.getSensorReading(index);
 			return 0;
 		}
 	}

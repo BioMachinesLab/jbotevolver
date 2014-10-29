@@ -4,11 +4,11 @@ import simulation.robot.sensors.DoubleParameterSensor;
 import simulation.robot.sensors.Sensor;
 
 public class DoubleParameterNNInput extends NNInput {
-	DoubleParameterSensor sensor;
+	private DoubleParameterSensor dpSensor;
 	
 	public DoubleParameterNNInput(Sensor sensor) {
 		super(sensor);
-		this.sensor = (DoubleParameterSensor) sensor;
+		this.dpSensor = (DoubleParameterSensor) sensor;
 	}
 	
 	@Override
@@ -18,6 +18,6 @@ public class DoubleParameterNNInput extends NNInput {
 
 	@Override
 	public double getValue(int index) {
-		return (sensor.getSensorReading(index) - sensor.getMinimumValue()) / (sensor.getMaximumValue() - sensor.getMinimumValue());
+		return (dpSensor.getSensorReading(index) - dpSensor.getMinimumValue()) / (dpSensor.getMaximumValue() - dpSensor.getMinimumValue());
 	}
 }

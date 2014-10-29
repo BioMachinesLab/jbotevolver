@@ -4,11 +4,11 @@ import simulation.robot.sensors.PositionSensor;
 import simulation.robot.sensors.Sensor;
 
 public class PositionNNInput extends NNInput {
-	PositionSensor sensor;
+	private PositionSensor positionSensor;
 	
 	public PositionNNInput(Sensor sensor) {
 		super(sensor);
-		this.sensor = (PositionSensor) sensor;
+		this.positionSensor = (PositionSensor) sensor;
 	}
 	
 //	@Override
@@ -19,9 +19,9 @@ public class PositionNNInput extends NNInput {
 //	@Override
 	public double getValue(int index) {
 		if (index == 0)
-			return sensor.getSensorReading(index) / sensor.getEnvironmentWidth() + 0.5;
+			return positionSensor.getSensorReading(index) / positionSensor.getEnvironmentWidth() + 0.5;
 		else
-			return sensor.getSensorReading(index) / sensor.getEnvironmentHeight() + 0.5;			
+			return positionSensor.getSensorReading(index) / positionSensor.getEnvironmentHeight() + 0.5;			
 	
 	}
 

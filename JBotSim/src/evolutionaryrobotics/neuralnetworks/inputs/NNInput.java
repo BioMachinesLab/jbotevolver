@@ -11,10 +11,18 @@ import simulation.util.Factory;
 
 public abstract class NNInput implements Serializable {
 	
-	public NNInput(Sensor s) {}
+	protected Sensor sensor;
+	
+	public NNInput(Sensor s) {
+		this.sensor = s;
+	}
 	
 	public abstract int getNumberOfInputValues();
 	public abstract double getValue(int index);
+	
+	public Sensor getSensor() {
+		return sensor;
+	}
 	
 	public static Vector<NNInput> getNNInputs(Simulator simulator, Robot robot, Arguments arguments) {
 

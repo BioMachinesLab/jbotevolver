@@ -55,6 +55,13 @@ public abstract class Environment implements KeyListener, Serializable {
 	}
 	
 	public void setup(Simulator simulator) {
+		
+		/* eliminate the problem where the first random number can be similar even though
+		 * the random seed is different (0 to 100 in the case of post-evaluations)
+		 * See for more details: http://stackoverflow.com/questions/12282628/why-are-initial-random-numbers-similar-when-using-similar-seeds
+		 */
+		simulator.getRandom().nextDouble();
+		
 		this.setup = true;
 	}
 
