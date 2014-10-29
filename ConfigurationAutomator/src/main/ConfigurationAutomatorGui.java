@@ -80,10 +80,8 @@ public class ConfigurationAutomatorGui {
 	
 	private JButton optionsButton;
 	private JButton saveArgumentsFileButton;
-	private JButton AmplifyPreviewButton;
 	private JButton jListRemoveButton;
-	private JButton jListSeeSensorsButton;
-	
+
 	private JComboBox<String> robotsClassNameComboBox;
 	private JComboBox<String> sensorsComboBox;
 	private JComboBox<String> actuatorsComboBox;
@@ -97,8 +95,8 @@ public class ConfigurationAutomatorGui {
 	
 	private ArrayList<AutomatorOptionsAttribute> optionsAttributes;
 	
-	private DefaultListModel<String> jListModel;
-	private JList<String> jList;
+	private DefaultListModel<String> sensorsActuatorsListModel;
+	private JList<String> sensorsActuatorsList;
 
 	private AutomatorOptions currentOptions;
 	private String currentClassName;
@@ -184,16 +182,14 @@ public class ConfigurationAutomatorGui {
 		fileContentWrapper.add(resultContentWrapper, BorderLayout.CENTER);
 		
 		JPanel jListContentWrapper = new JPanel(new BorderLayout());
-		jListModel = new DefaultListModel<String>();
-		jList = new JList<String>(jListModel);
-		jListSeeSensorsButton = new JButton("See Sensors");
+		sensorsActuatorsListModel = new DefaultListModel<String>();
+		sensorsActuatorsList = new JList<String>(sensorsActuatorsListModel);
 		jListRemoveButton = new JButton("Remove");
 		
-		JPanel buttonsPanel = new JPanel(new GridLayout(1,2));
-		buttonsPanel.add(jListSeeSensorsButton);
+		JPanel buttonsPanel = new JPanel();
 		buttonsPanel.add(jListRemoveButton);
 		
-		jListContentWrapper.add(new JScrollPane(jList));
+		jListContentWrapper.add(new JScrollPane(sensorsActuatorsList));
 		jListContentWrapper.add(buttonsPanel, BorderLayout.SOUTH);
 		jListContentWrapper.setBorder(BorderFactory.createTitledBorder("Attributes List"));
 		fileContentWrapper.add(jListContentWrapper, BorderLayout.SOUTH);
@@ -202,13 +198,9 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private JPanel createResultContentButtons() {
-		JPanel panel = new JPanel(new GridLayout(2,1));
+		JPanel panel = new JPanel();
 		saveArgumentsFileButton = new JButton("Save to File");
 		panel.add(saveArgumentsFileButton);
-		JPanel panel2 = new JPanel(new GridLayout(1,2));
-		AmplifyPreviewButton = new JButton("Amplify Preview");
-		panel2.add(AmplifyPreviewButton);
-		panel.add(panel2);
 		return panel;
 	}
 
@@ -351,7 +343,7 @@ public class ConfigurationAutomatorGui {
 			}
 		});
 		
-		jList.addMouseListener(new MouseListener() {
+		sensorsActuatorsList.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent event) { }
 			@Override
@@ -363,20 +355,14 @@ public class ConfigurationAutomatorGui {
 			@Override
 			public void mouseClicked(MouseEvent event) {
 				editOptionPanelAttribute();
-			}
-		});
-		
-		jListSeeSensorsButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
 				seeSensors();
 			}
-		});;
+		});
 		
 		jListRemoveButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				removeElementFromJList();
+				removeElementFromSensorsActuatorsList();
 			}
 		});
 		
@@ -385,17 +371,6 @@ public class ConfigurationAutomatorGui {
 			public void actionPerformed(ActionEvent event) {
 				createArgumentFile();
 				
-			}
-		});
-		
-		AmplifyPreviewButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent event) {
-				try {
-					amplifyPreview();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 			}
 		});
 		
@@ -422,14 +397,13 @@ public class ConfigurationAutomatorGui {
 			try {
 				String extraRendererArgumets = "conesensorid=";
 				
-				String selectedID = jList.getSelectedValue();
+				String selectedID = sensorsActuatorsList.getSelectedValue();
 				if(selectedID.contains("Sensor")){
 					String id = result.getRobots().getIDForSensor(selectedID);
 					extraRendererArgumets += id;
 					showPreview(extraRendererArgumets);
 				}else{
-					JOptionPane.showMessageDialog(frame, "JList selected item need to be a Sensor.");
-					return;
+					showPreview();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -459,22 +433,41 @@ public class ConfigurationAutomatorGui {
 	private void show(String[] args) throws IOException, ClassNotFoundException {
 		HashMap<String, Arguments> arguments = Arguments.parseArgs(args);
 		
-		Simulator simulator = new Simulator(new Random(), arguments);
-		simulator.setupEnvironment();
+		rendererPanel.removeAll();
 		
-		ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
-		simulator.addRobots(robots);
-		
-		if (renderer != null) {
-			renderer.enableInputMethods(true);
-			renderer.setSimulator(simulator);
-			renderer.drawFrame();
-			rendererPanel.removeAll();
-			rendererPanel.add(renderer);
-			rendererPanel.revalidate();
-			rendererPanel.repaint();
-			frame.revalidate();
-			frame.repaint();
+		try {
+			Simulator simulator = new Simulator(new Random(), arguments);
+			
+			ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
+			simulator.addRobots(robots);
+			
+			simulator.setupEnvironment();
+			
+			if (renderer != null) {
+				renderer.addMouseListener(new MouseListener() {
+					public void mouseReleased(MouseEvent e) {}
+					public void mousePressed(MouseEvent e) {}
+					public void mouseExited(MouseEvent e) {}
+					public void mouseEntered(MouseEvent e) {}
+					public void mouseClicked(MouseEvent e) {
+						amplifyPreview();
+					}
+				});
+				
+				renderer.enableInputMethods(true);
+				renderer.setSimulator(simulator);
+				renderer.drawFrame();
+				
+				rendererPanel.add(renderer);
+				rendererPanel.revalidate();
+				rendererPanel.repaint();
+				
+				frame.revalidate();
+				frame.repaint();
+			}
+		} catch(Exception e) {
+			//Gotta catch 'em all! Silence the exceptions that might occur because of problems in the
+			//initialization of Environments
 		}
 	}
 	
@@ -503,8 +496,8 @@ public class ConfigurationAutomatorGui {
 		}
 	}
 	
-	private void removeElementFromJList() {
-		String selectedID = jList.getSelectedValue();
+	private void removeElementFromSensorsActuatorsList() {
+		String selectedID = sensorsActuatorsList.getSelectedValue();
 		if(selectedID.contains("Sensor"))
 			result.getRobots().removeSensorInformation(selectedID);
 		else if(selectedID.contains("Actuator"))
@@ -512,7 +505,7 @@ public class ConfigurationAutomatorGui {
 		else
 			System.err.println("Selected Id doesn't contain Sensor, Actuator, Robot or Network.");
 		
-		jListModel.removeElement(selectedID);
+		sensorsActuatorsListModel.removeElement(selectedID);
 
 		updateConfigurationText();
 	}
@@ -610,12 +603,12 @@ public class ConfigurationAutomatorGui {
 			}
 		}
 		
-		jListModel.clear();
+		sensorsActuatorsListModel.clear();
 		for (String id : result.getRobots().getSensorIds()) {
-			jListModel.addElement(id);
+			sensorsActuatorsListModel.addElement(id);
 		}
 		for (String id : result.getRobots().getActuatorsIds()) {
-			jListModel.addElement(id);
+			sensorsActuatorsListModel.addElement(id);
 		}
 		updateConfigurationText();
 		optionsAttributes.clear();
@@ -892,7 +885,7 @@ public class ConfigurationAutomatorGui {
 	
 	private void editOptionPanelAttribute(){
 		try {
-			String attributeID = jList.getSelectedValue();
+			String attributeID = sensorsActuatorsList.getSelectedValue();
 			if(attributeID != null){
 				Arguments args = null;
 				
