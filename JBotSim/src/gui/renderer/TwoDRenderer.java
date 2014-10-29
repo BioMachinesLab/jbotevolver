@@ -87,6 +87,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				}
 			}
 			
+			int numberOfRobots = 0;
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
 				switch(m.getType()){
 				case PREY:
@@ -94,6 +95,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					break;
 				case ROBOT:
 					drawCones(graphics, (Robot) m);
+					numberOfRobots ++;
 					break;
 				case WALLBUTTON:
 					drawWall((Wall) m);
@@ -111,6 +113,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				switch(m.getType()){
 				case ROBOT:
 					drawRobot(graphics, (Robot) m);
+					if(numberOfRobots > 1)
+						drawRobotId(graphics, (Robot) m);
 				}
 			}
 		}
@@ -119,6 +123,18 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	
 	protected void drawCones(Graphics g, Robot robot){
 		
+	}
+	
+	protected void drawRobotId(Graphics g, Robot robot){
+		
+		int x = transformX(robot.getPosition().x + robot.getRadius());
+		int y = transformY(robot.getPosition().y - robot.getDiameter());
+		
+		g.setColor(Color.WHITE);
+		g.fillRect(x, y-10, 8, 10);
+		
+		g.setColor(Color.BLACK);
+		g.drawString(String.valueOf(robot.getId()), x, y);
 	}
 
 	public void zoomIn() {
