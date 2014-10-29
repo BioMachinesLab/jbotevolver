@@ -101,12 +101,9 @@ public class ConfigurationAutomatorGui {
 	private AutomatorOptions currentOptions;
 	private String currentClassName;
 	
-	private int sensorId = 1;
-	private int actuatorId = 1;
-	
 	private String editedAttributeName;
 	
-	private RobotsResult robotsResult;
+	private RobotsResult robotConfig;
 	private ControllersResult controllersResult;
 	private ConfigurationResult result ;
 
@@ -114,9 +111,9 @@ public class ConfigurationAutomatorGui {
 		
 		optionsAttributes = new ArrayList<AutomatorOptionsAttribute>();
 		
-		robotsResult = new RobotsResult();
+		robotConfig = new RobotsResult();
 		controllersResult = new ControllersResult();
-		result = new ConfigurationResult(keys, robotsResult,controllersResult);
+		result = new ConfigurationResult(keys,controllersResult);
 		
 		frame = new JFrame("Configuration File Automator");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -397,49 +394,54 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private void seeSensors() {
-		if(result.getRobots().isFilled() && !result.getArgument("--environment").equals("")){
+		if(robotConfig.getCompleteArguments().getNumberOfArguments() > 0 && result.getArgument("--environment").getNumberOfArguments() > 0){
 			try {
-				String extraRendererArgumets = "conesensorid=";
+				String extraRendererArguments = "conesensorid=";
 				
 				String selectedID = sensorsActuatorsList.getSelectedValue();
 				if(selectedID.contains("Sensor")){
-					String id = result.getRobots().getIDForSensor(selectedID);
-					extraRendererArgumets += id;
-					showPreview(extraRendererArgumets);
+					String id = robotConfig.getSensor(selectedID).getArgumentAsString("id");
+					extraRendererArguments += id;
 				}else{
-					showPreview();
+					extraRendererArguments += 0;
 				}
+				
+				showPreview(extraRendererArguments);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}else{
-			JOptionPane.showMessageDialog(frame, "Robot or/and Environment arguments are not set.");
 		}
 	}
 	
-	private void showPreview() throws Exception{
-		Arguments rendererArgs = new Arguments("classname=TwoDRendererDebug",true);
-		renderer = Renderer.getRenderer(rendererArgs);
-		
-		String[] args = Arguments.readOptionsFromString(result.getRobots() + "\n" + result.getArgument("--environment"));
-		show(args);
-	}
+//	private void showPreview() throws Exception{
+//		Arguments rendererArgs = new Arguments("classname=TwoDRendererDebug",true);
+//		renderer = Renderer.getRenderer(rendererArgs);
+//		
+//		String[] args = Arguments.readOptionsFromString(
+//						"--robots " + result.getArgument("--robots") + "\n" +
+//						"--environment " + result.getArgument("--environment"));
+//		show(args);
+//	}
 	
 	private void showPreview(String rendererExtraArgs) throws Exception{
 		String arguments = "classname=TwoDRendererDebug," +rendererExtraArgs;
 		Arguments rendererArgs = new Arguments(arguments,true);
 		renderer = Renderer.getRenderer(rendererArgs);
 		
-		String[] args = Arguments.readOptionsFromString(result.getRobots() + "\n" + result.getArgument("--environment"));
+		String[] args = Arguments.readOptionsFromString(
+				"--robots " + result.getArgument("--robots") + "\n" +
+				"--environment " + result.getArgument("--environment"));
 		show(args);
 	}
 
 	private void show(String[] args) throws IOException, ClassNotFoundException {
-		HashMap<String, Arguments> arguments = Arguments.parseArgs(args);
-		
-		rendererPanel.removeAll();
-		
+
 		try {
+			rendererPanel.removeAll();
+			
+			HashMap<String, Arguments> arguments = Arguments.parseArgs(args);
+			
 			Simulator simulator = new Simulator(new Random(), arguments);
 			
 			ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
@@ -501,16 +503,24 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private void removeElementFromSensorsActuatorsList() {
-		String selectedID = sensorsActuatorsList.getSelectedValue();
-		if(selectedID.contains("Sensor"))
-			result.getRobots().removeSensorInformation(selectedID);
-		else if(selectedID.contains("Actuator"))
-			result.getRobots().removeActuatorInformation(selectedID);
-		else
-			System.err.println("Selected Id doesn't contain Sensor, Actuator, Robot or Network.");
 		
-		sensorsActuatorsListModel.removeElement(selectedID);
-
+		String selectedID = sensorsActuatorsList.getSelectedValue();
+		
+		System.out.println("_REMOVE BUTTON_ "+selectedID);
+		
+		if(selectedID == null)
+			return;
+		
+		if(selectedID.contains("Sensor")) {
+			robotConfig.removeSensor(selectedID);
+			result.setArgument("--robots", robotConfig.getCompleteArguments());
+		} else if(selectedID.contains("Actuator")) {
+			robotConfig.removeActuator(selectedID);
+			result.setArgument("--robots", robotConfig.getCompleteArguments());
+		}
+		
+		updateSensorsActuatorsList();
+		
 		updateConfigurationText();
 	}
 	
@@ -587,65 +597,48 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private void getOptionsFromPanel() {
-		if(!editedAttributeName.isEmpty()){
-			
-			//Neste caso é para editar o argumento que está em editedAttributeName
-			
-		}else{
-			String arguments ="classname=" + currentClassName;
-			for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-				if(!arguments.isEmpty())
-					arguments+= "," + createAttributeString(attribute, false);
-			}
-			
-			writeAttributes(arguments);
-			
-			if(result.getRobots().isFilled() && !result.getArgument("--environment").equals("")){
-				try {
-					showPreview();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-			
-			sensorsActuatorsListModel.clear();
-			for (String id : result.getRobots().getSensorIds()) {
-				sensorsActuatorsListModel.addElement(id);
-			}
-			for (String id : result.getRobots().getActuatorsIds()) {
-				sensorsActuatorsListModel.addElement(id);
-			}
-			updateConfigurationText();
-			optionsAttributes.clear();
-			cleanOptionsPanel();
+		
+		String arguments ="classname=" + currentClassName;
+		for (AutomatorOptionsAttribute attribute : optionsAttributes) {
+			if(!arguments.isEmpty())
+				arguments+= createAttributeString(attribute, true);
+		}
+		
+		writeAttributes(arguments);
+		
+		seeSensors();
+		
+		updateSensorsActuatorsList();
+		
+		updateConfigurationText();
+		optionsAttributes.clear();
+		
+		cleanOptionsPanel();
+	}
+	
+	private void updateSensorsActuatorsList() {
+		sensorsActuatorsListModel.clear();
+		for (String id : robotConfig.getSensorIds()) {
+			sensorsActuatorsListModel.addElement(id);
+		}
+		for (String id : robotConfig.getActuatorsIds()) {
+			sensorsActuatorsListModel.addElement(id);
 		}
 	}
 	
 	private void writeAttributes(String arguments) {
 		switch (currentOptions) {
 			case ROBOTS:
-				result.getRobots().addClassname("classname=" + currentClassName);
-				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					String sT = createAttributeString(attribute, false);
-					if(!sT.isEmpty())
-						result.getRobots().addAttribute(sT);
-				}
+				robotConfig.setAttributes(arguments);
+				result.setArgument("--robots",robotConfig.getCompleteArguments());
 				break;
 			case SENSORS:
-				String sensorInformation = currentClassName + "=(classname=" + currentClassName + ",id=" + sensorId++;
-				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					sensorInformation += createAttributeString(attribute, true);
-				}
-				sensorInformation += ")";
-				result.getRobots().addSensorInformation(currentClassName, sensorInformation);
+				robotConfig.addSensor(currentClassName, arguments);
+				result.setArgument("--robots",robotConfig.getCompleteArguments());
 				break;
 			case ACTUATORS:
-				String actuatorInformation = currentClassName + "=(classname=" + currentClassName + ",id=" + actuatorId++;
-				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					actuatorInformation += createAttributeString(attribute, true);
-				}
-				actuatorInformation += ")";
-				result.getRobots().addActuatorInformation(currentClassName, actuatorInformation);
+				robotConfig.addActuator(currentClassName, arguments);
+				result.setArgument("--robots",robotConfig.getCompleteArguments());
 				break;
 			case CONTROLLERS:
 				result.getControllers().addClassname("classname=" + currentClassName);
@@ -683,7 +676,7 @@ public class ConfigurationAutomatorGui {
 		String result = "";
 		if(attribute.getComponent() instanceof JTextField){
 			JTextField textField = (JTextField)attribute.getComponent();
-			if(attribute.getCheckBox().isSelected() && !textField.getText().isEmpty()){
+			if(attribute.getCheckBox().isSelected() && !textField.getText().isEmpty() && !attribute.getName().isEmpty()){
 				if(insertComma)
 					result = "," + attribute.getName() + "=" + textField.getText();
 				else
@@ -692,7 +685,7 @@ public class ConfigurationAutomatorGui {
 		}else if(attribute.getComponent() instanceof JComboBox<?>){
 			JComboBox<?> comboBox = (JComboBox<?>) attribute.getComponent();
 			String selection = (String)comboBox.getSelectedItem();
-			if(attribute.getCheckBox().isSelected() && !selection.isEmpty()){
+			if(attribute.getCheckBox().isSelected() && !selection.isEmpty() && !attribute.getName().isEmpty()){
 				if(insertComma)
 					result = "," + attribute.getName() + "=" + comboBox.getSelectedItem();
 				else
@@ -898,10 +891,10 @@ public class ConfigurationAutomatorGui {
 				Class<?> c = null;
 				if(attributeID.contains("Sensor")){
 					c = Sensor.class;
-					args = result.getRobots().getArgumentsForSensorId(attributeID);
+					args = robotConfig.getSensor(attributeID);
 				}else if(attributeID.contains("Actuator")){
 					c = Actuator.class;
-					args = result.getRobots().getArgumentsForActuatorId(attributeID);
+					args = robotConfig.getActuator(attributeID);
 				}else{
 					System.err.println("Error on the editOptionPanelAttribute(), attributeID don't contain the word Sensor or Actuator");
 				}
@@ -911,7 +904,7 @@ public class ConfigurationAutomatorGui {
 				//Preencher com as opções existentes
 				ArrayList<AutomatorOptionsAttribute> optionsAttribute = getAttributesFromArgumentsString(args);
 				
-				fullFillOptionsPanel(findClassesContainingName(c), attributeID.split(" ")[0], optionsAttribute);
+				fullFillOptionsPanel(findClassesContainingName(c), args.getArgumentAsString("classname"), optionsAttribute);
 			}	
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -921,32 +914,28 @@ public class ConfigurationAutomatorGui {
 	private ArrayList<AutomatorOptionsAttribute> getAttributesFromArgumentsString(Arguments args) {
 		ArrayList<AutomatorOptionsAttribute> optionsAttribute = new ArrayList<AutomatorOptionsAttribute>();
 		
-		for (String v : args.getValues()) {
-			String[] argsAttributes = v.split(",");
-			for (String a : argsAttributes) {
-				String[] attributeComplete = a.split("=");
-				if(!attributeComplete[0].equals("classname")){
-					AutomatorOptionsAttribute oA = new AutomatorOptionsAttribute();
-					oA.setName(attributeComplete[0]);
-					oA.setDefaultValue(attributeComplete[1]);
-					optionsAttribute.add(oA);
+		for (String key : args.getArguments()) { 
+			
+			String val = args.getArgumentAsString(key);
+			
+			if(!key.equals("classname")) {
+				AutomatorOptionsAttribute oA = new AutomatorOptionsAttribute();
+				oA.setName(key);
+				oA.setDefaultValue(val);
+				optionsAttribute.add(oA);
+			} else {
+				currentClassName = val;
+				if(val.contains("Sensor")){
+					currentOptions = AutomatorOptions.SENSORS;
+				}else if(val.contains("Actuator")){
+					currentOptions = AutomatorOptions.ACTUATORS;
 				}else{
-					currentClassName = attributeComplete[1];
-					if(attributeComplete[1].contains("Sensor")){
-						currentOptions = AutomatorOptions.SENSORS;
-					}else if(attributeComplete[1].contains("Actuator")){
-						currentOptions = AutomatorOptions.ACTUATORS;
-					}else{
-						System.err.println("Error on the getAttributesFromArgumentsString(), attributeComplete[1] don't contain the word Sensor or Actuator");
-					}
+					System.err.println("Error on the getAttributesFromArgumentsString(), attributeComplete[1] don't contain the word Sensor or Actuator");
 				}
 			}
+			
 		}
 		return optionsAttribute;
-	}
-
-	public static void main(String[] args) {
-		new ConfigurationAutomatorGui();
 	}
 	
 	class OptionsAtributesListener implements ActionListener{
@@ -1083,6 +1072,10 @@ public class ConfigurationAutomatorGui {
 				component.setEnabled(false);
 		}
 		
+	}
+	
+	public static void main(String[] args) {
+		new ConfigurationAutomatorGui();
 	}
 	
 }	

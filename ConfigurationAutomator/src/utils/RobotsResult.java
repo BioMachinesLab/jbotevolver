@@ -1,161 +1,97 @@
 package utils;
 
-import java.util.HashMap;
-import java.util.Set;
-
+import java.util.Vector;
 import simulation.util.Arguments;
 
 public class RobotsResult {
 	
-	private String classname;
-	private String attributes;
-	private HashMap<String,Arguments> sensors;
-	private HashMap<String,Arguments> actuators;
-	
-	private int sensorCount = 0;
-	private int actuatorCount = 0;
+	private Arguments robotArgs;
+	private Arguments sensors;
+	private Arguments actuators;
 	
 	public RobotsResult() {
-		attributes = "";
-		sensors = new HashMap<String,Arguments>();
-		actuators = new HashMap<String,Arguments>();
+		robotArgs = new Arguments("");
+		sensors = new Arguments("");
+		actuators = new Arguments("");
 	}
 	
-	public String getClassname() {
-		if(classname == null)
-			return "";
-		return "\n\t" + classname + ",";
+	public void setAttributes(String text){
+		robotArgs = new Arguments(text,false);
 	}
 	
-	public String getAttributes() {
-		return attributes;
-	}
-	
-	public void addClassname(String text){
-		classname = text;
-		attributes = "";
-	}
-	
-	public void addAttribute(String text){
-		attributes += "\n\t" + text + ",";
-	}
-	
-	public void addSensorInformation(String className, String sensorInformation){
-		String id = className + " " + sensorCount;
+	public Arguments getCompleteArguments() {
+		Arguments result = new Arguments(robotArgs.getCompleteArgumentString());
 		
-		if(!getSensors().equals("") && getSensors().contains(className)){
-			String newInfo = className + sensorCount + sensorInformation.substring(sensorInformation.indexOf("="));
-			sensors.put(id,new Arguments(newInfo));
-		}else{
-			sensors.put(id,new Arguments(sensorInformation));
+		if(sensors.getNumberOfArguments() > 0)
+			result.setArgument("sensors", sensors.getCompleteArgumentString());
+		if(actuators.getNumberOfArguments() > 0)
+			result.setArgument("actuators", actuators.getCompleteArgumentString());
+		
+		return result;
+	}
+	
+	public void addSensor(String className, String sensorInformation){
+		
+		int id = sensors.getNumberOfArguments() + 1;
+		
+		String name = className + "_" + id;
+		
+		String newInfo = sensorInformation+",id="+id;
+		sensors.setArgument(name,newInfo);
+	}
+	
+	public void addActuator(String className, String actuatorInformation){
+		String id = className + "_" + (actuators.getNumberOfArguments() + 1);
+		actuators.setArgument(id, actuatorInformation);
+	}
+	
+	public void removeSensor(String key){
+		sensors.removeArgument(key);
+		sensors = recalculateIds(sensors);
+	}
+	
+	public void removeActuator(String key){
+		actuators.removeArgument(key);
+		actuators = recalculateIds(actuators);
+	}
+	
+	private Arguments recalculateIds(Arguments args) {
+		int id = 1;
+		
+		Arguments newArgs = new Arguments("");
+		
+		for(String s : args.getArguments()) {
+			String currentArgsString = args.getArgumentAsString(s);
+			Arguments currentArgs = new Arguments(currentArgsString);
+			currentArgs.setArgument("id", id);
+			
+			String newName = s.split("_")[0] + "_" + (id++);
+			
+			newArgs.setArgument(newName, currentArgs.getCompleteArgumentString());
 		}
 		
-		sensorCount ++;
+		return newArgs;
 	}
 	
-	public void removeSensorInformation(String id){
-		sensors.remove(id);
+	public Arguments getSensor(String name){
+		return new Arguments(sensors.getArgumentAsString(name));
 	}
 	
-	public Arguments getArgumentsForSensorId(String id){
-		return sensors.get(id);
+	public Arguments getActuator(String name){
+		return new Arguments(actuators.getArgumentAsString(name));
 	}
 	
-	public Set<String> getSensorIds(){
-		return sensors.keySet();
+	public Vector<String> getSensorIds(){
+		return sensors.getArguments();
 	}
 	
-	public String getSensors(){
-		if(!sensors.isEmpty()){
-			String completeSensors = "\tsensors=( \n";
-			int count = 0;
-			
-			for(String s : sensors.keySet()) {
-				count++;
-				Arguments arg = sensors.get(s);
-				String fullArguments = arg.getCompleteArgumentString();
-				
-				completeSensors += "\t\t" + fullArguments;
-				
-				if(count < sensors.keySet().size())
-					completeSensors += ",\n";
-				else
-					completeSensors += "\n";
-			}
-			
-			return "\n" + completeSensors + "\t),";
-		}else{
-			return "";
-		}
-	}
-	
-	public void addActuatorInformation(String className, String actuatorInformation){
-		String id = className + " " + actuatorCount;
-		actuators.put(id, new Arguments(actuatorInformation));
-		actuatorCount++;
-	}
-	
-	public void removeActuatorInformation(String id){
-		actuators.remove(id);
-	}
-	
-	public Arguments getArgumentsForActuatorId(String id){
-		return actuators.get(id);
-	}
-	
-	public Set<String> getActuatorsIds(){
-		return actuators.keySet();
-	}
-	
-	public String getActuators(){
-		if(!actuators.isEmpty()){
-			String completeActuators = "actuators=( \n";
-			int count = 0;
-			
-			for(String s : actuators.keySet()) {
-				count++;
-				Arguments arg = actuators.get(s);
-				String fullArguments = arg.getCompleteArgumentString();
-				
-				completeActuators += "\t\t" + fullArguments;
-				
-				if(count < actuators.keySet().size())
-					completeActuators += ",\n";
-				else
-					completeActuators += "\n";
-				
-			}
-			
-			return completeActuators + "\t)";
-		}else{
-			return "";
-		}
-		
-	}
-	
-	public String getIDForSensor(String sensorKeyName){
-		Arguments args = sensors.get(sensorKeyName);
-		
-		for (String v : args.getValues()) {
-			String[] argsAttributes = v.split(",");
-			for (String a : argsAttributes) {
-				String[] attributeComplete = a.split("=");
-				if(attributeComplete[0].equals("id")){
-					return attributeComplete[1];
-				}
-			}
-		}
-		
-		return null;
-	}
-	
-	public boolean isFilled(){
-		return classname!=null && !sensors.isEmpty() && !actuators.isEmpty();
+	public Vector<String> getActuatorsIds(){
+		return actuators.getArguments();
 	}
 	
 	@Override
 	public String toString() {
-		return "--robots " + getClassname() + getAttributes() + getSensors() + getActuators();
+		return "--robots " + getCompleteArguments().getCompleteArgumentString();
 	}
 	
 }

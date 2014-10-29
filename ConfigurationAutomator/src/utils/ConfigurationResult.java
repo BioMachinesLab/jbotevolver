@@ -6,29 +6,17 @@ import simulation.util.Arguments;
 
 
 public class ConfigurationResult {
-	private RobotsResult robots;
 	private ControllersResult controllers;
 	private String[] keys;
 	
 	private HashMap<String,Arguments> arguments = new HashMap<String, Arguments>();
 
-	public ConfigurationResult(String[] keys, RobotsResult robots, ControllersResult controllers) {
-		this.robots = robots;
+	public ConfigurationResult(String[] keys, ControllersResult controllers) {
 		this.keys = keys;
 		this.controllers = controllers;
 		
 		for (String key : keys) 
 			arguments.put(key, new Arguments(""));
-		
-	}
-
-	public RobotsResult getRobots() {
-		return robots;
-	}
-	
-	public void setRobots(RobotsResult robots) {
-		this.robots = robots;
-		setArgument("--robots", new Arguments(this.robots.toString(),false));
 	}
 
 	public ControllersResult getControllers() {
@@ -37,7 +25,7 @@ public class ConfigurationResult {
 
 	public void setControllers(ControllersResult controllers) {
 		this.controllers = controllers;
-		setArgument("--controllers", new Arguments(this.controllers.toString(),false));
+		setArgument("--controllers", new Arguments(this.controllers.toString()));
 	}
 	
 	public void setArgument(String name, Arguments arg) {
