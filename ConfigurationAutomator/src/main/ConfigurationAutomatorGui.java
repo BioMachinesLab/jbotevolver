@@ -52,7 +52,6 @@ import taskexecutor.TaskExecutor;
 import utils.AutomatorOptions;
 import utils.AutomatorOptionsAttribute;
 import utils.ConfigurationResult;
-import utils.ControllersResult;
 import utils.RobotsResult;
 import controllers.Controller;
 
@@ -104,7 +103,6 @@ public class ConfigurationAutomatorGui {
 	private String editedAttributeName;
 	
 	private RobotsResult robotConfig;
-	private ControllersResult controllersResult;
 	private ConfigurationResult result ;
 
 	public ConfigurationAutomatorGui() {
@@ -112,8 +110,7 @@ public class ConfigurationAutomatorGui {
 		optionsAttributes = new ArrayList<AutomatorOptionsAttribute>();
 		
 		robotConfig = new RobotsResult();
-		controllersResult = new ControllersResult();
-		result = new ConfigurationResult(keys,controllersResult);
+		result = new ConfigurationResult(keys);
 		
 		frame = new JFrame("Configuration File Automator");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -399,7 +396,7 @@ public class ConfigurationAutomatorGui {
 				String extraRendererArguments = "conesensorid=";
 				
 				String selectedID = sensorsActuatorsList.getSelectedValue();
-				if(selectedID.contains("Sensor")){
+				if(selectedID != null && selectedID.contains("Sensor")){
 					String id = robotConfig.getSensor(selectedID).getArgumentAsString("id");
 					extraRendererArguments += id;
 				}else{
@@ -436,7 +433,8 @@ public class ConfigurationAutomatorGui {
 	}
 
 	private void show(String[] args) throws IOException, ClassNotFoundException {
-
+		for(String s : args)
+			System.out.println(s);
 		try {
 			rendererPanel.removeAll();
 			
@@ -647,15 +645,11 @@ public class ConfigurationAutomatorGui {
 				result.setArgument("--robots",robotConfig.getCompleteArguments());
 				break;
 			case CONTROLLERS:
-				result.getControllers().addClassname("classname=" + currentClassName);
+				result.setArgument("--controllers", new Arguments(arguments, false));
 				break;
 			case NETWORK:
-				result.getControllers().addNetworkClassname("classname=" + currentClassName);
-				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					String sT = createAttributeString(attribute, false);
-					if(!sT.isEmpty())
-						result.getControllers().addToNetworkString(sT);
-				}
+				Arguments controllerArgs = result.getArgument("--controllers");
+				controllerArgs.setArgument("network", arguments + ",inputs=auto,outputs=auto");
 				break;
 			case POPULATION:
 				result.setArgument("--population", new Arguments(arguments, false));
@@ -962,13 +956,13 @@ public class ConfigurationAutomatorGui {
 			try {
 				currentOptions = selected;
 				comboBox = (JComboBox<String>) event.getSource();
-				if(!comboBox.getSelectedItem().equals("")){
+				if(!((String)comboBox.getSelectedItem()).isEmpty()){
 					currentClassName = (String)comboBox.getSelectedItem();
 					fullFillOptionsPanel(classesList, currentClassName, null);
 				}else{
 					switch (selected) {
 					case NETWORK:
-						result.getControllers().clearNetwork();
+						result.getArgument("--controllers").removeArgument("network");;
 						break;
 					case POPULATION:
 						result.setArgument("--population", new Arguments(""));
