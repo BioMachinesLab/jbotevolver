@@ -7,14 +7,12 @@ import simulation.util.Arguments;
 
 public class ControllersResult {
 	
-	private String result;
 	private String classname;
 	private String network;
 	private HashMap<String,Arguments> inputs;
 	private HashMap<String,Arguments> outputs;
 	
 	public ControllersResult() {
-		result = "--controllers ";
 		inputs = new HashMap<String,Arguments>();
 		outputs = new HashMap<String,Arguments>();
 	}
@@ -73,9 +71,13 @@ public class ControllersResult {
 		network += ",\n\t\t" + text;
 	}
 	
-	public String getResult() {
-		return result + getClassname() + getNetwork();
+	public boolean isFilled(){
+		return classname != null && network != null;
 	}
 	
+	@Override
+	public String toString() {
+		return "--controllers " + getClassname() + getNetwork();
+	}
 
 }

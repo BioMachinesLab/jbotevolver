@@ -7,7 +7,8 @@ import simulation.util.Arguments;
 
 public class RobotsResult {
 	
-	private String result;
+	private String classname;
+	private String attributes;
 	private HashMap<String,Arguments> sensors;
 	private HashMap<String,Arguments> actuators;
 	
@@ -15,18 +16,40 @@ public class RobotsResult {
 	private int actuatorCount = 0;
 	
 	public RobotsResult() {
-		result = "--robots ";
+		attributes = "";
 		sensors = new HashMap<String,Arguments>();
 		actuators = new HashMap<String,Arguments>();
 	}
 	
-	public void appendTextToResult(String text){
-		result += "\n\t" + text + ",";
+	public String getClassname() {
+		if(classname == null)
+			return "";
+		return "\n\t" + classname + ",";
+	}
+	
+	public String getAttributes() {
+		return attributes;
+	}
+	
+	public void addClassname(String text){
+		classname = text;
+		attributes = "";
+	}
+	
+	public void addAttribute(String text){
+		attributes += "\n\t" + text + ",";
 	}
 	
 	public void addSensorInformation(String className, String sensorInformation){
 		String id = className + " " + sensorCount;
-		sensors.put(id,new Arguments(sensorInformation));
+		
+		if(!getSensors().equals("") && getSensors().contains(className)){
+			String newInfo = className + sensorCount + sensorInformation.substring(sensorInformation.indexOf("="));
+			sensors.put(id,new Arguments(newInfo));
+		}else{
+			sensors.put(id,new Arguments(sensorInformation));
+		}
+		
 		sensorCount ++;
 	}
 	
@@ -110,8 +133,29 @@ public class RobotsResult {
 		
 	}
 	
-	public String getResult() {
-		return result + getSensors() + getActuators();
+	public String getIDForSensor(String sensorKeyName){
+		Arguments args = sensors.get(sensorKeyName);
+		
+		for (String v : args.getValues()) {
+			String[] argsAttributes = v.split(",");
+			for (String a : argsAttributes) {
+				String[] attributeComplete = a.split("=");
+				if(attributeComplete[0].equals("id")){
+					return attributeComplete[1];
+				}
+			}
+		}
+		
+		return null;
+	}
+	
+	public boolean isFilled(){
+		return classname!=null && !sensors.isEmpty() && !actuators.isEmpty();
+	}
+	
+	@Override
+	public String toString() {
+		return "--robots " + getClassname() + getAttributes() + getSensors() + getActuators();
 	}
 	
 }

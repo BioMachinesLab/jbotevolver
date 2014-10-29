@@ -1,3 +1,10 @@
+package main;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.evolution.Evolution;
+import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
+import evolutionaryrobotics.populations.Population;
+import gui.renderer.Renderer;
+
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -9,9 +16,12 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -31,6 +41,7 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
@@ -44,10 +55,6 @@ import utils.ConfigurationResult;
 import utils.ControllersResult;
 import utils.RobotsResult;
 import controllers.Controller;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.evolution.Evolution;
-import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
-import evolutionaryrobotics.populations.Population;
 
 public class ConfigurationAutomatorGui {
 	
@@ -55,9 +62,13 @@ public class ConfigurationAutomatorGui {
 
 	private JFrame frame;
 	
+	private Renderer renderer;
+	
 	private JPanel optionsPanelLeft;
 	private JPanel optionsPanelCenter;
 	private JPanel optionsPanelRight;
+	
+	private JPanel rendererPanel;
 	
 	private JTextArea configResult;
 	
@@ -68,7 +79,9 @@ public class ConfigurationAutomatorGui {
 	
 	private JButton optionsButton;
 	private JButton saveArgumentsFileButton;
-	private JButton jListButton;
+	private JButton AmplifyPreviewButton;
+	private JButton jListRemoveButton;
+	private JButton jListSeeSensorsButton;
 	
 	private JComboBox<String> robotsClassNameComboBox;
 	private JComboBox<String> sensorsComboBox;
@@ -85,7 +98,7 @@ public class ConfigurationAutomatorGui {
 	
 	private DefaultListModel<String> jListModel;
 	private JList<String> jList;
-	
+
 	private AutomatorOptions currentOptions;
 	private String currentClassName;
 	
@@ -108,12 +121,12 @@ public class ConfigurationAutomatorGui {
 		
 		frame = new JFrame("Configuration File Automator");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setSize(1280, 760);
+		frame.setSize(1280, 860);
 	
 		frame.getContentPane().add(initLeftWrapperPanel(), BorderLayout.WEST);
 		frame.getContentPane().add(initCenterWrapperPanel(), BorderLayout.CENTER);
 		frame.getContentPane().add(initRightWrapperPanel(), BorderLayout.EAST);
-
+		
 		initListeners();
 		
 		frame.setLocationRelativeTo(null);
@@ -122,22 +135,37 @@ public class ConfigurationAutomatorGui {
 	}
 
 	private Component initLeftWrapperPanel() {
+		JPanel sidePanel = new JPanel(new BorderLayout());
+		
 		JPanel argumentsWrapper = new JPanel();
-		argumentsWrapper.setPreferredSize(new Dimension(450,frame.getHeight()));
-		argumentsWrapper.setLayout(new GridLayout(8, 1));
+		argumentsWrapper.setPreferredSize(new Dimension(450,450));
+		argumentsWrapper.setLayout(new BorderLayout());
+				
+		JPanel north = new JPanel(new BorderLayout());
+		JPanel subPanelNorth = new JPanel(new GridLayout(1,1));
+		subPanelNorth.add(initOutputWrapperPanel()); // 1. Output
+
+		JPanel subPanelNorth2 = new JPanel(new GridLayout(1,1));
+		subPanelNorth2.add(initRobotsWrapperPanel()); // 2. Robots
 		
-		argumentsWrapper.add(initOutputWrapperPanel()); // 1. Output
-		argumentsWrapper.add(initRobotsWrapperPanel()); // 2. Robots
-		argumentsWrapper.add(initControllersWrapperPanel()); // 3. Controllers
-		argumentsWrapper.add(initPopulationWrapperPanel()); // 4. Population
-		argumentsWrapper.add(initEnvironmentWrapperPanel()); // 5. Environment
-		argumentsWrapper.add(initExecutorWrapperPanel()); // 6. Executor
-		argumentsWrapper.add(initEvolutionWrapperPanel()); // 7. Evolution
-		argumentsWrapper.add(initEvaluationWrapperPanel()); // 8. Evaluation
+		JPanel subPanelNorth3 = new JPanel(new GridLayout(1,1));
+		subPanelNorth3.add(initControllersWrapperPanel()); // 3. Controllers
 		
+		north.add(subPanelNorth, BorderLayout.NORTH);
+		north.add(subPanelNorth2);
+		north.add(subPanelNorth3, BorderLayout.SOUTH);
+		
+		argumentsWrapper.add(north, BorderLayout.NORTH);
+		argumentsWrapper.add(initMiscWrapperPanel());
 		argumentsWrapper.setBorder(BorderFactory.createTitledBorder("Arguments"));
 
-		return argumentsWrapper;
+		sidePanel.add(argumentsWrapper, BorderLayout.NORTH);
+		
+		rendererPanel = new JPanel(new BorderLayout());
+		rendererPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
+		sidePanel.add(rendererPanel);
+		
+		return sidePanel;
 	}
 	
 	private Component initCenterWrapperPanel() {
@@ -150,22 +178,39 @@ public class ConfigurationAutomatorGui {
 		configResult.setText(result.getResult());
 		resultContentWrapper.add(new JScrollPane(configResult));
 		resultContentWrapper.setBorder(BorderFactory.createTitledBorder("Result"));
-		saveArgumentsFileButton = new JButton("Save to File");
-		resultContentWrapper.add(saveArgumentsFileButton, BorderLayout.SOUTH);
+		
+		resultContentWrapper.add(createResultContentButtons(), BorderLayout.SOUTH);
 		fileContentWrapper.add(resultContentWrapper, BorderLayout.CENTER);
 		
 		JPanel jListContentWrapper = new JPanel(new BorderLayout());
 		jListModel = new DefaultListModel<String>();
 		jList = new JList<String>(jListModel);
-		jListButton = new JButton("Remove");
+		jListSeeSensorsButton = new JButton("See Sensors");
+		jListRemoveButton = new JButton("Remove");
+		
+		JPanel buttonsPanel = new JPanel(new GridLayout(1,2));
+		buttonsPanel.add(jListSeeSensorsButton);
+		buttonsPanel.add(jListRemoveButton);
+		
 		jListContentWrapper.add(new JScrollPane(jList));
-		jListContentWrapper.add(jListButton, BorderLayout.SOUTH);
+		jListContentWrapper.add(buttonsPanel, BorderLayout.SOUTH);
 		jListContentWrapper.setBorder(BorderFactory.createTitledBorder("Attributes List"));
 		fileContentWrapper.add(jListContentWrapper, BorderLayout.SOUTH);
 	
 		return fileContentWrapper;
 	}
 	
+	private JPanel createResultContentButtons() {
+		JPanel panel = new JPanel(new GridLayout(2,1));
+		saveArgumentsFileButton = new JButton("Save to File");
+		panel.add(saveArgumentsFileButton);
+		JPanel panel2 = new JPanel(new GridLayout(1,2));
+		AmplifyPreviewButton = new JButton("Amplify Preview");
+		panel2.add(AmplifyPreviewButton);
+		panel.add(panel2);
+		return panel;
+	}
+
 	private Component initRightWrapperPanel() {
 		JPanel rightWrapper = new JPanel();
 		rightWrapper.setPreferredSize(new Dimension(410,frame.getHeight()));
@@ -206,17 +251,15 @@ public class ConfigurationAutomatorGui {
 		JPanel outputWrapper = new JPanel();
 		outputWrapper.setLayout(new GridLayout(2,1));
 		
-		JLabel outputLabel = new JLabel("Setup Name: ");
 		outputTextField = new JTextField(20);
-		JLabel randomSeedLabel = new JLabel("Random Seed: ");
 		randomSeedTextField = new JTextField(10);
 		
-		outputWrapper.add(outputLabel);
+		outputWrapper.add(new JLabel("Output Name: "));
 		outputWrapper.add(outputTextField);
-		outputWrapper.add(randomSeedLabel);
+		outputWrapper.add(new JLabel("Random Seed: "));
 		outputWrapper.add(randomSeedTextField);
 
-		outputWrapper.setBorder(BorderFactory.createTitledBorder("Output"));
+		outputWrapper.setBorder(BorderFactory.createTitledBorder(""));
 		return outputWrapper;
 	}
 
@@ -224,25 +267,20 @@ public class ConfigurationAutomatorGui {
 		JPanel robotsWrapper = new JPanel();
 		robotsWrapper.setLayout(new GridLayout(3,1));
 		
-		JLabel classNameLabel = new JLabel("Class name: ");
 		robotsClassNameComboBox = loadRobotsClassNamesToComboBox(Robot.class);
-		
-		JLabel sensorsLabel = new JLabel("Sensors: ");
 		sensorsComboBox = loadRobotsClassNamesToComboBox(Sensor.class);
-		
-		JLabel actuatorsLabel = new JLabel("Actuators: ");
 		actuatorsComboBox = loadRobotsClassNamesToComboBox(Actuator.class);
 		
-		robotsWrapper.add(classNameLabel);
+		robotsWrapper.add(new JLabel("Robot: "));
 		robotsWrapper.add(robotsClassNameComboBox);
 		
-		robotsWrapper.add(sensorsLabel);
+		robotsWrapper.add(new JLabel("Sensors: "));
 		robotsWrapper.add(sensorsComboBox);
 		
-		robotsWrapper.add(actuatorsLabel);
+		robotsWrapper.add(new JLabel("Actuators: "));
 		robotsWrapper.add(actuatorsComboBox);
 
-		robotsWrapper.setBorder(BorderFactory.createTitledBorder("Robots"));
+		robotsWrapper.setBorder(BorderFactory.createTitledBorder(""));
 		return robotsWrapper;
 	}
 	
@@ -250,96 +288,50 @@ public class ConfigurationAutomatorGui {
 		JPanel controllersWrapper = new JPanel();
 		controllersWrapper.setLayout(new GridLayout(2,1));
 		
-		JLabel classNameLabel = new JLabel("Class name: ");
 		controllersClassNameComboBox = loadRobotsClassNamesToComboBox(Controller.class);
-		
-		JLabel networkLabel = new JLabel("Network: ");
 		networkComboBox = loadRobotsClassNamesToComboBox(NeuralNetwork.class);
 		
-		controllersWrapper.add(classNameLabel);
+		controllersWrapper.add(new JLabel("Controller: "));
 		controllersWrapper.add(controllersClassNameComboBox);
 		
-		controllersWrapper.add(networkLabel);
+		controllersWrapper.add(new JLabel("Network: "));
 		controllersWrapper.add(networkComboBox);
 		
-		controllersWrapper.setBorder(BorderFactory.createTitledBorder("Controllers"));
+		controllersWrapper.setBorder(BorderFactory.createTitledBorder(""));
 		return controllersWrapper;
 	}
 
-	private Component initPopulationWrapperPanel() {
-		JPanel populationWrapper = new JPanel();
-		populationWrapper.setLayout(new GridLayout(1,1));
+	private Component initMiscWrapperPanel() {
+		JPanel miscWrapper = new JPanel();
+		miscWrapper.setLayout(new GridLayout(5,1));
 		
-		JLabel classNameLabel = new JLabel("Class name: ");
 		populationClassNameComboBox = loadRobotsClassNamesToComboBox(Population.class);
+		miscWrapper.add(new JLabel("Population: "));
+		miscWrapper.add(populationClassNameComboBox);
 		
-		populationWrapper.add(classNameLabel);
-		populationWrapper.add(populationClassNameComboBox);
-		
-		populationWrapper.setBorder(BorderFactory.createTitledBorder("Population"));
-		return populationWrapper;
-	}
-
-	private Component initEnvironmentWrapperPanel() {
-		JPanel environmentWrapper = new JPanel();
-		environmentWrapper.setLayout(new GridLayout(1,1));
-		
-		JLabel classNameLabel = new JLabel("Class name: ");
 		environmentClassNameComboBox = loadRobotsClassNamesToComboBox(Environment.class);
+		miscWrapper.add(new JLabel("Environment: "));
+		miscWrapper.add(environmentClassNameComboBox);
 		
-		environmentWrapper.add(classNameLabel);
-		environmentWrapper.add(environmentClassNameComboBox);
-		
-		environmentWrapper.setBorder(BorderFactory.createTitledBorder("Environment"));
-		return environmentWrapper;
-	}
-
-	private Component initExecutorWrapperPanel() {
-		JPanel executorWrapper = new JPanel();
-		executorWrapper.setLayout(new GridLayout(1,1));
-		
-		JLabel classNameLabel = new JLabel("Class name: ");
 		executorClassNameComboBox = loadRobotsClassNamesToComboBox(TaskExecutor.class);
+		miscWrapper.add(new JLabel("Executor: "));
+		miscWrapper.add(executorClassNameComboBox);
 		
-		executorWrapper.add(classNameLabel);
-		executorWrapper.add(executorClassNameComboBox);
-		
-		executorWrapper.setBorder(BorderFactory.createTitledBorder("Executor"));
-		return executorWrapper;
-	}
-
-	private Component initEvolutionWrapperPanel() {
-		JPanel evolutionWrapper = new JPanel();
-		evolutionWrapper.setLayout(new GridLayout(1,1));
-		
-		JLabel classNameLabel = new JLabel("Class name: ");
 		evolutionClassNameComboBox = loadRobotsClassNamesToComboBox(Evolution.class);
+		miscWrapper.add(new JLabel("Evolution: "));
+		miscWrapper.add(evolutionClassNameComboBox);
 		
-		evolutionWrapper.add(classNameLabel);
-		evolutionWrapper.add(evolutionClassNameComboBox);
-		
-		evolutionWrapper.setBorder(BorderFactory.createTitledBorder("Evolution"));
-		return evolutionWrapper;
-	}
-
-	private Component initEvaluationWrapperPanel() {
-		JPanel evaluationWrapper = new JPanel();
-		evaluationWrapper.setLayout(new GridLayout(1,1));
-		
-		JLabel classNameLabel = new JLabel("Class name: ");
 		evaluationClassNameComboBox = loadRobotsClassNamesToComboBox(EvaluationFunction.class);
+		miscWrapper.add(new JLabel("Evaluation: "));
+		miscWrapper.add(evaluationClassNameComboBox);
 		
-		evaluationWrapper.add(classNameLabel);
-		evaluationWrapper.add(evaluationClassNameComboBox);
-		
-		evaluationWrapper.setBorder(BorderFactory.createTitledBorder("Evaluation"));
-		return evaluationWrapper;
+		miscWrapper.setBorder(BorderFactory.createTitledBorder(""));
+		return miscWrapper;
 	}
 	
 	private void initListeners() {
 		outputTextField.getDocument().addDocumentListener(new TextFieldListener(outputTextField, AutomatorOptions.OUTPUT));
 		randomSeedTextField.getDocument().addDocumentListener(new TextFieldListener(randomSeedTextField, AutomatorOptions.RANDOM_SEED));
-		
 		robotsClassNameComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Robot.class), AutomatorOptions.ROBOTS));
 		sensorsComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Sensor.class), AutomatorOptions.SENSORS));
 		actuatorsComboBox.addActionListener(new OptionsAtributesListener(findClassesContainingName(Actuator.class), AutomatorOptions.ACTUATORS));
@@ -354,20 +346,7 @@ public class ConfigurationAutomatorGui {
 		optionsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if(editedAttribute){
-					jListButton.doClick();
-				}
-				writeAttributes();
-				jListModel.clear();
-				for (String id : result.getRobotsResult().getSensorIds()) {
-					jListModel.addElement(id);
-				}
-				for (String id : result.getRobotsResult().getActuatorsIds()) {
-					jListModel.addElement(id);
-				}
-				configResult.setText(result.getResult());
-				optionsAttributes.clear();
-				cleanOptionsPanel();
+				getOptionsFromPanel();
 			}
 		});
 		
@@ -382,66 +361,158 @@ public class ConfigurationAutomatorGui {
 			public void mouseEntered(MouseEvent event) { }
 			@Override
 			public void mouseClicked(MouseEvent event) {
-				try {
-					editOptionPanelAttribute();
-				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
-				}
+				editOptionPanelAttribute();
 			}
 		});
 		
-		jListButton.addActionListener(new ActionListener() {
+		jListSeeSensorsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String selectedID = jList.getSelectedValue();
-				if(selectedID.contains("Sensor"))
-					result.getRobotsResult().removeSensorInformation(selectedID);
-				else if(selectedID.contains("Actuator"))
-					result.getRobotsResult().removeActuatorInformation(selectedID);
-				else if(selectedID.contains("network"))
-					result.getRobotsResult().removeActuatorInformation(selectedID);
-				else if(selectedID.contains("robot"))
-					result.getRobotsResult().removeActuatorInformation(selectedID);
-				else
-					System.err.println("Selected Id doesn't contain Sensor, Actuator, Robot or Network.");
-				
-				jListModel.removeElement(selectedID);
-				configResult.setText(result.getResult());
+				seeSensors();
+			}
+		});;
+		
+		jListRemoveButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				removeElementFromJList();
 			}
 		});
 		
 		saveArgumentsFileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				if(outputTextField.getText().trim().length() > 0){
-					JFileChooser fileChooser = new JFileChooser();
-					fileChooser.setDialogTitle("Save File");
-					fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-					
-					if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
-						PrintWriter printWriter = null;
-						try {
-							String pathname = fileChooser.getSelectedFile().getAbsolutePath() + "/" + outputTextField.getText() + ".conf";
-							
-							printWriter = new PrintWriter(new File(pathname));
-					    	printWriter.println(result.getResult());
-					    	JOptionPane.showMessageDialog(frame, "File " + outputTextField.getText() + ".conf, created!");
-					    } catch (FileNotFoundException e) {
-					    	e.printStackTrace();
-					    } finally {
-					    	printWriter.close ();
-					    }
-					}
-				}else{
-					JOptionPane.showMessageDialog(frame, "No Setup Name defined.");
-				}
+				createArgumentFile();
 				
 			}
 		});
+		
+		AmplifyPreviewButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				try {
+					amplifyPreview();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
 	}
 
-	private JComboBox<String> loadRobotsClassNamesToComboBox(Class<?> className) {
+	private void amplifyPreview() {
+		if(renderer != null){
+			JFrame previewFrame = new JFrame("Preview");
+			
+			previewFrame.getContentPane().add(renderer);
+			
+			previewFrame.setSize(800, 800);
+			previewFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			previewFrame.setVisible(true);
+		}
+	}
+	
+	private void seeSensors() {
+		if(result.getRobots().isFilled() && result.getEnvironment().isFilled()){
+			try {
+				String extraRendererArgumets = "conesensorid=";
+				
+				String selectedID = jList.getSelectedValue();
+				if(selectedID.contains("Sensor")){
+					String id = result.getRobots().getIDForSensor(selectedID);
+					extraRendererArgumets += id;
+					showPreview(extraRendererArgumets);
+				}else{
+					JOptionPane.showMessageDialog(frame, "JList selected item need to be a Sensor.");
+					return;
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else{
+			JOptionPane.showMessageDialog(frame, "Robot or/and Environment arguments are not set.");
+		}
+	}
+	
+	private void showPreview() throws Exception{
+		Arguments rendererArgs = new Arguments("classname=TwoDRendererDebug",true);
+		renderer = Renderer.getRenderer(rendererArgs);
 		
+		String[] args = Arguments.readOptionsFromString(result.getRobots() + "\n" + result.getEnvironment());
+		show(args);
+	}
+	
+	private void showPreview(String rendererExtraArgs) throws Exception{
+		String arguments = "classname=TwoDRendererDebug," +rendererExtraArgs;
+		Arguments rendererArgs = new Arguments(arguments,true);
+		renderer = Renderer.getRenderer(rendererArgs);
+		
+		String[] args = Arguments.readOptionsFromString(result.getRobots() + "\n" + result.getEnvironment());
+		show(args);
+	}
+
+	private void show(String[] args) throws IOException, ClassNotFoundException {
+		HashMap<String, Arguments> arguments = Arguments.parseArgs(args);
+		
+		Simulator simulator = new Simulator(new Random(), arguments);
+		simulator.setupEnvironment();
+		
+		ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
+		simulator.addRobots(robots);
+		
+		if (renderer != null) {
+			renderer.enableInputMethods(true);
+			renderer.setSimulator(simulator);
+			renderer.drawFrame();
+			rendererPanel.removeAll();
+			rendererPanel.add(renderer);
+			rendererPanel.revalidate();
+			rendererPanel.repaint();
+			frame.revalidate();
+			frame.repaint();
+		}
+	}
+	
+	private void createArgumentFile() {
+		if(outputTextField.getText().trim().length() > 0){
+			JFileChooser fileChooser = new JFileChooser();
+			fileChooser.setDialogTitle("Save File");
+			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			
+			if (fileChooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+				PrintWriter printWriter = null;
+				try {
+					String filePath = fileChooser.getSelectedFile().getAbsolutePath() + "/" + outputTextField.getText() + ".conf";
+					
+					printWriter = new PrintWriter(new File(filePath));
+			    	printWriter.println(result.getResult());
+			    	JOptionPane.showMessageDialog(frame, "File " + outputTextField.getText() + ".conf, created!");
+			    } catch (FileNotFoundException e) {
+			    	e.printStackTrace();
+			    } finally {
+			    	printWriter.close ();
+			    }
+			}
+		}else{
+			JOptionPane.showMessageDialog(frame, "No Setup Name defined.");
+		}
+	}
+	
+	private void removeElementFromJList() {
+		String selectedID = jList.getSelectedValue();
+		if(selectedID.contains("Sensor"))
+			result.getRobots().removeSensorInformation(selectedID);
+		else if(selectedID.contains("Actuator"))
+			result.getRobots().removeActuatorInformation(selectedID);
+		else
+			System.err.println("Selected Id doesn't contain Sensor, Actuator, Robot or Network.");
+		
+		jListModel.removeElement(selectedID);
+
+		configResult.setText(result.getResult());
+	}
+	
+	private JComboBox<String> loadRobotsClassNamesToComboBox(Class<?> className) {
 		JComboBox<String> comboBox = new JComboBox<String>();
 		ArrayList<Class<?>> aux = findClassesContainingName(className);
 		
@@ -513,14 +584,40 @@ public class ConfigurationAutomatorGui {
 		return false;
 	}
 	
+	private void getOptionsFromPanel() {
+		if(editedAttribute){
+			jListRemoveButton.doClick();
+		}
+		writeAttributes();
+		
+		if(result.getRobots().isFilled() && result.getEnvironment().isFilled()){
+			try {
+				showPreview();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		jListModel.clear();
+		for (String id : result.getRobots().getSensorIds()) {
+			jListModel.addElement(id);
+		}
+		for (String id : result.getRobots().getActuatorsIds()) {
+			jListModel.addElement(id);
+		}
+		configResult.setText(result.getResult());
+		optionsAttributes.clear();
+		cleanOptionsPanel();
+	}
+	
 	private void writeAttributes() {
 		switch (currentOptions) {
 			case ROBOTS:
-				result.getRobotsResult().appendTextToResult("classname=" + currentClassName);
+				result.getRobots().addClassname("classname=" + currentClassName);
 				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
 					String s = createAttributeString(attribute, false);
 					if(!s.isEmpty())
-						result.getRobotsResult().appendTextToResult(s);
+						result.getRobots().addAttribute(s);
 				}
 				break;
 			case SENSORS:
@@ -529,7 +626,7 @@ public class ConfigurationAutomatorGui {
 					sensorInformation += createAttributeString(attribute, true);
 				}
 				sensorInformation += ")";
-				result.getRobotsResult().addSensorInformation(currentClassName, sensorInformation);
+				result.getRobots().addSensorInformation(currentClassName, sensorInformation);
 				break;
 			case ACTUATORS:
 				String actuatorInformation = currentClassName + "=(classname=" + currentClassName + ",id=" + actuatorId++;
@@ -537,57 +634,57 @@ public class ConfigurationAutomatorGui {
 					actuatorInformation += createAttributeString(attribute, true);
 				}
 				actuatorInformation += ")";
-				result.getRobotsResult().addActuatorInformation(currentClassName, actuatorInformation);
+				result.getRobots().addActuatorInformation(currentClassName, actuatorInformation);
 				break;
 			case CONTROLLERS:
-				result.getControllersResult().addClassname("classname=" + currentClassName);
+				result.getControllers().addClassname("classname=" + currentClassName);
 				break;
 			case NETWORK:
-				result.getControllersResult().addNetworkClassname("classname=" + currentClassName);
+				result.getControllers().addNetworkClassname("classname=" + currentClassName);
 				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
 					String s = createAttributeString(attribute, false);
 					if(!s.isEmpty())
-					result.getControllersResult().addToNetworkString(s);
+						result.getControllers().addToNetworkString(s);
 				}
 				break;
 			case POPULATION:
-				result.appendTextToPopulation("classname=" + currentClassName);
+				result.getPopulation().addClassname("classname=" + currentClassName);
 				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
 					String s = createAttributeString(attribute, false);
 					if(!s.isEmpty())
-						result.appendTextToPopulation(s);
+						result.getPopulation().addAttribute(s);
 				}
 				break;
 			case ENVIRONMENT:
-				result.appendTextToEnvironment("classname=" + currentClassName);
+				result.getEnvironment().addClassname("classname=" + currentClassName);
 				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
 					String s = createAttributeString(attribute, false);
 					if(!s.isEmpty())
-						result.appendTextToEnvironment(s);
+						result.getEnvironment().addAttribute(s);
 				}
 				break;
 			case EXECUTOR:
-				result.appendTextToExecutor("classname=" + currentClassName);
+				result.getExecutor().addClassname("classname=" + currentClassName);
 				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
 					String s = createAttributeString(attribute, false);
 					if(!s.isEmpty())
-						result.appendTextToExecutor(s);
+						result.getExecutor().addAttribute(s);
 				}
 				break;
 			case EVOLUTION:
-				result.appendTextToEvolution("classname=" + currentClassName);
+				result.getEvolution().addClassname("classname=" + currentClassName);
 				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
 					String s = createAttributeString(attribute, false);
 					if(!s.isEmpty())
-						result.appendTextToEvolution(s);
+						result.getEvolution().addAttribute(s);
 				}
 				break;
 			case EVALUATION:
-				result.appendTextToEvaluation("classname=" + currentClassName);
+				result.getEvaluation().addClassname("classname=" + currentClassName);
 				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
 					String s = createAttributeString(attribute, false);
 					if(!s.isEmpty())
-						result.appendTextToEvaluation(s);
+						result.getEvaluation().addAttribute(s);
 				}
 				break;
 		default:
@@ -659,8 +756,6 @@ public class ConfigurationAutomatorGui {
 			optionsPanelRight.setLayout(new GridLayout(15,1));	
 		}
 		
-		editedAttribute = false;
-		
 		JLabel jl = new JLabel("classname");
 		JTextField jtf = new JTextField(currentClassName);
 		jtf.setEnabled(false);
@@ -702,7 +797,6 @@ public class ConfigurationAutomatorGui {
 					textField = createOptionPanelTextField(attribute,defaultValue, false);
 				else{
 					textField = createOptionPanelTextField(attribute,attributeToEdit.getDefaultValue(), true);
-					editedAttribute = true; 
 					isEdited = true;
 				}
 			}else{
@@ -710,7 +804,6 @@ public class ConfigurationAutomatorGui {
 					combo = createOptionPanelComboBox(annotation, attribute);
 				else{
 					combo = editOptionPanelComboBox(annotation, attribute,attributeToEdit.getDefaultValue());
-					editedAttribute = true;
 					isEdited = true;
 				}
 			}
@@ -810,26 +903,32 @@ public class ConfigurationAutomatorGui {
 		return checkBox;
 	}
 	
-	private void editOptionPanelAttribute() throws ClassNotFoundException {
-		String attributeID = jList.getSelectedValue();
-		if(attributeID != null){
-			Arguments args = null;
-			
-			Class<?> c = null;
-			if(attributeID.contains("Sensor")){
-				c = Sensor.class;
-				args = result.getRobotsResult().getArgumentsForSensorId(attributeID);
-			}else if(attributeID.contains("Actuator")){
-				c = Actuator.class;
-				args = result.getRobotsResult().getArgumentsForActuatorId(attributeID);
-			}else{
-				System.err.println("Error on the editOptionPanelAttribute(), attributeID don't contain the word Sensor or Actuator");
-			}
-			
-			//Preencher com as opções existentes
-			ArrayList<AutomatorOptionsAttribute> optionsAttribute = getAttributesFromArgumentsString(args);
-			
-			fullFillOptionsPanel(findClassesContainingName(c), attributeID.split(" ")[0], optionsAttribute);
+	private void editOptionPanelAttribute(){
+		try {
+			String attributeID = jList.getSelectedValue();
+			if(attributeID != null){
+				Arguments args = null;
+				
+				Class<?> c = null;
+				if(attributeID.contains("Sensor")){
+					c = Sensor.class;
+					args = result.getRobots().getArgumentsForSensorId(attributeID);
+				}else if(attributeID.contains("Actuator")){
+					c = Actuator.class;
+					args = result.getRobots().getArgumentsForActuatorId(attributeID);
+				}else{
+					System.err.println("Error on the editOptionPanelAttribute(), attributeID don't contain the word Sensor or Actuator");
+				}
+				
+				editedAttribute = true;
+				
+				//Preencher com as opções existentes
+				ArrayList<AutomatorOptionsAttribute> optionsAttribute = getAttributesFromArgumentsString(args);
+				
+				fullFillOptionsPanel(findClassesContainingName(c), attributeID.split(" ")[0], optionsAttribute);
+			}	
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -878,15 +977,42 @@ public class ConfigurationAutomatorGui {
 		@SuppressWarnings("unchecked")
 		@Override
 		public void actionPerformed(ActionEvent event) {
+			editedAttribute=false;
 			try {
 				currentOptions = selected;
 				comboBox = (JComboBox<String>) event.getSource();
 				if(!comboBox.getSelectedItem().equals("")){
 					currentClassName = (String)comboBox.getSelectedItem();
 					fullFillOptionsPanel(classesList, currentClassName, null);
-				}else if(selected == AutomatorOptions.NETWORK){
-					result.getControllersResult().clearNetwork();
-					configResult.setText(result.getResult());
+				}else{
+					switch (selected) {
+					case NETWORK:
+						result.getControllers().clearNetwork();
+						configResult.setText(result.getResult());
+						break;
+					case POPULATION:
+						result.getPopulation().clear();
+						configResult.setText(result.getResult());
+						break;
+					case ENVIRONMENT:
+						result.getEnvironment().clear();
+						configResult.setText(result.getResult());
+						break;
+					case EXECUTOR:
+						result.getExecutor().clear();
+						configResult.setText(result.getResult());
+						break;
+					case EVOLUTION:
+						result.getEvolution().clear();
+						configResult.setText(result.getResult());
+						break;
+					case EVALUATION:
+						result.getEvaluation().clear();
+						configResult.setText(result.getResult());
+						break;
+					default:
+						break;
+					}
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
