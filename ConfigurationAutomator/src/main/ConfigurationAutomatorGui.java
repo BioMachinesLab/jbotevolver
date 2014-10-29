@@ -1,10 +1,10 @@
 package main;
+
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.populations.Population;
 import gui.renderer.Renderer;
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -19,10 +19,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -40,7 +40,6 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
@@ -61,6 +60,7 @@ public class ConfigurationAutomatorGui {
 	private String[] keys = {"--output","--robots", "--controllers", "--population", "--environment", "--executor", "--evolution", "--evaluation", "--random-seed"};
 
 	private JFrame frame;
+	private JFrame previewFrame = new JFrame("Preview");
 	
 	private Renderer renderer;
 	
@@ -103,7 +103,9 @@ public class ConfigurationAutomatorGui {
 	private String editedAttributeName;
 	
 	private RobotsResult robotConfig;
-	private ConfigurationResult result ;
+	private ConfigurationResult result;
+	
+	private Arguments rendererArgs;
 
 	public ConfigurationAutomatorGui() {
 		
@@ -124,6 +126,10 @@ public class ConfigurationAutomatorGui {
 		
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
+		
+		previewFrame.setSize(800, 800);
+		previewFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		previewFrame.setVisible(false);
 		
 	}
 
@@ -378,14 +384,10 @@ public class ConfigurationAutomatorGui {
 		return panel;
 	}
 	
-	private void amplifyPreview() {
+	private void amplifyPreview(Renderer renderer) {
 		if(renderer != null){
-			JFrame previewFrame = new JFrame("Preview");
-			
+			previewFrame.removeAll();
 			previewFrame.getContentPane().add(renderer);
-			
-			previewFrame.setSize(800, 800);
-			previewFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			previewFrame.setVisible(true);
 		}
 	}
@@ -411,20 +413,20 @@ public class ConfigurationAutomatorGui {
 		}
 	}
 	
-//	private void showPreview() throws Exception{
-//		Arguments rendererArgs = new Arguments("classname=TwoDRendererDebug",true);
-//		renderer = Renderer.getRenderer(rendererArgs);
-//		
-//		String[] args = Arguments.readOptionsFromString(
-//						"--robots " + result.getArgument("--robots") + "\n" +
-//						"--environment " + result.getArgument("--environment"));
-//		show(args);
-//	}
-	
 	private void showPreview(String rendererExtraArgs) throws Exception{
 		String arguments = "classname=TwoDRendererDebug," +rendererExtraArgs;
-		Arguments rendererArgs = new Arguments(arguments,true);
+		rendererArgs = new Arguments(arguments,true);
 		renderer = Renderer.getRenderer(rendererArgs);
+		
+		renderer.addMouseListener(new MouseListener() {
+			public void mouseReleased(MouseEvent e) {}
+			public void mousePressed(MouseEvent e) {}
+			public void mouseExited(MouseEvent e) {}
+			public void mouseEntered(MouseEvent e) {}
+			public void mouseClicked(MouseEvent e) {
+				amplifyPreview(Renderer.getRenderer(rendererArgs));
+			}
+		});
 		
 		String[] args = Arguments.readOptionsFromString(
 				"--robots " + result.getArgument("--robots") + "\n" +
@@ -433,8 +435,6 @@ public class ConfigurationAutomatorGui {
 	}
 
 	private void show(String[] args) throws IOException, ClassNotFoundException {
-		for(String s : args)
-			System.out.println(s);
 		try {
 			rendererPanel.removeAll();
 			
@@ -448,15 +448,6 @@ public class ConfigurationAutomatorGui {
 			simulator.setupEnvironment();
 			
 			if (renderer != null) {
-				renderer.addMouseListener(new MouseListener() {
-					public void mouseReleased(MouseEvent e) {}
-					public void mousePressed(MouseEvent e) {}
-					public void mouseExited(MouseEvent e) {}
-					public void mouseEntered(MouseEvent e) {}
-					public void mouseClicked(MouseEvent e) {
-						amplifyPreview();
-					}
-				});
 				
 				renderer.enableInputMethods(true);
 				renderer.setSimulator(simulator);
@@ -565,8 +556,10 @@ public class ConfigurationAutomatorGui {
 	    					path = f.getAbsolutePath().split("/bin/")[1].replaceAll(".class", "").replaceAll("/", ".");
 	    				
 		    			Class<?> cl = Class.forName(path);
+		    			
+		    			boolean isAbstract = Modifier.isAbstract(cl.getModifiers());
 
-		    			if(isIntanceOf(cl, objectClass)){
+		    			if(!isAbstract && isIntanceOf(cl, objectClass)){
 		    				cls.add(cl);
 		    			}
 		    			
@@ -579,6 +572,7 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private boolean isIntanceOf(Class<?> cls, Class<?> objectClass) {
+		
 		Class<?> superClass = cls.getSuperclass();
 		
 		if(superClass != null){			
