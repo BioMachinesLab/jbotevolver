@@ -385,10 +385,12 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private void amplifyPreview(Renderer renderer) {
+		System.out.println(renderer);
 		if(renderer != null){
-			previewFrame.removeAll();
 			previewFrame.getContentPane().add(renderer);
 			previewFrame.setVisible(true);
+			previewFrame.invalidate();
+			previewFrame.repaint();
 		}
 	}
 	
@@ -417,6 +419,7 @@ public class ConfigurationAutomatorGui {
 		String arguments = "classname=TwoDRendererDebug," +rendererExtraArgs;
 		rendererArgs = new Arguments(arguments,true);
 		renderer = Renderer.getRenderer(rendererArgs);
+		
 		
 		renderer.addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {}
@@ -724,9 +727,9 @@ public class ConfigurationAutomatorGui {
 		}else{
 			spaceToFillGrid = OPTIONS_GRID_LAYOUT_SIZE - (annotations.size()+1);
 			
-			optionsPanelLeft.setLayout(new GridLayout(15,1));
-			optionsPanelCenter.setLayout(new GridLayout(15,1));
-			optionsPanelRight.setLayout(new GridLayout(15,1));	
+			optionsPanelLeft.setLayout(new GridLayout(OPTIONS_GRID_LAYOUT_SIZE,1));
+			optionsPanelCenter.setLayout(new GridLayout(OPTIONS_GRID_LAYOUT_SIZE,1));
+			optionsPanelRight.setLayout(new GridLayout(OPTIONS_GRID_LAYOUT_SIZE,1));	
 		}
 		
 		JLabel jl = new JLabel("classname");
@@ -749,11 +752,10 @@ public class ConfigurationAutomatorGui {
 				
 			AutomatorOptionsAttribute attribute = new AutomatorOptionsAttribute();
 			attribute.setName(annotation.name());
-				
-			JTextField textField = null;
-			JComboBox<String> combo = null;
 			String defaultValue = annotation.defaultValue();
 			
+			JTextField textField = null;
+			JComboBox<String> combo = null;
 			AutomatorOptionsAttribute attributeToEdit = null;
 			
 			if(optAttributes != null){
