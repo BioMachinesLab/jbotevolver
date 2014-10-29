@@ -41,8 +41,14 @@ public class RobotsResult {
 	}
 	
 	public void addActuator(String className, String actuatorInformation){
-		String id = className + "_" + (actuators.getNumberOfArguments() + 1);
-		actuators.setArgument(id, actuatorInformation);
+		actuators.setArgument(className, actuatorInformation);
+	}
+	
+	public void edit(String key, String arguments) {
+		if(sensors.getArgumentIsDefined(key))
+			sensors.setArgument(key, arguments);
+		if(actuators.getArgumentIsDefined(key))
+			actuators.setArgument(key, arguments);
 	}
 	
 	public void removeSensor(String key){

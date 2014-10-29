@@ -633,11 +633,17 @@ public class ConfigurationAutomatorGui {
 				result.setArgument("--robots",robotConfig.getCompleteArguments());
 				break;
 			case SENSORS:
-				robotConfig.addSensor(currentClassName, arguments);
+				if(editedAttributeName.isEmpty())
+					robotConfig.addSensor(currentClassName, arguments);
+				else
+					robotConfig.edit(editedAttributeName, arguments);
 				result.setArgument("--robots",robotConfig.getCompleteArguments());
 				break;
 			case ACTUATORS:
-				robotConfig.addActuator(currentClassName, arguments);
+				if(editedAttributeName.isEmpty())
+					robotConfig.addActuator(currentClassName, arguments);
+				else 
+					robotConfig.edit(editedAttributeName, arguments);
 				result.setArgument("--robots",robotConfig.getCompleteArguments());
 				break;
 			case CONTROLLERS:
