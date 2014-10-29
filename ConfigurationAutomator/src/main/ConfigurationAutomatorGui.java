@@ -59,6 +59,7 @@ import controllers.Controller;
 public class ConfigurationAutomatorGui {
 	
 	private static final int OPTIONS_GRID_LAYOUT_SIZE = 15;
+	private String[] keys = {"--output","--robots", "--controllers", "--population", "--environment", "--executor", "--evolution", "--evaluation", "--random-seed"};
 
 	private JFrame frame;
 	
@@ -117,7 +118,7 @@ public class ConfigurationAutomatorGui {
 		
 		robotsResult = new RobotsResult();
 		controllersResult = new ControllersResult();
-		result = new ConfigurationResult(robotsResult,controllersResult);
+		result = new ConfigurationResult(keys, robotsResult,controllersResult);
 		
 		frame = new JFrame("Configuration File Automator");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -175,7 +176,7 @@ public class ConfigurationAutomatorGui {
 		JPanel resultContentWrapper = new JPanel(new BorderLayout());
 		configResult = new JTextArea();
 		configResult.setEditable(false);
-		configResult.setText(result.getResult());
+		updateConfigurationText();
 		resultContentWrapper.add(new JScrollPane(configResult));
 		resultContentWrapper.setBorder(BorderFactory.createTitledBorder("Result"));
 		
@@ -400,6 +401,10 @@ public class ConfigurationAutomatorGui {
 		
 	}
 
+	private void updateConfigurationText() {
+		configResult.setText(result.toString());
+	}
+	
 	private void amplifyPreview() {
 		if(renderer != null){
 			JFrame previewFrame = new JFrame("Preview");
@@ -413,7 +418,7 @@ public class ConfigurationAutomatorGui {
 	}
 	
 	private void seeSensors() {
-		if(result.getRobots().isFilled() && result.getEnvironment().isFilled()){
+		if(result.getRobots().isFilled() && !result.getArgument("--environment").equals("")){
 			try {
 				String extraRendererArgumets = "conesensorid=";
 				
@@ -438,7 +443,7 @@ public class ConfigurationAutomatorGui {
 		Arguments rendererArgs = new Arguments("classname=TwoDRendererDebug",true);
 		renderer = Renderer.getRenderer(rendererArgs);
 		
-		String[] args = Arguments.readOptionsFromString(result.getRobots() + "\n" + result.getEnvironment());
+		String[] args = Arguments.readOptionsFromString(result.getRobots() + "\n" + result.getArgument("--environment"));
 		show(args);
 	}
 	
@@ -447,7 +452,7 @@ public class ConfigurationAutomatorGui {
 		Arguments rendererArgs = new Arguments(arguments,true);
 		renderer = Renderer.getRenderer(rendererArgs);
 		
-		String[] args = Arguments.readOptionsFromString(result.getRobots() + "\n" + result.getEnvironment());
+		String[] args = Arguments.readOptionsFromString(result.getRobots() + "\n" + result.getArgument("--environment"));
 		show(args);
 	}
 
@@ -485,7 +490,7 @@ public class ConfigurationAutomatorGui {
 					String filePath = fileChooser.getSelectedFile().getAbsolutePath() + "/" + outputTextField.getText() + ".conf";
 					
 					printWriter = new PrintWriter(new File(filePath));
-			    	printWriter.println(result.getResult());
+			    	printWriter.println(result.toString());
 			    	JOptionPane.showMessageDialog(frame, "File " + outputTextField.getText() + ".conf, created!");
 			    } catch (FileNotFoundException e) {
 			    	e.printStackTrace();
@@ -509,7 +514,7 @@ public class ConfigurationAutomatorGui {
 		
 		jListModel.removeElement(selectedID);
 
-		configResult.setText(result.getResult());
+		updateConfigurationText();
 	}
 	
 	private JComboBox<String> loadRobotsClassNamesToComboBox(Class<?> className) {
@@ -588,9 +593,16 @@ public class ConfigurationAutomatorGui {
 		if(editedAttribute){
 			jListRemoveButton.doClick();
 		}
-		writeAttributes();
 		
-		if(result.getRobots().isFilled() && result.getEnvironment().isFilled()){
+		String arguments ="classname=" + currentClassName;
+		for (AutomatorOptionsAttribute attribute : optionsAttributes) {
+			if(!arguments.isEmpty())
+				arguments+= "," + createAttributeString(attribute, false);
+		}
+		
+		writeAttributes(arguments);
+		
+		if(result.getRobots().isFilled() && !result.getArgument("--environment").equals("")){
 			try {
 				showPreview();
 			} catch (Exception e) {
@@ -605,19 +617,19 @@ public class ConfigurationAutomatorGui {
 		for (String id : result.getRobots().getActuatorsIds()) {
 			jListModel.addElement(id);
 		}
-		configResult.setText(result.getResult());
+		updateConfigurationText();
 		optionsAttributes.clear();
 		cleanOptionsPanel();
 	}
 	
-	private void writeAttributes() {
+	private void writeAttributes(String arguments) {
 		switch (currentOptions) {
 			case ROBOTS:
 				result.getRobots().addClassname("classname=" + currentClassName);
 				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					String s = createAttributeString(attribute, false);
-					if(!s.isEmpty())
-						result.getRobots().addAttribute(s);
+					String sT = createAttributeString(attribute, false);
+					if(!sT.isEmpty())
+						result.getRobots().addAttribute(sT);
 				}
 				break;
 			case SENSORS:
@@ -642,50 +654,25 @@ public class ConfigurationAutomatorGui {
 			case NETWORK:
 				result.getControllers().addNetworkClassname("classname=" + currentClassName);
 				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					String s = createAttributeString(attribute, false);
-					if(!s.isEmpty())
-						result.getControllers().addToNetworkString(s);
+					String sT = createAttributeString(attribute, false);
+					if(!sT.isEmpty())
+						result.getControllers().addToNetworkString(sT);
 				}
 				break;
 			case POPULATION:
-				result.getPopulation().addClassname("classname=" + currentClassName);
-				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					String s = createAttributeString(attribute, false);
-					if(!s.isEmpty())
-						result.getPopulation().addAttribute(s);
-				}
+				result.setArgument("--population", new Arguments(arguments, false));
 				break;
 			case ENVIRONMENT:
-				result.getEnvironment().addClassname("classname=" + currentClassName);
-				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					String s = createAttributeString(attribute, false);
-					if(!s.isEmpty())
-						result.getEnvironment().addAttribute(s);
-				}
+				result.setArgument("--environment", new Arguments(arguments, false));
 				break;
 			case EXECUTOR:
-				result.getExecutor().addClassname("classname=" + currentClassName);
-				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					String s = createAttributeString(attribute, false);
-					if(!s.isEmpty())
-						result.getExecutor().addAttribute(s);
-				}
+				result.setArgument("--executor", new Arguments(arguments, false));
 				break;
 			case EVOLUTION:
-				result.getEvolution().addClassname("classname=" + currentClassName);
-				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					String s = createAttributeString(attribute, false);
-					if(!s.isEmpty())
-						result.getEvolution().addAttribute(s);
-				}
+				result.setArgument("--evolution", new Arguments(arguments, false));
 				break;
 			case EVALUATION:
-				result.getEvaluation().addClassname("classname=" + currentClassName);
-				for (AutomatorOptionsAttribute attribute : optionsAttributes) {
-					String s = createAttributeString(attribute, false);
-					if(!s.isEmpty())
-						result.getEvaluation().addAttribute(s);
-				}
+				result.setArgument("--evaluation", new Arguments(arguments, false));
 				break;
 		default:
 			System.err.println("The currentOption variable is not available for writeAttributes()!");
@@ -988,31 +975,26 @@ public class ConfigurationAutomatorGui {
 					switch (selected) {
 					case NETWORK:
 						result.getControllers().clearNetwork();
-						configResult.setText(result.getResult());
 						break;
 					case POPULATION:
-						result.getPopulation().clear();
-						configResult.setText(result.getResult());
+						result.setArgument("--population", new Arguments(""));
 						break;
 					case ENVIRONMENT:
-						result.getEnvironment().clear();
-						configResult.setText(result.getResult());
+						result.setArgument("--environment", new Arguments(""));
 						break;
 					case EXECUTOR:
-						result.getExecutor().clear();
-						configResult.setText(result.getResult());
+						result.setArgument("--executor", new Arguments(""));
 						break;
 					case EVOLUTION:
-						result.getEvolution().clear();
-						configResult.setText(result.getResult());
+						result.setArgument("--evolution", new Arguments(""));
 						break;
 					case EVALUATION:
-						result.getEvaluation().clear();
-						configResult.setText(result.getResult());
+						result.setArgument("--evaluation", new Arguments(""));
 						break;
 					default:
 						break;
 					}
+					updateConfigurationText();
 				}
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
@@ -1033,40 +1015,32 @@ public class ConfigurationAutomatorGui {
 		
 		@Override
 		public void insertUpdate(DocumentEvent e) {
-			switch (option) {
-				case OUTPUT:
-					result.setOutput("--output " + textfield.getText());
-					configResult.setText(result.getResult());
-					break;
-				case RANDOM_SEED:
-					result.setRandomSeed("--random_seed " + textfield.getText());
-					configResult.setText(result.getResult());
-					break;
-			default:
-				System.err.println("option variable received on the listener TextFieldListener is not supported by the method insertUpdate!");
-				break;
-			}
+			updateTextfieldInformation();
 		}
 
 		@Override
 		public void removeUpdate(DocumentEvent e) {
-			switch (option) {
-				case OUTPUT:
-					result.setOutput("--output " + textfield.getText());
-					configResult.setText(result.getResult());
-					break;
-				case RANDOM_SEED:
-					result.setRandomSeed("--random_seed " + textfield.getText());
-					configResult.setText(result.getResult());
-					break;
-			default:
-				System.err.println("option variable received on the listener TextFieldListener is not supported by the method removeUpdate!");
-				break;
-			}
+			updateTextfieldInformation();
 		}
 
 		@Override
 		public void changedUpdate(DocumentEvent e) { }
+		
+		public void updateTextfieldInformation(){
+			switch (option) {
+			case OUTPUT:
+				result.setArgument("--output", new Arguments(textfield.getText(),false));
+				break;
+			case RANDOM_SEED:
+				result.setArgument("--random-seed", new Arguments(textfield.getText(),false));
+				break;
+			default:
+				System.err.println("option variable received on the listener TextFieldListener is not supported");
+				break;
+			}
+			
+			updateConfigurationText();
+		}
 		
 	}
 	
