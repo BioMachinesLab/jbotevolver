@@ -16,10 +16,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -62,8 +60,6 @@ public class ConfigurationAutomatorGui {
 
 	private JFrame frame;
 	private JFrame previewFrame;
-	
-	private Renderer renderer;
 	
 	private JPanel optionsPanelLeft;
 	private JPanel optionsPanelCenter;
@@ -343,15 +339,10 @@ public class ConfigurationAutomatorGui {
 		});
 		
 		sensorsActuatorsList.addMouseListener(new MouseListener() {
-			@Override
 			public void mouseReleased(MouseEvent event) { }
-			@Override
 			public void mousePressed(MouseEvent event) { }
-			@Override
 			public void mouseExited(MouseEvent event) { }
-			@Override
 			public void mouseEntered(MouseEvent event) { }
-			@Override
 			public void mouseClicked(MouseEvent event) {
 				editOptionPanelAttribute();
 				seeSensors();
@@ -369,10 +360,8 @@ public class ConfigurationAutomatorGui {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				createArgumentFile();
-				
 			}
 		});
-		
 	}
 
 	private void updateConfigurationText() {
@@ -388,9 +377,11 @@ public class ConfigurationAutomatorGui {
 	
 	private void amplifyPreview(Renderer renderer) {
 		if(renderer != null){
+			previewFrame.getContentPane().removeAll();
 			previewFrame.getContentPane().add(renderer);
 			previewFrame.setVisible(true);
 			previewFrame.invalidate();
+			previewFrame.validate();
 			previewFrame.repaint();
 		}
 	}
@@ -420,8 +411,8 @@ public class ConfigurationAutomatorGui {
 	private void showPreview(String rendererExtraArgs) throws Exception{
 		String arguments = "classname=TwoDRendererDebug," +rendererExtraArgs;
 		rendererArgs = new Arguments(arguments,true);
-		renderer = Renderer.getRenderer(rendererArgs);
 		
+		Renderer renderer = setupRenderer(rendererArgs);
 		
 		renderer.addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {}
@@ -429,19 +420,31 @@ public class ConfigurationAutomatorGui {
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
 			public void mouseClicked(MouseEvent e) {
-				amplifyPreview(Renderer.getRenderer(rendererArgs));
+				amplifyPreview(setupRenderer(rendererArgs));
 			}
 		});
 		
-		String[] args = Arguments.readOptionsFromString(
-				"--robots " + result.getArgument("robots") + "\n" +
-				"--environment " + result.getArgument("environment"));
-		show(args);
+		rendererPanel.removeAll();
+		
+		if (renderer != null) {
+			
+			rendererPanel.add(renderer);
+			rendererPanel.revalidate();
+			rendererPanel.repaint();
+			
+			frame.revalidate();
+			frame.repaint();
+		}
 	}
-
-	private void show(String[] args) throws IOException, ClassNotFoundException {
+	
+	private Renderer setupRenderer(Arguments rArgs) {
+		
 		try {
-			rendererPanel.removeAll();
+			Renderer renderer = Renderer.getRenderer(rArgs);
+			
+			String[] args = Arguments.readOptionsFromString(
+					"--robots " + result.getArgument("robots") + "\n" +
+					"--environment " + result.getArgument("environment"));
 			
 			HashMap<String, Arguments> arguments = Arguments.parseArgs(args);
 			
@@ -452,25 +455,20 @@ public class ConfigurationAutomatorGui {
 			
 			simulator.setupEnvironment();
 			
-			if (renderer != null) {
-				
-				renderer.enableInputMethods(true);
-				renderer.setSimulator(simulator);
-				renderer.drawFrame();
-				
-				rendererPanel.add(renderer);
-				rendererPanel.revalidate();
-				rendererPanel.repaint();
-				
-				frame.revalidate();
-				frame.repaint();
-			}
+			renderer.enableInputMethods(true);
+			renderer.setSimulator(simulator);
+			renderer.drawFrame();
+			
+			return renderer;
+		
 		} catch(Exception e) {
 			//Gotta catch 'em all! Silence the exceptions that might occur because of problems in the
 			//initialization of Environments
 		}
+		
+		return null;
 	}
-	
+
 	private void createArgumentFile() {
 		if(outputTextField.getText().trim().length() > 0){
 			JFileChooser fileChooser = new JFileChooser();
