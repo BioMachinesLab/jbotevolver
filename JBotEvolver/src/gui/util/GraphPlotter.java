@@ -300,7 +300,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 					}
 				}
 			}
-			
+			plot.set("border", "3");
 			(new Plotter(plot)).start();
 		}
 		
@@ -374,7 +374,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 							
 							for(int z = 0 ; z < inputs.get(j).getNumberOfInputValues() ; z++) {
 								if(Arrays.binarySearch(chosenInts, z) >= 0) {
-									titlesList.add(inputs.get(j).getClass().getSimpleName()+" "+z);
+									titlesList.add(inputs.get(j).getSensor().getClass().getSimpleName()+" "+z);
 									valuesList.add(new double[simulator.getEnvironment().getSteps()][2]);
 								}
 							}
@@ -522,7 +522,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		for(int i = 0 ; i < inputs.size() ; i++) {
 			NNInput input = inputs.get(i);
 			
-			String name = input.getClass().getSimpleName() +" ("+input.getNumberOfInputValues()+")";
+			String name = input.getSensor().getClass().getSimpleName() +" ("+input.getNumberOfInputValues()+")";
 			JCheckBox checkbox = new JCheckBox(name);
 			checkbox.setSelected(true);
 			
@@ -724,6 +724,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 					(new Plotter(p)).start();
 				}
 			}
+			
 		}
 	}
 	
