@@ -883,4 +883,13 @@ public class Arguments implements Serializable {
 		return newString;
 	}
 	
+	public void removeArgument(String key) {
+		int index = arguments.indexOf(key);
+		
+		if(index >= 0) {
+			arguments.remove(index);
+			values.remove(index);
+		}
+	}
+	
 }

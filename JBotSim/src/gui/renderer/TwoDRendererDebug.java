@@ -158,7 +158,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 			if(coneSensorId >= 0 || !coneClass.isEmpty()){	
 				for(Sensor s : robot.getSensors()){
 					if(s.getClass().getSimpleName().equals(coneClass) || s.getId() == coneSensorId){
-						if(s != null){
+						if(s != null && s instanceof ConeTypeSensor){
 							ConeTypeSensor preySensor = (ConeTypeSensor)s;
 							for (Double angle : preySensor.getAngles()) {
 							
