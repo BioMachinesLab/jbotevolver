@@ -127,15 +127,14 @@ public class ConfigurationAutomatorGui extends JFrame{
 		
 		JPanel subPanelNorth = new JPanel(new GridLayout(1,1));
 		subPanelNorth.add(initOutputWrapperPanel()); // 1. Output
+		subNorth.add(subPanelNorth, BorderLayout.NORTH);
 
 		JPanel subPanelNorth2 = new JPanel(new GridLayout(1,1));
 		subPanelNorth2.add(createJComboBoxPanel(new Class<?>[]{Robot.class, Sensor.class, Actuator.class})); // 2. Robots
+		subNorth.add(subPanelNorth2);
 		
 		JPanel subPanelNorth3 = new JPanel(new GridLayout(1,1));
 		subPanelNorth3.add(createJComboBoxPanel(new Class<?>[]{Controller.class, NeuralNetwork.class})); // 3. Controllers
-		
-		subNorth.add(subPanelNorth, BorderLayout.NORTH);
-		subNorth.add(subPanelNorth2);
 		subNorth.add(subPanelNorth3, BorderLayout.SOUTH);
 		
 		north.add(subNorth, BorderLayout.NORTH);
@@ -273,7 +272,6 @@ public class ConfigurationAutomatorGui extends JFrame{
 	private void initListeners() {
 
 		optionsButton.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent e) {
 				getOptionsFromPanel();
 			}
@@ -291,7 +289,6 @@ public class ConfigurationAutomatorGui extends JFrame{
 		});
 		
 		saveArgumentsFileButton.addActionListener(new ActionListener() {
-			@Override
 			public void actionPerformed(ActionEvent event) {
 				createArgumentFile();
 			}
@@ -771,7 +768,6 @@ public class ConfigurationAutomatorGui extends JFrame{
 		}
 		
 		@SuppressWarnings("unchecked")
-		@Override
 		public void actionPerformed(ActionEvent event) {
 			editedAttributeName="";
 			try {
@@ -805,17 +801,14 @@ public class ConfigurationAutomatorGui extends JFrame{
 			this.option = option;
 		}
 		
-		@Override
 		public void insertUpdate(DocumentEvent e) {
 			updateTextfieldInformation();
 		}
 
-		@Override
 		public void removeUpdate(DocumentEvent e) {
 			updateTextfieldInformation();
 		}
 
-		@Override
 		public void changedUpdate(DocumentEvent e) { }
 		
 		public void updateTextfieldInformation(){
@@ -851,7 +844,6 @@ public class ConfigurationAutomatorGui extends JFrame{
 			this.component = component;
 		}
 
-		@Override
 		public void actionPerformed(ActionEvent e) {
 			JCheckBox checkBox = (JCheckBox)e.getSource();
 			if(checkBox.isSelected())
