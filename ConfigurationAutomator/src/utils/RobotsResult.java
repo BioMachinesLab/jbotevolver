@@ -30,7 +30,16 @@ public class RobotsResult {
 		return result;
 	}
 	
-	public void addSensor(String className, String sensorInformation){
+	public void addSensorActuator(String keyName, String className, String sensorInformation){
+		if(keyName.isEmpty()) {
+			if(className.contains("Sensor"))
+				addSensor(className, sensorInformation);
+			else actuators.setArgument(className, sensorInformation);
+		}else
+			editSensorActuator(keyName, sensorInformation);
+	}
+	
+	private void addSensor(String className, String sensorInformation){
 		
 		int id = sensors.getNumberOfArguments() + 1;
 		
@@ -40,11 +49,7 @@ public class RobotsResult {
 		sensors.setArgument(name,newInfo);
 	}
 	
-	public void addActuator(String className, String actuatorInformation){
-		actuators.setArgument(className, actuatorInformation);
-	}
-	
-	public void edit(String key, String arguments) {
+	private void editSensorActuator(String key, String arguments) {
 		if(sensors.getArgumentIsDefined(key)) {
 			sensors.removeArgument(key);
 			sensors.setArgument(key, arguments);
@@ -56,14 +61,14 @@ public class RobotsResult {
 		}
 	}
 	
-	public void removeSensor(String key){
-		sensors.removeArgument(key);
-		sensors = recalculateIds(sensors);
-	}
-	
-	public void removeActuator(String key){
-		actuators.removeArgument(key);
-		actuators = recalculateIds(actuators);
+	public void remove(String key){
+		if(sensors.getArgumentIsDefined(key)) {
+			sensors.removeArgument(key);
+			sensors = recalculateIds(sensors);
+		} else {
+			actuators.removeArgument(key);
+			actuators = recalculateIds(actuators);
+		}
 	}
 	
 	private Arguments recalculateIds(Arguments args) {
@@ -84,20 +89,18 @@ public class RobotsResult {
 		return newArgs;
 	}
 	
-	public Arguments getSensor(String name){
-		return new Arguments(sensors.getArgumentAsString(name));
-	}
-	
-	public Arguments getActuator(String name){
+	public Arguments getSensorActuator(String name){
+		if(sensors.getArgumentIsDefined(name))
+			return new Arguments(sensors.getArgumentAsString(name));
+		
 		return new Arguments(actuators.getArgumentAsString(name));
 	}
 	
-	public Vector<String> getSensorIds(){
-		return sensors.getArguments();
-	}
-	
-	public Vector<String> getActuatorsIds(){
-		return actuators.getArguments();
+	public Vector<String> getSensorActuatorsIds(){
+		Vector<String> vector = new Vector<String>();
+		vector.addAll(sensors.getArguments());
+		vector.addAll(actuators.getArguments());
+		return vector;
 	}
 	
 	@Override
