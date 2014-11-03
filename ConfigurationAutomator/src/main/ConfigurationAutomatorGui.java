@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -35,6 +36,8 @@ import javax.swing.JTextField;
 import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.DefaultCaret;
+
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
@@ -50,6 +53,7 @@ import controllers.Controller;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
+import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
 import evolutionaryrobotics.populations.Population;
 import gui.renderer.Renderer;
 
@@ -159,6 +163,11 @@ public class ConfigurationAutomatorGui extends JFrame{
 		
 		JPanel resultContentWrapper = new JPanel(new BorderLayout());
 		configResult = new JTextArea();
+		configResult.setTabSize(2);
+		
+		DefaultCaret caret = (DefaultCaret) configResult.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		
 		configResult.setEditable(false);
 		updateConfigurationText();
 		resultContentWrapper.add(new JScrollPane(configResult));
@@ -257,7 +266,9 @@ public class ConfigurationAutomatorGui extends JFrame{
 			JComboBox<String> currentBox = loadClassNamesToComboBox(c);
 			
 			String configName = c.getSimpleName().toLowerCase();
-			configName.replace("neuralnetwork", "network");
+			configName = configName.replace("neuralnetwork", "network");
+			configName = configName.replace("taskexecutor", "executor");
+			configName = configName.replace("evaluationfunction", "evaluation");
 			configName = nameExceptions.contains(configName) ? configName+"s" : configName;
 			
 			currentBox.addActionListener(new OptionsAtributesListener(c, configName));
@@ -402,17 +413,18 @@ public class ConfigurationAutomatorGui extends JFrame{
 
 	private void createArgumentFile() {
 		
-		String outputText = result.getArgument("--output").getCompleteArgumentString().trim();
+		String outputText = result.getArgument("output").getCompleteArgumentString().trim();
 		
 		if(outputText.length() > 0){
-			JFileChooser fileChooser = new JFileChooser();
+			JFileChooser fileChooser = new JFileChooser(".");
+			fileChooser.setSelectedFile(new File(outputText + ".conf"));
 			fileChooser.setDialogTitle("Save File");
 			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			
-			if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 				PrintWriter printWriter = null;
 				try {
-					String filePath = fileChooser.getSelectedFile().getAbsolutePath() + "/" + outputText + ".conf";
+					String filePath = fileChooser.getSelectedFile().getAbsolutePath();
 					
 					printWriter = new PrintWriter(new File(filePath));
 			    	printWriter.println(result.toString());
@@ -424,7 +436,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 			    }
 			}
 		}else{
-			JOptionPane.showMessageDialog(this, "No Setup Name defined.");
+			JOptionPane.showMessageDialog(this, "No Output Name defined.");
 		}
 	}
 	
@@ -592,8 +604,10 @@ public class ConfigurationAutomatorGui extends JFrame{
 			
 			if(optAttributes != null){
 				for (AutomatorOptionsAttribute optAttribute : optAttributes) {
-					if(optAttribute.getName().equals(annotation.name()))
+					if(optAttribute.getName().equals(annotation.name())){
 						attributeToEdit = optAttribute;
+						break;
+					}
 				}
 			}
 			
@@ -728,7 +742,9 @@ public class ConfigurationAutomatorGui extends JFrame{
 				//Preencher com as opções existentes
 				ArrayList<AutomatorOptionsAttribute> optionsAttribute = getAttributesFromArgumentsString(args);
 				
+				optionsAttributes.clear();
 				fullFillOptionsPanel(ClassLoadHelper.findClassesContainingName(c), args.getArgumentAsString("classname"), optionsAttribute);
+				
 			}	
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
@@ -767,9 +783,9 @@ public class ConfigurationAutomatorGui extends JFrame{
 			this.selected = selected;
 		}
 		
-		@SuppressWarnings("unchecked")
 		public void actionPerformed(ActionEvent event) {
 			editedAttributeName="";
+			optionsAttributes.clear();
 			try {
 				currentOptions = selected;
 				comboBox = (JComboBox<String>) event.getSource();
@@ -799,6 +815,11 @@ public class ConfigurationAutomatorGui extends JFrame{
 		public TextFieldListener(JTextField textfield, String option) {
 			this.textfield = textfield;
 			this.option = option;
+			if(option == "random-seed"){
+				textfield.setText("1");
+				result.setArgument(option, new Arguments(textfield.getText()));
+				updateConfigurationText();
+			}
 		}
 		
 		public void insertUpdate(DocumentEvent e) {
@@ -812,7 +833,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 		public void changedUpdate(DocumentEvent e) { }
 		
 		public void updateTextfieldInformation(){
-			result.setArgument(option, new Arguments(textfield.getText(),false));
+			result.setArgument(option, new Arguments(textfield.getText()));
 			updateConfigurationText();
 		}
 		
@@ -853,7 +874,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 		}
 		
 	}
-	
+		
 	public static void main(String[] args) {
 		new ConfigurationAutomatorGui();
 	}

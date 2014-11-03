@@ -51,4 +51,9 @@ public class AutomatorOptionsAttribute {
 		this.checkBox = checkBox;
 	}
 	
+	@Override
+	public String toString() {
+		return name + ", " + defaultValue;
+	}
+	
 }
