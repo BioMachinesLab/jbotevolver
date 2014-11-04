@@ -53,7 +53,6 @@ import controllers.Controller;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
-import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
 import evolutionaryrobotics.populations.Population;
 import gui.renderer.Renderer;
 
@@ -78,6 +77,8 @@ public class ConfigurationAutomatorGui extends JFrame{
 	
 	private JButton optionsButton;
 	private JButton saveArgumentsFileButton;
+	
+	private JComboBox<String> currentComboBox;
 
 	private ArrayList<AutomatorOptionsAttribute> optionsAttributes;
 	
@@ -501,6 +502,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 			case "sensors":
 				robotConfig.addSensorActuator(editedAttributeName,currentClassName, arguments);
 				editedAttributeName = "";
+				currentComboBox.setSelectedIndex(0);
 				result.setArgument("robots",robotConfig.getCompleteArguments());
 				break;
 			case "network":
@@ -789,6 +791,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 			try {
 				currentOptions = selected;
 				comboBox = (JComboBox<String>) event.getSource();
+				currentComboBox = comboBox;
 				if(!((String)comboBox.getSelectedItem()).isEmpty()){
 					currentClassName = (String)comboBox.getSelectedItem();
 					fullFillOptionsPanel(classesList, currentClassName, null);
@@ -799,6 +802,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 					else
 						result.setArgument(selected, new Arguments(""));
 					
+					cleanOptionsPanel();
 					updateConfigurationText();
 				}
 			} catch (ClassNotFoundException e) {
