@@ -136,7 +136,7 @@ public class ResultViewerGui extends Gui {
 		enableDebugOptions = args.getArgumentAsIntOrSetDefault("enabledebugoptions", 0) == 1;
 		
 		frame = new JFrame("Result Viewer");
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(1200, 860);
 	
 		frame.getContentPane().add(initBottomPanel(), BorderLayout.SOUTH);	
