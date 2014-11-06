@@ -23,7 +23,8 @@ public class AutoArgumentsGeneration {
 				for(int i = 0 ; i < sensorArgs.getNumberOfArguments() ; i++) {
 					String sensorName = sensorArgs.getArgumentAt(i);
 					Arguments currentSensorArgs = new Arguments(sensorArgs.getArgumentAsString(sensorName));
-					fullAutoInputs = getNNInputName(fullAutoInputs,currentSensorArgs,sensorName);
+					String realSensorName = currentSensorArgs.getArgumentAsString("classname");
+					fullAutoInputs = getNNInputName(fullAutoInputs,currentSensorArgs,realSensorName);
 				}
 				networkArgs.setArgument("inputs", fullAutoInputs);
 				controllerArgs.setArgument("network", networkArgs.getCompleteArgumentString());
@@ -83,12 +84,14 @@ public class AutoArgumentsGeneration {
                 if(networkArgs.getArgumentAsString("outputs").equals("auto")) {
                         Arguments actuatorArgs = new Arguments(robotArgs.getArgumentAsString("actuators"));
                         for(int i = 0 ; i < actuatorArgs.getNumberOfArguments() ; i++) {
-                                String actuatorName = actuatorArgs.getArgumentAt(i);
-                                Arguments currentSensorArgs = new Arguments(actuatorArgs.getArgumentAsString(actuatorName));
-                                String outputName = actuatorName.replace("Actuator","NNOutput");
-                                String fullOutputName = ClassSearchUtils.getClassFullName(outputName);
-                                String id = currentSensorArgs.getArgumentAsString("id");
-                                fullAutoOutputs+=outputName+"=(classname="+fullOutputName+",id="+id+"),";                                       
+                        	String actuatorName = actuatorArgs.getArgumentAt(i);
+                        	Arguments currentSensorArgs = new Arguments(actuatorArgs.getArgumentAsString(actuatorName));
+                        	String realActuatorName = currentSensorArgs.getArgumentAsString("classname");
+                        	String outputName = realActuatorName.replace("Actuator","NNOutput");
+                        	outputName = outputName.split("\\.")[outputName.split("\\.").length-1];
+                        	String fullOutputName = ClassSearchUtils.getClassFullName(outputName);
+                        	String id = currentSensorArgs.getArgumentAsString("id");
+                        	fullAutoOutputs+=outputName+"=(classname="+fullOutputName+",id="+id+"),";                                       
                         }
                         networkArgs.setArgument("outputs", fullAutoOutputs);
                         controllerArgs.setArgument("network", networkArgs.getCompleteArgumentString());
