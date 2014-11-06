@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.SimpleFitnessResult;
 import taskexecutor.tasks.GenerationalTask;
@@ -18,6 +19,7 @@ import evolutionaryrobotics.util.DiskStorage;
 public class GenerationalEvolution extends Evolution {
 	
 	protected Population population;
+	@ArgumentsAnnotation(name="supressmessages", values={"0","1"}, help="Set to 1 to show information about the evolution on the java console")
 	protected boolean supressMessages = false;
 	protected DiskStorage diskStorage;
 	protected String output = "";
@@ -130,4 +132,10 @@ public class GenerationalEvolution extends Evolution {
 		if(!supressMessages)
 			System.out.print(s);
 	}
+	
+	@Override
+	public Population getPopulation() {
+		return population;
+	}
+	
 }

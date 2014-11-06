@@ -12,7 +12,7 @@ import java.util.Vector;
 import javax.swing.JPanel;
 
 public class GraphingData extends JPanel {
-//	private static final int MAX = 4000;
+	private static final int MAX = 4000;
 	private int showLast = 2000;
 	final int PAD = 20;
 	private String xLabel = "Generations";
@@ -21,14 +21,17 @@ public class GraphingData extends JPanel {
 	private double scale = 0;
 	
 	private Vector<Vector<Double>> listOfData = new Vector<Vector<Double>>();
+	private Vector<Double> simpleData = new Vector<Double>();
 
-//	public void addData(Double value) {
-//		data.add(value);
-//		if (data.size() > MAX) {
-//			data.remove(0);
-//		}
-//		repaint();
-//	}
+	public void addData(Double value) {
+		simpleData.add(value);
+		if (simpleData.size() > MAX) {
+			simpleData.remove(0);
+		}
+		listOfData.clear();
+		listOfData.add(0, simpleData);
+		repaint();
+	}
 	
 	public void addDataList(Double[] dataList){
 		Vector<Double> aux = new Vector<Double>();

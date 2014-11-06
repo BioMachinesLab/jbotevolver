@@ -301,4 +301,10 @@ public class CoEvolution extends Evolution {
 			fitness += result.getFitness();
 			vector[index] = fitness;
 		}
+		
+		@Override
+		public Population getPopulation() {
+			return populationA;
+		}
+		
 }

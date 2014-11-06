@@ -4,6 +4,7 @@ import simulation.util.Arguments;
 import simulation.util.Factory;
 import taskexecutor.TaskExecutor;
 import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.populations.Population;
 
 public abstract class Evolution {
 
@@ -16,6 +17,7 @@ public abstract class Evolution {
 	}
 
 	public abstract void executeEvolution();
+	public abstract Population getPopulation();
 	
 	public synchronized static Evolution getEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))
