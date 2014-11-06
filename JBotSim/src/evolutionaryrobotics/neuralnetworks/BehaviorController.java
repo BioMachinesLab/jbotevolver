@@ -1,6 +1,7 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.ArrayList;
+
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import simulation.Simulator;
@@ -8,6 +9,7 @@ import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.robot.behaviors.Behavior;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class BehaviorController extends NeuralNetworkController implements FixedLenghtGenomeEvolvableController {
 	
@@ -15,12 +17,15 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 	protected ArrayList<Controller> subControllers = new ArrayList<Controller>();
 	protected ArrayList<Controller> parallelSubControllers = new ArrayList<Controller>();
 	protected int currentSubNetwork = 0;
-	boolean keepFeeding = false;
-	boolean resetChosen = true;
-	boolean debugMax = false;
-	private int fixedOutput = -1;
-	private boolean printValues = false;
+	protected boolean keepFeeding = false;
+	protected boolean resetChosen = true;
+	protected 	boolean debugMax = false;
 	private int switches = 0;
+	
+	@ArgumentsAnnotation(name="fixedoutput", defaultValue="-1")
+	private int fixedOutput = -1;
+	@ArgumentsAnnotation(name="printvalues", values={"0","1"})
+	private boolean printValues = false;
 	
 	public BehaviorController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
@@ -118,7 +123,7 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 			c.reset();
 	}
 	
-	private void setupControllers(Simulator simulator, Arguments args) {
+	protected void setupControllers(Simulator simulator, Arguments args) {
 		
 		if(!args.getArgumentAsString("subcontrollers").isEmpty()) {
 			Arguments subControllerArgs = new Arguments(args.getArgumentAsString("subcontrollers"));

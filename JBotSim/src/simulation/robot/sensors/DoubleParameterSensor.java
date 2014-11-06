@@ -3,6 +3,7 @@ package simulation.robot.sensors;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 /**
  * A sensor that maps from a user specified parameter to a sensor value. The "key" is the name of the parameter.
  * 
@@ -10,7 +11,10 @@ import simulation.util.Arguments;
  */
 public class DoubleParameterSensor extends Sensor {
 	protected String key;
+	
+	@ArgumentsAnnotation(name="min", defaultValue = "0.0")
 	protected double minValue;
+	@ArgumentsAnnotation(name="max", defaultValue = "1.0")
 	protected double maxValue;
 	
 	

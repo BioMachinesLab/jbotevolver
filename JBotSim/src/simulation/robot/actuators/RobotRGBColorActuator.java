@@ -23,7 +23,7 @@ public class RobotRGBColorActuator extends Actuator {
 	boolean controlGreen = false;
 	boolean controlBlue  = false;
 	
-	@ArgumentsAnnotation(name="mode", values={"","R","G","B"})
+	@ArgumentsAnnotation(name="mode", values={"","R","G","B", "RG", "RB", "GB", "RGB"})
 	private String modeStr;
 	
 	public RobotRGBColorActuator(Simulator simulator, int id, Arguments args) {

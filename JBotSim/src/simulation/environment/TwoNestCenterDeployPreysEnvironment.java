@@ -1,15 +1,18 @@
 package simulation.environment;
 
 import java.util.LinkedList;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.Prey;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
-public class TwoNestCenterDeployPreysEnvironment extends TwoNestSimpleForageEnvironment {
-
+public class TwoNestCenterDeployPreysEnvironment extends TwoNestForageEnvironment {
+	
+	@ArgumentsAnnotation(name="numberOfPreysAvailable", defaultValue="3")
 	private int numberOfPreysAvailable;
+	
+	@ArgumentsAnnotation(name="rateOfNewPreyPerCycle", defaultValue="1")
 	private double rateOfNewPreyPerCycle;
 
 	private LinkedList<Prey> foragedPreys = new LinkedList<Prey>();
@@ -40,9 +43,8 @@ public class TwoNestCenterDeployPreysEnvironment extends TwoNestSimpleForageEnvi
 		}
 	}
 
-	@Override
 	protected void releasePrey(Prey prey) {
-		super.releasePrey(prey);
+		prey.setEnabled(false);
 		foragedPreys.add(prey);
 	}
 

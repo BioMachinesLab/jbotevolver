@@ -1,23 +1,25 @@
 package simulation.environment;
 
 import java.util.Random;
-
-import controllers.RandomRobotController;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObjectType;
-import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
-import simulation.robot.DifferentialDriveRobot;
-import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class RoundRobotForageEnvironment extends Environment {
+	
+	@ArgumentsAnnotation(name="nestlimit", defaultValue="0.5")
 	private double nestLimit;
+	
+	@ArgumentsAnnotation(name="foragelimit", defaultValue="2.0")
 	private double forageLimit;
+	
+	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="5.0")
 	private double forbiddenArea;
+	
 	private Nest nest;
 	private Wall topWall;
 	private Wall bottomWall;

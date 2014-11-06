@@ -1,9 +1,6 @@
 package simulation.environment;
 
-import gui.renderer.Renderer;
-
 import java.util.Random;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
@@ -14,15 +11,26 @@ import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class RoundForageEnvironment extends Environment {
 
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1;
+	
+	@ArgumentsAnnotation(name="nestlimit", defaultValue="0.5")
 	private double nestLimit;
+	
+	@ArgumentsAnnotation(name="foragelimit", defaultValue="2.0")
 	private double forageLimit;
+	
+	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="5.0")
 	private	double forbiddenArea;
+	
+	@ArgumentsAnnotation(name="numberofpreys", defaultValue="20")
 	private int numberOfPreys;
+	
+	@ArgumentsAnnotation(name="densityofpreys", defaultValue="")
 	private Nest nest;
 	private int numberOfFoodSuccessfullyForaged = 0;
 	private Random random;

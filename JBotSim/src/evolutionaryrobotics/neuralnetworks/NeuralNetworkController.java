@@ -1,16 +1,20 @@
 package evolutionaryrobotics.neuralnetworks;
 
 import java.util.LinkedList;
+
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 
 public class NeuralNetworkController extends Controller implements FixedLenghtGenomeEvolvableController {
 	protected NeuralNetwork neuralNetwork;
+	
+	@ArgumentsAnnotation(name="printweights", values={"0","1"})
 	protected boolean printWeights = false;
 
 	public NeuralNetworkController(Simulator simulator, Robot robot, Arguments args) {

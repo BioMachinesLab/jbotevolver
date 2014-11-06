@@ -1,6 +1,7 @@
 package simulation.robot.actuators;
 
 import java.util.LinkedList;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.TwoRoomsEnvironment;
@@ -8,10 +9,13 @@ import simulation.physicalobjects.Wall;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class OpenDoorActuator extends Actuator {
 	
 	protected TwoRoomsEnvironment env;
+	
+	@ArgumentsAnnotation(name="distancetodoor", defaultValue = "0.2")
 	protected double distanceToDoor = 0.2;
 	protected boolean open = false;
 	protected Simulator simulator;

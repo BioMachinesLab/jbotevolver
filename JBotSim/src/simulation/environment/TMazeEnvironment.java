@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.LightPole;
@@ -13,37 +14,63 @@ import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import comm.FileProvider;
 
 public class TMazeEnvironment extends Environment {
 
+	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="7")
 	private	double forbiddenArea;
+	
+	@ArgumentsAnnotation(name="randomize", values={"1","0"})
+	private boolean randomize = false;
+	
+	@ArgumentsAnnotation(name="squaresize", defaultValue="0.3")
+	protected double squareSize = 0.3;
+	
+	@ArgumentsAnnotation(name="mirror", values={"0","1"})
+	private boolean mirror = false;
+	
+	@ArgumentsAnnotation(name="inverse", values={"0","1"})
+	protected boolean inverse = false;
+	
+	@ArgumentsAnnotation(name="teleport", values={"0","1"})
+	private boolean teleport = false;
+	
+	@ArgumentsAnnotation(name="widthchange", defaultValue="0")
+	private double widthChange = 0;
+	
+	@ArgumentsAnnotation(name="randomizeorientation", values={"0","1"})
+	private double randomizeOrientation = 0;
+	
+	@ArgumentsAnnotation(name="mazename", defaultValue="tmaze")
+	private String mazeName;
+	
+	@ArgumentsAnnotation(name="numberofmazes", defaultValue="0")
+	private int numberOfMazes;
+	@ArgumentsAnnotation(name="numberofdifferentsamples", defaultValue="tmaze")
+	private int numberOfDifferentSamples;
+	
+	@ArgumentsAnnotation(name="randomizex", defaultValue="0")
+	protected double randomizeX = 0;
+	
+	@ArgumentsAnnotation(name="randomizey", defaultValue="0")
+	protected double randomizeY = 0;
+	
 	private int    currentSample;
 	private LinkedList<Square> squares = new LinkedList<Square>();
 	private LinkedList<Square> allSquares = new LinkedList<Square>();
 	private LinkedList<Square> forbiddenSquares = new LinkedList<Square>();
-	protected double squareSize = 0.3;
+	
 	private int imageSize = 400;
 	private LinkedList<LightPole> lights = new LinkedList<LightPole>();
 	private boolean killSample = false;
-	private boolean randomize = false;
+	
 	private LinkedList<Boolean> lightPoleEnabled = new LinkedList<Boolean>();
 	private boolean firstWall = true;
-	private boolean mirror = false;
-	private boolean teleport = false;
-	private double widthChange = 0;
-	private double randomizeOrientation = 0;
-	private String mazeName;
-	//private FileProvider fileProvider;
-	private int numberOfMazes;
-	private int numberOfDifferentSamples;
 	
-	protected boolean inverse = false;
 	protected Random random;
 	protected int fitnesssample = 0;
-	protected double randomizeX = 0;
-	protected double randomizeY = 0;
-	
 	protected double positionX = 0;
 	protected double positionY = 0;
 

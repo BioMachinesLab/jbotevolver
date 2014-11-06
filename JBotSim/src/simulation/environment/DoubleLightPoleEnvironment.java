@@ -1,13 +1,26 @@
 package simulation.environment;
 
-import gui.renderer.Renderer;
 import simulation.Simulator;
 import simulation.physicalobjects.LightPole;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class DoubleLightPoleEnvironment extends Environment {
 
-	private double lightPoleRadius,lightPoleDistance,widthPole,heightPole;
+	
+	@ArgumentsAnnotation(name="lightpoleradius", defaultValue="0.1")
+	private double lightPoleRadius;
+	
+	@ArgumentsAnnotation(name="lightpoledistance", defaultValue="2")
+	private double lightPoleDistance;
+	
+	@ArgumentsAnnotation(name="width", defaultValue="-1")
+	private double widthPole;
+	
+	@ArgumentsAnnotation(name="height", defaultValue="0")
+	private double heightPole;
+	
+	@ArgumentsAnnotation(name="width", defaultValue="-1")
 	private double forageLimit, forbiddenArea;
 	private LightPole lightPoleLeft, lightPoleRight;
 

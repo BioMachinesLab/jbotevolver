@@ -2,6 +2,7 @@ package simulation.environment;
 
 import java.util.Iterator;
 import java.util.Random;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
@@ -12,25 +13,49 @@ import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;
 import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class GroupedPreyEnvironment extends Environment {
 
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1;
+	
+	@ArgumentsAnnotation(name="nestlimit", defaultValue="0.5")
 	private double nestLimit;
+	
+	@ArgumentsAnnotation(name="foragelimit", defaultValue="6.0")
 	private double forageLimit;
+	
+	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="7.0")
 	private	double forbiddenArea;
+	
+	@ArgumentsAnnotation(name="preyangle", defaultValue="")
 	private	double preyAngle;
-	private double preyMinDistance;
-	private double preyMaxDistance;
-	private double preyCenter;
-	private int    totalSamples;
-	private int    currentSample;
-	private boolean redeployPrey;
-	private int redeployCounter;
-	private int currentRedeployCounter;
+	
+	@ArgumentsAnnotation(name="redeployprey", values={"0","1"})
 	private boolean preyIncreaseDistance;
-	private int    amountOfFood;
+	
+	@ArgumentsAnnotation(name="preymindistance", defaultValue="3")
+	private double preyMinDistance;
+	
+	@ArgumentsAnnotation(name="preymaxdistance", defaultValue="6")
+	private double preyMaxDistance;
+	
+	@ArgumentsAnnotation(name="amountoffood", defaultValue="10")
+	private int amountOfFood;
+	
+	@ArgumentsAnnotation(name="totalsamples", defaultValue="5")
+	private int    totalSamples;
+	
+	@ArgumentsAnnotation(name="redeployprey", values={"0","1"})
+	private boolean redeployPrey;
+	
+	@ArgumentsAnnotation(name="redeploycounter", defaultValue="0")
+	private int redeployCounter;
+
+	private int    currentSample;
+	private double preyCenter;
+	private int currentRedeployCounter;
 	private Nest   nest;
 	private int    numberOfFoodSuccessfullyForaged = 0;
 	private Random preyPlacementRandom;
@@ -42,8 +67,8 @@ public class GroupedPreyEnvironment extends Environment {
 		preyPlacementRandom = new Random(simulator.getRandom().nextLong());
 		this.simulator = simulator;
 
-		forbiddenArea       = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")	: 7;
 		nestLimit       = arguments.getArgumentIsDefined("nestlimit") ? arguments.getArgumentAsDouble("nestlimit")			: .5;
+		forbiddenArea       = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")	: 7;
 		forageLimit     = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit")		: 6.0;
 		preyAngle    = arguments.getArgumentIsDefined("preyangle") ? arguments.getArgumentAsDouble("preyangle")	: newRandomAngle();
 		preyMinDistance    = arguments.getArgumentIsDefined("preymindistance") ? arguments.getArgumentAsDouble("preymindistance")	: 3;

@@ -1,32 +1,35 @@
 package simulation.environment;
 
 import java.util.Random;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.Nest;
-import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.Prey;
-import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
-import simulation.robot.actuators.PreyPickerActuator;
-import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
-import controllers.RandomRobotController;
+import simulation.util.ArgumentsAnnotation;
 
 public class RoundPreyForageEnvironment extends Environment {
 
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1;
+	
+	@ArgumentsAnnotation(name="nestlimit", defaultValue="0.5")
 	private double nestLimit;
+	
+	@ArgumentsAnnotation(name="foragelimit", defaultValue="2.0")
 	private double forageLimit;
+	
+	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="5.0")
 	private double forbiddenArea;
+	
+	@ArgumentsAnnotation(name="numberofpreys", defaultValue="20")
 	private int numberOfPreys;
+	
+	@ArgumentsAnnotation(name="densityofpreys", defaultValue="")
 	private Nest nest;
 	private int numberOfFoodSuccessfullyForaged = 0;
 	private Random random;
-	private Arguments arguments;
 
 	public RoundPreyForageEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
@@ -38,7 +41,6 @@ public class RoundPreyForageEnvironment extends Environment {
 		forbiddenArea = arguments.getArgumentIsDefined("forbiddenarea") ? arguments
 				.getArgumentAsDouble("forbiddenarea") : 5.0;
 
-		this.arguments = arguments;
 		this.random = simulator.getRandom();
 
 		if (arguments.getArgumentIsDefined("densityofpreys")) {
@@ -50,7 +52,6 @@ public class RoundPreyForageEnvironment extends Environment {
 			numberOfPreys = arguments.getArgumentIsDefined("numberofpreys") ? arguments
 					.getArgumentAsInt("numberofpreys") : 20;
 		}
-
 	}
 
 	@Override
@@ -88,7 +89,6 @@ public class RoundPreyForageEnvironment extends Environment {
 			if (distanceToPrey - r.getRadius() - prey.getRadius() < distance)
 				prey.teleportTo(newRandomPosition());
 		}
-			
 	}
 
 	public int getNumberOfFoodSuccessfullyForaged() {
