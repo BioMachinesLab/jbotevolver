@@ -56,7 +56,7 @@ public class EvolutionGui extends JFrame {
 		UpdateEvolutionThread updateThread = new UpdateEvolutionThread();
 		updateThread.start();
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setSize(880, 320);
 		setLocationRelativeTo(null);
 		setVisible(true);

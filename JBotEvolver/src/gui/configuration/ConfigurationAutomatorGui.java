@@ -33,7 +33,6 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultCaret;
@@ -64,7 +63,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 
 	private JFrame previewFrame;
 	
-	private JPanel optionsPanelLeft;
+	private JPanel configurationPanelLeft;
 	private JPanel optionsPanelCenter;
 	private JPanel optionsPanelRight;
 	
@@ -105,9 +104,9 @@ public class ConfigurationAutomatorGui extends JFrame{
 		robotConfig = new RobotsResult();
 		result = new ConfigurationResult(keys);
 		
-		getContentPane().add(initLeftWrapperPanel(), BorderLayout.WEST);
-		getContentPane().add(initCenterWrapperPanel(), BorderLayout.CENTER);
-		getContentPane().add(initRightWrapperPanel(), BorderLayout.EAST);
+		getContentPane().add(initResultPanel(), BorderLayout.EAST);
+		getContentPane().add(initSelectionPanel(), BorderLayout.WEST);
+		getContentPane().add(initConfigurationPanel(), BorderLayout.CENTER);
 		
 		initListeners();
 
@@ -117,13 +116,13 @@ public class ConfigurationAutomatorGui extends JFrame{
 		previewFrame.setVisible(false);
 		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(1280, 860);
+		setSize(1100, 800);
 		setLocationRelativeTo(null);
 		setVisible(true);
 	}
 
-	private Component initCenterWrapperPanel() {
-		JPanel sidePanel = new JPanel(new BorderLayout());
+	private Component initSelectionPanel() {
+		JPanel panel = new JPanel(new BorderLayout());
 		
 		JPanel argumentsWrapper = new JPanel();
 		argumentsWrapper.setLayout(new BorderLayout());
@@ -149,34 +148,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 		argumentsWrapper.add(north, BorderLayout.NORTH);
 		argumentsWrapper.setBorder(BorderFactory.createTitledBorder("Arguments"));
 
-		sidePanel.add(argumentsWrapper, BorderLayout.NORTH);
-		
-		rendererPanel = new JPanel(new BorderLayout());
-		rendererPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
-		sidePanel.add(rendererPanel);
-		
-		return sidePanel;
-	}
-	
-	private Component initLeftWrapperPanel() {
-		JPanel fileContentWrapper = new JPanel();
-		fileContentWrapper.setPreferredSize(new Dimension(370,370));
-		fileContentWrapper.setLayout(new BorderLayout());
-		
-		JPanel resultContentWrapper = new JPanel(new BorderLayout());
-		configResult = new JTextArea();
-		configResult.setTabSize(2);
-		
-		DefaultCaret caret = (DefaultCaret) configResult.getCaret();
-		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
-		
-		configResult.setEditable(false);
-		updateConfigurationText();
-		resultContentWrapper.add(new JScrollPane(configResult));
-		resultContentWrapper.setBorder(BorderFactory.createTitledBorder("Result"));
-		
-		resultContentWrapper.add(createResultContentButtons(), BorderLayout.SOUTH);
-		fileContentWrapper.add(resultContentWrapper, BorderLayout.CENTER);
+		panel.add(argumentsWrapper, BorderLayout.NORTH);
 		
 		JPanel jListContentWrapper = new JPanel(new BorderLayout());
 		sensorsActuatorsListModel = new DefaultListModel<String>();
@@ -194,22 +166,66 @@ public class ConfigurationAutomatorGui extends JFrame{
 			}
 		});
 		
+		buttonsPanel.setPreferredSize(new Dimension(300,50));
 		buttonsPanel.add(jListRemoveButton);
 		
 		jListContentWrapper.add(new JScrollPane(sensorsActuatorsList));
 		jListContentWrapper.add(buttonsPanel, BorderLayout.SOUTH);
 		jListContentWrapper.setBorder(BorderFactory.createTitledBorder("Attributes List"));
-		fileContentWrapper.add(jListContentWrapper, BorderLayout.SOUTH);
-	
-		return fileContentWrapper;
+		panel.add(jListContentWrapper, BorderLayout.CENTER);
+		
+		panel.setPreferredSize(new Dimension(300,300));
+		
+		return panel;
 	}
 	
-	private Component initRightWrapperPanel() {
-		JPanel rightWrapper = new JPanel();
-		rightWrapper.setPreferredSize(new Dimension(410,getHeight()));
-		rightWrapper.setLayout(new BorderLayout());
+	private Component initResultPanel() {
+		JPanel panel = new JPanel();
+		panel.setBorder(BorderFactory.createTitledBorder("Result"));
+		panel.setPreferredSize(new Dimension(370,350));
+		panel.setLayout(new BorderLayout());
 		
-		optionsPanelLeft = new JPanel();
+		JPanel resultContentWrapper = new JPanel(new BorderLayout());
+		resultContentWrapper.setBorder(BorderFactory.createTitledBorder("Configuration"));
+		
+		configResult = new JTextArea();
+		configResult.setTabSize(2);
+		
+		DefaultCaret caret = (DefaultCaret) configResult.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+		
+		configResult.setEditable(false);
+		updateConfigurationText();
+		JScrollPane scroll = new JScrollPane(configResult);
+//		scroll.setPreferredSize(new Dimension(panel.getWidth(), 320));
+		resultContentWrapper.add(scroll, BorderLayout.CENTER);
+		
+		panel.add(resultContentWrapper, BorderLayout.CENTER);
+		
+		JPanel southPanel = new JPanel(new BorderLayout());
+		
+		rendererPanel = new JPanel(new BorderLayout());
+		rendererPanel.setPreferredSize(new Dimension(370, 370));
+		rendererPanel.setMinimumSize(new Dimension(370, 370));
+		rendererPanel.setBorder(BorderFactory.createTitledBorder("Preview"));
+		southPanel.add(rendererPanel, BorderLayout.NORTH);
+		
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setPreferredSize(new Dimension(370,50));
+		buttonPanel.add(createResultContentButtons());
+		southPanel.add(buttonPanel, BorderLayout.SOUTH);
+		
+		panel.add(southPanel, BorderLayout.SOUTH);
+		
+		return panel;
+	}
+	
+	private Component initConfigurationPanel() {
+		JPanel panel = new JPanel();
+		panel.setPreferredSize(new Dimension(410,getHeight()));
+		panel.setLayout(new BorderLayout());
+		
+		configurationPanelLeft = new JPanel();
 		optionsPanelCenter = new JPanel();
 		optionsPanelRight = new JPanel();
 		
@@ -219,32 +235,41 @@ public class ConfigurationAutomatorGui extends JFrame{
 		JPanel borderLayout = new JPanel(new BorderLayout());
 		
 		JPanel splitLayout = new JPanel(new BorderLayout());
-		splitLayout.add(optionsPanelLeft, BorderLayout.WEST);
-		splitLayout.add(optionsPanelCenter, BorderLayout.CENTER);
-		splitLayout.add(optionsPanelRight, BorderLayout.EAST);
-		borderLayout.add(new JScrollPane(splitLayout,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER));
+		splitLayout.add(configurationPanelLeft, BorderLayout.CENTER);
+		
+		JPanel panelRight = new JPanel(new BorderLayout());
+		
+		panelRight.add(optionsPanelCenter, BorderLayout.CENTER);
+		panelRight.add(optionsPanelRight, BorderLayout.EAST);
+		
+		splitLayout.add(panelRight, BorderLayout.EAST);
+		
+		JScrollPane scroll = new JScrollPane(splitLayout,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scroll.setBorder(BorderFactory.createLineBorder(new Color(238,238,238), 2));
+		borderLayout.add(scroll, BorderLayout.CENTER);
+//		borderLayout.setBorder(BorderFactory.createLineBorder(new Color(238,238,238), 10));
 		
 		helpArea = new JTextArea();
-		Border border = BorderFactory.createLineBorder(Color.BLACK, 1);
 		helpArea.setWrapStyleWord(true);
 		helpArea.setLineWrap(true);
-		helpArea.setEnabled(false);
-		helpArea.setBorder(border);
-		helpArea.setVisible(false);
-		helpArea.setPreferredSize(new Dimension(borderLayout.getWidth(), 45));
+		helpArea.setEditable(false);
+		helpArea.setBorder(BorderFactory.createTitledBorder("Help"));
+		helpArea.setBackground(new Color(238,238,238));
+		helpArea.setPreferredSize(new Dimension(borderLayout.getWidth(), 60));
 		borderLayout.add(helpArea,BorderLayout.SOUTH);
 		
-		rightWrapper.add(borderLayout);
-		rightWrapper.add(optionsButton, BorderLayout.SOUTH);
-		rightWrapper.setBorder(BorderFactory.createTitledBorder("Options"));
-		return rightWrapper;
+		panel.add(borderLayout, BorderLayout.CENTER);
+		panel.add(optionsButton, BorderLayout.SOUTH);
+		panel.setBorder(BorderFactory.createTitledBorder("Options"));
+		
+		return panel;
 	}
 
 	private Component initOutputWrapperPanel() {
 		JPanel outputWrapper = new JPanel();
 		outputWrapper.setLayout(new GridLayout(2,1));
 		
-		JTextField outputTextField = new JTextField(20);
+		JTextField outputTextField = new JTextField(10);
 		JTextField randomSeedTextField = new JTextField(10);
 		
 		outputTextField.getDocument().addDocumentListener(new TextFieldListener(outputTextField, "output"));
@@ -304,6 +329,11 @@ public class ConfigurationAutomatorGui extends JFrame{
 		
 		saveArgumentsFileButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
+				
+				if(!correctConfiguration()) {
+					return;
+				}
+				
 				createArgumentFile();
 			}
 		});
@@ -313,6 +343,10 @@ public class ConfigurationAutomatorGui extends JFrame{
 			public void actionPerformed(ActionEvent event) {
 				PrintWriter printWriter = null;
 				String outputText = result.getArgument("output").getCompleteArgumentString().trim();
+				
+				if(!correctConfiguration()) {
+					return;
+				}
 				
 				try {
 					printWriter = new PrintWriter(new File(outputText + ".conf"));
@@ -328,6 +362,25 @@ public class ConfigurationAutomatorGui extends JFrame{
 			    }
 			}
 		});
+	}
+	
+	private boolean correctConfiguration() {
+		
+		String msg = "";
+		
+		for(String k : keys) {
+			if(result.getArgument(k).getNumberOfArguments() == 0) {
+				String argMsg = "Missing argument \"--"+k+"\""; 
+				msg+= msg.isEmpty() ? argMsg : "\n" + argMsg; 
+			}
+		}
+		
+		if(!msg.isEmpty()) {
+			JOptionPane.showConfirmDialog(this, msg);
+			return false;
+		}
+		
+		return true;
 	}
 
 	private void updateConfigurationText() {
@@ -355,32 +408,16 @@ public class ConfigurationAutomatorGui extends JFrame{
 	}
 	
 	private void seeSensors() {
-		
-		if(robotConfig.getCompleteArguments().getNumberOfArguments() > 0 && result.getArgument("environment").getNumberOfArguments() > 0){
-			try {
-				String extraRendererArguments = "conesensorid=";
-				
-				String selectedID = sensorsActuatorsList.getSelectedValue();
-						
-				if(selectedID != null && selectedID.contains("Sensor")){
-					String id = robotConfig.getSensorActuator(selectedID).getArgumentAsString("id");
-					extraRendererArguments += id;
-				} else
-					extraRendererArguments += -1;
-				
-				showPreview(extraRendererArguments);
-				
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+		try {
+			showPreview();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	
-	private void showPreview(String rendererExtraArgs) throws Exception{
-		String arguments = "classname=TwoDRendererDebug," +rendererExtraArgs;
-		rendererArgs = new Arguments(arguments,true);
+	private void showPreview() throws Exception{
 		
-		Renderer renderer = setupRenderer(rendererArgs);
+		Renderer renderer = setupRenderer();
 		
 		renderer.addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent e) {}
@@ -388,7 +425,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 			public void mouseExited(MouseEvent e) {}
 			public void mouseEntered(MouseEvent e) {}
 			public void mouseClicked(MouseEvent e) {
-				amplifyPreview(setupRenderer(rendererArgs));
+				amplifyPreview(setupRenderer());
 			}
 		});
 		
@@ -405,23 +442,49 @@ public class ConfigurationAutomatorGui extends JFrame{
 		}
 	}
 	
-	private Renderer setupRenderer(Arguments rArgs) {
+	private Renderer setupRenderer() {
+		
+		String extraRendererArguments = "";
+		
+		String selectedID = sensorsActuatorsList.getSelectedValue();
+		
+		if(selectedID != null && selectedID.contains("Sensor")) {
+			extraRendererArguments = ",conesensorid=";
+			String id = robotConfig.getSensorActuator(selectedID).getArgumentAsString("id");
+			extraRendererArguments += id;
+		}
+		
+		rendererArgs = new Arguments("classname=TwoDRendererDebug" +extraRendererArguments,true);
+		
+		String robotArgs = "";
+		if(result.getArgument("robots").getNumberOfArguments() > 0) {
+			robotArgs = "--robots " + result.getArgument("robots") + "\n";
+		}
+		
+		String environmentArgs = "";
+		if(result.getArgument("environment").getNumberOfArguments() > 0) {
+			environmentArgs = "--environment " + result.getArgument("environment");
+		} else {
+			environmentArgs = "--environment classname=NoLandmarksEnvironment,width=4,height=4";
+		}
 		
 		try {
-			Renderer renderer = Renderer.getRenderer(rArgs);
+			Renderer renderer = Renderer.getRenderer(rendererArgs);
 			
-			String[] args = Arguments.readOptionsFromString(
-					"--robots " + result.getArgument("robots") + "\n" +
-					"--environment " + result.getArgument("environment"));
+			String[] args = Arguments.readOptionsFromString(robotArgs + environmentArgs );
 			
 			HashMap<String, Arguments> arguments = Arguments.parseArgs(args);
 			
 			Simulator simulator = new Simulator(new Random(), arguments);
 			
-			ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
-			simulator.addRobots(robots);
+			if(!robotArgs.isEmpty()) {
+				ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
+				simulator.addRobots(robots);
+			}
 			
-			simulator.setupEnvironment();
+			if(!environmentArgs.isEmpty()) {
+				simulator.setupEnvironment();
+			}
 			
 			renderer.enableInputMethods(true);
 			renderer.setSimulator(simulator);
@@ -430,6 +493,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 			return renderer;
 		
 		} catch(Exception e) {
+			e.printStackTrace();
 			//Gotta catch 'em all! Silence the exceptions that might occur because of problems in the
 			//initialization of Environments
 		}
@@ -566,7 +630,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 		return result;
 	}
 
-	private void fullFillOptionsPanel(ArrayList<Class<?>> classesList, String className, ArrayList<AutomatorOptionsAttribute> optAttributes) throws ClassNotFoundException {
+	private void populateOptionsPanel(ArrayList<Class<?>> classesList, String className, ArrayList<AutomatorOptionsAttribute> optAttributes) throws ClassNotFoundException {
 		cleanOptionsPanel();
 		
 		Class<?> cls = null;
@@ -589,37 +653,34 @@ public class ConfigurationAutomatorGui extends JFrame{
 			upperClass = upperClass.getSuperclass();
 		}
 		
-		int spaceToFillGrid = 0;
+		int height = annotations.size() + 1 >= OPTIONS_GRID_LAYOUT_SIZE ? annotations.size() + 1 : OPTIONS_GRID_LAYOUT_SIZE;
 		
-		if(annotations.size() >= OPTIONS_GRID_LAYOUT_SIZE){
-			optionsPanelLeft.setLayout(new GridLayout(annotations.size()+1,1));
-			optionsPanelCenter.setLayout(new GridLayout(annotations.size()+1,1));
-			optionsPanelRight.setLayout(new GridLayout(annotations.size()+1,1));
-		}else{
-			spaceToFillGrid = OPTIONS_GRID_LAYOUT_SIZE - (annotations.size()+1);
-			
-			optionsPanelLeft.setLayout(new GridLayout(OPTIONS_GRID_LAYOUT_SIZE,1));
-			optionsPanelCenter.setLayout(new GridLayout(OPTIONS_GRID_LAYOUT_SIZE,1));
-			optionsPanelRight.setLayout(new GridLayout(OPTIONS_GRID_LAYOUT_SIZE,1));	
-		}
+		int spaceToFillGrid = OPTIONS_GRID_LAYOUT_SIZE - height;
 		
-		JLabel jl = new JLabel("classname");
+		configurationPanelLeft.setLayout(new GridLayout(height,1));
+		optionsPanelCenter.setLayout(new GridLayout(height,1));
+		optionsPanelRight.setLayout(new GridLayout(height,1));
+		
 		JTextField jtf = new JTextField(currentClassName);
 		jtf.setEnabled(false);
 		JCheckBox jcb = new JCheckBox();
 		jcb.setEnabled(false);
 		jcb.setVisible(false);
-		optionsPanelLeft.add(jl);
+		configurationPanelLeft.add(new JLabel("classname"));
 		optionsPanelCenter.add(jtf);
 		optionsPanelRight.add(jcb);
 		
 		for (ArgumentsAnnotation annotation : annotations) {
-			JLabel label = new JLabel(annotation.name());
+			
+			String text = annotation.name();
+			
+			JLabel label = new JLabel(text);
+			label.setToolTipText(text);
 				
 			if(!annotation.help().isEmpty())
 				label.addMouseListener(new LabelMouseListener(annotation.help()));
 			
-			optionsPanelLeft.add(label);
+			configurationPanelLeft.add(label);
 				
 			AutomatorOptionsAttribute attribute = new AutomatorOptionsAttribute();
 			attribute.setName(annotation.name());
@@ -669,7 +730,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 		for (int i = 0; i < spaceToFillGrid; i++) {
 			JLabel left = new JLabel();
 			left.setVisible(false);
-			optionsPanelLeft.add(left);
+			configurationPanelLeft.add(left);
 			JLabel center = new JLabel();
 			left.setVisible(false);
 			optionsPanelCenter.add(center);
@@ -726,7 +787,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 	}
 
 	private void cleanOptionsPanel() {
-		optionsPanelLeft.removeAll();
+		configurationPanelLeft.removeAll();
 		optionsPanelCenter.removeAll();
 		optionsPanelRight.removeAll();
 		optionsButton.setVisible(false);
@@ -770,7 +831,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 				ArrayList<AutomatorOptionsAttribute> optionsAttribute = getAttributesFromArgumentsString(args);
 				
 				optionsAttributes.clear();
-				fullFillOptionsPanel(ClassLoadHelper.findClassesContainingName(c), args.getArgumentAsString("classname"), optionsAttribute);
+				populateOptionsPanel(ClassLoadHelper.findClassesContainingName(c), args.getArgumentAsString("classname"), optionsAttribute);
 				
 			}	
 		} catch (ClassNotFoundException e) {
@@ -820,7 +881,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 				currentComboBox = comboBox;
 				if(!((String)comboBox.getSelectedItem()).isEmpty()){
 					currentClassName = (String)comboBox.getSelectedItem();
-					fullFillOptionsPanel(classesList, currentClassName, null);
+					populateOptionsPanel(classesList, currentClassName, null);
 				}else{
 					
 					if(selected.equals("network"))
