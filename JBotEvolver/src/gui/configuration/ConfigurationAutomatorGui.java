@@ -11,6 +11,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -18,8 +19,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Scanner;
 
 import javax.swing.BorderFactory;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -46,6 +49,7 @@ import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 import taskexecutor.TaskExecutor;
 import controllers.Controller;
+import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
@@ -75,10 +79,14 @@ public class ConfigurationAutomatorGui extends JFrame{
 	private JButton optionsButton;
 	private JButton saveArgumentsFileButton;
 	private JButton runEvolution;
+	private JButton testArgumentsFileButton;
+	
+	private JButton loadArgumentsButton;
 	
 	private JComboBox<String> currentComboBox;
 
 	private ArrayList<AutomatorOptionsAttribute> optionsAttributes;
+	private HashMap<String, Component> argumentsComponents;
 	
 	private DefaultListModel<String> sensorsActuatorsListModel;
 	private JList<String> sensorsActuatorsList;
@@ -94,12 +102,15 @@ public class ConfigurationAutomatorGui extends JFrame{
 	private Arguments rendererArgs;
 
 	private ConfigurationAutomator configurationAutomator;
-
+	
+	private boolean showPreview = true;
+	
 	public ConfigurationAutomatorGui(ConfigurationAutomator configurationAutomator) {
 		super("Configuration File Automator");
 		this.configurationAutomator = configurationAutomator;
 		
 		optionsAttributes = new ArrayList<AutomatorOptionsAttribute>();
+		argumentsComponents = new HashMap<String, Component>();
 		
 		robotConfig = new RobotsResult();
 		result = new ConfigurationResult(keys);
@@ -166,8 +177,17 @@ public class ConfigurationAutomatorGui extends JFrame{
 			}
 		});
 		
+		loadArgumentsButton = new JButton("Load File");
+		loadArgumentsButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				loadArgumentsFromFile();
+			}
+		});
+		
 		buttonsPanel.setPreferredSize(new Dimension(300,50));
 		buttonsPanel.add(jListRemoveButton);
+		buttonsPanel.add(loadArgumentsButton);
 		
 		jListContentWrapper.add(new JScrollPane(sensorsActuatorsList));
 		jListContentWrapper.add(buttonsPanel, BorderLayout.SOUTH);
@@ -275,6 +295,9 @@ public class ConfigurationAutomatorGui extends JFrame{
 		outputTextField.getDocument().addDocumentListener(new TextFieldListener(outputTextField, "output"));
 		randomSeedTextField.getDocument().addDocumentListener(new TextFieldListener(randomSeedTextField, "random-seed"));
 		
+		argumentsComponents.put("output", outputTextField);
+		argumentsComponents.put("random-seed", randomSeedTextField);
+		
 		outputWrapper.add(new JLabel("Output Name: "));
 		outputWrapper.add(outputTextField);
 		outputWrapper.add(new JLabel("Random Seed: "));
@@ -302,6 +325,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 			currentBox.addActionListener(new OptionsAtributesListener(c, configName));
 			panel.add(new JLabel(c.getSimpleName()+": "));
 			panel.add(currentBox);
+			argumentsComponents.put(configName, currentBox);
 		}
 		
 		panel.setBorder(BorderFactory.createTitledBorder(""));
@@ -335,6 +359,57 @@ public class ConfigurationAutomatorGui extends JFrame{
 				}
 				
 				createArgumentFile();
+			}
+		});
+		
+		testArgumentsFileButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				//TEST THE CONFIGURATION FILE
+				if(!correctConfiguration()) {
+					return;
+				}
+				
+				try {
+					String[] transformedArgs = Arguments.readOptionsFromString(configResult.getText());
+					HashMap<String,Arguments> argumentsHash = Arguments.parseArgs(transformedArgs);
+					
+					Arguments environmentArgs = argumentsHash.get("--environment");
+					environmentArgs.setArgument("steps", 5);
+					argumentsHash.put("--environment", environmentArgs);
+					
+					Arguments populationArgs = argumentsHash.get("--population");
+					populationArgs.setArgument("size", 50);
+					populationArgs.setArgument("samples", 1);
+					populationArgs.setArgument("generations", 1);
+					argumentsHash.put("--population", populationArgs);
+					
+					String[] finalArgs = Arguments.readOptionsFromString(createConfigFileStringFromHash(argumentsHash));
+					
+					JBotEvolver jBotEvolver = new JBotEvolver(finalArgs);
+					TaskExecutor taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
+					taskExecutor.start();
+					//Kill taskExecutor thread after a will for stuck cases (ex: evolution=Conillon)
+					Evolution evo = Evolution.getEvolution(jBotEvolver, taskExecutor, jBotEvolver.getArguments().get("--evolution"));
+					evo.executeEvolution();
+					taskExecutor.stopTasks();
+					
+					JOptionPane.showMessageDialog(ConfigurationAutomatorGui.this, "OK");
+					
+				} catch (Exception e) {
+					JOptionPane.showMessageDialog(ConfigurationAutomatorGui.this, "ERROR");
+				}
+				
+				//Clear folder and files added by the evolution
+			}
+
+			private String createConfigFileStringFromHash(HashMap<String,Arguments> argumentsHash) {
+				String finalArgs = "";
+				for (String key : argumentsHash.keySet()) {
+					finalArgs += key + " " + argumentsHash.get(key) + "\n";
+				}
+				Arguments.beautifyString(finalArgs);
+				return finalArgs;
 			}
 		});
 		
@@ -391,6 +466,8 @@ public class ConfigurationAutomatorGui extends JFrame{
 		JPanel panel = new JPanel();
 		saveArgumentsFileButton = new JButton("Save to File");
 		panel.add(saveArgumentsFileButton);
+		testArgumentsFileButton = new JButton("Test File");
+		panel.add(testArgumentsFileButton);
 		runEvolution = new JButton("Run Evolution");
 		panel.add(runEvolution);
 		return panel;
@@ -416,22 +493,23 @@ public class ConfigurationAutomatorGui extends JFrame{
 	}
 	
 	private void showPreview() throws Exception{
+		if(!showPreview)
+			return;
 		
 		Renderer renderer = setupRenderer();
-		
-		renderer.addMouseListener(new MouseListener() {
-			public void mouseReleased(MouseEvent e) {}
-			public void mousePressed(MouseEvent e) {}
-			public void mouseExited(MouseEvent e) {}
-			public void mouseEntered(MouseEvent e) {}
-			public void mouseClicked(MouseEvent e) {
-				amplifyPreview(setupRenderer());
-			}
-		});
 		
 		rendererPanel.removeAll();
 		
 		if (renderer != null) {
+			renderer.addMouseListener(new MouseListener() {
+				public void mouseReleased(MouseEvent e) {}
+				public void mousePressed(MouseEvent e) {}
+				public void mouseExited(MouseEvent e) {}
+				public void mouseEntered(MouseEvent e) {}
+				public void mouseClicked(MouseEvent e) {
+					amplifyPreview(setupRenderer());
+				}
+			});
 			
 			rendererPanel.add(renderer);
 			rendererPanel.revalidate();
@@ -527,6 +605,197 @@ public class ConfigurationAutomatorGui extends JFrame{
 			}
 		}else{
 			JOptionPane.showMessageDialog(this, "No Output Name defined.");
+		}
+	}
+	
+	private void loadArgumentsFromFile() {
+		showPreview = false;
+		
+		cleanBeforeLoad();
+		
+		File file = chooseFile();
+		if(file != null){
+			Scanner scanner = null;
+			try {
+				scanner = new Scanner(file);
+				String loadedFileArgs = "";
+				boolean first = true;
+				while(scanner.hasNext()){
+					String line = scanner.nextLine();
+					if(line.startsWith("--") && !first){
+						loadedFileArgs += "\n";
+					}
+					first=false;
+					loadedFileArgs += line;
+				}
+				scanner.close();
+				String[] transformedArgs = Arguments.readOptionsFromString(loadedFileArgs);
+				loadArgumentsToGui(transformedArgs);
+			} catch (ClassNotFoundException | IOException e) {
+				e.printStackTrace();
+			}finally{
+				if(scanner != null)
+					scanner.close();
+			}
+		}
+		showPreview = true;
+		seeSensors();
+	}
+
+	private void cleanBeforeLoad(){
+		while(!sensorsActuatorsListModel.isEmpty()){
+			robotConfig.remove(sensorsActuatorsListModel.get(0));
+			updateSensorsActuatorsList();
+			updateConfigurationText();
+		}
+
+		result.setArgument("robots", robotConfig.getCompleteArguments());
+		
+		for (String key : argumentsComponents.keySet()) {
+			Component component = argumentsComponents.get(key);
+			if(component instanceof JComboBox){
+				@SuppressWarnings("unchecked")
+				JComboBox<String> comboBox = (JComboBox<String>) component;
+				comboBox.setSelectedIndex(0);
+			}else if(component instanceof JTextField){
+				if(key.equals("random-seed"))
+					continue;
+				JTextField textfield = (JTextField) component;
+				textfield.setText("");
+			}
+		}
+		rendererPanel.removeAll();
+	}
+	
+	private File chooseFile() {
+		File file = null;
+		
+		JFileChooser fileChooser = new JFileChooser(".");
+		fileChooser.setDialogTitle("Load File");
+		fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		
+		if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+			file = new File(fileChooser.getSelectedFile().getAbsolutePath());
+			
+		}
+		return file;
+	}
+	
+	private void loadArgumentsToGui(String[] args) throws ClassNotFoundException, IOException {
+		HashMap<String,Arguments> argumentsHash = Arguments.parseArgs(args);
+		for (String key : argumentsHash.keySet()) {
+			boolean specialAdd = false;
+			String correctKey = key.replace("--", "");
+			Arguments completeArguments = argumentsHash.get(key);
+			String className = "";
+			if(correctKey.equals("output")){
+				className = completeArguments.getArguments().get(0);
+			}else if(correctKey.equals("random-seed")){
+				className = completeArguments.getArguments().get(0);;
+			}else{
+				className = completeArguments.getArgumentAsString("classname");
+				if(className == null)
+					continue;
+				className = className.split("\\.")[className.split("\\.").length-1];
+				specialAdd = true;
+			}
+			setLoadedArgToComponent(correctKey, className);
+			
+			if(specialAdd){
+				specialAddToConfigFile(correctKey, completeArguments, className);
+			}
+		}
+	}
+
+	private void specialAddToConfigFile(String key, Arguments arguments,String className) {
+		if(key.equals("robots")){
+			addLoadedArgumentsToConfigFile(key,arguments,className);
+			addLoadedSensorActuatorArgumentsToConfigFile(arguments, "sensors");
+			addLoadedSensorActuatorArgumentsToConfigFile(arguments, "actuators");
+		}else if(key.equals("controllers")){
+			addLoadedArgumentsToConfigFile(key,arguments,className);
+			Arguments neuralNetworkArgs = new Arguments(arguments.getArgumentAsString("network"));
+			String neuralNetworkClassName = neuralNetworkArgs.getArgumentAsString("classname");
+			addLoadedArgumentsToConfigFile("network",neuralNetworkArgs,neuralNetworkClassName);
+		}else{
+			addLoadedArgumentsToConfigFile(key,arguments,className);
+		}
+	}
+	
+	private void addLoadedSensorActuatorArgumentsToConfigFile(Arguments robotArguments, String option){
+		Arguments sensorsArguments = new Arguments(robotArguments.getArgumentAsString(option));
+		for (String value : sensorsArguments.getValues()) {
+			Arguments newArgs = new Arguments(value);
+			String className = newArgs.getArgumentAsString("classname");
+			addLoadedArgumentsToConfigFile(option,newArgs,className);
+		}
+	}
+	
+	private void addLoadedArgumentsToConfigFile(String argumentKey, Arguments arguments, String className){
+		try {
+			Class<?> c = getRightClass(argumentKey);
+			optionsAttributes.clear();
+			
+			ArrayList<AutomatorOptionsAttribute> optionsAttribute = getAttributesFromArgumentsString(arguments);
+			currentOptions = argumentKey;
+			populateOptionsPanel(ClassLoadHelper.findClassesContainingName(c), className, optionsAttribute);
+			optionsButton.doClick();
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private Class<?> getRightClass(String key) {
+		switch (key) {
+		case "robots":
+			return Robot.class;
+		case "actuators":
+			return Actuator.class;
+		case "sensors":
+			return Sensor.class;
+		case "controllers":
+			return Controller.class;
+		case "network":
+			return NeuralNetwork.class;
+		case "population":
+			return Population.class;
+		case "environment":
+			return Environment.class;
+		case "executor":
+			return TaskExecutor.class;
+		case "evolution":
+			return Evolution.class;
+		case "evaluation":
+			return EvaluationFunction.class;
+		default:
+			System.err.println("Problems getting the right Class for " + key);
+			return null;
+		}
+	}
+
+	private void setLoadedArgToComponent(String key, String className){
+		Component component = argumentsComponents.get(key);
+		if(component instanceof JComboBox){
+			@SuppressWarnings("unchecked")
+			JComboBox<String> comboBox = (JComboBox<String>) component;
+			ComboBoxModel<String> comboBoxModel = comboBox.getModel();
+			for (int i = 0; i < comboBoxModel.getSize(); i++) {
+				if(comboBoxModel.getElementAt(i).equals(className)){
+					comboBox.setSelectedIndex(i);
+					break;
+				}
+			}
+		}else if(component instanceof JTextField){
+			JTextField textfield = (JTextField) component;
+			if(key.equals("output")){
+				textfield.setText(className);
+				result.setArgument("output", new Arguments(textfield.getText()));
+				updateConfigurationText();
+			}else if(key.equals("random-seed")){
+				textfield.setText(className);
+				result.setArgument("random-seed", new Arguments(textfield.getText()));
+				updateConfigurationText();
+			}
 		}
 	}
 	
@@ -873,12 +1142,13 @@ public class ConfigurationAutomatorGui extends JFrame{
 		
 		@SuppressWarnings("unchecked")
 		public void actionPerformed(ActionEvent event) {
-			editedAttributeName="";
-			optionsAttributes.clear();
 			try {
+				editedAttributeName="";
+				optionsAttributes.clear();
 				currentOptions = selected;
 				comboBox = (JComboBox<String>) event.getSource();
 				currentComboBox = comboBox;
+				
 				if(!((String)comboBox.getSelectedItem()).isEmpty()){
 					currentClassName = (String)comboBox.getSelectedItem();
 					populateOptionsPanel(classesList, currentClassName, null);
@@ -892,6 +1162,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 					cleanOptionsPanel();
 					updateConfigurationText();
 				}
+				
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
 			}
