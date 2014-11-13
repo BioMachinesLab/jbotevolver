@@ -365,14 +365,16 @@ public class ConfigurationAutomatorGui extends JFrame{
 		testArgumentsFileButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				//TEST THE CONFIGURATION FILE
 				if(!correctConfiguration()) {
 					return;
 				}
+				String output = "test_" + new Random().nextInt();
 				
 				try {
 					String[] transformedArgs = Arguments.readOptionsFromString(configResult.getText());
 					HashMap<String,Arguments> argumentsHash = Arguments.parseArgs(transformedArgs);
+					
+					argumentsHash.put("--output", new Arguments(output));
 					
 					Arguments environmentArgs = argumentsHash.get("--environment");
 					environmentArgs.setArgument("steps", 5);
@@ -389,7 +391,6 @@ public class ConfigurationAutomatorGui extends JFrame{
 					JBotEvolver jBotEvolver = new JBotEvolver(finalArgs);
 					TaskExecutor taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
 					taskExecutor.start();
-					//Kill taskExecutor thread after a will for stuck cases (ex: evolution=Conillon)
 					Evolution evo = Evolution.getEvolution(jBotEvolver, taskExecutor, jBotEvolver.getArguments().get("--evolution"));
 					evo.executeEvolution();
 					taskExecutor.stopTasks();
@@ -398,11 +399,13 @@ public class ConfigurationAutomatorGui extends JFrame{
 					
 				} catch (Exception e) {
 					JOptionPane.showMessageDialog(ConfigurationAutomatorGui.this, "ERROR");
+				}finally{
+					File f = new File(output);
+					deleteDirectory(f);
 				}
 				
-				//Clear folder and files added by the evolution
 			}
-
+			
 			private String createConfigFileStringFromHash(HashMap<String,Arguments> argumentsHash) {
 				String finalArgs = "";
 				for (String key : argumentsHash.keySet()) {
@@ -411,6 +414,18 @@ public class ConfigurationAutomatorGui extends JFrame{
 				Arguments.beautifyString(finalArgs);
 				return finalArgs;
 			}
+			
+			private void deleteDirectory(File f) {
+				for (File subFile : f.listFiles()) {
+					if(subFile.isDirectory()){
+						deleteDirectory(subFile);
+					}else{
+						subFile.delete();
+					}
+				}
+				f.delete();  
+			}
+			
 		});
 		
 		runEvolution.addActionListener(new ActionListener() {
