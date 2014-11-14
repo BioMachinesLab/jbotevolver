@@ -36,6 +36,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultCaret;
@@ -73,7 +74,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 	
 	private JPanel rendererPanel;
 	
-	private JTextArea configResult;
+	private JTextPane configResult;
 	private JTextArea helpArea;
 	
 	private JButton optionsButton;
@@ -208,8 +209,8 @@ public class ConfigurationAutomatorGui extends JFrame{
 		JPanel resultContentWrapper = new JPanel(new BorderLayout());
 		resultContentWrapper.setBorder(BorderFactory.createTitledBorder("Configuration"));
 		
-		configResult = new JTextArea();
-		configResult.setTabSize(2);
+		configResult = new JTextPane();
+		configResult.setContentType("text/html");
 		
 		DefaultCaret caret = (DefaultCaret) configResult.getCaret();
 		caret.setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
@@ -217,7 +218,6 @@ public class ConfigurationAutomatorGui extends JFrame{
 		configResult.setEditable(false);
 		updateConfigurationText();
 		JScrollPane scroll = new JScrollPane(configResult);
-//		scroll.setPreferredSize(new Dimension(panel.getWidth(), 320));
 		resultContentWrapper.add(scroll, BorderLayout.CENTER);
 		
 		panel.add(resultContentWrapper, BorderLayout.CENTER);
@@ -267,7 +267,6 @@ public class ConfigurationAutomatorGui extends JFrame{
 		JScrollPane scroll = new JScrollPane(splitLayout,JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		scroll.setBorder(BorderFactory.createLineBorder(new Color(238,238,238), 2));
 		borderLayout.add(scroll, BorderLayout.CENTER);
-//		borderLayout.setBorder(BorderFactory.createLineBorder(new Color(238,238,238), 10));
 		
 		helpArea = new JTextArea();
 		helpArea.setWrapStyleWord(true);
@@ -353,11 +352,9 @@ public class ConfigurationAutomatorGui extends JFrame{
 		
 		saveArgumentsFileButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				
 				if(!correctConfiguration()) {
 					return;
 				}
-				
 				createArgumentFile();
 			}
 		});
@@ -371,7 +368,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 				String output = "test_" + new Random().nextInt();
 				
 				try {
-					String[] transformedArgs = Arguments.readOptionsFromString(configResult.getText());
+					String[] transformedArgs = Arguments.readOptionsFromString(result.toString());
 					HashMap<String,Arguments> argumentsHash = Arguments.parseArgs(transformedArgs);
 					
 					argumentsHash.put("--output", new Arguments(output));
@@ -398,7 +395,8 @@ public class ConfigurationAutomatorGui extends JFrame{
 					JOptionPane.showMessageDialog(ConfigurationAutomatorGui.this, "OK");
 					
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(ConfigurationAutomatorGui.this, "ERROR");
+					e.printStackTrace();
+					JOptionPane.showMessageDialog(ConfigurationAutomatorGui.this, "ERROR " + e.getStackTrace() );
 				}finally{
 					File f = new File(output);
 					deleteDirectory(f);
@@ -440,7 +438,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 				
 				try {
 					printWriter = new PrintWriter(new File(outputText + ".conf"));
-					printWriter.write(configResult.getText());
+					printWriter.write(result.toString());
 					printWriter.close ();
 					
 					configurationAutomator.startEvolution(outputText);
@@ -474,7 +472,10 @@ public class ConfigurationAutomatorGui extends JFrame{
 	}
 
 	private void updateConfigurationText() {
-		configResult.setText(result.toString());
+		configResult.setText(result.toHTMLString());
+//		for(String s:keys){
+//			tree.setArgumet(s,result.getArgument(s));
+//		}
 	}
 	
 	private JPanel createResultContentButtons() {
@@ -610,7 +611,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 					String filePath = fileChooser.getSelectedFile().getAbsolutePath();
 					
 					printWriter = new PrintWriter(new File(filePath));
-					printWriter.write(configResult.getText());
+					printWriter.write(result.toString());
 			    	JOptionPane.showMessageDialog(this, "File " + outputText + ".conf, created!");
 			    } catch (FileNotFoundException e) {
 			    	e.printStackTrace();
@@ -646,6 +647,10 @@ public class ConfigurationAutomatorGui extends JFrame{
 				scanner.close();
 				String[] transformedArgs = Arguments.readOptionsFromString(loadedFileArgs);
 				loadArgumentsToGui(transformedArgs);
+
+				cleanOptionsPanel();
+				showPreview = true;
+				seeSensors();
 			} catch (ClassNotFoundException | IOException e) {
 				e.printStackTrace();
 			}finally{
@@ -653,10 +658,8 @@ public class ConfigurationAutomatorGui extends JFrame{
 					scanner.close();
 			}
 		}
-		showPreview = true;
-		seeSensors();
 	}
-
+	
 	private void cleanBeforeLoad(){
 		while(!sensorsActuatorsListModel.isEmpty()){
 			robotConfig.remove(sensorsActuatorsListModel.get(0));
@@ -669,7 +672,6 @@ public class ConfigurationAutomatorGui extends JFrame{
 		for (String key : argumentsComponents.keySet()) {
 			Component component = argumentsComponents.get(key);
 			if(component instanceof JComboBox){
-				@SuppressWarnings("unchecked")
 				JComboBox<String> comboBox = (JComboBox<String>) component;
 				comboBox.setSelectedIndex(0);
 			}else if(component instanceof JTextField){
@@ -699,7 +701,6 @@ public class ConfigurationAutomatorGui extends JFrame{
 	private void loadArgumentsToGui(String[] args) throws ClassNotFoundException, IOException {
 		HashMap<String,Arguments> argumentsHash = Arguments.parseArgs(args);
 		for (String key : argumentsHash.keySet()) {
-			boolean specialAdd = false;
 			String correctKey = key.replace("--", "");
 			Arguments completeArguments = argumentsHash.get(key);
 			String className = "";
@@ -712,86 +713,65 @@ public class ConfigurationAutomatorGui extends JFrame{
 				if(className == null)
 					continue;
 				className = className.split("\\.")[className.split("\\.").length-1];
-				specialAdd = true;
-			}
-			setLoadedArgToComponent(correctKey, className);
-			
-			if(specialAdd){
+				
 				specialAddToConfigFile(correctKey, completeArguments, className);
 			}
+			setLoadedArgToComponent(correctKey, className);
 		}
 	}
 
 	private void specialAddToConfigFile(String key, Arguments arguments,String className) {
 		if(key.equals("robots")){
-			addLoadedArgumentsToConfigFile(key,arguments,className);
-			addLoadedSensorActuatorArgumentsToConfigFile(arguments, "sensors");
-			addLoadedSensorActuatorArgumentsToConfigFile(arguments, "actuators");
-		}else if(key.equals("controllers")){
-			addLoadedArgumentsToConfigFile(key,arguments,className);
-			Arguments neuralNetworkArgs = new Arguments(arguments.getArgumentAsString("network"));
-			String neuralNetworkClassName = neuralNetworkArgs.getArgumentAsString("classname");
-			addLoadedArgumentsToConfigFile("network",neuralNetworkArgs,neuralNetworkClassName);
-		}else{
-			addLoadedArgumentsToConfigFile(key,arguments,className);
-		}
-	}
-	
-	private void addLoadedSensorActuatorArgumentsToConfigFile(Arguments robotArguments, String option){
-		Arguments sensorsArguments = new Arguments(robotArguments.getArgumentAsString(option));
-		for (String value : sensorsArguments.getValues()) {
-			Arguments newArgs = new Arguments(value);
-			String className = newArgs.getArgumentAsString("classname");
-			addLoadedArgumentsToConfigFile(option,newArgs,className);
-		}
-	}
-	
-	private void addLoadedArgumentsToConfigFile(String argumentKey, Arguments arguments, String className){
-		try {
-			Class<?> c = getRightClass(argumentKey);
-			optionsAttributes.clear();
+			Arguments sensorArguments = new Arguments(arguments.getArgumentAsString("sensors"));
+			Arguments actuatorsArguments = new Arguments(arguments.getArgumentAsString("actuators"));
 			
-			ArrayList<AutomatorOptionsAttribute> optionsAttribute = getAttributesFromArgumentsString(arguments);
-			currentOptions = argumentKey;
-			populateOptionsPanel(ClassLoadHelper.findClassesContainingName(c), className, optionsAttribute);
-			optionsButton.doClick();
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	private Class<?> getRightClass(String key) {
-		switch (key) {
-		case "robots":
-			return Robot.class;
-		case "actuators":
-			return Actuator.class;
-		case "sensors":
-			return Sensor.class;
-		case "controllers":
-			return Controller.class;
-		case "network":
-			return NeuralNetwork.class;
-		case "population":
-			return Population.class;
-		case "environment":
-			return Environment.class;
-		case "executor":
-			return TaskExecutor.class;
-		case "evolution":
-			return Evolution.class;
-		case "evaluation":
-			return EvaluationFunction.class;
-		default:
-			System.err.println("Problems getting the right Class for " + key);
-			return null;
+			arguments.removeArgument("sensors");
+			arguments.removeArgument("actuators");
+			addLoadedArgumentsToConfigFile(key,arguments);
+			
+			for (int i = 0; i < sensorArguments.getArguments().size(); i++) {
+				currentClassName = new Arguments(sensorArguments.getValues().get(i)).getArgumentAsString("classname");
+				currentClassName = currentClassName.split("\\.")[currentClassName.split("\\.").length-1];
+				Arguments newSensorAgrs = new Arguments(sensorArguments.getValues().get(i));
+				newSensorAgrs.removeArgument("id");
+				currentComboBox = (JComboBox<String>) argumentsComponents.get("sensors");
+				addLoadedArgumentsToConfigFile("sensors", newSensorAgrs);
+			}
+			
+			for (int i = 0; i < actuatorsArguments.getArguments().size(); i++) {
+				currentClassName = new Arguments(actuatorsArguments.getValues().get(i)).getArgumentAsString("classname");
+				currentClassName = currentClassName.split("\\.")[currentClassName.split("\\.").length-1];
+				Arguments newActuatorAgrs = new Arguments(actuatorsArguments.getValues().get(i));
+				newActuatorAgrs.removeArgument("id");
+				currentComboBox = (JComboBox<String>) argumentsComponents.get("actuators");
+				addLoadedArgumentsToConfigFile("actuators", newActuatorAgrs);
+			}
+			
+		}else if(key.equals("controllers")){
+			Arguments networkArguments = new Arguments(arguments.getArgumentAsString("network"));
+			
+			arguments.removeArgument("network");
+			addLoadedArgumentsToConfigFile(key,arguments);
+			
+			networkArguments.removeArgument("inputs");
+			networkArguments.removeArgument("outputs");
+			addLoadedArgumentsToConfigFile("network",networkArguments);
+		}else{
+			addLoadedArgumentsToConfigFile(key,arguments);
 		}
 	}
 
+	private void addLoadedArgumentsToConfigFile(String argumentKey, Arguments arguments){
+		currentOptions = argumentKey;
+		writeAttributes(arguments.toString());
+		
+		updateSensorsActuatorsList();
+		updateConfigurationText();
+	}
+	
 	private void setLoadedArgToComponent(String key, String className){
 		Component component = argumentsComponents.get(key);
 		if(component instanceof JComboBox){
-			@SuppressWarnings("unchecked")
 			JComboBox<String> comboBox = (JComboBox<String>) component;
 			ComboBoxModel<String> comboBoxModel = comboBox.getModel();
 			for (int i = 0; i < comboBoxModel.getSize(); i++) {
@@ -805,17 +785,15 @@ public class ConfigurationAutomatorGui extends JFrame{
 			if(key.equals("output")){
 				textfield.setText(className);
 				result.setArgument("output", new Arguments(textfield.getText()));
-				updateConfigurationText();
 			}else if(key.equals("random-seed")){
 				textfield.setText(className);
 				result.setArgument("random-seed", new Arguments(textfield.getText()));
-				updateConfigurationText();
 			}
+			updateConfigurationText();
 		}
 	}
 	
 	private void removeElementFromSensorsActuatorsList() {
-		
 		String selectedID = sensorsActuatorsList.getSelectedValue();
 		
 		robotConfig.remove(selectedID);
@@ -1155,10 +1133,10 @@ public class ConfigurationAutomatorGui extends JFrame{
 			this.selected = selected;
 		}
 		
-		@SuppressWarnings("unchecked")
 		public void actionPerformed(ActionEvent event) {
 			try {
 				editedAttributeName="";
+				cleanOptionsPanel();
 				optionsAttributes.clear();
 				currentOptions = selected;
 				comboBox = (JComboBox<String>) event.getSource();
@@ -1195,6 +1173,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 			if(option == "random-seed"){
 				textfield.setText("1");
 				result.setArgument(option, new Arguments(textfield.getText()));
+				result.setSelectedKey("");
 				updateConfigurationText();
 			}
 		}

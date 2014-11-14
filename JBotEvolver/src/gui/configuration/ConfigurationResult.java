@@ -6,6 +6,7 @@ import simulation.util.Arguments;
 
 public class ConfigurationResult {
 	private String[] keys;
+	private String selectedKey;
 	
 	private HashMap<String,Arguments> arguments = new HashMap<String, Arguments>();
 
@@ -17,11 +18,16 @@ public class ConfigurationResult {
 	}
 
 	public void setArgument(String name, Arguments arg) {
+		selectedKey = name;
 		this.arguments.put(name, arg);
 	}
 	
 	public Arguments getArgument(String name) {
 		return this.arguments.get(name);
+	}
+	
+	public void setSelectedKey(String selectedKey) {
+		this.selectedKey = selectedKey;
 	}
 	
 	public String toString(){
@@ -36,4 +42,25 @@ public class ConfigurationResult {
 		
 		return res;
 	}
+	
+	public String toHTMLString(){
+		String res = "<pre>";
+		
+		for(String s : keys) {
+			if(s.equals(selectedKey)){
+				res+="<span style=\"background-color: #FFFF00\"> ";
+			}
+			if(arguments.get(s).getNumberOfArguments() > 1)
+				res+= "--"+s +"<br> "+ Arguments.beautifyString(arguments.get(s) + "") + "<br><br>";
+			else
+				res+= "--"+s + " "+ arguments.get(s) + "<br><br>";
+			if(s.equals(selectedKey)){
+				res+="</span>";
+			}
+
+		}
+		
+		return res +"</pre>";
+	}
+	
 }
