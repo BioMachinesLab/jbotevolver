@@ -20,7 +20,7 @@ public class KeyboardController extends Controller {
 	public void controlStep(double time) {
 		((DifferentialDriveRobot) robot).setWheelSpeed(leftSpeed, rightSpeed);
 	}
-	
+		
 	public void keyTyped(KeyEvent e) {
 		if (e.getKeyChar() == 'a' || e.getKeyChar() == 'A') {
 			leftSpeed -= SPEEDCHANGE;
