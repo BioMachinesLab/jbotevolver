@@ -32,12 +32,8 @@ public class ConfigurationAutomator {
 			try {
 				String[] args = new String[]{configFileName + ".conf"};
 				JBotEvolver jBotEvolver = new JBotEvolver(args);
-				TaskExecutor taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
-				taskExecutor.start();
-				Evolution evo = Evolution.getEvolution(jBotEvolver, taskExecutor, jBotEvolver.getArguments().get("--evolution"));
-				new EvolutionGui(configFileName, evo.getPopulation());
+				EvolutionGui evo = new EvolutionGui(jBotEvolver);
 				evo.executeEvolution();
-				taskExecutor.stopTasks();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

@@ -15,14 +15,14 @@ public class ClassLoadHelper {
         for (String path : paths) {
             File file = new File(path);
             if (file.exists() && file.isDirectory()) {
-            	ClassLoadHelper.findClasses(file, objectClass,classes);
+            	findClasses(file, objectClass,classes);
             }
         }
         
         return classes;
     }
 	
-	public static boolean isIntanceOf(Class<?> cls, Class<?> objectClass) {
+	public static boolean isInstanceOf(Class<?> cls, Class<?> objectClass) {
 		
 		Class<?> superClass = cls.getSuperclass();
 		
@@ -32,7 +32,7 @@ public class ClassLoadHelper {
 			}else if(superClass.equals(objectClass)){
 				return true;
 			}else{
-				return isIntanceOf(superClass, objectClass);
+				return isInstanceOf(superClass, objectClass);
 			}
 		}
 		
@@ -57,7 +57,7 @@ public class ClassLoadHelper {
 		    			
 		    			boolean isAbstract = Modifier.isAbstract(cl.getModifiers());
 
-		    			if(!isAbstract && ClassLoadHelper.isIntanceOf(cl, objectClass)){
+		    			if(!isAbstract && isInstanceOf(cl, objectClass)){
 		    				cls.add(cl);
 		    			}
 		    			

@@ -1,6 +1,8 @@
 package gui.evolution;
 
+import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.ViewerMain;
+import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.populations.Population;
 import gui.util.GraphingData;
 
@@ -23,6 +25,8 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
+import taskexecutor.TaskExecutor;
+
 public class EvolutionGui extends JFrame {
 
 	private static final long serialVersionUID = -63231826531435127L;
@@ -38,16 +42,26 @@ public class EvolutionGui extends JFrame {
 	private JTextField averageTextField;
 	private JTextField worstTextField;
 	private JTextField etaTextField;
+	
+	private Evolution evo;
+	private TaskExecutor taskExecutor;
 
-	private String configFileName;
 	private long time;
 
 	private Population population;
 	
-	public EvolutionGui(String configFileName, Population population) {
+	private String configName = "";
+	
+	public EvolutionGui(JBotEvolver jBotEvolver) {
 		super("Evolution GUI");
-		this.configFileName = configFileName;
-		this.population = population;
+		
+		TaskExecutor taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
+		taskExecutor.start();
+		evo = Evolution.getEvolution(jBotEvolver, taskExecutor, jBotEvolver.getArguments().get("--evolution"));
+		population = evo.getPopulation();
+		
+		configName = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
+		
 		time = System.currentTimeMillis();
 		
 		getContentPane().add(createGraphPanel());
@@ -60,6 +74,11 @@ public class EvolutionGui extends JFrame {
 		setSize(880, 320);
 		setLocationRelativeTo(null);
 		setVisible(true);
+	}
+	
+	public void executeEvolution() {
+		evo.executeEvolution();
+		taskExecutor.stopTasks();
 	}
 
 	private Component createGraphPanel() {
@@ -79,7 +98,7 @@ public class EvolutionGui extends JFrame {
 		JPanel infoPanel = new JPanel(new GridLayout(6, 1));
 		
 		JLabel configNameLabel = new JLabel("Configuration File Name:");
-		configNameTextField = new JTextField(configFileName);
+		configNameTextField = new JTextField(configName);
 		configNameTextField.setEnabled(false);
 		infoPanel.add(configNameLabel);
 		infoPanel.add(configNameTextField);
@@ -218,7 +237,7 @@ public class EvolutionGui extends JFrame {
 		private double[] getFitnessFromFile() {
 			Scanner scanner = null;
 			try {
-				scanner = new Scanner(new File(configFileName + "/_fitness.log"));
+				scanner = new Scanner(new File(configName + "/_fitness.log"));
 				String line = "";
 				
 				while(scanner.hasNext()){
@@ -227,9 +246,14 @@ public class EvolutionGui extends JFrame {
 				
 				String[] splitStrings = line.split("\t");
 				double[] fitnessValeus = new double[3];
-				fitnessValeus[0] = Double.valueOf(splitStrings[3].trim());
-				fitnessValeus[1] = Double.valueOf(splitStrings[4].trim());
-				fitnessValeus[2] = Double.valueOf(splitStrings[5].trim());
+				
+				try {
+				
+					fitnessValeus[0] = Double.valueOf(splitStrings[3].trim());
+					fitnessValeus[1] = Double.valueOf(splitStrings[4].trim());
+					fitnessValeus[2] = Double.valueOf(splitStrings[5].trim());
+				
+				} catch(NumberFormatException e){}
 				
 				return fitnessValeus;
 			} catch (FileNotFoundException e) {
