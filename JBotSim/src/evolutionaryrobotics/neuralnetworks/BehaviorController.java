@@ -13,7 +13,7 @@ import simulation.util.ArgumentsAnnotation;
 
 public class BehaviorController extends NeuralNetworkController implements FixedLenghtGenomeEvolvableController {
 	
-	private boolean[] parallelController;
+	protected boolean[] parallelController;
 	protected ArrayList<Controller> subControllers = new ArrayList<Controller>();
 	protected ArrayList<Controller> parallelSubControllers = new ArrayList<Controller>();
 	protected int currentSubNetwork = 0;
@@ -125,7 +125,7 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 	
 	protected void setupControllers(Simulator simulator, Arguments args) {
 		
-		if(!args.getArgumentAsString("subcontrollers").isEmpty()) {
+		if(args.getArgumentIsDefined("subcontrollers")) {
 			Arguments subControllerArgs = new Arguments(args.getArgumentAsString("subcontrollers"));
 			
 			parallelController = new boolean[subControllerArgs.getNumberOfArguments()];

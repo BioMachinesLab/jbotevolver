@@ -33,6 +33,10 @@ public class Wall extends PhysicalObject{
 			color = Color.RED;
 	}
 	
+	public Wall(Simulator simulator, double x, double y, double width, double height) {
+		this(simulator, "wall"+simulator.getRandom().nextInt(1000), x, y, 0, 0, 0, 0, width, height, PhysicalObjectType.WALL);
+	}
+	
 	public void moveWall() {
 		initializeEdges();
 		edges = getEdges();

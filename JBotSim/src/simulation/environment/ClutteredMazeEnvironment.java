@@ -57,50 +57,52 @@ public class ClutteredMazeEnvironment extends TMazeEnvironment {
 		exitWidth = squareSize/2;
 		createRoom(simulator, minWidth,maxWidth,minHeight,maxHeight);
 		
-		Robot robot = robots.get(0);
-		double originalX = 0;
-		double originalY = 0;
-		int tries = 0;
-		do{
-			if(++tries % 10 == 0) {
-				randomizeX+=0.1;
-				randomizeY+=0.1;
-			}
+		if(!robots.isEmpty()) {
+			Robot robot = robots.get(0);
+			double originalX = 0;
+			double originalY = 0;
+			int tries = 0;
+			do{
+				if(++tries % 10 == 0) {
+					randomizeX+=0.1;
+					randomizeY+=0.1;
+				}
+				
+				double x = originalX;
+				double y = originalY;
 			
-			double x = originalX;
-			double y = originalY;
-		
-			if(randomizeX > 0) {
-				double distance = (simulator.getRandom().nextDouble()*2-1)*randomizeX;
-				x-=distance;
-			}
-			if(randomizeY > 0) {
-				double distance = (simulator.getRandom().nextDouble()*2-1)*randomizeY;
-				y+=distance;
-			}
-			
-			robot.moveTo(new Vector2d(x, y));
-			
-			updateRobotCloseObjects(0);
-			updateCollisions(0);
-		} while(robot.isInvolvedInCollison());
-
-		if(extraRobot) {
-			
-			Robot r = new Epuck(simulator, new Arguments(""));
-			r.setController(new DummyController(simulator,r,new Arguments("")));
-			
-			double deltaY = -0.05;
-			
-			if(fitnesssample == 0 || fitnesssample == 2) {
-				deltaY*=-1;
-			}
-			
-			double deltaX = 0.2;
-			
-			r.moveTo(new Vector2d(getSquares().peekLast().getX()+deltaX,getSquares().peekLast().getY()+deltaY));
-			addRobot(r);
-		} 
+				if(randomizeX > 0) {
+					double distance = (simulator.getRandom().nextDouble()*2-1)*randomizeX;
+					x-=distance;
+				}
+				if(randomizeY > 0) {
+					double distance = (simulator.getRandom().nextDouble()*2-1)*randomizeY;
+					y+=distance;
+				}
+				
+				robot.moveTo(new Vector2d(x, y));
+				
+				updateRobotCloseObjects(0);
+				updateCollisions(0);
+			} while(robot.isInvolvedInCollison());
+	
+			if(extraRobot) {
+				
+				Robot r = new Epuck(simulator, new Arguments(""));
+				r.setController(new DummyController(simulator,r,new Arguments("")));
+				
+				double deltaY = -0.05;
+				
+				if(fitnesssample == 0 || fitnesssample == 2) {
+					deltaY*=-1;
+				}
+				
+				double deltaX = 0.2;
+				
+				r.moveTo(new Vector2d(getSquares().peekLast().getX()+deltaX,getSquares().peekLast().getY()+deltaY));
+				addRobot(r);
+			} 
+		}
 	}
 	
 	protected void createRoom(Simulator simulator, double minWidth, double maxWidth, double minHeight, double maxHeight) {

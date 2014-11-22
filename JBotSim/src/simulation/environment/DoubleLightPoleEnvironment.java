@@ -14,20 +14,19 @@ public class DoubleLightPoleEnvironment extends Environment {
 	@ArgumentsAnnotation(name="lightpoledistance", defaultValue="2")
 	private double lightPoleDistance;
 	
-	@ArgumentsAnnotation(name="width", defaultValue="-1")
+	@ArgumentsAnnotation(name="widthpole", defaultValue="-1")
 	private double widthPole;
 	
-	@ArgumentsAnnotation(name="height", defaultValue="0")
+	@ArgumentsAnnotation(name="heightpole", defaultValue="0")
 	private double heightPole;
 	
-	@ArgumentsAnnotation(name="width", defaultValue="-1")
 	private double forageLimit, forbiddenArea;
 	private LightPole lightPoleLeft, lightPoleRight;
 
 	public DoubleLightPoleEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
-		widthPole = arguments.getArgumentIsDefined("width") ? arguments.getArgumentAsDouble("width") : -1.0;
-		heightPole = arguments.getArgumentIsDefined("height") ? arguments.getArgumentAsDouble("height") : 0.0;
+		widthPole = arguments.getArgumentIsDefined("widthpole") ? arguments.getArgumentAsDouble("widthpole") : -1.0;
+		heightPole = arguments.getArgumentIsDefined("heightpole") ? arguments.getArgumentAsDouble("heightpole") : 0.0;
 		lightPoleDistance = arguments.getArgumentIsDefined("lightpoledistance") ? arguments.getArgumentAsDouble("lightpoledistance") : 2.0;
 		lightPoleRadius = arguments.getArgumentIsDefined("lightpoleradius") ? arguments.getArgumentAsDouble("lightpoleradius") : 0.10;
 	}

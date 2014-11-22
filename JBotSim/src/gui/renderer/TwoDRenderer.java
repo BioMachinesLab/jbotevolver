@@ -70,7 +70,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		
 		drawBackground();
 		
-		if(simulator.getEnvironment().getMovableObjects().size()>0){
+		if(simulator.getEnvironment().getAllObjects().size()>0){
 			
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
 				switch(m.getType()){	

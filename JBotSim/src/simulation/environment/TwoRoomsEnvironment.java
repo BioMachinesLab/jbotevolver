@@ -118,6 +118,10 @@ public class TwoRoomsEnvironment extends Environment {
 	}
 	
 	protected void placeRobots() {
+		
+		if(robots.isEmpty())
+			return;
+		
 		if(teleport) {
 			double sign = 1;
 			if(random.nextDouble() > 0.5 && bothRooms)
