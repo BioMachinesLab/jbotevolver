@@ -1,7 +1,6 @@
 package gui.renderer;
 
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RadialGradientPaint;
@@ -9,11 +8,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 
-import commoninterface.AquaticDroneCI.LedState;
-
 import mathutils.Vector2d;
 import net.jafama.FastMath;
 import simulation.robot.Epuck;
+import simulation.robot.LedState;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.robot.sensors.EpuckIRSensor;

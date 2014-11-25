@@ -7,10 +7,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import javax.swing.text.AbstractDocument.LeafElement;
-
-import commoninterface.AquaticDroneCI.LedState;
-
 import simulation.Simulator;
 import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;
