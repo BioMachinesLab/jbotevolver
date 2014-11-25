@@ -8,12 +8,16 @@ import simulation.Simulator;
 import simulation.physicalobjects.LightPole;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class GPSEnvironment extends Environment{
 	
 	protected LinkedList<LightPole> waypoints = new LinkedList<LightPole>();
+	@ArgumentsAnnotation(name="waypoints", help="Waypoints to appear on the environment, ex: (1,1;2,2)")
 	protected String waypointCoordinates = "";
+	@ArgumentsAnnotation(name="random", values={"0","1"})
 	protected boolean rand = false;
+	@ArgumentsAnnotation(name="numberofrobots", defaultValue="30")
 	protected int numberOfRobots = 30;
 	
 	public GPSEnvironment(Simulator simulator, Arguments args) {

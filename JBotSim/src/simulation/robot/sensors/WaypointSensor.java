@@ -9,10 +9,12 @@ import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class WaypointSensor extends Sensor {
 	
 	private Simulator sim;
+	@ArgumentsAnnotation(name="distance", defaultValue="1")
 	private double distance = 1;
 	private String destination = "";
 	private LightPole destinationLightPole = null;
