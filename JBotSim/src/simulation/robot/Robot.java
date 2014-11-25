@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import javax.swing.text.AbstractDocument.LeafElement;
+
+import commoninterface.AquaticDroneCI.LedState;
+
 import simulation.Simulator;
 import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;
@@ -71,6 +75,9 @@ public class Robot extends MovableObject {
 	@ArgumentsAnnotation(name="variablenumber", values={"0","1"})
 	private static int variableNumber;
 	
+	private Color ledColor;
+	private LedState ledState;
+	
 	public static final int REDINDEX   = 0;
 	public static final int GREENINDEX = 1;
 	public static final int BLUEINDEX  = 2;
@@ -118,9 +125,13 @@ public class Robot extends MovableObject {
 		try {
 		    Field field = Color.class.getField(args.getArgumentAsStringOrSetDefault("color", "black"));
 		    color = (Color)field.get(null);
+		    ledColor =  (Color)field.get(null); 
 		} catch (Exception e) {
 		    color = null; // Not defined
+		    ledColor = null;
 		}
+		
+		ledState = LedState.OFF;
 		
 		if(color != null)
 			setBodyColor(color);
@@ -475,4 +486,21 @@ public class Robot extends MovableObject {
 	public boolean ignoreRobotToRobotCollisions() {
 		return ignoreRobotToRobotCollisions;
 	}
+	
+	public Color getLedColor() {
+		return ledColor;
+	}
+	
+	public void setLedColor(Color ledColor) {
+		this.ledColor = ledColor;
+	}
+	
+	public LedState getLedState() {
+		return ledState;
+	}
+	
+	public void setLedState(LedState ledState) {
+		this.ledState = ledState;
+	}
+	
 }
