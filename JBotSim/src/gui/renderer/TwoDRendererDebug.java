@@ -9,6 +9,8 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 
+import commoninterface.AquaticDroneCI.LedState;
+
 import mathutils.Vector2d;
 import net.jafama.FastMath;
 import simulation.robot.Epuck;
@@ -27,6 +29,8 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	private String coneClass = "";
 	private int robotId;
 
+	private boolean blink = true;
+	
 	public TwoDRendererDebug(Arguments args) {
 		super(args);
 		this.addMouseListener(new MouseListenerSentinel());
@@ -115,11 +119,43 @@ public class TwoDRendererDebug extends TwoDRenderer {
 //		for(Actuator act:robot.getActuators()){
 //			System.out.println(act);
 //		}
-//		System.out.println("\n Sensors:");
+//		System.out.println("\n Sensors:"); 
 //		for(Sensor sensor:robot.getSensors()){
 //			System.out.println(sensor);
 //		}
 //		System.out.println("\n\n");
+		
+		double ledRadius = 0.015;
+		
+		p0.set(ledRadius*3/2,0);
+		p0.rotate(orientation + Math.PI);
+		
+		int ledX = transformX(p0.getX() + robot.getPosition().getX() - ledRadius);
+		int ledY = transformY(p0.getY() + robot.getPosition().getY() + ledRadius);
+		
+		int leadDiameter = (int) Math.round(ledRadius * 2 *scale);
+		
+		boolean paint = false;
+		
+		if(robot.getLedState() == LedState.BLINKING){
+			if(blink){
+				robot.setLedColor(Color.RED);
+				graphics.setColor(robot.getLedColor());
+				paint = true;
+				blink = false;
+			}else{
+				blink = true;
+			}
+			
+		}else if(robot.getLedState() == LedState.ON){
+			robot.setLedColor(Color.RED);
+			graphics.setColor(robot.getLedColor());
+			paint = true;
+		}
+		if(paint)
+			graphics.fillOval(ledX, ledY, leadDiameter, leadDiameter);
+		
+		
 		
 		if(robot instanceof Epuck) {
 			Sensor s = robot.getSensorByType(EpuckIRSensor.class);
