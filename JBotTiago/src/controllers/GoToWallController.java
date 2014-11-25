@@ -1,7 +1,6 @@
 package controllers;
 
 import simulation.Simulator;
-import simulation.robot.AquaticDrone;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;

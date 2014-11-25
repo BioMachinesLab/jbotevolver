@@ -7,7 +7,7 @@ public class EMain {
 //		long time = System.currentTimeMillis();
 		
 //		new EvolverMain(args);
-		new EvolverMain(new String[]{"drone_test.conf"});
+//		new EvolverMain(new String[]{"drone_test.conf"});
 //		new EvolverMain(new String[]{"weird4/_restartevolution.conf"});
 //		new EvolverMain(new String[]{"shared_sensors.conf","--output","ss_movingprey"});
 //		new EvolverMain(new String[]{"shared_sensors_4/_restartevolution.conf"});
