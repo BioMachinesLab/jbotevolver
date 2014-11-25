@@ -22,6 +22,21 @@ public class RandomWallRobotController extends Controller {
 	private boolean reset = true;
 	private boolean specialBeahvior;
 	
+	public RandomWallRobotController(Simulator simulator, Robot robot, Arguments args) {
+		super(simulator, robot, args);
+		specialBeahvior = false;
+		if(args.getArgumentIsDefined("actuators")){
+			Arguments actuators = new Arguments(args.getArgumentAsString("actuators"));
+			for (int i = 0; i < actuators.getNumberOfArguments(); i++) {
+				Arguments actuatorArgs = new Arguments(actuators.getValueAt(i));
+				if(actuatorArgs.getArgumentIsDefined("maxspeed")){
+					maxSpeed = actuatorArgs.getArgumentAsDoubleOrSetDefault("maxspeed", 0.1);
+				}
+			}
+		}
+		random = simulator.getRandom();
+		direction = random.nextDouble() > 0.5 ? -1 : 1;
+	}
 
 	public RandomWallRobotController(Simulator simulator, Robot robot, Arguments args, boolean specialBeahvior) {
 		super(simulator, robot, args);
