@@ -66,7 +66,7 @@ public class JBotEvolver extends JBotSim {
 	public void setChromosome(ArrayList<Robot> robots, Chromosome chromosome) {
 		for (Robot r : robots) {
 			
-			if(r.getController() instanceof NeuralNetworkController) {
+			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
 				FixedLenghtGenomeEvolvableController controller = (FixedLenghtGenomeEvolvableController)r.getController();
 				controller.setNNWeights(chromosome.getAlleles());
 			}
