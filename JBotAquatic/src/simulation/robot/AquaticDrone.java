@@ -22,17 +22,22 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	private double accelarationConstant = 0.1;
 	private Vector2d velocity = new Vector2d();
 	private Simulator simulator;
+//	private double lat = 38.749365;
+//	private double lon = -9.153418;
 	private LinkedList<Waypoint> waypoints = new LinkedList<>();
 	
 	public AquaticDrone(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		this.simulator = simulator;
+
+//		double[] start = CoordinateUtilities.GPSToCartesian(lat, lon);
+//		System.out.println(start[0]+" "+start[1]);
+//		setPosition(start[0], start[1]);
+//		waypoints.add(new Waypoint(38.74957,-9.153383));
 	}
 	
 	@Override
-	public void shutdown() {
-		
-	}
+	public void shutdown() {}
 
 	@Override
 	public void setMotorSpeeds(double leftMotor, double rightMotor) {

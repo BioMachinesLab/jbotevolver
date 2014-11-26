@@ -16,7 +16,7 @@ public class GoToWayPointController extends Controller {
 	public GoToWayPointController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
 		CILogger logger = new CIStdOutLogger((AquaticDroneCI) robot);
-		String[] argsString = new String[]{"angletolerance=20", "distancetolerance=3"};
+		String[] argsString = new String[]{"angletolerance=10", "distancetolerance=3"};
 		goToWayPointBehavior = new GoToWaypointCIBehavior(argsString, (AquaticDroneCI) robot, logger);
 	}
 
