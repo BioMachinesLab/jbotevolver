@@ -1,6 +1,7 @@
 package simulation.robot;
 
 import java.util.LinkedList;
+
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import net.jafama.FastMath;
@@ -13,6 +14,7 @@ import simulation.robot.sensors.WaypointSensor;
 import simulation.util.Arguments;
 import commoninterface.AquaticDroneCI;
 import commoninterface.CILogger;
+import commoninterface.utils.CoordinateUtilities;
 
 public class AquaticDrone extends DifferentialDriveRobot implements AquaticDroneCI{
 
@@ -20,6 +22,7 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	private double accelarationConstant = 0.1;
 	private Vector2d velocity = new Vector2d();
 	private Simulator simulator;
+	private LinkedList<Waypoint> waypoints = new LinkedList<>();
 	
 	public AquaticDrone(Simulator simulator, Arguments args) {
 		super(simulator, args);
@@ -37,24 +40,22 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 		twoWheelActuator.setWheelSpeed(leftMotor, rightMotor);
 	}
 
+	//Create drone compass sensor
 	@Override
 	public double getCompassOrientationInDegrees() {
 		CompassSensor compassSensor = (CompassSensor) getSensorByType(CompassSensor.class);
 		double heading = (360-(compassSensor.getSensorReading(0) * 360) + 90) % 360;
-		System.out.println(heading);
 		return heading;
 	}
 
 	@Override
 	public double getGPSLatitude() {
-		WaypointSensor waypointSensor = (WaypointSensor) getSensorByType(WaypointSensor.class);
-		return waypointSensor.getSensorReading(0);
+		return CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY())[0];
 	}
 
 	@Override
 	public double getGPSLongitude() {
-		WaypointSensor waypointSensor = (WaypointSensor) getSensorByType(WaypointSensor.class);
-		return waypointSensor.getSensorReading(1);
+		return CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY())[1];
 	}
 
 	@Override
@@ -116,7 +117,7 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 
 	@Override
 	public LinkedList<Waypoint> getWaypoints() {
-		return null;
+		return waypoints;
 	}
 
 }
