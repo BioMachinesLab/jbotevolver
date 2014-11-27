@@ -1,5 +1,6 @@
 package gui.util;
 
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -7,11 +8,11 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Vector;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -23,6 +24,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 
+import simulation.Simulator;
+import simulation.Updatable;
+import simulation.robot.Robot;
+
 import com.panayotis.gnuplot.JavaPlot;
 import com.panayotis.gnuplot.dataset.FileDataSet;
 import com.panayotis.gnuplot.plot.DataSetPlot;
@@ -31,14 +36,7 @@ import com.panayotis.gnuplot.style.PlotStyle;
 import com.panayotis.gnuplot.style.Smooth;
 import com.panayotis.gnuplot.style.Style;
 
-import simulation.Simulator;
-import simulation.Updatable;
-import simulation.robot.Robot;
-import simulation.robot.actuators.Actuator;
-import simulation.robot.behaviors.Behavior;
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.evolution.CoEvolution;
 import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
@@ -615,26 +613,55 @@ public class GraphPlotterCoEvolution extends JFrame implements Updatable {
 				} catch(Exception e) {e.printStackTrace();}
 			} else {
 	
-				JavaPlot p = new JavaPlot();
-		
-				PlotStyle myPlotStyle = new PlotStyle();
-				myPlotStyle.setStyle(Style.LINES);
-				myPlotStyle.setLineWidth(1);
-				
-				boolean smooth = smoothCheckBox.isSelected();
-		
-				for(int i = 0 ; i < valuesList.size() ; i++) { 
-					DataSetPlot s = new DataSetPlot(valuesList.get(i));
-					s.setPlotStyle(myPlotStyle);
-					if(smooth)
-						s.setSmooth(Smooth.CSPLINES);
-					s.setTitle(titlesList.get(i));
-					p.addPlot(s);
+				if (System.getProperty("os.name").contains("Windows")) {
+					JFrame window = new JFrame();
+					JPanel graphPanel = new JPanel(new BorderLayout());
+					window.getContentPane().add(graphPanel);
+					GraphingData graph = new GraphingData();
+					graphPanel.add(graph);
+					
+					int dataSize = 0;
+					for(int i = 0 ; i < valuesList.size() ; i++) {
+						double[][] aux = valuesList.get(i);
+						Double[] data = new Double[aux.length];
+						for (int x = 0; x < aux.length; x++) {
+							data[x] = (aux[x][1]);
+						}
+						
+						if(data.length > dataSize)
+							dataSize = data.length;
+						
+						graph.addDataList(data);
+					}
+					
+					graph.setxLabel("TimeSteps", dataSize+1);
+			        graph.setShowLast(dataSize);
+					
+					window.setVisible(true);
+					window.setSize(800,500);
+					window.setLocationRelativeTo(null);
+					window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				}else{
+					JavaPlot p = new JavaPlot();
+					PlotStyle myPlotStyle = new PlotStyle();
+					myPlotStyle.setStyle(Style.LINES);
+					myPlotStyle.setLineWidth(1);
+					
+					boolean smooth = smoothCheckBox.isSelected();
+			
+					for(int i = 0 ; i < valuesList.size() ; i++) { 
+						DataSetPlot s = new DataSetPlot(valuesList.get(i));
+						s.setPlotStyle(myPlotStyle);
+						if(smooth)
+							s.setSmooth(Smooth.CSPLINES);
+						s.setTitle(titlesList.get(i));
+						p.addPlot(s);
+					}
+			
+					p.set("xrange", "[0:"+(currentStep)+"]");
+					p.set("border", "3");
+					(new Plotter(p)).start();
 				}
-		
-				p.set("xrange", "[0:"+(currentStep-1)+"]");
-				p.set("border", "3");
-				(new Plotter(p)).start();
 			}
 		}
 	}
