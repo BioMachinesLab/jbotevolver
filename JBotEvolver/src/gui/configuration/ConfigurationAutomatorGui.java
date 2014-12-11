@@ -104,6 +104,8 @@ public class ConfigurationAutomatorGui extends JFrame{
 
 	private ConfigurationAutomator configurationAutomator;
 	
+	private ArrayList<String> blackList;
+	
 	private boolean showPreview = true;
 	
 	public ConfigurationAutomatorGui(ConfigurationAutomator configurationAutomator) {
@@ -112,6 +114,10 @@ public class ConfigurationAutomatorGui extends JFrame{
 		
 		optionsAttributes = new ArrayList<AutomatorOptionsAttribute>();
 		argumentsComponents = new HashMap<String, Component>();
+		
+		blackList = new ArrayList<String>();
+		
+		fillBlackList();
 		
 		robotConfig = new RobotsResult();
 		result = new ConfigurationResult(keys);
@@ -131,6 +137,90 @@ public class ConfigurationAutomatorGui extends JFrame{
 		setSize(1100, 800);
 		setLocationRelativeTo(null);
 		setVisible(true);
+	}
+
+	private void fillBlackList() {
+		blackList.add("ConillonTaskExecutor");
+		blackList.add("CompassSensor");
+		blackList.add("ConeTypeSensor");
+		blackList.add("DoubleParameterSensor");
+		blackList.add("EpuckIRSensor");
+		blackList.add("EpuckLightSensor");
+		blackList.add("LightTypeSensor");
+		blackList.add("NearRobotSensor");
+		blackList.add("NestSensor");
+		blackList.add("PerimeterSimpleLightTypeSensor");
+		blackList.add("PerimeterSimpleRobotColorSensor");
+		blackList.add("PositionSensor");
+		blackList.add("PreySensor");
+		blackList.add("RobotColorSensor");
+		blackList.add("RobotRGBColorSensor");
+		blackList.add("RobotSensor");
+		blackList.add("Sensor");
+		blackList.add("SimpleMouseSensor");
+		blackList.add("SimpleNestSensorPerimeter");
+		blackList.add("SimplePreySensorPerimeter");
+		blackList.add("SimpleTeamNestSensor");
+		blackList.add("WallButtonSensor");
+		blackList.add("WallSensor");
+		blackList.add("WaypointSensor");
+		blackList.add("XRayPreySensor");
+		blackList.add("OpenDoorActuator");
+		blackList.add("RobotColorActuator");
+		blackList.add("RobotRGBColorActuator");
+		blackList.add("StopActuator");
+		blackList.add("Epuck");
+		blackList.add("BehaviorController");
+		blackList.add("MulitlayerPerceptron");
+		blackList.add("DoNothingController");
+		blackList.add("DummyController");
+		blackList.add("KeyboardController");
+		blackList.add("RandomRobotController");
+		blackList.add("DestructiveBehavior");
+		blackList.add("DummyBehavior");
+		blackList.add("MoveForwardBehavior");
+		blackList.add("OpenDoorBehavior");
+		blackList.add("TurnLeftBehavior");
+		blackList.add("TurnRightBehavior");
+		blackList.add("ProgrammedForager");
+		blackList.add("ClutteredMazeEnvironment");
+		blackList.add("GPSEnvironment");
+		blackList.add("GroupedPreyEnvironment");
+		blackList.add("RoundPreyForageEnvironment");
+		blackList.add("RoundRobotForageEnvironment");
+		blackList.add("TMazeEnvironment");
+		blackList.add("TwoNestCenterDeployPreysEnvironment");
+		blackList.add("TwoNestForageEnvironment");
+		blackList.add("TwoRoomsEnvironment");
+		blackList.add("AverageDistanceFromCenterEvaluationFunction");
+		blackList.add("CenterOfMassAndClustersEvaluationFunction");
+		blackList.add("ClutteredMazeEvaluationFunction");
+		blackList.add("CollaboratingTwoNetsForagingEvaluationFunction");
+		blackList.add("ColorMatchEvaluationFunction");
+		blackList.add("ColorNearPreyEvaluationFunction");
+		blackList.add("CommunicationEvaluationFunction");
+		blackList.add("CompetingTwoNetsForagingEvaluationFunction");
+		blackList.add("CrossRoomsEvaluationFunction");
+		blackList.add("EmptyEvaluationFunction");
+		blackList.add("ERSimbadForagingEvaluationFunction");
+		blackList.add("FindWallButtonEvaluationFunction");
+		blackList.add("FoodWaterEvaluationFunction");
+		blackList.add("GoToButtonEvaluationFunction");
+		blackList.add("GoToWaypointEvaluationFunction");
+		blackList.add("OpenDoorEvaluationFunction");
+		blackList.add("PickAndDropsEvaluationFunction");
+		blackList.add("PreyAggregationEvaluationFunction");
+		blackList.add("PreyCatchEvaluationFunction");
+		blackList.add("PreyEscapeEvaluationFunction");
+		blackList.add("RoomMazeBackBehaviors2EvaluationFunction");
+		blackList.add("RoomMazeBackBehaviorsEvaluationFunction");
+		blackList.add("RoomMazeBackEvaluationFunction");
+		blackList.add("StepsWithPreyEvaluationFunction");
+		blackList.add("TMazeEvaluationFunction");
+		blackList.add("TwoRoomsEvaluationFunction");
+		blackList.add("CoEvolution");
+		blackList.add("SingleSampleGenerationalEvolution");
+		blackList.add("SimpleRobotColorSensor");
 	}
 
 	private Component initSelectionPanel() {
@@ -809,8 +899,21 @@ public class ConfigurationAutomatorGui extends JFrame{
 		
 		comboBox.addItem("");
 		
-		for (Class<?> cl : aux)
-			comboBox.addItem(cl.getSimpleName());
+		boolean addClass = true;
+		for (Class<?> cl : aux){
+			String cls = cl.getName().split("\\.")[cl.getName().split("\\.").length-1];
+			for (String blackListClass : blackList) {
+				if(cls.equals(blackListClass))
+					addClass = false;
+			}
+			
+			if(addClass){
+				comboBox.addItem(cl.getSimpleName());
+			}else{
+				addClass = true;
+			}
+			
+		}
 		
 		return comboBox;
 	}
