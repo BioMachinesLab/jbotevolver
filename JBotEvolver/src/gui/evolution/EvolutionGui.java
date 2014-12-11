@@ -1,11 +1,9 @@
 package gui.evolution;
 
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.ViewerMain;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.populations.Population;
 import gui.util.GraphingData;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -16,10 +14,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Time;
 import java.util.Scanner;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -79,6 +75,7 @@ public class EvolutionGui extends JPanel {
 		population = evo.getPopulation();
 		
 		configName = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
+		configNameTextField.setText(configName);
 		
 		fitnessGraph.clear();
 		fitnessGraph.setShowLast(population.getNumberOfGenerations());
