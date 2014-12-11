@@ -1027,7 +1027,8 @@ public class ConfigurationAutomatorGui extends JPanel{
 		optionsPanelCenter.setLayout(new GridLayout(height,1));
 		optionsPanelRight.setLayout(new GridLayout(height,1));
 		
-		JTextField jtf = new JTextField(currentClassName);
+		String classNameSplit = currentClassName.split("\\.")[currentClassName.split("\\.").length-1];
+		JTextField jtf = new JTextField(classNameSplit);
 		jtf.setEnabled(false);
 		JCheckBox jcb = new JCheckBox();
 		jcb.setEnabled(false);
