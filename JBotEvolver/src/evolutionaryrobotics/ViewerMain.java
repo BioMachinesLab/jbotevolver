@@ -10,7 +10,7 @@ public class ViewerMain {
 	
 	public static void main(String[] args) {
 		try {
-			new CombinedGui(args);
+			new CombinedGui(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRenderer))"});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
