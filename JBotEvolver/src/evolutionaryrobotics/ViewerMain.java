@@ -10,7 +10,7 @@ public class ViewerMain {
 	
 	public static void main(String[] args) {
 		try {
-			new CombinedGui();
+			new CombinedGui(args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

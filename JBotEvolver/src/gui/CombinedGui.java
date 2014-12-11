@@ -12,7 +12,7 @@ public class CombinedGui extends JFrame {
 	
 	private JTabbedPane tabbedPane;
 	
-	public CombinedGui() {
+	public CombinedGui(String[] args) {
 		tabbedPane = new JTabbedPane();
 		
 		EvolutionGui evolution = new EvolutionGui();
@@ -22,7 +22,7 @@ public class CombinedGui extends JFrame {
 		
 		JBotEvolver jbot = null;
 		try {
-			jbot = new JBotEvolver(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRenderer))"});
+			jbot = new JBotEvolver(args);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -43,7 +43,7 @@ public class CombinedGui extends JFrame {
 	}
 	
 	public static void main(String[] args) {
-		new CombinedGui();
+		new CombinedGui(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRenderer))"});
 	}
 	
 	class WaitForEvolutionThread extends Thread {
