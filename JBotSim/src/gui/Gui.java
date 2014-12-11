@@ -4,6 +4,8 @@ import gui.renderer.Renderer;
 
 import java.lang.reflect.Constructor;
 
+import javax.swing.JPanel;
+
 import simulation.JBotSim;
 import simulation.Updatable;
 import simulation.util.Arguments;
@@ -21,6 +23,7 @@ import simulation.util.Factory;
 public abstract class Gui implements Updatable {
 	
 	protected JBotSim jBotSim;
+	protected JPanel guiPanel;
 	
 	public Gui(JBotSim jBotSim, Arguments args) {
 		this.jBotSim = jBotSim;
@@ -37,5 +40,13 @@ public abstract class Gui implements Updatable {
 			throw new RuntimeException("Gui 'classname' not defined: "+ arguments.toString());
 		
 		return (Gui)Factory.getInstance(arguments.getArgumentAsString("classname"),jBotSim,arguments);
+	}
+	
+	public void setGuiPanel(JPanel guiPanel) {
+		this.guiPanel = guiPanel;
+	}
+	
+	public JPanel getGuiPanel() {
+		return guiPanel;
 	}
 }
