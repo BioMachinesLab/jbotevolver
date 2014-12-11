@@ -157,7 +157,7 @@ public class EvolutionGui extends JPanel {
 		stopButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				evo.stopEvolution();
+				stopEvolution();
 			}
 		});
 		progessPanel.add(stopButton);
@@ -167,6 +167,11 @@ public class EvolutionGui extends JPanel {
 		
 		mainPanel.setBorder(BorderFactory.createTitledBorder("Status"));
 		return mainPanel;
+	}
+	
+	public void stopEvolution() {
+		if(evo != null)
+			evo.stopEvolution();
 	}
 
 	private class UpdateEvolutionThread extends Thread{

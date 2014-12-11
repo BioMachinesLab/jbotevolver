@@ -1,6 +1,7 @@
 package gui.configuration;
 
 import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evolution.Evolution;
 import gui.evolution.EvolutionGui;
 
 public class ConfigurationAutomator {
@@ -27,6 +28,9 @@ public class ConfigurationAutomator {
 		@Override
 		public void run() {
 			try {
+				
+				evo.stopEvolution();
+				
 				String[] args = new String[]{configFileName + ".conf"};
 				JBotEvolver jBotEvolver = new JBotEvolver(args);
 				evo.init(jBotEvolver);
