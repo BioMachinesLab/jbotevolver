@@ -34,10 +34,13 @@ public class RoundForageEnvironment extends Environment {
 	private Nest nest;
 	private int numberOfFoodSuccessfullyForaged = 0;
 	private Random random;
+	
+	private Simulator simulator;
 
 	public RoundForageEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
-
+		this.simulator = simulator;
+		
 		nestLimit       = arguments.getArgumentIsDefined("nestlimit") ? arguments.getArgumentAsDouble("nestlimit")       : .5;
 		forageLimit     = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit")       : 2.0;
 		forbiddenArea   = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")       : 5.0;
@@ -70,12 +73,9 @@ public class RoundForageEnvironment extends Environment {
 	
 	@Override
 	public void update(double time) {
-		nest.shape.getClosePrey().update(time, teleported);
-		CloseObjectIterator i = nest.shape.getClosePrey().iterator();
-
-		while(i.hasNext()){
-			 PhysicalObjectDistance preyDistance = i.next();
-			 Prey nextPrey = (Prey)(preyDistance.getObject());
+//		nest.shape.getClosePrey().update(time, teleported);
+//		CloseObjectIterator i = nest.shape.getClosePrey().iterator();
+		for (Prey nextPrey : simulator.getEnvironment().getPrey()) {
 			 double distance = nextPrey.getPosition().length();
 			 if(nextPrey.isEnabled() && distance < nestLimit){
 				 if(distance == 0){
@@ -84,7 +84,6 @@ public class RoundForageEnvironment extends Environment {
 				 nextPrey.teleportTo(newRandomPosition());
 				 numberOfFoodSuccessfullyForaged++;
 			 }
-			 i.updateCurrentDistance(distance);
 		}
 		
 		for(Robot robot: robots){
