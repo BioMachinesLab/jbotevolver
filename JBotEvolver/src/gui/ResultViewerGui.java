@@ -60,7 +60,8 @@ import simulation.util.Arguments;
 import updatables.BlenderExport;
 
 public class ResultViewerGui extends Gui {
-	protected JFrame      frame;
+//	protected JFrame      frame;
+	protected JPanel frame;
 	protected JTextField  simulationTimeTextField;
 	protected JTextField  controlStepTextField;	
 	protected JTextField  fitnessTextField;
@@ -135,18 +136,21 @@ public class ResultViewerGui extends Gui {
 		
 		enableDebugOptions = args.getArgumentAsIntOrSetDefault("enabledebugoptions", 0) == 1;
 		
-		frame = new JFrame("Result Viewer");
-		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame = new JPanel();
+		frame.setLayout(new BorderLayout());
+		super.setGuiPanel(frame);
+//		frame = new JFrame("Result Viewer");
+//		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		frame.setSize(1200, 860);
 	
-		frame.getContentPane().add(initBottomPanel(), BorderLayout.SOUTH);	
-		frame.getContentPane().add(initRightWrapperPanel(), BorderLayout.EAST);
-		frame.getContentPane().add(initLeftWrapperPanel(), BorderLayout.WEST);
+		frame.add(initBottomPanel(), BorderLayout.SOUTH);	
+		frame.add(initRightWrapperPanel(), BorderLayout.EAST);
+		frame.add(initLeftWrapperPanel(), BorderLayout.WEST);
 
 		initActions();
 		initListeners();
 		
-		frame.setLocationRelativeTo(null);
+//		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 	}
 
@@ -273,82 +277,82 @@ public class ResultViewerGui extends Gui {
 		shiftTextField.getInputMap().put(KeyStroke.getKeyStroke("meta LEFT"), "none");;
 		shiftTextField.getInputMap().put(KeyStroke.getKeyStroke("meta RIGHT"), "none");
 		
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control ENTER"), "control ENTER");
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta ENTER"), "control ENTER");
-		((JComponent) frame.getContentPane()).getActionMap().put("control ENTER", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control ENTER"), "control ENTER");
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta ENTER"), "control ENTER");
+		((JComponent) frame).getActionMap().put("control ENTER", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				loadCurrentFile();
 			}
 		});
 		
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control P"), "control P");
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta P"), "control P");
-		((JComponent) frame.getContentPane()).getActionMap().put("control P", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control P"), "control P");
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta P"), "control P");
+		((JComponent) frame).getActionMap().put("control P", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				pauseButton();
 			}
 		});
 		
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "control S");  
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta S"), "control S");
-		((JComponent) frame.getContentPane()).getActionMap().put("control S", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "control S");  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta S"), "control S");
+		((JComponent) frame).getActionMap().put("control S", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				startButton();
 			}
 		});
 		
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control LEFT"), "control LEFT");
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta LEFT"), "control LEFT");
-		((JComponent) frame.getContentPane()).getActionMap().put("control LEFT", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control LEFT"), "control LEFT");
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta LEFT"), "control LEFT");
+		((JComponent) frame).getActionMap().put("control LEFT", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				shiftSimulationBy(-position_shift,false);
 			}
 		});
 		
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt LEFT"), "alt LEFT");
-		((JComponent) frame.getContentPane()).getActionMap().put("alt LEFT", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt LEFT"), "alt LEFT");
+		((JComponent) frame).getActionMap().put("alt LEFT", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveLeft();
 			}
 		});
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt RIGHT"), "alt RIGHT");
-		((JComponent) frame.getContentPane()).getActionMap().put("alt RIGHT", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt RIGHT"), "alt RIGHT");
+		((JComponent) frame).getActionMap().put("alt RIGHT", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveRight();
 			}
 		});
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt UP"), "alt UP");
-		((JComponent) frame.getContentPane()).getActionMap().put("alt UP", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt UP"), "alt UP");
+		((JComponent) frame).getActionMap().put("alt UP", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveUp();
 			}
 		});
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt DOWN"), "alt DOWN");
-		((JComponent) frame.getContentPane()).getActionMap().put("alt DOWN", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt DOWN"), "alt DOWN");
+		((JComponent) frame).getActionMap().put("alt DOWN", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveDown();
 			}
 		});
 		
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control RIGHT"), "control RIGHT");
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta RIGHT"), "control RIGHT");
-		((JComponent) frame.getContentPane()).getActionMap().put("control RIGHT", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control RIGHT"), "control RIGHT");
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta RIGHT"), "control RIGHT");
+		((JComponent) frame).getActionMap().put("control RIGHT", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				shiftSimulationBy(position_shift,false);
 			}
 		});
 		
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('+'), "+");  
-		((JComponent) frame.getContentPane()).getActionMap().put("+", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('+'), "+");  
+		((JComponent) frame).getActionMap().put("+", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.zoomIn();
@@ -356,8 +360,8 @@ public class ResultViewerGui extends Gui {
 			}
 		});  
 
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('-'), "-");  
-		((JComponent) frame.getContentPane()).getActionMap().put("-", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('-'), "-");  
+		((JComponent) frame).getActionMap().put("-", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.zoomOut();
@@ -365,8 +369,8 @@ public class ResultViewerGui extends Gui {
 			}
 		});  
 
-		((JComponent) frame.getContentPane()).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('*'), "*");  
-		((JComponent) frame.getContentPane()).getActionMap().put("*", new AbstractAction(){  
+		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('*'), "*");  
+		((JComponent) frame).getActionMap().put("*", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.resetZoom();
@@ -603,7 +607,7 @@ public class ResultViewerGui extends Gui {
 		PostEvaluationTableModel postsModel = new PostEvaluationTableModel(postsInformations);
 		JTable comparisonTable = new JTable(postsModel);
 		JScrollPane comparisonScrollPane = new JScrollPane(comparisonTable);
-		comparisonFrame.getContentPane().add(comparisonScrollPane);
+		comparisonFrame.add(comparisonScrollPane);
 		comparisonFrame.pack();
 		comparisonFrame.setLocationRelativeTo(frame);
 		comparisonFrame.setVisible(true);
@@ -991,7 +995,7 @@ public class ResultViewerGui extends Gui {
 		HashMap<String,Arguments> args = jBotEvolver.getArguments();
 		
 		if(renderer != null)
-			frame.getContentPane().remove(renderer);
+			frame.remove(renderer);
 		
 		if(args.get("--gui") != null && args.get("--gui").getArgumentIsDefined("renderer"))
 			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
@@ -1020,7 +1024,7 @@ public class ResultViewerGui extends Gui {
 		if (renderer != null) {
 			renderer.enableInputMethods(true);
 			renderer.setSimulator(simulator);
-			frame.getContentPane().add(renderer);
+			frame.add(renderer);
 			if(simulateUntil == 0)
 				renderer.drawFrame();
 			frame.validate();

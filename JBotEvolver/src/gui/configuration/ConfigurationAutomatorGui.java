@@ -57,7 +57,7 @@ import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.populations.Population;
 import gui.renderer.Renderer;
 
-public class ConfigurationAutomatorGui extends JFrame{
+public class ConfigurationAutomatorGui extends JPanel{
 	
 	private static final long serialVersionUID = -5613912585135405020L;
 	private static final int OPTIONS_GRID_LAYOUT_SIZE = 15;
@@ -109,7 +109,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 	private boolean showPreview = true;
 	
 	public ConfigurationAutomatorGui(ConfigurationAutomator configurationAutomator) {
-		super("Configuration File Automator");
+//		super("Configuration File Automator");
 		this.configurationAutomator = configurationAutomator;
 		
 		optionsAttributes = new ArrayList<AutomatorOptionsAttribute>();
@@ -122,9 +122,10 @@ public class ConfigurationAutomatorGui extends JFrame{
 		robotConfig = new RobotsResult();
 		result = new ConfigurationResult(keys);
 		
-		getContentPane().add(initResultPanel(), BorderLayout.EAST);
-		getContentPane().add(initSelectionPanel(), BorderLayout.WEST);
-		getContentPane().add(initConfigurationPanel(), BorderLayout.CENTER);
+		setLayout(new BorderLayout());
+		add(initResultPanel(), BorderLayout.EAST);
+		add(initSelectionPanel(), BorderLayout.WEST);
+		add(initConfigurationPanel(), BorderLayout.CENTER);
 		
 		initListeners();
 
@@ -133,9 +134,9 @@ public class ConfigurationAutomatorGui extends JFrame{
 		previewFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		previewFrame.setVisible(false);
 		
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(1100, 800);
-		setLocationRelativeTo(null);
+//		setLocationRelativeTo(null);
 		setVisible(true);
 	}
 
@@ -532,7 +533,7 @@ public class ConfigurationAutomatorGui extends JFrame{
 					printWriter.close ();
 					
 					configurationAutomator.startEvolution(outputText);
-					setVisible(false);
+					wakeUpWaitingThreads();
 			    } catch (FileNotFoundException e) {
 			    	e.printStackTrace();
 			    } finally {
@@ -581,8 +582,8 @@ public class ConfigurationAutomatorGui extends JFrame{
 	
 	private void amplifyPreview(Renderer renderer) {
 		if(renderer != null){
-			previewFrame.getContentPane().removeAll();
-			previewFrame.getContentPane().add(renderer);
+			previewFrame.removeAll();
+			previewFrame.add(renderer);
 			previewFrame.setVisible(true);
 			previewFrame.invalidate();
 			previewFrame.validate();
@@ -1332,6 +1333,18 @@ public class ConfigurationAutomatorGui extends JFrame{
 				component.setEnabled(false);
 		}
 		
+	}
+	
+	public synchronized void wakeUpWaitingThreads() {
+		notifyAll();
+	}
+	
+	public synchronized void waitUntilEvolutionLaunched() {
+		try {
+			wait();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 	
 }	

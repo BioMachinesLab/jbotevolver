@@ -10,6 +10,7 @@ public abstract class Evolution {
 
 	protected JBotEvolver jBotEvolver;
 	protected TaskExecutor taskExecutor;
+	protected boolean executeEvolution = true;
 
 	public Evolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		this.taskExecutor = taskExecutor;
@@ -18,6 +19,9 @@ public abstract class Evolution {
 
 	public abstract void executeEvolution();
 	public abstract Population getPopulation();
+	public void stopEvolution() {
+		executeEvolution = false;
+	}
 	
 	public synchronized static Evolution getEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))

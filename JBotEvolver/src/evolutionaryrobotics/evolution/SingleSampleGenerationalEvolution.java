@@ -32,7 +32,7 @@ public class SingleSampleGenerationalEvolution extends GenerationalEvolution {
 		
 		double highestFitness = 0;
 		
-		while(!population.evolutionDone()) {
+		while(!population.evolutionDone() && executeEvolution) {
 			
 			double d = Double.valueOf(df.format(highestFitness));
 			taskExecutor.setDescription(output+" "+population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations() + " " + d);
@@ -41,7 +41,7 @@ public class SingleSampleGenerationalEvolution extends GenerationalEvolution {
 			
 			int totalSamples = 0;
 			
-			while ((c = population.getNextChromosomeToEvaluate()) != null) {
+			while ((c = population.getNextChromosomeToEvaluate()) != null && executeEvolution) {
 				
 				Random r = new Random(population.getGenerationRandomSeed());
 				for(int i = 0 ; i < samples ; i++) {
@@ -55,28 +55,29 @@ public class SingleSampleGenerationalEvolution extends GenerationalEvolution {
 			
 			double values[] = new double[population.getPopulationSize()];
 			
-			while(totalSamples-- > 0) {
+			while(totalSamples-- > 0 && executeEvolution) {
 				PostEvaluationResult result = (PostEvaluationResult)taskExecutor.getResult();
 				print("!");
 				values[result.getRun()]+=result.getFitness();
 			}
 			
-			for(int i = 0; i < values.length ; i++) {
+			for(int i = 0; i < values.length && executeEvolution ; i++) {
 				population.setEvaluationResultForId(i,values[i]/samples);
 			}
 			
-			print("\nGeneration "+population.getNumberOfCurrentGeneration()+
-					"\tHighest: "+population.getHighestFitness()+
-					"\tAverage: "+population.getAverageFitness()+
-					"\tLowest: "+population.getLowestFitness()+"\n");
-			
-			try {
-				diskStorage.savePopulation(population);
-			} catch(Exception e) {e.printStackTrace();}
-			
-			highestFitness = population.getHighestFitness();
-			population.createNextGeneration();
-			
+			if(executeEvolution) {
+				print("\nGeneration "+population.getNumberOfCurrentGeneration()+
+						"\tHighest: "+population.getHighestFitness()+
+						"\tAverage: "+population.getAverageFitness()+
+						"\tLowest: "+population.getLowestFitness()+"\n");
+				
+				try {
+					diskStorage.savePopulation(population);
+				} catch(Exception e) {e.printStackTrace();}
+				
+				highestFitness = population.getHighestFitness();
+				population.createNextGeneration();
+			}
 		}
 	}
 }

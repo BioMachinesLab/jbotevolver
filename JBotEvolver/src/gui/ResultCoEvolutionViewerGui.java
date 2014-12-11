@@ -97,7 +97,7 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		HashMap<String,Arguments> args = jBotEvolver.getArguments();
 		
 		if(renderer != null)
-			frame.getContentPane().remove(renderer);
+			frame.remove(renderer);
 		
 		if(args.get("--gui") != null && args.get("--gui").getArgumentIsDefined("renderer"))
 			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
@@ -137,7 +137,7 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		if (renderer != null) {
 			renderer.enableInputMethods(true);
 			renderer.setSimulator(simulator);
-			frame.getContentPane().add(renderer);
+			frame.add(renderer);
 			if(simulateUntil == 0)
 				renderer.drawFrame();
 			frame.validate();

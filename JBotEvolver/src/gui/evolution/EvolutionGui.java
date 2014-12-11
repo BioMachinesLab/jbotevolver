@@ -27,7 +27,7 @@ import javax.swing.JTextField;
 
 import taskexecutor.TaskExecutor;
 
-public class EvolutionGui extends JFrame {
+public class EvolutionGui extends JPanel {
 
 	private static final long serialVersionUID = -63231826531435127L;
 
@@ -52,8 +52,26 @@ public class EvolutionGui extends JFrame {
 	
 	private String configName = "";
 	
-	public EvolutionGui(JBotEvolver jBotEvolver) {
-		super("Evolution GUI");
+	JPanel graphPanel;
+	
+	public EvolutionGui() {
+//		super("Evolution GUI");
+		
+		
+//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setLayout(new BorderLayout());
+		
+		fitnessGraph = new GraphingData();
+		graphPanel = new JPanel(new BorderLayout());
+		graphPanel.add(fitnessGraph, BorderLayout.CENTER);
+		add(graphPanel, BorderLayout.CENTER);
+		add(createnfoPanel(), BorderLayout.EAST);
+		setSize(880, 320);
+//		setLocationRelativeTo(null);
+//		setVisible(true);
+	}
+	
+	public void init(JBotEvolver jBotEvolver) {
 		
 		taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
 		taskExecutor.start();
@@ -62,18 +80,14 @@ public class EvolutionGui extends JFrame {
 		
 		configName = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
 		
-		time = System.currentTimeMillis();
+		fitnessGraph.clear();
+		fitnessGraph.setShowLast(population.getNumberOfGenerations());
+		fitnessGraph.setxLabel("Generations", population.getNumberOfGenerations());
 		
-		getContentPane().add(createGraphPanel());
-		getContentPane().add(createnfoPanel(), BorderLayout.EAST);
+		time = System.currentTimeMillis();
 		
 		UpdateEvolutionThread updateThread = new UpdateEvolutionThread();
 		updateThread.start();
-		
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setSize(880, 320);
-		setLocationRelativeTo(null);
-		setVisible(true);
 	}
 	
 	public void executeEvolution() {
@@ -81,16 +95,6 @@ public class EvolutionGui extends JFrame {
 		taskExecutor.stopTasks();
 	}
 
-	private Component createGraphPanel() {
-		JPanel graphPanel = new JPanel(new BorderLayout());
-		fitnessGraph = new GraphingData();
-		fitnessGraph.setShowLast(population.getNumberOfGenerations());
-		fitnessGraph.setxLabel("Generations", population.getNumberOfGenerations());
-		
-		graphPanel.add(fitnessGraph);
-		return graphPanel;
-	}
-	
 	private Component createnfoPanel() {
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setPreferredSize(new Dimension(350,getHeight()));
@@ -152,18 +156,14 @@ public class EvolutionGui extends JFrame {
 		evolutionProgessPanel.add(evolutionProgressBar);
 		progessPanel.add(evolutionProgessPanel);
 		
-		JButton viewerButton = new JButton("Show Result Viewer");
-		viewerButton.addActionListener(new ActionListener() {
+		JButton stopButton = new JButton("Stop Evolution");
+		stopButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
-				try {
-					new ViewerMain(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRenderer))"});
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+				evo.stopEvolution();
 			}
 		});
-		progessPanel.add(viewerButton);
+		progessPanel.add(stopButton);
 		
 		mainPanel.add(infoPanel);
 		mainPanel.add(progessPanel, BorderLayout.SOUTH);

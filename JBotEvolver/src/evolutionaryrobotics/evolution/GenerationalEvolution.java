@@ -69,7 +69,7 @@ public class GenerationalEvolution extends Evolution {
 		
 		double highestFitness = 0;
 		
-		while(!population.evolutionDone()) {
+		while(!population.evolutionDone() && executeEvolution) {
 			
 			double d = Double.valueOf(df.format(highestFitness));
 			taskExecutor.setDescription(output+" "+population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations() + " " + d);
@@ -78,7 +78,7 @@ public class GenerationalEvolution extends Evolution {
 			
 			int totalChromosomes = 0;
 			
-			while ((c = population.getNextChromosomeToEvaluate()) != null) {
+			while ((c = population.getNextChromosomeToEvaluate()) != null && executeEvolution) {
 				int samples = population.getNumberOfSamplesPerChromosome();
 				
 				taskExecutor.addTask(new GenerationalTask(
@@ -92,24 +92,26 @@ public class GenerationalEvolution extends Evolution {
 			
 			print("\n");
 			
-			while(totalChromosomes-- > 0) {
+			while(totalChromosomes-- > 0 && executeEvolution) {
 				SimpleFitnessResult result = (SimpleFitnessResult)taskExecutor.getResult();
 				population.setEvaluationResultForId(result.getChromosomeId(), result.getFitness());
 				print("!");
 			}
 			
-			print("\nGeneration "+population.getNumberOfCurrentGeneration()+
-					"\tHighest: "+population.getHighestFitness()+
-					"\tAverage: "+population.getAverageFitness()+
-					"\tLowest: "+population.getLowestFitness()+"\n");
+			if(executeEvolution) {
 			
-			try {
-				diskStorage.savePopulation(population);
-			} catch(Exception e) {e.printStackTrace();}
-			
-			highestFitness = population.getHighestFitness();
-			population.createNextGeneration();
-			
+				print("\nGeneration "+population.getNumberOfCurrentGeneration()+
+						"\tHighest: "+population.getHighestFitness()+
+						"\tAverage: "+population.getAverageFitness()+
+						"\tLowest: "+population.getLowestFitness()+"\n");
+				
+				try {
+					diskStorage.savePopulation(population);
+				} catch(Exception e) {e.printStackTrace();}
+				
+				highestFitness = population.getHighestFitness();
+				population.createNextGeneration();
+			}
 		}
 	}
 	

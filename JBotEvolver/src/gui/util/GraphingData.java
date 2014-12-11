@@ -137,6 +137,12 @@ public class GraphingData extends JPanel {
 		g2.drawString(String.valueOf(max), 0, (int) (h - PAD - scale * max));
 		
 	}
+	
+	public void clear() {
+		simpleData.clear();
+		listOfData.clear();
+		repaint();
+	}
 
 	private double getMax(Vector<Double> dataList) {
 		double max = -Integer.MAX_VALUE;
