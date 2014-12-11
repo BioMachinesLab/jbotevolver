@@ -42,8 +42,12 @@ public class CombinedGui extends JFrame {
 		new WaitForEvolutionThread(configAutomatorGui).start();
 	}
 	
+	public CombinedGui() {
+		this(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRenderer))"});
+	}
+	
 	public static void main(String[] args) {
-		new CombinedGui(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRenderer))"});
+		new CombinedGui();
 	}
 	
 	class WaitForEvolutionThread extends Thread {
