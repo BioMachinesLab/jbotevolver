@@ -39,7 +39,7 @@ public abstract class Environment implements KeyListener, Serializable {
 	protected double height;
 	@ArgumentsAnnotation(name="height", defaultValue="4")
 	protected double width;
-	@ArgumentsAnnotation(name="steps", defaultValue="0")
+	@ArgumentsAnnotation(name="steps", defaultValue="100")
 	protected int steps;
 	
 	protected boolean setup = false;
@@ -49,7 +49,7 @@ public abstract class Environment implements KeyListener, Serializable {
 	public Environment(Simulator simulator, Arguments args) {
 		this.width = args.getArgumentAsDoubleOrSetDefault("width", 4);
 		this.height = args.getArgumentAsDoubleOrSetDefault("height", 4);
-		this.steps = args.getArgumentAsIntOrSetDefault("steps", 0);
+		this.steps = args.getArgumentAsIntOrSetDefault("steps", 100);
 		collisionManager = new SimpleCollisionManager(simulator);
 		this.geometricCalculator = new GeometricCalculator();//simulator.getGeoCalculator();
 	}
