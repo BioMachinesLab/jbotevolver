@@ -55,7 +55,7 @@ public class EvolutionGui extends JFrame {
 	public EvolutionGui(JBotEvolver jBotEvolver) {
 		super("Evolution GUI");
 		
-		TaskExecutor taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
+		taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
 		taskExecutor.start();
 		evo = Evolution.getEvolution(jBotEvolver, taskExecutor, jBotEvolver.getArguments().get("--evolution"));
 		population = evo.getPopulation();

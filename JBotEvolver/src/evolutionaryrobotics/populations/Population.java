@@ -26,7 +26,7 @@ public abstract class Population implements Serializable {
 	private static final long serialVersionUID = 5558128741655037815L;
 	
 	protected long generationRandomSeed;
-	@ArgumentsAnnotation(name="samples", defaultValue="3")
+	@ArgumentsAnnotation(name="samples", defaultValue="5")
 	protected int numberOfSamplesPerChromosome;
 	@ArgumentsAnnotation(name="generations", defaultValue="100")
 	protected int numberOfGenerations    = 100;

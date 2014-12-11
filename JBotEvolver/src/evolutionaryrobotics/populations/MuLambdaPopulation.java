@@ -22,7 +22,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	protected int genomelength;
-	@ArgumentsAnnotation(name="size", defaultValue="50")
+	@ArgumentsAnnotation(name="size", defaultValue="100")
 	protected int populationSize;
 	protected int currentGeneration;
 	protected Chromosome bestChromosome;
@@ -42,9 +42,9 @@ public class MuLambdaPopulation extends Population implements Serializable {
 
 	public MuLambdaPopulation(Arguments arguments) {
 		super(arguments);
-		populationSize = arguments.getArgumentAsIntOrSetDefault("size",50);
+		populationSize = arguments.getArgumentAsIntOrSetDefault("size",100);
 		numberOfGenerations = arguments.getArgumentAsIntOrSetDefault("generations",100);
-		numberOfSamplesPerChromosome = arguments.getArgumentAsIntOrSetDefault("samples",3);
+		numberOfSamplesPerChromosome = arguments.getArgumentAsIntOrSetDefault("samples",5);
 		mutationRate = arguments.getArgumentAsDoubleOrSetDefault("mutationrate", 0.1);
 		
 		genomelength = arguments.getArgumentAsInt("genomelength");
