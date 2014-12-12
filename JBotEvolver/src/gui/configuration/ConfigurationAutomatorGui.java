@@ -141,6 +141,7 @@ public class ConfigurationAutomatorGui extends JPanel{
 	}
 
 	private void fillBlackList() {
+		/*
 		blackList.add("ConillonTaskExecutor");
 		blackList.add("CompassSensor");
 		blackList.add("ConeTypeSensor");
@@ -222,6 +223,7 @@ public class ConfigurationAutomatorGui extends JPanel{
 		blackList.add("CoEvolution");
 		blackList.add("SingleSampleGenerationalEvolution");
 		blackList.add("SimpleRobotColorSensor");
+		*/
 	}
 
 	private Component initSelectionPanel() {

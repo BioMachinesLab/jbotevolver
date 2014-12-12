@@ -1,6 +1,7 @@
 package evolutionaryrobotics.evolution;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -23,10 +24,17 @@ public class GenerationalEvolution extends Evolution {
 	protected boolean supressMessages = false;
 	protected DiskStorage diskStorage;
 	protected String output = "";
-	protected DecimalFormat df = new DecimalFormat("#.##");
+	protected DecimalFormat df;
 
 	public GenerationalEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
+		
+		DecimalFormat format=(DecimalFormat) DecimalFormat.getInstance();
+		DecimalFormatSymbols symbols=format.getDecimalFormatSymbols();
+		char sep=symbols.getDecimalSeparator();
+		
+		df = new DecimalFormat("#"+sep+"##");
+		
 		Arguments populationArguments = jBotEvolver.getArguments().get("--population");
 		populationArguments.setArgument("genomelength", getGenomeLength());
 		supressMessages = args.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
