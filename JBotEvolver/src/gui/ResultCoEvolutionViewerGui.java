@@ -5,18 +5,14 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import gui.util.GraphPlotter;
-import gui.util.GraphPlotterCoEvolution;
 import simulation.JBotSim;
 import simulation.Simulator;
-import simulation.Updatable;
 import simulation.util.Arguments;
 
 public class ResultCoEvolutionViewerGui extends ResultViewerGui {
@@ -38,8 +34,9 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 					try{
 						simulationState = PAUSED;
 						jBotEvolver.loadFile(currentFileTextField.getText(), extraArguments.getText());
-						new GraphPlotterCoEvolution(jBotEvolver,loadSimulator(),"--robots");
-						new GraphPlotterCoEvolution(jBotEvolver,loadSimulator(),"--robots2");
+						JOptionPane.showMessageDialog(getGuiPanel(), "This feature is not implemented for CoEvolution! Please implement it :)");
+//						new GraphPlotterCoEvolution(jBotEvolver,loadSimulator(),"--robots");
+//						new GraphPlotterCoEvolution(jBotEvolver,loadSimulator(),"--robots2");
 					}catch(Exception e){
 						e.printStackTrace();
 					}

@@ -16,6 +16,8 @@ public class CombinedGui extends JFrame {
 	
 	public CombinedGui(String[] args) {
 		
+		super("JBotEvolver");
+		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException
@@ -44,7 +46,7 @@ public class CombinedGui extends JFrame {
 		
 		add(tabbedPane);
 
-		setSize(1100,900);
+		setSize(1100,750);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);

@@ -1,7 +1,6 @@
 package gui.util;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -15,7 +14,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Vector;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -26,19 +24,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-
 import simulation.Simulator;
 import simulation.Updatable;
 import simulation.robot.Robot;
-
-import com.panayotis.gnuplot.JavaPlot;
-import com.panayotis.gnuplot.dataset.FileDataSet;
-import com.panayotis.gnuplot.plot.DataSetPlot;
-import com.panayotis.gnuplot.style.NamedPlotColor;
-import com.panayotis.gnuplot.style.PlotStyle;
-import com.panayotis.gnuplot.style.Smooth;
-import com.panayotis.gnuplot.style.Style;
-
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
@@ -164,10 +152,12 @@ public class GraphPlotter extends JFrame implements Updatable {
 			
 			add(mainPanel);
 	
-			setLocationRelativeTo(null);
-			setResizable(false);
+//			setSize(800,500);
 			pack();
+			setLocationRelativeTo(null);
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			setVisible(true);
+			
 			
 		}catch(Exception e) {e.printStackTrace();}
 	}
@@ -177,132 +167,67 @@ public class GraphPlotter extends JFrame implements Updatable {
 	 * @param files list of file names of the fitness.log files to plot
 	 */
 	public GraphPlotter(String[] files) {
-		if (System.getProperty("os.name").contains("Windows")) {
-			JFrame window = new JFrame();
-			JPanel graphPanel = new JPanel(new BorderLayout());
-			window.getContentPane().add(graphPanel);
-			GraphingData graph = new GraphingData();
-			graphPanel.add(graph);
-			
-			int numberOfPoints = 0;
-			
-			for (String file : files) {
-				try {
-					
-					File fitnessFile = new File(file);
-					File generationsFile = new File(fitnessFile.getParent() + "\\_generationnumber");
-					
-					Scanner sc = new Scanner(generationsFile);
-					int totalGenerations = sc.nextInt();
-					sc.close();
-					
-			        sc = new Scanner(fitnessFile);
-			        Double[] dataList = new Double[totalGenerations+1];
-			        
-			        while (sc.hasNextLine()) {
-			        	String line = sc.nextLine();
-			            if(line.charAt(0) == '#')
-			            	continue;
-			            else{
-			            	line = line.replaceAll(" ", "");
-			            	line = line.replaceAll("\t\t", "\t");
-			            	String[] lineValues = line.trim().split("\t");
-			            	lineValues = removeBlankSpaceOnArray(lineValues);
-			            	int generation = Integer.valueOf(lineValues[0]);
-			            	Double value = Double.valueOf(lineValues[1]);
-			            	dataList[generation] = value;
-			            }
-			            	
-			        }
-			        sc.close();
-			        
-			        if(totalGenerations > numberOfPoints)
-			        	numberOfPoints = totalGenerations;
-			        
-			        graph.addDataList(dataList);
-			    } 
-			    catch (FileNotFoundException e) {
-			        e.printStackTrace();
-			    }
-			}
-			
-
-			graph.setxLabel("Generations", numberOfPoints+1);
-	        graph.setShowLast(numberOfPoints);
-			
-			window.setVisible(true);
-			window.setSize(800,500);
-			window.setLocationRelativeTo(null);
-			window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			
-		}else{
-			
-			JavaPlot plot = new JavaPlot();
-			FileDataSet fileDataSet;
-			
-			int subStringIndex = 0;
-			int amountOfGoodPlots = 0;
-			
-			for(String s : files)
-				if(!s.isEmpty())
-					amountOfGoodPlots++;
-			
-			if(files.length > 0) {
-				String s = files[0];
-				boolean stop = false;
-				int i = 0;
-				for(i = 1 ; i < s.length() && !stop; i++) {
-					String subString = s.substring(0, i);
-					for(String other : files)
-						if(!other.isEmpty() && !other.startsWith(subString)) stop = true;
-				}
-				subStringIndex = i-2;
-			}
-			
-			if(amountOfGoodPlots == 1)
-				subStringIndex=0;
-			
-			NamedPlotColor[] colors = {NamedPlotColor.RED, NamedPlotColor.BLUE, NamedPlotColor.GREEN, NamedPlotColor.ORANGE, NamedPlotColor.YELLOW,
-					NamedPlotColor.VIOLET, NamedPlotColor.PINK, NamedPlotColor.GOLDENROD, NamedPlotColor.TURQUOISE, NamedPlotColor.SALMON};
-			int colorIndex = 0;
-			
-			for(String s : files) {
-				if(!s.isEmpty()) {
-					try {
-						File f = new File(s);
-						boolean coEvolution = (new File(f.getParent()+"/_ashowbest_current.conf").exists());
-						
-						fileDataSet = new FileDataSet(new File(s));
-						DataSetPlot dataSet = new DataSetPlot(fileDataSet);
-						PlotStyle style = getNewPlotStyle();
-						dataSet.setPlotStyle(style);
-						int currentColor = (colorIndex++)%colors.length;
-						style.setLineType(colors[currentColor]);
-						dataSet.setTitle(s.substring(subStringIndex));
-						
-						plot.addPlot(dataSet);
-						
-						//In co-evolution, the fitness is plotted in pairs
-						if(coEvolution) {
-							DataSetPlot dataSetB = new DataSetPlot(fileDataSet);
-							dataSetB.put("using", "1:5");
-							PlotStyle styleB = getNewPlotStyle();
-							styleB.setStyle(Style.LINESPOINTS);
-							dataSetB.setPlotStyle(styleB);
-							styleB.setLineType(colors[currentColor]);
-							dataSetB.setTitle(s.substring(subStringIndex)+" B");
-							dataSet.setTitle(s.substring(subStringIndex)+" A");
-							plot.addPlot(dataSetB);
-						}
-						
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			}
-			plot.set("border", "3");
-			(new Plotter(plot)).start();
+		
+		boolean isWindows = System.getProperty("os.name").contains("Windows");
+		
+		String folderSeparator = isWindows ? "\\" : "/";
+		
+		JFrame window = new JFrame();
+		JPanel graphPanel = new JPanel(new BorderLayout());
+		window.getContentPane().add(graphPanel);
+		GraphingData graph = new GraphingData();
+		graphPanel.add(graph);
+		
+		int numberOfPoints = 0;
+		
+		for (String file : files) {
+			try {
+				
+				File fitnessFile = new File(file);
+				File generationsFile = new File(fitnessFile.getParent() + folderSeparator +"_generationnumber");
+				
+				Scanner sc = new Scanner(generationsFile);
+				int totalGenerations = sc.nextInt();
+				sc.close();
+				
+		        sc = new Scanner(fitnessFile);
+		        Double[] dataList = new Double[totalGenerations+1];
+		        
+		        while (sc.hasNextLine()) {
+		        	String line = sc.nextLine();
+		            if(line.charAt(0) == '#')
+		            	continue;
+		            else{
+		            	line = line.replaceAll(" ", "");
+		            	line = line.replaceAll("\t\t", "\t");
+		            	String[] lineValues = line.trim().split("\t");
+		            	lineValues = removeBlankSpaceOnArray(lineValues);
+		            	int generation = Integer.valueOf(lineValues[0]);
+		            	Double value = Double.valueOf(lineValues[1]);
+		            	dataList[generation] = value;
+		            }
+		            	
+		        }
+		        sc.close();
+		        
+		        if(totalGenerations > numberOfPoints)
+		        	numberOfPoints = totalGenerations;
+		        
+		        graph.addDataList(dataList);
+		    } 
+		    catch (FileNotFoundException e) {
+		        e.printStackTrace();
+		    }
 		}
+
+		graph.setxLabel("Generations ("+(numberOfPoints+1)+")");
+		graph.setyLabel("Fitness");
+        graph.setShowLast(numberOfPoints);
+		
+		window.setSize(800,500);
+		window.setLocationRelativeTo(null);
+		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		window.setVisible(true);
 		
 		dispose();
 	}
@@ -324,13 +249,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 		return result;
 	}
 
-	private PlotStyle getNewPlotStyle() {
-		PlotStyle myPlotStyle = new PlotStyle();
-		myPlotStyle.setStyle(Style.LINES);
-		myPlotStyle.setLineWidth(1);
-		return myPlotStyle;
-	}
-	
 	private void changeAllCheckboxes(boolean value) {
 		
 		for(JCheckBox c : robotCheckboxes)
@@ -674,72 +592,36 @@ public class GraphPlotter extends JFrame implements Updatable {
 					pw.close();
 				} catch(Exception e) {e.printStackTrace();}
 			} else {
-				if (System.getProperty("os.name").contains("Windows")) {
-					JFrame window = new JFrame();
-					JPanel graphPanel = new JPanel(new BorderLayout());
-					window.getContentPane().add(graphPanel);
-					GraphingData graph = new GraphingData();
-					graphPanel.add(graph);
-					
-					int dataSize = 0;
-					for(int i = 0 ; i < valuesList.size() ; i++) {
-						double[][] aux = valuesList.get(i);
-						Double[] data = new Double[aux.length];
-						for (int x = 0; x < aux.length; x++) {
-							data[x] = (aux[x][1]);
-						}
-						
-						if(data.length > dataSize)
-							dataSize = data.length;
-						
-						graph.addDataList(data);
+				
+				JFrame window = new JFrame();
+				JPanel graphPanel = new JPanel(new BorderLayout());
+				window.getContentPane().add(graphPanel);
+				GraphingData graph = new GraphingData();
+				graphPanel.add(graph);
+				
+				int dataSize = 0;
+				for(int i = 0 ; i < valuesList.size() ; i++) {
+					double[][] aux = valuesList.get(i);
+					Double[] data = new Double[aux.length];
+					for (int x = 0; x < aux.length; x++) {
+						data[x] = (aux[x][1]);
 					}
 					
-					graph.setxLabel("TimeSteps", dataSize+1);
-			        graph.setShowLast(dataSize);
+					if(data.length > dataSize)
+						dataSize = data.length;
 					
-					window.setVisible(true);
-					window.setSize(800,500);
-					window.setLocationRelativeTo(null);
-					window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				}else{
-					JavaPlot p = new JavaPlot();
-					PlotStyle myPlotStyle = new PlotStyle();
-					myPlotStyle.setStyle(Style.LINES);
-					myPlotStyle.setLineWidth(1);
-					
-					boolean smooth = smoothCheckBox.isSelected();
-			
-					for(int i = 0 ; i < valuesList.size() ; i++) { 
-						DataSetPlot s = new DataSetPlot(valuesList.get(i));
-						s.setPlotStyle(myPlotStyle);
-						if(smooth)
-							s.setSmooth(Smooth.CSPLINES);
-						s.setTitle(titlesList.get(i));
-						p.addPlot(s);
-					}
-			
-					p.set("xrange", "[0:"+(currentStep)+"]");
-					p.set("border", "3");
-					(new Plotter(p)).start();
+					graph.addDataList(data);
 				}
+				
+				graph.setxLabel("Timesteps ("+(dataSize+1)+")");
+				graph.setyLabel("Fitness");
+		        graph.setShowLast(dataSize);
+				
+				window.setSize(800,500);
+				window.setLocationRelativeTo(null);
+				window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+				window.setVisible(true);
 			}
-			
 		}
-	}
-	
-	private class Plotter extends Thread {
-		
-		private JavaPlot plot;
-		
-		public Plotter(JavaPlot plot) {
-			this.plot = plot;
-		}
-		
-		@Override
-		public void run() {
-			plot.plot();
-		}
-	
 	}
 }

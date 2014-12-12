@@ -11,6 +11,7 @@ import gui.util.NetworkViewer;
 import gui.util.PostEvaluationData;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.KeyboardFocusManager;
@@ -33,6 +34,7 @@ import java.util.Vector;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -65,7 +67,6 @@ public class ResultViewerGui extends Gui {
 	protected JTextField  simulationTimeTextField;
 	protected JTextField  controlStepTextField;	
 	protected JTextField  fitnessTextField;
-	protected JTextField  shiftTextField;
 
 	protected JTextField  controlStepTimeTextField;
 	protected JTextField  rendererTimeTextField;
@@ -76,17 +77,14 @@ public class ResultViewerGui extends Gui {
 	
 	JPanel treeWrapper;
 
-	protected JButton     startButton = new JButton("Start");
-	protected JButton     quitButton  = new JButton("Quit");
-	protected JButton     pauseButton = new JButton("Pause");
-	protected JButton		plotButton = new JButton("Plot Graph");
-	protected JButton		shiftButton = new JButton("Set");
+	protected JButton     pauseButton = new JButton("Start/Pause");
+	protected JButton		plotButton = new JButton("Plot Neural Activations");
 	protected JButton		newRandomSeedButton = new JButton("New Random Seed");
 
 	protected JSlider playPosition = new JSlider(0,100);
 	protected JSlider sleepSlider = new JSlider(0,100);
 
-	protected JEditorPane extraArguments = new JEditorPane();
+	protected JEditorPane extraArguments;
 
 	protected FileTree fileTree;
 	protected JTextField currentFileTextField = new JTextField(18);
@@ -102,7 +100,6 @@ public class ResultViewerGui extends Gui {
 	static final int STOPPED     = 4;	
 	static final int ENDED       = 5;
 	
-	protected int position_shift = 10;
 	protected int simulateUntil = 0;
 
 	protected int simulationState = STOPPED;
@@ -141,9 +138,7 @@ public class ResultViewerGui extends Gui {
 		super.setGuiPanel(frame);
 //		frame = new JFrame("Result Viewer");
 //		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		frame.setSize(1200, 860);
 	
-		frame.add(initBottomPanel(), BorderLayout.SOUTH);	
 		frame.add(initRightWrapperPanel(), BorderLayout.EAST);
 		frame.add(initLeftWrapperPanel(), BorderLayout.WEST);
 
@@ -156,30 +151,48 @@ public class ResultViewerGui extends Gui {
 
 	protected JPanel initLeftWrapperPanel() {
 
-		treeWrapper = new JPanel();
-		treeWrapper.setPreferredSize(new Dimension(250,100));
+		treeWrapper = new JPanel(new BorderLayout());
+//		treeWrapper.setPreferredSize(new Dimension(250,100));
 
 		fileTree = new FileTree(new File("."));
 
 		JPanel argumentsPanel = new JPanel(new BorderLayout());
-		argumentsPanel.setPreferredSize(new Dimension(230,250));
+//		argumentsPanel.setPreferredSize(new Dimension(230,250));
+		extraArguments = new JEditorPane();
 		argumentsPanel.add(new JLabel("Extra arguments"),BorderLayout.NORTH);
 		argumentsPanel.add(new JScrollPane(extraArguments),BorderLayout.CENTER);
 		
 		extraArguments.getInputMap().put(KeyStroke.getKeyStroke("control LEFT"), "none");
 		extraArguments.getInputMap().put(KeyStroke.getKeyStroke("control RIGHT"), "none");
 
-		treeWrapper.add(currentFileTextField);
-		treeWrapper.add(fileTree);
-		treeWrapper.add(fitnessSummary);
-		treeWrapper.add(editButton);
-		treeWrapper.add(loadButton);
-		treeWrapper.add(compareFitnessButton);
-		treeWrapper.add(plotFitnessButton);
-		treeWrapper.add(argumentsPanel);
-		treeWrapper.add(newRandomSeedButton);
+		JPanel topPanel = new JPanel();
+		topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
 		
-		fitnessSummary.setPreferredSize(new Dimension(200, 20));
+		topPanel.add(currentFileTextField);
+		currentFileTextField.setAlignmentX(Component.CENTER_ALIGNMENT);
+		topPanel.add(fileTree);
+		fileTree.setAlignmentX(Component.CENTER_ALIGNMENT);
+		topPanel.add(fitnessSummary);
+		fitnessSummary.setAlignmentX(Component.CENTER_ALIGNMENT);
+		topPanel.add(editButton);
+		
+		JPanel editLoad = new JPanel();
+		editLoad.add(editButton);
+		editLoad.add(loadButton);
+		
+		editLoad.setAlignmentX(Component.CENTER_ALIGNMENT);
+		topPanel.add(editLoad);
+		
+		topPanel.add(compareFitnessButton);
+		compareFitnessButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		topPanel.add(plotFitnessButton);
+		plotFitnessButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+		
+		treeWrapper.add(topPanel, BorderLayout.NORTH);
+		treeWrapper.add(argumentsPanel, BorderLayout.CENTER);
+		treeWrapper.add(newRandomSeedButton, BorderLayout.SOUTH);
+		
+//		fitnessSummary.setPreferredSize(new Dimension(200, 20));
 
 		treeWrapper.setBorder(BorderFactory.createTitledBorder("Experiments"));
 
@@ -189,10 +202,8 @@ public class ResultViewerGui extends Gui {
 	protected JPanel initRightWrapperPanel() {
 
 		JPanel sideTopPanel = new JPanel();
-		sideTopPanel.setLayout(new GridLayout(13,1));
-		sideTopPanel.add(startButton);
+		sideTopPanel.setLayout(new GridLayout(14,1));
 		sideTopPanel.add(pauseButton);
-		sideTopPanel.add(quitButton);
 		sideTopPanel.add(plotButton);
 
 		sideTopPanel.add(new JLabel(" Sleep between control steps (ms)"));
@@ -213,14 +224,6 @@ public class ResultViewerGui extends Gui {
 		playPosition.setValue(0);
 		sideTopPanel.add(playPosition);
 		
-		sideTopPanel.add(new JLabel(" Number of steps to shift (ctrl+arrows)"));
-		JPanel buttonPanel = new JPanel();
-		shiftTextField = new JTextField(5);
-		shiftTextField.setText(""+position_shift);
-		buttonPanel.add(shiftTextField);
-		buttonPanel.add(shiftButton);
-		sideTopPanel.add(buttonPanel);
-		
 		if(enableDebugOptions) {
 		
 			neuralNetworkCheckbox = new JCheckBox("Show Neural Network");
@@ -235,47 +238,41 @@ public class ResultViewerGui extends Gui {
 		}
 		
 		JPanel sideWrapperPanel = new JPanel();
-		sideWrapperPanel.setLayout(new BorderLayout());
-		sideWrapperPanel.add(sideTopPanel, BorderLayout.NORTH);
-
 		sideWrapperPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
+		sideWrapperPanel.setLayout(new BorderLayout());
+		
+		//Status panel
+		JPanel statusPanel1 = new JPanel();
+		statusPanel1.add(new JLabel("Simulation time: "));
+		simulationTimeTextField = new JTextField("N/A");
+		simulationTimeTextField.setPreferredSize(new Dimension(100, 20));
+		simulationTimeTextField.setHorizontalAlignment(JTextField.RIGHT);
+		statusPanel1.add(simulationTimeTextField);
+
+		JPanel statusPanel2 = new JPanel();
+		statusPanel2.add(new JLabel("Control step: "));
+		controlStepTextField = new JTextField("N/A");
+		controlStepTextField.setPreferredSize(new Dimension(100, 20));
+		controlStepTextField.setHorizontalAlignment(JTextField.RIGHT);
+		statusPanel2.add(controlStepTextField);
+
+		JPanel statusPanel3 = new JPanel();
+		statusPanel3.add(new JLabel("Fitness: "));
+		fitnessTextField = new JTextField("N/A");
+		fitnessTextField.setPreferredSize(new Dimension(100, 20));
+		fitnessTextField.setHorizontalAlignment(JTextField.RIGHT);
+		statusPanel3.add(fitnessTextField);
+		
+		sideTopPanel.add(statusPanel1);
+		sideTopPanel.add(statusPanel2);
+		sideTopPanel.add(statusPanel3);
+		
+		sideWrapperPanel.add(sideTopPanel, BorderLayout.NORTH);
 
 		return sideWrapperPanel;
 	}
 
-	protected JPanel initBottomPanel() {
-
-		JPanel bottomPanel   = new JPanel();
-
-		bottomPanel.add(new JLabel("Simulation time: "));
-		simulationTimeTextField = new JTextField("N/A");
-		simulationTimeTextField.setPreferredSize(new Dimension(100, 20));
-		simulationTimeTextField.setHorizontalAlignment(JTextField.RIGHT);
-		bottomPanel.add(simulationTimeTextField);
-
-		bottomPanel.add(new JLabel("Control step: "));
-		controlStepTextField = new JTextField("N/A");
-		controlStepTextField.setPreferredSize(new Dimension(100, 20));
-		controlStepTextField.setHorizontalAlignment(JTextField.RIGHT);
-		bottomPanel.add(controlStepTextField);
-
-		bottomPanel.add(new JLabel("Fitness: "));
-		fitnessTextField = new JTextField("N/A");
-		fitnessTextField.setPreferredSize(new Dimension(100, 20));
-		fitnessTextField.setHorizontalAlignment(JTextField.RIGHT);
-		bottomPanel.add(fitnessTextField);
-		
-		bottomPanel.setBorder(BorderFactory.createTitledBorder("Status"));
-
-		return bottomPanel;
-	}
-
 	protected void initActions() {
-		
-		shiftTextField.getInputMap().put(KeyStroke.getKeyStroke("control LEFT"), "none");
-		shiftTextField.getInputMap().put(KeyStroke.getKeyStroke("control RIGHT"), "none");
-		shiftTextField.getInputMap().put(KeyStroke.getKeyStroke("meta LEFT"), "none");;
-		shiftTextField.getInputMap().put(KeyStroke.getKeyStroke("meta RIGHT"), "none");
 		
 		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control ENTER"), "control ENTER");
 		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta ENTER"), "control ENTER");
@@ -291,25 +288,7 @@ public class ResultViewerGui extends Gui {
 		((JComponent) frame).getActionMap().put("control P", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
-				pauseButton();
-			}
-		});
-		
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "control S");  
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta S"), "control S");
-		((JComponent) frame).getActionMap().put("control S", new AbstractAction(){  
-			protected static final long serialVersionUID = 1L;
-			public void actionPerformed(ActionEvent evt) {  
-				startButton();
-			}
-		});
-		
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control LEFT"), "control LEFT");
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta LEFT"), "control LEFT");
-		((JComponent) frame).getActionMap().put("control LEFT", new AbstractAction(){  
-			protected static final long serialVersionUID = 1L;
-			public void actionPerformed(ActionEvent evt) {  
-				shiftSimulationBy(-position_shift,false);
+				startPauseButton();
 			}
 		});
 		
@@ -339,15 +318,6 @@ public class ResultViewerGui extends Gui {
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveDown();
-			}
-		});
-		
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control RIGHT"), "control RIGHT");
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta RIGHT"), "control RIGHT");
-		((JComponent) frame).getActionMap().put("control RIGHT", new AbstractAction(){  
-			protected static final long serialVersionUID = 1L;
-			public void actionPerformed(ActionEvent evt) {  
-				shiftSimulationBy(position_shift,false);
 			}
 		});
 		
@@ -391,21 +361,9 @@ public class ResultViewerGui extends Gui {
 			public void mouseClicked(MouseEvent arg0) {}
 		});
 
-		startButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				startButton();
-			} 		
-		});
-
-		quitButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				System.exit(0);
-			} 		
-		});
-
 		pauseButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				pauseButton();
+				startPauseButton();
 			} 		
 		});
 
@@ -454,26 +412,6 @@ public class ResultViewerGui extends Gui {
 						e.printStackTrace();
 					}
 				}
-			}
-		});
-		
-		shiftButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				try{
-					int value = Integer.parseInt(shiftTextField.getText());
-					position_shift = value;
-				}catch(Exception e) {}
-			}
-		});
-		
-		shiftTextField.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				try{
-					int value = Integer.parseInt(shiftTextField.getText());
-					position_shift = value;
-				}catch(Exception e) {}				
 			}
 		});
 		
@@ -690,15 +628,15 @@ public class ResultViewerGui extends Gui {
 		frame.setVisible(false);
 	}
 	
-	protected void startButton() {
-		simulationState = RUN;
-		simulateUntil = 0;
-		readyToSkip = true;
-		if(simulator != null && simulator.simulationFinished())
-			loadCurrentFile();
-	}
+//	protected void startButton() {
+//		simulationState = RUN;
+//		simulateUntil = 0;
+//		readyToSkip = true;
+//		if(simulator != null && simulator.simulationFinished())
+//			loadCurrentFile();
+//	}
 	
-	protected void pauseButton() {
+	protected void startPauseButton() {
 		if (simulationState == RUN)
 			simulationState = PAUSED;
 		else
@@ -983,8 +921,9 @@ public class ResultViewerGui extends Gui {
 	}
 	
 	protected void createRenderer(Arguments args) {
-		if(args.getArgumentIsDefined("classname"))
+		if(args.getArgumentIsDefined("classname")) {
 			this.renderer = Renderer.getRenderer(args);
+		}
 	}
 	
 	public Simulator loadSimulator() {

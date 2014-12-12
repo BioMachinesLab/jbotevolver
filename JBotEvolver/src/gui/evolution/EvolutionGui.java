@@ -38,17 +38,13 @@ public class EvolutionGui extends JPanel {
 	private JTextField averageTextField;
 	private JTextField worstTextField;
 	private JTextField etaTextField;
-	
 	private Evolution evo;
 	private TaskExecutor taskExecutor;
-
 	private long time;
-
 	private Population population;
-	
 	private String configName = "";
-	
-	JPanel graphPanel;
+	private JPanel graphPanel;
+	private JButton stopButton;
 	
 	public EvolutionGui() {
 //		super("Evolution GUI");
@@ -58,10 +54,13 @@ public class EvolutionGui extends JPanel {
 		setLayout(new BorderLayout());
 		
 		fitnessGraph = new GraphingData();
+		fitnessGraph.setxLabel("Generations");
+		fitnessGraph.setyLabel("Fitness");
+		
 		graphPanel = new JPanel(new BorderLayout());
 		graphPanel.add(fitnessGraph, BorderLayout.CENTER);
 		add(graphPanel, BorderLayout.CENTER);
-		add(createnfoPanel(), BorderLayout.EAST);
+		add(createnfoPanel(), BorderLayout.SOUTH);
 		setSize(880, 320);
 //		setLocationRelativeTo(null);
 //		setVisible(true);
@@ -79,7 +78,9 @@ public class EvolutionGui extends JPanel {
 		
 		fitnessGraph.clear();
 		fitnessGraph.setShowLast(population.getNumberOfGenerations());
-		fitnessGraph.setxLabel("Generations", population.getNumberOfGenerations());
+		
+		fitnessGraph.setxLabel("Generations ("+population.getNumberOfGenerations()+")");
+		fitnessGraph.setyLabel("Fitness");
 		
 		time = System.currentTimeMillis();
 		
@@ -88,84 +89,98 @@ public class EvolutionGui extends JPanel {
 	}
 	
 	public void executeEvolution() {
+		evolutionProgressBar.setValue(0);
+		generationsProgressBar.setValue(0);
+		stopButton.setEnabled(true);
 		evo.executeEvolution();
 		taskExecutor.stopTasks();
+		stopButton.setEnabled(false);
 	}
 
 	private Component createnfoPanel() {
 		JPanel mainPanel = new JPanel(new BorderLayout());
-		mainPanel.setPreferredSize(new Dimension(350,getHeight()));
+//		mainPanel.setPreferredSize(new Dimension(200,200));
 		
-		JPanel infoPanel = new JPanel(new GridLayout(6, 1));
+		JPanel infoPanel = new JPanel(new GridLayout(2, 3));
+		infoPanel.setBorder(BorderFactory.createTitledBorder("Status"));
 		
-		JLabel configNameLabel = new JLabel("Configuration File Name:");
+//		for(int i = 0 ; i < 6 ; i++)
+//			infoPanel.add(new JLabel());
+		
+		JLabel configNameLabel = new JLabel("Configuration:");
 		configNameTextField = new JTextField(configName);
-		configNameTextField.setEnabled(false);
+		configNameTextField.setEditable(false);
 		infoPanel.add(configNameLabel);
 		infoPanel.add(configNameTextField);
 		
 		JLabel generationLabel = new JLabel("Generations:");
 		generationTextField = new JTextField("0");
-		generationTextField.setEnabled(false);
+		generationTextField.setEditable(false);
 		infoPanel.add(generationLabel);
 		infoPanel.add(generationTextField);
 		
+		JLabel etaLabel = new JLabel("ETA:");
+		etaTextField = new JTextField("N/A");
+		etaTextField.setEditable(false);
+		infoPanel.add(etaLabel);
+		infoPanel.add(etaTextField);
+		
 		JLabel bestLabel = new JLabel("Best:");
 		bestTextField = new JTextField("N/A");
-		bestTextField.setEnabled(false);
+		bestTextField.setEditable(false);
 		infoPanel.add(bestLabel);
 		infoPanel.add(bestTextField);
 		
 		JLabel averageLabel = new JLabel("Average:");
 		averageTextField = new JTextField("N/A");
-		averageTextField.setEnabled(false);
+		averageTextField.setEditable(false);
 		infoPanel.add(averageLabel);
 		infoPanel.add(averageTextField);
 		
 		JLabel worstLabel = new JLabel("Worst:");
 		worstTextField = new JTextField("N/A");
-		worstTextField.setEnabled(false);
+		worstTextField.setEditable(false);
 		infoPanel.add(worstLabel);
 		infoPanel.add(worstTextField);
 		
-		JLabel etaLabel = new JLabel("ETA:");
-		etaTextField = new JTextField("N/A");
-		etaTextField.setEnabled(false);
-		etaTextField.setEditable(false);
-		infoPanel.add(etaLabel);
-		infoPanel.add(etaTextField);
+//		for(int i = 0 ; i < 6 ; i++)
+//			infoPanel.add(new JLabel());
 		
-		JPanel progessPanel = new JPanel(new GridLayout(3,1));
+		JPanel mainProgressPanel = new JPanel(new BorderLayout());
+		mainProgressPanel.setBorder(BorderFactory.createTitledBorder("Progress"));
 		
-		JPanel generationProgessPanel = new JPanel(new GridLayout(2,1));
-		JLabel generationsProgressLabel = new JLabel("Generation Progess:");
+		JPanel progessPanel = new JPanel(new GridLayout(2,1));
+		
+		JPanel generationProgessPanel = new JPanel(new BorderLayout());
+		JLabel generationsProgressLabel = new JLabel("Generation Progress:  ");
 		generationsProgressBar = new JProgressBar(0,100);
 		generationsProgressBar.setStringPainted(true);
-		generationProgessPanel.add(generationsProgressLabel);
-		generationProgessPanel.add(generationsProgressBar);
+		generationProgessPanel.add(generationsProgressLabel, BorderLayout.WEST);
+		generationProgessPanel.add(generationsProgressBar, BorderLayout.CENTER);
 		progessPanel.add(generationProgessPanel);
 		
-		JPanel evolutionProgessPanel = new JPanel(new GridLayout(2,1));
-		JLabel evolutionProgressLabel = new JLabel("Evolution Progess:");
+		JPanel evolutionProgessPanel = new JPanel(new BorderLayout());
+		JLabel evolutionProgressLabel = new JLabel("Evolution Progress:    ");
 		evolutionProgressBar = new JProgressBar(0,100);
 		evolutionProgressBar.setStringPainted(true);
-		evolutionProgessPanel.add(evolutionProgressLabel);
-		evolutionProgessPanel.add(evolutionProgressBar);
+		evolutionProgessPanel.add(evolutionProgressLabel, BorderLayout.WEST);
+		evolutionProgessPanel.add(evolutionProgressBar, BorderLayout.CENTER);
 		progessPanel.add(evolutionProgessPanel);
 		
-		JButton stopButton = new JButton("Stop Evolution");
+		stopButton = new JButton("Stop Evolution");
+		stopButton.setEnabled(false);
 		stopButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent event) {
 				stopEvolution();
 			}
 		});
-		progessPanel.add(stopButton);
+		mainProgressPanel.add(progessPanel, BorderLayout.CENTER);
+		mainProgressPanel.add(stopButton, BorderLayout.EAST);
 		
-		mainPanel.add(infoPanel);
-		mainPanel.add(progessPanel, BorderLayout.SOUTH);
+		mainPanel.add(infoPanel, BorderLayout.WEST);
+		mainPanel.add(mainProgressPanel, BorderLayout.CENTER);
 		
-		mainPanel.setBorder(BorderFactory.createTitledBorder("Status"));
 		return mainPanel;
 	}
 	
