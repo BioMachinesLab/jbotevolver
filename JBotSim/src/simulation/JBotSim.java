@@ -1,7 +1,6 @@
 package simulation;
 
 import gui.Gui;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -9,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Random;
-
-import net.jafama.FastMath;
 import controllers.Controller;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -22,11 +19,13 @@ public class JBotSim implements Serializable{
 	protected long randomSeed;
 	
 	public JBotSim(HashMap<String,Arguments> arguments, long randomSeed) {
+		Locale.setDefault(new Locale("en","US"));
 		this.arguments = arguments;
 		this.randomSeed = randomSeed;
 	}
 	
 	public JBotSim(String[] commandLineArgs) throws IOException, ClassNotFoundException {
+		Locale.setDefault(new Locale("en","US"));
 		if (commandLineArgs != null)
 			loadArguments(commandLineArgs);
 	}
