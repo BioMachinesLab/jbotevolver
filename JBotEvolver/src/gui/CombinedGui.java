@@ -4,7 +4,6 @@ import evolutionaryrobotics.JBotEvolver;
 import gui.configuration.ConfigurationAutomator;
 import gui.configuration.ConfigurationAutomatorGui;
 import gui.evolution.EvolutionGui;
-
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;

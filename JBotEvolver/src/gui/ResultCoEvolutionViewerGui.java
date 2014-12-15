@@ -55,12 +55,6 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 
 		JPanel bottomPanel   = new JPanel();
 
-		bottomPanel.add(new JLabel("Simulation time: "));
-		simulationTimeTextField = new JTextField("N/A");
-		simulationTimeTextField.setPreferredSize(new Dimension(50, 20));
-		simulationTimeTextField.setHorizontalAlignment(JTextField.RIGHT);
-		bottomPanel.add(simulationTimeTextField);
-
 		bottomPanel.add(new JLabel("Control step: "));
 		controlStepTextField = new JTextField("N/A");
 		controlStepTextField.setPreferredSize(new Dimension(50, 20));
@@ -141,7 +135,6 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		}
 		
 		if(simulateUntil == 0) {
-			simulationTimeTextField.setText("0");
 			controlStepTextField.setText("0");
 			fitnessTextField.setText("0");
 		}

@@ -115,6 +115,8 @@ public class GenerationalEvolution extends Evolution {
 				population.createNextGeneration();
 			}
 		}
+		
+		evolutionFinished = true;
 	}
 	
 	private int getGenomeLength() {

@@ -3,7 +3,9 @@ package gui.evolution;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.populations.Population;
-import gui.util.GraphingData;
+import gui.renderer.Renderer;
+import gui.util.Graph;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -13,21 +15,29 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.Scanner;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
+import simulation.Simulator;
+import simulation.Updatable;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 
 public class EvolutionGui extends JPanel {
 
 	private static final long serialVersionUID = -63231826531435127L;
+	private static final long PREVIEW_SLEEP = 10;
 
-	private GraphingData fitnessGraph;
+	private Graph fitnessGraph;
 	
 	private JProgressBar evolutionProgressBar;
 	private JProgressBar generationsProgressBar;
@@ -45,28 +55,38 @@ public class EvolutionGui extends JPanel {
 	private String configName = "";
 	private JPanel graphPanel;
 	private JButton stopButton;
+	private Renderer renderer;
+	private JBotEvolver jBotEvolver;
+	private boolean enablePreview = true;
+	private JTextField previewGenerationTextField;
 	
 	public EvolutionGui() {
-//		super("Evolution GUI");
-		
-		
-//		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setLayout(new BorderLayout());
 		
-		fitnessGraph = new GraphingData();
+		fitnessGraph = new Graph();
 		fitnessGraph.setxLabel("Generations");
 		fitnessGraph.setyLabel("Fitness");
 		
 		graphPanel = new JPanel(new BorderLayout());
+		graphPanel.setBorder(BorderFactory.createTitledBorder("Fitness Graph"));
 		graphPanel.add(fitnessGraph, BorderLayout.CENTER);
+		
 		add(graphPanel, BorderLayout.CENTER);
-		add(createnfoPanel(), BorderLayout.SOUTH);
+		add(createInfoPanel(), BorderLayout.SOUTH);
+		add(createPreviewPanel(), BorderLayout.EAST);
+		
 		setSize(880, 320);
-//		setLocationRelativeTo(null);
-//		setVisible(true);
+		
+		ShowBestThread showBestThread = new ShowBestThread();
+		showBestThread.start();
+		
+		UpdateEvolutionThread updateThread = new UpdateEvolutionThread();
+		updateThread.start();
 	}
 	
 	public void init(JBotEvolver jBotEvolver) {
+		
+		this.jBotEvolver = jBotEvolver;
 		
 		taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
 		taskExecutor.start();
@@ -76,75 +96,109 @@ public class EvolutionGui extends JPanel {
 		configName = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
 		configNameTextField.setText(configName);
 		
-		fitnessGraph.clear();
-		fitnessGraph.setShowLast(population.getNumberOfGenerations());
-		
 		fitnessGraph.setxLabel("Generations ("+population.getNumberOfGenerations()+")");
 		fitnessGraph.setyLabel("Fitness");
 		
 		time = System.currentTimeMillis();
-		
-		UpdateEvolutionThread updateThread = new UpdateEvolutionThread();
-		updateThread.start();
 	}
 	
 	public void executeEvolution() {
 		evolutionProgressBar.setValue(0);
 		generationsProgressBar.setValue(0);
 		stopButton.setEnabled(true);
+		fitnessGraph.clear();
+		fitnessGraph.setShowLast(population.getNumberOfGenerations());
+		newGeneration();
 		evo.executeEvolution();
 		taskExecutor.stopTasks();
 		stopButton.setEnabled(false);
 	}
+	
+	private Component createPreviewPanel() {
+		int panelWidth = 500;
+		
+		JPanel panel = new JPanel(new BorderLayout());
+		
+		renderer = Renderer.getRenderer(new Arguments("classname=TwoDRenderer",true));
+		renderer.setPreferredSize(new Dimension(panelWidth,panelWidth));
+		
+		panel.add(renderer, BorderLayout.CENTER);
+		
+		JPanel configPanel = new JPanel();
+		
+		previewGenerationTextField = new JTextField(4);
+		previewGenerationTextField.setText("0");
+		previewGenerationTextField.setEditable(false);
+		previewGenerationTextField.setHorizontalAlignment(JTextField.CENTER);
+		
+		configPanel.add(new JLabel("Generation: "));
+		configPanel.add(previewGenerationTextField);
+		
+		JCheckBox enableCheckbox = new JCheckBox();
+		enableCheckbox.setSelected(true);
+		enableCheckbox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				enablePreview = ((JCheckBox)e.getSource()).isSelected();
+				newGeneration();
+			}
+		});
+		
+		configPanel.add(new JLabel("Enable preview: "));
+		configPanel.add(enableCheckbox);
+		
+		panel.add(configPanel, BorderLayout.SOUTH);
+		panel.setBorder(BorderFactory.createTitledBorder("Preview"));
+		
+		return panel;
+	}
 
-	private Component createnfoPanel() {
+	private Component createInfoPanel() {
 		JPanel mainPanel = new JPanel(new BorderLayout());
-//		mainPanel.setPreferredSize(new Dimension(200,200));
 		
 		JPanel infoPanel = new JPanel(new GridLayout(2, 3));
 		infoPanel.setBorder(BorderFactory.createTitledBorder("Status"));
 		
-//		for(int i = 0 ; i < 6 ; i++)
-//			infoPanel.add(new JLabel());
-		
 		JLabel configNameLabel = new JLabel("Configuration:");
 		configNameTextField = new JTextField(configName);
 		configNameTextField.setEditable(false);
+		configNameTextField.setHorizontalAlignment(JTextField.CENTER);
 		infoPanel.add(configNameLabel);
 		infoPanel.add(configNameTextField);
 		
 		JLabel generationLabel = new JLabel("Generations:");
 		generationTextField = new JTextField("0");
 		generationTextField.setEditable(false);
+		generationTextField.setHorizontalAlignment(JTextField.CENTER);
 		infoPanel.add(generationLabel);
 		infoPanel.add(generationTextField);
 		
 		JLabel etaLabel = new JLabel("ETA:");
 		etaTextField = new JTextField("N/A");
 		etaTextField.setEditable(false);
+		etaTextField.setHorizontalAlignment(JTextField.CENTER);
 		infoPanel.add(etaLabel);
 		infoPanel.add(etaTextField);
 		
 		JLabel bestLabel = new JLabel("Best:");
 		bestTextField = new JTextField("N/A");
 		bestTextField.setEditable(false);
+		bestTextField.setHorizontalAlignment(JTextField.CENTER);
 		infoPanel.add(bestLabel);
 		infoPanel.add(bestTextField);
 		
 		JLabel averageLabel = new JLabel("Average:");
 		averageTextField = new JTextField("N/A");
 		averageTextField.setEditable(false);
+		averageTextField.setHorizontalAlignment(JTextField.CENTER);
 		infoPanel.add(averageLabel);
 		infoPanel.add(averageTextField);
 		
 		JLabel worstLabel = new JLabel("Worst:");
 		worstTextField = new JTextField("N/A");
 		worstTextField.setEditable(false);
+		worstTextField.setHorizontalAlignment(JTextField.CENTER);
 		infoPanel.add(worstLabel);
 		infoPanel.add(worstTextField);
-		
-//		for(int i = 0 ; i < 6 ; i++)
-//			infoPanel.add(new JLabel());
 		
 		JPanel mainProgressPanel = new JPanel(new BorderLayout());
 		mainProgressPanel.setBorder(BorderFactory.createTitledBorder("Progress"));
@@ -200,8 +254,9 @@ public class EvolutionGui extends JPanel {
 		
 		@Override
 		public void run() {
-			if(population != null){
-				while(true){
+			
+			while(true){
+				if(population != null && !evo.isEvolutionFinished()){
 					int currentGeneration = population.getNumberOfCurrentGeneration();
 					
 					if(generation < currentGeneration){
@@ -231,6 +286,8 @@ public class EvolutionGui extends JPanel {
 						int eta = (int) (passedTime / completePercentage * (1 - completePercentage));
 						etaTextField.setText(new Time(eta- 3600000).toString());
 						
+						newGeneration();
+						
 					}else{
 						int chromosomesEvaluated = population.getNumberOfChromosomesEvaluated();
 						int populationSize = population.getPopulationSize();
@@ -239,14 +296,14 @@ public class EvolutionGui extends JPanel {
 						generationsProgressBar.setValue(generationProgress);
 						generationsProgressBar.setString(generationProgress + "%");
 					}
-					
-					fitnessGraph.repaint();
-					
 					try {
 						sleep(10);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
+				} else {
+					waitForNewGeneration();
+					generation = 0;
 				}
 			}
 		}
@@ -283,4 +340,59 @@ public class EvolutionGui extends JPanel {
 		}
 	}
 	
+	public synchronized void newGeneration() {
+		notifyAll();
+	}
+	
+	private synchronized void waitForNewGeneration() {
+		try {
+			wait();
+		} catch (InterruptedException e) {}
+	}
+	
+	class ShowBestThread extends Thread implements Updatable {
+		
+		private int currentGenerationNumber = 0;
+		
+		@Override
+		public void update(Simulator simulator) {
+			if(enablePreview)
+				renderer.drawFrame();
+		}
+		
+		@Override
+		public void run() {
+			
+			while(true) {
+				if(evo != null) {
+					while(!evo.isEvolutionFinished()) {
+						
+						int evoPopulation = evo.getPopulation().getNumberOfCurrentGeneration();
+						
+						if(enablePreview && evoPopulation > 0 && evoPopulation != currentGenerationNumber){
+							currentGenerationNumber = evoPopulation;
+							
+							Simulator sim = jBotEvolver.createSimulator();
+							sim.addCallback(jBotEvolver.getEvaluationFunction());
+							sim.addCallback(this);
+							ArrayList<Robot> robots = jBotEvolver.createRobots(sim);
+							jBotEvolver.setChromosome(robots, evo.getPopulation().getBestChromosome());
+							sim.addRobots(robots);
+							
+							
+							previewGenerationTextField.setText(""+currentGenerationNumber);
+							
+							renderer.setSimulator(sim);
+							renderer.drawFrame();
+							
+							sim.simulate(PREVIEW_SLEEP);
+						} else
+							waitForNewGeneration();
+					}
+				} else {
+					waitForNewGeneration();
+				}
+			}
+		}
+	}
 }

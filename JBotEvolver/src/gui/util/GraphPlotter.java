@@ -175,7 +175,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		JFrame window = new JFrame();
 		JPanel graphPanel = new JPanel(new BorderLayout());
 		window.getContentPane().add(graphPanel);
-		GraphingData graph = new GraphingData();
+		Graph graph = new Graph();
 		graphPanel.add(graph);
 		
 		int numberOfPoints = 0;
@@ -596,7 +596,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 				JFrame window = new JFrame();
 				JPanel graphPanel = new JPanel(new BorderLayout());
 				window.getContentPane().add(graphPanel);
-				GraphingData graph = new GraphingData();
+				Graph graph = new Graph();
 				graphPanel.add(graph);
 				
 				int dataSize = 0;

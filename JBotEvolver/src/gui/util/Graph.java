@@ -12,7 +12,7 @@ import java.util.Vector;
 
 import javax.swing.JPanel;
 
-public class GraphingData extends JPanel {
+public class Graph extends JPanel {
 	private static final int MAX = 4000;
 	private int showLast = 2000;
 	final int PAD = 20;
@@ -53,8 +53,8 @@ public class GraphingData extends JPanel {
 		repaint();
 	}
 
-	protected void paintComponent(Graphics g) {
-		super.paintComponent(g);
+	public void paint(Graphics g) {
+		super.paint(g);
 		
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, getWidth(), getHeight());

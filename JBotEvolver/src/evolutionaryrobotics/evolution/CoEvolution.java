@@ -249,6 +249,7 @@ public class CoEvolution extends Evolution {
 				populationA.createNextGeneration();
 				populationB.createNextGeneration();
 			}
+			evolutionFinished = true;
 		}
 
 		private int getGenomeLength() {

@@ -79,5 +79,6 @@ public class SingleSampleGenerationalEvolution extends GenerationalEvolution {
 				population.createNextGeneration();
 			}
 		}
+		evolutionFinished = true;
 	}
 }
