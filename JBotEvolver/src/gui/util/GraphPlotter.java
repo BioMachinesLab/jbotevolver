@@ -57,8 +57,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 	private ArrayList<double[][]> valuesList = new ArrayList<double[][]>();
 	private ArrayList<String> titlesList = new ArrayList<String>();
 	
-	private JCheckBox smoothCheckBox = new JCheckBox("Smooth lines");
-	
 	private double currentStep = 0;
 	private int currentIndex = 0;
 	
@@ -105,9 +103,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 	
 			JPanel buttonsPanel = new JPanel(new GridLayout(1,4));
 			
-			smoothCheckBox.setSelected(true);
-			buttonsPanel.add(smoothCheckBox);
-			
 			JButton checkAllButton = new JButton("Check all");
 			buttonsPanel.add(checkAllButton);
 			
@@ -152,7 +147,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 			
 			add(mainPanel);
 	
-//			setSize(800,500);
 			pack();
 			setLocationRelativeTo(null);
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -214,6 +208,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		        	numberOfPoints = totalGenerations;
 		        
 		        graph.addDataList(dataList);
+		        graph.addLegend(fitnessFile.getAbsolutePath());
 		    } 
 		    catch (FileNotFoundException e) {
 		        e.printStackTrace();
@@ -224,7 +219,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		graph.setyLabel("Fitness");
         graph.setShowLast(numberOfPoints);
 		
-		window.setSize(800,500);
+		window.setSize(800,500+graph.getHeaderSize());
 		window.setLocationRelativeTo(null);
 		window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		window.setVisible(true);
@@ -234,7 +229,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 	
 	private String[] removeBlankSpaceOnArray(String[] lineValues) {
 		ArrayList<String> list = new ArrayList<String>();
-		int j = 0;
 		
 		for (int i = 0; i < lineValues.length; i++) {
 			if(!lineValues[i].equals(""))
@@ -613,11 +607,14 @@ public class GraphPlotter extends JFrame implements Updatable {
 					graph.addDataList(data);
 				}
 				
+				for(String s : titlesList)
+					graph.addLegend(s);
+				
 				graph.setxLabel("Timesteps ("+(dataSize+1)+")");
 				graph.setyLabel("Fitness");
 		        graph.setShowLast(dataSize);
 				
-				window.setSize(800,500);
+				window.setSize(800,500+graph.getHeaderSize());
 				window.setLocationRelativeTo(null);
 				window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 				window.setVisible(true);
