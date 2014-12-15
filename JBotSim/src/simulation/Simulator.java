@@ -1,23 +1,16 @@
 package simulation;
 
-import java.awt.List;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 import simulation.environment.Environment;
-import simulation.physicalobjects.GeometricCalculator;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.Robot;
@@ -192,6 +185,18 @@ public class Simulator implements Serializable {
 		setup();
 		for (time = Double.valueOf(0); time < environment.getSteps() && !stopSimulation; time++) {
 			performOneSimulationStep(time);
+		}
+		stopSimulation = true;
+	}
+	
+	public void simulate(long sleepTime) {
+		setup();
+		for (time = Double.valueOf(0); time < environment.getSteps() && !stopSimulation; time++) {
+			performOneSimulationStep(time);
+			
+			try {
+				Thread.sleep(sleepTime);
+			} catch (InterruptedException e) {}
 		}
 		stopSimulation = true;
 	}
