@@ -25,7 +25,6 @@ public class PostEvaluationTask extends JBotEvolverTask {
 		super(jBotEvolver);
 		this.fitnesssample = fitnesssample;
 		this.chromosome = chromosome;
-		this.jBotEvolver = jBotEvolver;
 		this.nSamples = nSamples;
 		this.threshold = threshold;
 		this.run = run;

@@ -24,7 +24,6 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 		super(jBotEvolver);
 		this.fitnesssample = fitnesssample;
 		this.chromosome = chromosome;
-		this.jBotEvolver = jBotEvolver;
 		this.sample = sample;
 		this.threshold = threshold;
 		this.run = run;

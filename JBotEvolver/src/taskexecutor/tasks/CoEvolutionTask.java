@@ -21,7 +21,6 @@ public class CoEvolutionTask extends JBotEvolverTask {
 	private int numPreys;
 	private String evaluation;
 	private Random random;
-	private JBotEvolver jBotEvolver;
 
 	public CoEvolutionTask(JBotEvolver jBotEvolver, int samples,
 			Chromosome chromosome, Chromosome opponentChromosome, int numPreys,

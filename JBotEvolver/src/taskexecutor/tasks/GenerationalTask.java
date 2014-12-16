@@ -16,14 +16,12 @@ public class GenerationalTask extends JBotEvolverTask {
 	private double fitness = 0;
 	private Chromosome chromosome;
 	private Random random;
-	private JBotEvolver jBotEvolver;
 	
 	public GenerationalTask(JBotEvolver jBotEvolver, int samples, Chromosome chromosome, long seed) {
 		super(jBotEvolver);
 		this.samples = samples;
 		this.chromosome = chromosome;
 		this.random = new Random(seed);
-		this.jBotEvolver = jBotEvolver;
 	}
 	
 	@Override

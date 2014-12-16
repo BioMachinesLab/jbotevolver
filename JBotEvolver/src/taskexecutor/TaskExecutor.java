@@ -34,7 +34,4 @@ public abstract class TaskExecutor extends Thread {
 		return (TaskExecutor) Factory.getInstance(arguments.getArgumentAsString("classname"), jBotEvolver, arguments);
 	}
 
-	public void prepareArguments(HashMap<String, Arguments> arguments) {
-		
-	}
 }

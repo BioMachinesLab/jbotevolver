@@ -64,8 +64,6 @@ public class GenerationalEvolution extends Evolution {
 			population.createRandomPopulation();
 		
 		if(!population.evolutionDone()) {
-			taskExecutor.prepareArguments(jBotEvolver.getArguments());
-			
 			taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
 		}
 		

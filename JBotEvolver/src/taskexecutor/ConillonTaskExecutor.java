@@ -3,12 +3,13 @@ package taskexecutor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.jafama.FastMath;
 import result.Result;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
+import taskexecutor.tasks.JBotEvolverTask;
 import tasks.Task;
 import client.Client;
-import net.jafama.FastMath;
 import comm.ClientPriority;
 import evolutionaryrobotics.JBotEvolver;
 
@@ -50,15 +51,32 @@ public class ConillonTaskExecutor extends TaskExecutor {
 		else
 			client = new Client(desc,priority, serverName, serverPort, serverName, codePort);
 		connected = true;
-		//prepareArguments(jBotEvolver.getArguments());
 	}
 
 	@Override
-	public void prepareArguments(HashMap<String, Arguments> arguments) {
-		
+	public void addTask(Task t) {
 		if(!connected)
 			connect();
-
+		
+		prepareTask(t);
+		
+		client.commit(t);
+	}
+	
+	/*
+	 * We need to prepare the classes for Conillon. The a package name
+	 * has to be appended to the beginning of the original name. This
+	 * function is fast (I timed it at 0-1ms on an i7 processor), so it
+	 * shouldn't add a significant overhead. This is done on each copy
+	 * of JBotEvolver that is created for each task. Alternatively, we
+	 * could just do it on the constructor for the original JBotEvolver
+	 * instance, but that creates problems if we want to run that instance
+	 * locally (for instance, to preview the current generation in the GUI). 
+	 */
+	private void prepareTask(Task t) {
+		JBotEvolverTask jt = (JBotEvolverTask)t;
+		HashMap<String, Arguments> arguments = jt.getJBotEvolver().getArguments();
+		
 		for (String name : arguments.keySet()) {
 			Arguments args = arguments.get(name);
 			ArrayList<String> classNames = new ArrayList<String>();
@@ -72,15 +90,7 @@ public class ConillonTaskExecutor extends TaskExecutor {
 			completeArgs = Arguments.repleceTagByStrings("classname",
 					completeArgs, "__PLACEHOLDER__", classNames);
 			arguments.put(name, new Arguments(completeArgs));
-			//args.setArgument(name, completeArgs);
 		}
-	}
-	
-	@Override
-	public void addTask(Task t) {
-		if(!connected)
-			connect();
-		client.commit(t);
 	}
 	
 	@Override

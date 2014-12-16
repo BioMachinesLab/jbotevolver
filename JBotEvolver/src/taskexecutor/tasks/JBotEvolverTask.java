@@ -4,5 +4,13 @@ import evolutionaryrobotics.JBotEvolver;
 import tasks.Task;
 
 public abstract class JBotEvolverTask extends Task {
-	public JBotEvolverTask(JBotEvolver jBotEvolver) {}
+	
+	protected JBotEvolver jBotEvolver;
+	
+	public JBotEvolverTask(JBotEvolver jBotEvolver) {
+		this.jBotEvolver = jBotEvolver;
+	}
+	public JBotEvolver getJBotEvolver() {
+		return jBotEvolver;
+	}
 }

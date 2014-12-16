@@ -26,7 +26,6 @@ public class SingleSampleGenerationalEvolution extends GenerationalEvolution {
 		int samples = population.getNumberOfSamplesPerChromosome();
 		
 		if(!population.evolutionDone()) {
-			taskExecutor.prepareArguments(jBotEvolver.getArguments());
 			taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize()*samples);
 		}
 		

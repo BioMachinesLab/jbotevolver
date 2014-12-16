@@ -23,7 +23,6 @@ public class SimpleSampleTask extends JBotEvolverTask {
 		super(jBotEvolver);
 		this.fitnesssample = fitnesssample;
 		this.chromosome = chromosome;
-		this.jBotEvolver = jBotEvolver;
 		this.run = run;
 		this.randomSeed = randomSeed;
 	}

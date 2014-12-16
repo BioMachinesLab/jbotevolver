@@ -59,6 +59,7 @@ public class EvolutionGui extends JPanel {
 	private JBotEvolver jBotEvolver;
 	private boolean enablePreview = true;
 	private JTextField previewGenerationTextField;
+	UpdateEvolutionThread updateThread;
 	
 	public EvolutionGui() {
 		setLayout(new BorderLayout());
@@ -80,7 +81,7 @@ public class EvolutionGui extends JPanel {
 		ShowBestThread showBestThread = new ShowBestThread();
 		showBestThread.start();
 		
-		UpdateEvolutionThread updateThread = new UpdateEvolutionThread();
+		updateThread = new UpdateEvolutionThread();
 		updateThread.start();
 	}
 	
@@ -108,8 +109,11 @@ public class EvolutionGui extends JPanel {
 		stopButton.setEnabled(true);
 		fitnessGraph.clear();
 		fitnessGraph.setShowLast(population.getNumberOfGenerations());
+		File f = new File(jBotEvolver.getArguments().get("--output").getCompleteArgumentString()+"/_fitness.log");
+		fitnessGraph.addLegend(f.getAbsolutePath());
 		newGeneration();
 		evo.executeEvolution();
+		updateThread.updateGraph();
 		taskExecutor.stopTasks();
 		stopButton.setEnabled(false);
 	}
@@ -257,54 +261,62 @@ public class EvolutionGui extends JPanel {
 			
 			while(true){
 				if(population != null && !evo.isEvolutionFinished()){
-					int currentGeneration = population.getNumberOfCurrentGeneration();
-					
-					if(generation < currentGeneration){
-						generation = currentGeneration;
-						
-						double[] fitnessValues = getFitnessFromFile();
-						
-						int numberOfGenerations = population.getNumberOfGenerations();
-						
-						double highestFitness = fitnessValues[0];
-						double averageFitness = fitnessValues[1];
-						double lowestFitness = fitnessValues[2];
-						
-						generationTextField.setText(currentGeneration + "");
-						bestTextField.setText(highestFitness + "");
-						averageTextField.setText(averageFitness + "");
-						worstTextField.setText(lowestFitness + "");
-
-						fitnessGraph.addData(highestFitness);
-						
-						int evolutionProgress = currentGeneration * HUNDRED_PERCENT / numberOfGenerations;
-						evolutionProgressBar.setValue(evolutionProgress);
-						evolutionProgressBar.setString(evolutionProgress + "%");
-						
-						double passedTime = (System.currentTimeMillis() - time);
-						double completePercentage = currentGeneration/(double)numberOfGenerations;
-						int eta = (int) (passedTime / completePercentage * (1 - completePercentage));
-						etaTextField.setText(new Time(eta- 3600000).toString());
-						
-						newGeneration();
-						
-					}else{
-						int chromosomesEvaluated = population.getNumberOfChromosomesEvaluated();
-						int populationSize = population.getPopulationSize();
-						
-						int generationProgress = chromosomesEvaluated * HUNDRED_PERCENT / populationSize;
-						generationsProgressBar.setValue(generationProgress);
-						generationsProgressBar.setString(generationProgress + "%");
-					}
+					updateGraph();
 					try {
-						sleep(10);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
+						sleep(100);
+					} catch (InterruptedException e) {}
 				} else {
 					waitForNewGeneration();
 					generation = 0;
 				}
+			}
+		}
+		
+		private void updateGraph() {
+			int currentGeneration = population.getNumberOfCurrentGeneration();
+			
+			if(generation < currentGeneration){
+				generation++;
+				
+				//We cannot get the fitness files from the population because
+				//they are reset as soon as a new generation is created! We
+				//have to get the values from the file instead.
+				double[] fitnessValues = getFitnessFromFile();
+				
+				int numberOfGenerations = population.getNumberOfGenerations();
+				double highestFitness = fitnessValues[0];
+				double averageFitness = fitnessValues[1];
+				double lowestFitness = fitnessValues[2];
+				
+				generationTextField.setText(generation + "");
+				bestTextField.setText(highestFitness + "");
+				averageTextField.setText(averageFitness + "");
+				worstTextField.setText(lowestFitness + "");
+
+				fitnessGraph.addData(highestFitness);
+				
+				int evolutionProgress = generation * HUNDRED_PERCENT / numberOfGenerations;
+				
+				evolutionProgressBar.setValue(evolutionProgress);
+				evolutionProgressBar.setString(evolutionProgress + "%");
+				
+				double passedTime = (System.currentTimeMillis() - time);
+				double completePercentage = generation/(double)numberOfGenerations;
+				int eta = (int) (passedTime / completePercentage * (1 - completePercentage));
+				etaTextField.setText(new Time(eta- 3600000).toString());
+				
+				generationsProgressBar.setValue(100);
+				generationsProgressBar.setString("100%");
+				
+				newGeneration();
+				
+			}else{
+				int chromosomesEvaluated = population.getNumberOfChromosomesEvaluated();
+				int populationSize = population.getPopulationSize();
+				
+				int generationProgress = chromosomesEvaluated * HUNDRED_PERCENT / populationSize;
+				generationsProgressBar.setValue(generationProgress);
+				generationsProgressBar.setString(generationProgress + "%");
 			}
 		}
 
