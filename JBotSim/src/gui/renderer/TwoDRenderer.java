@@ -60,8 +60,11 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	@Override
 	public synchronized void drawFrame() {
-		if(simulator == null)
+		if(simulator == null) {
+			graphics.setColor(new Color(0xEE,0xEE,0xEE));
+			graphics.fillRect(0, 0,getWidth(),getHeight()); 
 			return;
+		}
 		
 		if(simulator.getTime() % drawFrames != 0) {
 			//repaint();
