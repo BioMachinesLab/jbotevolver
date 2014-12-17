@@ -5,7 +5,7 @@ import simulation.physicalobjects.checkers.AllowTeamNestChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class TeamNestSensor extends SimpleLightTypeSensor {
+public class TeamNestSensor extends LightTypeSensor {
 
 	public TeamNestSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);

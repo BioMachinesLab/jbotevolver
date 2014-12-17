@@ -144,9 +144,15 @@ public class Arguments implements Serializable {
 				
 				if (names.size() == 0) {
 					
+					//We're really sorry for this crappy code, but we needed this for legacy support :( authors: Miguel and Tiago
 					if(strings.get(i).endsWith("NNInput")) {
-						//We're really sorry for this crappy code, but we needed this for legacy support :( authors: Miguel and Tiago
 						List<String> sensorinputnames = ClassSearchUtils.searchFullNameInPath("SensorNNInput");
+						strings.set(i, sensorinputnames.get(0));
+						continue;
+					} if(strings.get(i).contains("Simple") && strings.get(i).contains("Sensor")) {
+						String currentString = strings.get(i);
+						currentString = currentString.replace("Simple", "");
+						List<String> sensorinputnames = ClassSearchUtils.searchFullNameInPath(currentString);
 						strings.set(i, sensorinputnames.get(0));
 						continue;
 					} else {

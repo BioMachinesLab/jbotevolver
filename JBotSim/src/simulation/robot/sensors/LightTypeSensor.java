@@ -9,9 +9,9 @@ import simulation.physicalobjects.checkers.AllowLightChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class SimpleLightTypeSensor extends ConeTypeSensor {
+public class LightTypeSensor extends ConeTypeSensor {
 	
-	public SimpleLightTypeSensor(Simulator simulator,int id, Robot robot, Arguments args) {
+	public LightTypeSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);
 		setAllowedObjectsChecker(new AllowLightChecker());
 	}
