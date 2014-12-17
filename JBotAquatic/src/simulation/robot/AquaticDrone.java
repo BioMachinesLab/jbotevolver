@@ -1,7 +1,6 @@
 package simulation.robot;
 
 import java.util.LinkedList;
-
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import net.jafama.FastMath;
@@ -10,7 +9,6 @@ import simulation.Simulator;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.TwoWheelActuator;
 import simulation.robot.sensors.CompassSensor;
-import simulation.robot.sensors.WaypointSensor;
 import simulation.util.Arguments;
 import commoninterface.AquaticDroneCI;
 import commoninterface.CILogger;
@@ -61,6 +59,12 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	@Override
 	public double getGPSLongitude() {
 		return CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY())[1];
+	}
+	
+	@Override
+	public double getGPSOrientationInDegrees() {
+		// TODO how should we fake this? add ~3m error? 
+		return 0;
 	}
 
 	@Override
