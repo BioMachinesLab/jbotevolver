@@ -98,7 +98,6 @@ public class NEATPostEval {
 					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, new Arguments("classname=SequentialTaskExecutor",true));
 				else
 					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
-				taskExecutor.prepareArguments(jBotEvolver.getArguments());
 				taskExecutor.start();
 			}
 		
@@ -110,7 +109,6 @@ public class NEATPostEval {
 					file = dir+i+"/_showbest_current.conf";
 				newArgs[0] = file;
 				jBotEvolver = new JBotEvolver(newArgs);
-				taskExecutor.prepareArguments(jBotEvolver.getArguments());
 
 				for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
 					for(int sample = 0 ; sample < samples ; sample++) {

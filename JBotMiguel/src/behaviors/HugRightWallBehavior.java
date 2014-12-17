@@ -1,9 +1,9 @@
 package behaviors;
 
+import epuck.EpuckIRSensor;
+import behaviors.Behavior;
 import simulation.Simulator;
 import simulation.robot.*;
-import simulation.robot.behaviors.Behavior;
-import simulation.robot.sensors.EpuckIRSensor;
 import simulation.util.Arguments;
 
 public class HugRightWallBehavior extends Behavior {

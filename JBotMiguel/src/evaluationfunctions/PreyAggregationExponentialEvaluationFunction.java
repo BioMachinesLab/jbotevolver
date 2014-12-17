@@ -2,13 +2,13 @@ package evaluationfunctions;
 
 import java.util.ArrayList;
 
+import controllers.BehaviorController;
 import simulation.Simulator;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import environments.TwoRoomsMultiPreyEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.BehaviorController;
 
 public class PreyAggregationExponentialEvaluationFunction extends EvaluationFunction {
 	

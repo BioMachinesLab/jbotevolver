@@ -1,7 +1,6 @@
 package sensors;
 
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
-import simulation.robot.sensors.RobotColorSensor;
 import simulation.robot.sensors.Sensor;
 
 public class RobotOrientationNNInput extends NNInput {

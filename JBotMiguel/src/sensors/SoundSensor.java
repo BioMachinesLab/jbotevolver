@@ -1,6 +1,6 @@
 package sensors;
 
-import actuators.SoundActuator;
+import roommaze.SoundActuator;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;

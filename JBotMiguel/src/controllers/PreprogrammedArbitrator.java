@@ -1,9 +1,10 @@
 package controllers;
 
 import java.util.ArrayList;
+
+import behaviors.Behavior;
 import simulation.Simulator;
 import simulation.robot.Robot;
-import simulation.robot.behaviors.Behavior;
 import simulation.util.Arguments;
 
 public class PreprogrammedArbitrator extends Controller {

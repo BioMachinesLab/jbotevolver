@@ -3,6 +3,7 @@ package behaviors;
 import java.awt.Color;
 import java.util.LinkedList;
 
+import behaviors.Behavior;
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import sensors.RobotPositionSensor;
@@ -14,7 +15,6 @@ import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
-import simulation.robot.behaviors.Behavior;
 import simulation.util.Arguments;
 
 public class SpreadBehavior extends Behavior {

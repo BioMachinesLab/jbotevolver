@@ -3,8 +3,8 @@ package environments;
 import java.awt.Color;
 
 import mathutils.Vector2d;
+import roommaze.TwoRoomsEnvironment;
 import simulation.Simulator;
-import simulation.environment.TwoRoomsEnvironment;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;

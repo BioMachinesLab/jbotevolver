@@ -1,16 +1,17 @@
 package controllers;
 
 import java.awt.Color;
+
 import mathutils.Vector2d;
 import environments.MaritimeMissionEnvironment;
 import sensors.IntruderSensor;
 import sensors.ParameterSensor;
 import sensors.RobotPositionSensor;
-import sensors.WaypointSensor;
 import simulation.Simulator;
 import simulation.physicalobjects.LightPole;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
+import simulation.robot.sensors.WaypointSensor;
 import simulation.util.Arguments;
 
 public class MaritimeMissionController extends PreprogrammedArbitrator {

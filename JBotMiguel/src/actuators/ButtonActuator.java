@@ -3,8 +3,9 @@ package actuators;
 import java.util.LinkedList;
 
 import mathutils.Vector2d;
+import roommaze.SoundActuator;
+import roommaze.TwoRoomsEnvironment;
 import simulation.Simulator;
-import simulation.environment.TwoRoomsEnvironment;
 import simulation.physicalobjects.Wall;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;

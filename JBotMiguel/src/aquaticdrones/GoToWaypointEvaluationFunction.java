@@ -1,5 +1,6 @@
-package evaluationfunctions;
+package aquaticdrones;
 
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.LightPole;
@@ -8,7 +9,6 @@ import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class GoToWaypointEvaluationFunction extends EvaluationFunction{
 	

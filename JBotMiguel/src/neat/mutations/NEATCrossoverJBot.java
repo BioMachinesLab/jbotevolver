@@ -142,12 +142,12 @@ public class NEATCrossoverJBot extends NEATCrossover {
 			// grab the actual objects from mom and dad for the specified
 			// indexes
 			// if there are none, then null
-			if (curMom < mom.getNumGenes()) {
+			if (curMom < mom.getLinksChromosome().size()) {
 				momGene = mom.getLinksChromosome().get(curMom);
 				momInnovation = momGene.getInnovationId();
 			}
 
-			if (curDad < dad.getNumGenes()) {
+			if (curDad < dad.getLinksChromosome().size()) {
 				dadGene = dad.getLinksChromosome().get(curDad);
 				dadInnovation = dadGene.getInnovationId();
 			}

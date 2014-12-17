@@ -1,4 +1,4 @@
-package actuators;
+package roommaze;
 
 import simulation.Simulator;
 import simulation.robot.Robot;

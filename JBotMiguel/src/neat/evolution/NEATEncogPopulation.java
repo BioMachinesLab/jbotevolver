@@ -2,10 +2,14 @@ package neat.evolution;
 
 import java.io.Serializable;
 import java.util.Random;
+
 import neat.WrapperNetwork;
+import neat.continuous.FactorNEATContinuousGenome;
+
 import org.encog.ml.MLError;
 import org.encog.ml.MLRegression;
 import org.encog.ml.ea.genome.Genome;
+import org.encog.ml.ea.genome.GenomeFactory;
 import org.encog.ml.ea.species.BasicSpecies;
 import org.encog.neural.hyperneat.FactorHyperNEATGenome;
 import org.encog.neural.hyperneat.HyperNEATCODEC;
@@ -53,6 +57,10 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 			setGenomeFactory(network.getGenomeFactory());
 		}
 		
+		if(getGenomeFactory() instanceof FactorNEATContinuousGenome) {
+			((FactorNEATContinuousGenome)getGenomeFactory()).setBootstrap(bootstrap);
+		}
+		
 		// create the new genomes
 		getSpecies().clear();
 
@@ -66,7 +74,7 @@ public class NEATEncogPopulation extends NEATPopulation implements Serializable,
 		
 		if(bootstrap > 0) {
 			
-			if(bootstrap == 3) {
+			if(bootstrap == 1) {
 				int nHidden = 11;
 				
 				//Innovations List manual init

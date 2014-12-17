@@ -2,17 +2,12 @@ package neat.layerered;
 
 import java.util.ArrayList;
 import java.util.Vector;
-
 import neat.WrapperNetwork;
-
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
 import org.encog.ml.MLMethod;
 import org.encog.ml.ea.codec.GeneticCODEC;
 import org.encog.ml.ea.genome.GenomeFactory;
-import org.encog.ml.factory.method.NEATFactory;
 import org.encog.neural.neat.FactorNEATGenome;
-import org.encog.neural.neat.NEATCODEC;
-
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
@@ -56,10 +51,6 @@ public class LayeredNeuralNetwork extends WrapperNetwork {
 	
 	public void setNetwork(MLMethod network) {
 		this.network = (LayeredANN)network;
-		/*int n = this.network.getAllNeurons().size();
-		int s = this.network.getAllSynapses().size();
-		int h = n-getNumberOfInputNeurons()-getNumberOfOutputNeurons();
-		System.out.println(n+" "+h+" "+s);*/
 	}
 	
 	@Override

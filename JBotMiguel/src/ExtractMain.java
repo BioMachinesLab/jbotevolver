@@ -15,11 +15,9 @@ public class ExtractMain {
 		try {
 			JBotEvolver jBotEvolver = new JBotEvolver(newArgs);
 			TaskExecutor taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, new Arguments("classname=SequentialTaskExecutor",true));
-			taskExecutor.prepareArguments(jBotEvolver.getArguments());
 			taskExecutor.start();
 		
 			jBotEvolver = new JBotEvolver(newArgs);
-			taskExecutor.prepareArguments(jBotEvolver.getArguments());
 
 			for(int fsample = 0 ; fsample < fitnesssamples ; fsample++) {
 				for(int sample = 0 ; sample < samples ; sample++) {

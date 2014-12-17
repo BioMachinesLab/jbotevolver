@@ -62,5 +62,4 @@ public class NEATContinuousNeuronGene extends NEATNeuronGene {
 		result.append("]");
 		return result.toString();
 	}
-
 }

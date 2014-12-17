@@ -1,9 +1,9 @@
 package behaviors;
 
+import behaviors.Behavior;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.RobotRGBColorActuator;
-import simulation.robot.behaviors.Behavior;
 import simulation.robot.sensors.PreySensor;
 import simulation.util.Arguments;
 

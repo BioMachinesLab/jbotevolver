@@ -3,9 +3,9 @@ package evaluationfunctions;
 import java.util.ArrayList;
 
 import mathutils.Vector2d;
+import roommaze.TwoRoomsEnvironment;
 import simulation.Simulator;
 import simulation.environment.Environment;
-import simulation.environment.TwoRoomsEnvironment;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.util.Arguments;

@@ -1,10 +1,10 @@
 package behaviors;
 
-import actuators.SoundActuator;
+import behaviors.OpenDoorBehavior;
+import roommaze.SoundActuator;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.behaviors.OpenDoorBehavior;
 import simulation.util.Arguments;
 
 public class OpenDoorSoundBehavior extends OpenDoorBehavior{

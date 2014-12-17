@@ -1,11 +1,9 @@
 package behaviors;
 
 import java.util.Random;
-
+import behaviors.Behavior;
 import simulation.Simulator;
 import simulation.robot.*;
-import simulation.robot.behaviors.Behavior;
-import simulation.robot.sensors.EpuckIRSensor;
 import simulation.util.Arguments;
 
 public class RandomWalkBehavior extends Behavior {

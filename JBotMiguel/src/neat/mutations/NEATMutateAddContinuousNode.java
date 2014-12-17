@@ -1,9 +1,8 @@
-package neat.continuous;
+package neat.mutations;
 
 import java.util.Random;
-
+import neat.continuous.NEATContinuousNeuronGene;
 import org.encog.engine.network.activation.ActivationFunction;
-import org.encog.mathutil.randomize.Randomizer;
 import org.encog.mathutil.randomize.RangeRandomizer;
 import org.encog.ml.ea.genome.Genome;
 import org.encog.neural.neat.NEATNeuronType;
@@ -15,7 +14,7 @@ import org.encog.neural.neat.training.opp.NEATMutateAddNode;
 
 public class NEATMutateAddContinuousNode extends NEATMutateAddNode{
 	
-	private static double decayRange = 2.0;
+	protected static double decayRange = 2.0;
 	
 	public void performOperation(final Random rnd, final Genome[] parents, final int parentIndex, final Genome[] offspring, final int offspringIndex) {
 		final NEATGenome target = obtainGenome(parents, parentIndex, offspring, offspringIndex);
@@ -31,16 +30,16 @@ public class NEATMutateAddContinuousNode extends NEATMutateAddNode{
 		int upperLimit;
 		if (target.getLinksChromosome().size() < sizeBias) {
 			// choose a link, use the square root to prefer the older links
-			upperLimit = target.getNumGenes() - 1 - (int) Math.sqrt(target.getNumGenes());
+			upperLimit = target.getLinksChromosome().size() - 1 - (int) Math.sqrt(target.getLinksChromosome().size());
 		} else {
-			upperLimit = target.getNumGenes() - 1;
+			upperLimit = target.getLinksChromosome().size() - 1;
 		}
 		
 		do{
 		
 			while ((countTrysToFindOldLink--) > 0) {
 				
-				final int i = (int) RangeRandomizer.randomize(rnd, 0, upperLimit + 1);
+				final int i = (int) RangeRandomizer.randomize(rnd, 0, upperLimit);
 				final NEATLinkGene link = target.getLinksChromosome().get(i);
 	
 				// get the from neuron

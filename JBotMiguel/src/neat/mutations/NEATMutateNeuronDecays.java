@@ -1,13 +1,13 @@
-package neat.continuous;
+package neat.mutations;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Random;
-
+import neat.continuous.NEATContinuousNeuronGene;
+import neat.continuous.SelectContinuousNeurons;
 import org.encog.ml.ea.genome.Genome;
 import org.encog.neural.neat.NEATPopulation;
 import org.encog.neural.neat.training.NEATGenome;
-import org.encog.neural.neat.training.NEATNeuronGene;
 import org.encog.neural.neat.training.opp.NEATMutation;
 
 public class NEATMutateNeuronDecays extends NEATMutation implements Serializable {

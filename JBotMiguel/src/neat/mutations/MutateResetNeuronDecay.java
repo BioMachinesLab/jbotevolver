@@ -1,7 +1,10 @@
-package neat.continuous;
+package neat.mutations;
 
 import java.io.Serializable;
 import java.util.Random;
+
+import neat.continuous.NEATContinuousNeuronGene;
+
 import org.encog.mathutil.randomize.RangeRandomizer;
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
 

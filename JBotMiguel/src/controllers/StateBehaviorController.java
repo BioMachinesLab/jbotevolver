@@ -5,7 +5,6 @@ import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
 import actuators.StateActuator;
-import evolutionaryrobotics.neuralnetworks.BehaviorController;
 
 public class StateBehaviorController extends BehaviorController {
 	

@@ -39,7 +39,6 @@ public class GridExplorationEvaluationFunction extends EvaluationFunction {
 		if(minimumDistance == 0 && robots.size() > 0)
 			minimumDistance = robots.size()*robots.get(0).getDiameter()*2;
 		
-		double currentFitness = 0;
 		double maxDistance = 0;
 		double centerX = 0;
 		double centerY = 0;
@@ -76,5 +75,10 @@ public class GridExplorationEvaluationFunction extends EvaluationFunction {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public double getFitness() {
+		return super.getFitness() / (visited.length*visited[0].length);
 	}
 }

@@ -1,16 +1,6 @@
 package neat.evolution;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.zip.GZIPOutputStream;
-
 import org.encog.Encog;
-
-
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import evolutionaryrobotics.JBotEvolver;
@@ -66,8 +56,6 @@ public class NEATGenerationalEvolution extends Evolution {
 			population.createRandomPopulation(jBotEvolver);
 
 		print("CREATED POPULATION...");
-		if(!population.evolutionDone())
-			taskExecutor.prepareArguments(jBotEvolver.getArguments());
 
 //		taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations() - 
 //				population.getNumberOfCurrentGeneration())*population.getPopulationSize() * population.getNumberOfObjectives());
@@ -116,6 +104,11 @@ public class NEATGenerationalEvolution extends Evolution {
 	private void print(String s) {
 		if(!supressMessages)
 			System.out.print(s);
+	}
+
+	@Override
+	public Population getPopulation() {
+		return population;
 	}
 
 }

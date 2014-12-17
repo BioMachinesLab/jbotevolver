@@ -27,7 +27,7 @@ public class LayeredANN implements MLRegression, MLError, Serializable  {
 			throw new NeuralNetworkError("Bias neuron is not in the correct place!");
 		}
 	}
-
+	
 	@Override
 	public int getInputCount() {
 		return this.inputCount;
@@ -183,9 +183,4 @@ public class LayeredANN implements MLRegression, MLError, Serializable  {
 		return new ANNLayer(originalLayer.getLayerId(), copyLayerNeurons);
 	}
 	
-	private void print(String s) {
-		boolean b = true;
-		if(!b)
-			System.out.println(s);
-	}
 }

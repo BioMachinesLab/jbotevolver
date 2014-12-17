@@ -1,7 +1,7 @@
 package outputs;
 
+import actuators.StopActuator;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.StopActuator;
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 

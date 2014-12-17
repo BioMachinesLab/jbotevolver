@@ -1,11 +1,11 @@
 package behaviors;
 
+import behaviors.Behavior;
+import behaviors.OpenDoorBehavior;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.behaviors.Behavior;
-import simulation.robot.behaviors.OpenDoorBehavior;
 import simulation.util.Arguments;
 
 public class ActuatorBehavior extends Behavior{

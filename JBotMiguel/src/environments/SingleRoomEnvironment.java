@@ -1,7 +1,8 @@
 package environments;
 
 import java.util.Random;
-import behaviors.RandomWalkBehavior;
+
+import epuck.Epuck;
 import behaviors.WalkInCirclesBehavior;
 import mathutils.Vector2d;
 import sensors.RobotOrientationDistanceSensor;
@@ -10,17 +11,28 @@ import simulation.environment.Environment;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
-import simulation.robot.Epuck;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class SingleRoomEnvironment extends Environment {
 
-	private Random random;
+	protected Random random;
+	
+	@ArgumentsAnnotation(name="teammate", values={"0","1"})
 	private boolean teammate;
+	
+	@ArgumentsAnnotation(name="closerobots", values={"0","1"})
 	private boolean closeRobots;
+	
+	@ArgumentsAnnotation(name="preys", defaultValue="0")
 	private int numberOfPreys;
-	private double randX,randY;
+	
+	@ArgumentsAnnotation(name="randomizewidth", defaultValue="0.0")
+	private double randX;
+	
+	@ArgumentsAnnotation(name="randomizeheight", defaultValue="0.0")
+	private double randY;
 	
 	public SingleRoomEnvironment(Simulator simulator, Arguments args) {
 		super(simulator, args);

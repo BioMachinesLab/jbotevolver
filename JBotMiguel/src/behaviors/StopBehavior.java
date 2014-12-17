@@ -1,9 +1,9 @@
 package behaviors;
 
+import behaviors.Behavior;
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
-import simulation.robot.behaviors.Behavior;
 import simulation.util.Arguments;
 
 public class StopBehavior extends Behavior {

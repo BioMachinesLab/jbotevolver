@@ -1,7 +1,7 @@
 package sensors;
 
+import roommaze.TwoRoomsEnvironment;
 import simulation.Simulator;
-import simulation.environment.TwoRoomsEnvironment;
 import simulation.robot.Robot;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;

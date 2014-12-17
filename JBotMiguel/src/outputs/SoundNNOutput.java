@@ -1,8 +1,8 @@
 package outputs;
 
+import roommaze.SoundActuator;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
-import actuators.SoundActuator;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 public class SoundNNOutput extends NNOutput {
