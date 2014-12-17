@@ -5,10 +5,10 @@ import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import sensors.IntruderSensor;
 import sensors.ParameterSensor;
 import sensors.RobotPositionSensor;
+import sensors.WaypointSensor;
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
-import simulation.robot.sensors.WaypointSensor;
 import simulation.util.Arguments;
 
 public class EvolvableMissionController extends PreprogrammedArbitrator implements FixedLenghtGenomeEvolvableController {
