@@ -7,7 +7,6 @@ import gui.renderer.Renderer;
 import gui.util.Editor;
 import gui.util.GraphPlotter;
 import gui.util.GraphViz;
-import gui.util.NetworkViewer;
 import gui.util.PostEvaluationData;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -58,17 +57,14 @@ import simulation.Updatable;
 import simulation.util.Arguments;
 import updatables.BlenderExport;
 
-public class ResultViewerGui extends Gui {
-//	protected JFrame      frame;
-	protected JPanel frame;
+public class ResultViewerGui extends Gui implements Updatable{
+
 	protected JTextField  controlStepTextField;	
 	protected JTextField  fitnessTextField;
 
 	protected JTextField  controlStepTimeTextField;
 	protected JTextField  rendererTimeTextField;
 	
-	protected NetworkViewer networkViewer = new NetworkViewer();
-
 	protected int         sleepBetweenControlSteps = 10;
 	
 	JPanel treeWrapper;
@@ -129,17 +125,15 @@ public class ResultViewerGui extends Gui {
 		
 		enableDebugOptions = args.getArgumentAsIntOrSetDefault("enabledebugoptions", 0) == 1;
 		
-		frame = new JPanel();
-		frame.setLayout(new BorderLayout());
-		super.setGuiPanel(frame);
+		setLayout(new BorderLayout());
 	
-		frame.add(initRightWrapperPanel(), BorderLayout.EAST);
-		frame.add(initLeftWrapperPanel(), BorderLayout.WEST);
+		add(initRightWrapperPanel(), BorderLayout.EAST);
+		add(initLeftWrapperPanel(), BorderLayout.WEST);
 
 		initActions();
 		initListeners();
 		
-		frame.setVisible(true);
+		setVisible(true);
 	}
 
 	protected JPanel initLeftWrapperPanel() {
@@ -275,55 +269,55 @@ public class ResultViewerGui extends Gui {
 
 	protected void initActions() {
 		
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control ENTER"), "control ENTER");
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta ENTER"), "control ENTER");
-		((JComponent) frame).getActionMap().put("control ENTER", new AbstractAction(){  
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control ENTER"), "control ENTER");
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta ENTER"), "control ENTER");
+		this.getActionMap().put("control ENTER", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				loadCurrentFile();
 			}
 		});
 		
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control P"), "control P");
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta P"), "control P");
-		((JComponent) frame).getActionMap().put("control P", new AbstractAction(){  
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control P"), "control P");
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("meta P"), "control P");
+		this.getActionMap().put("control P", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				startPauseButton();
 			}
 		});
 		
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt LEFT"), "alt LEFT");
-		((JComponent) frame).getActionMap().put("alt LEFT", new AbstractAction(){  
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt LEFT"), "alt LEFT");
+		this.getActionMap().put("alt LEFT", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveLeft();
 			}
 		});
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt RIGHT"), "alt RIGHT");
-		((JComponent) frame).getActionMap().put("alt RIGHT", new AbstractAction(){  
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt RIGHT"), "alt RIGHT");
+		this.getActionMap().put("alt RIGHT", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveRight();
 			}
 		});
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt UP"), "alt UP");
-		((JComponent) frame).getActionMap().put("alt UP", new AbstractAction(){  
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt UP"), "alt UP");
+		this.getActionMap().put("alt UP", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveUp();
 			}
 		});
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt DOWN"), "alt DOWN");
-		((JComponent) frame).getActionMap().put("alt DOWN", new AbstractAction(){  
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("alt DOWN"), "alt DOWN");
+		this.getActionMap().put("alt DOWN", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.moveDown();
 			}
 		});
 		
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('+'), "+");  
-		((JComponent) frame).getActionMap().put("+", new AbstractAction(){  
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('+'), "+");  
+		this.getActionMap().put("+", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.zoomIn();
@@ -331,8 +325,8 @@ public class ResultViewerGui extends Gui {
 			}
 		});  
 
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('-'), "-");  
-		((JComponent) frame).getActionMap().put("-", new AbstractAction(){  
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('-'), "-");  
+		this.getActionMap().put("-", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.zoomOut();
@@ -340,8 +334,8 @@ public class ResultViewerGui extends Gui {
 			}
 		});  
 
-		((JComponent) frame).getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('*'), "*");  
-		((JComponent) frame).getActionMap().put("*", new AbstractAction(){  
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke('*'), "*");  
+		this.getActionMap().put("*", new AbstractAction(){  
 			protected static final long serialVersionUID = 1L;
 			public void actionPerformed(ActionEvent evt) {  
 				renderer.resetZoom();
@@ -548,7 +542,7 @@ public class ResultViewerGui extends Gui {
 		JScrollPane comparisonScrollPane = new JScrollPane(comparisonTable);
 		comparisonFrame.add(comparisonScrollPane);
 		comparisonFrame.pack();
-		comparisonFrame.setLocationRelativeTo(frame);
+		comparisonFrame.setLocationRelativeTo(this);
 		comparisonFrame.setVisible(true);
 		
 		comparisonTable.getColumn("Folder").setPreferredWidth(250);
@@ -626,7 +620,7 @@ public class ResultViewerGui extends Gui {
 	}
 	
 	public void dispose() {
-		frame.setVisible(false);
+		setVisible(false);
 	}
 	
 //	protected void startButton() {
@@ -844,7 +838,7 @@ public class ResultViewerGui extends Gui {
 				tree = new JTree(nodes);
 				addTree();
 				treeWrapper.revalidate();
-				frame.invalidate();
+				invalidate();
 			}catch(Exception e){e.printStackTrace();}
 			
 			updateFitnessSummary(dir);
@@ -939,7 +933,7 @@ public class ResultViewerGui extends Gui {
 		HashMap<String,Arguments> args = jBotEvolver.getArguments();
 		
 		if(renderer != null)
-			frame.remove(renderer);
+			remove(renderer);
 		
 		if(args.get("--gui") != null && args.get("--gui").getArgumentIsDefined("renderer"))
 			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
@@ -949,9 +943,6 @@ public class ResultViewerGui extends Gui {
 		evaluationFunction = jBotEvolver.getEvaluationFunction();
 
 		simulator.addCallback(evaluationFunction);
-		
-		if(networkViewer.isVisible())
-			simulator.addCallback(networkViewer);
 		
 		jBotEvolver.setupBestIndividual(simulator);
 		
@@ -968,10 +959,10 @@ public class ResultViewerGui extends Gui {
 		if (renderer != null) {
 			renderer.enableInputMethods(true);
 			renderer.setSimulator(simulator);
-			frame.add(renderer);
+			add(renderer);
 			if(simulateUntil == 0)
 				renderer.drawFrame();
-			frame.validate();
+			validate();
 		}
 		
 		if(simulateUntil == 0) {

@@ -3,6 +3,7 @@ package gui.evolution;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.populations.Population;
+import gui.Gui;
 import gui.renderer.Renderer;
 import gui.util.Graph;
 
@@ -26,22 +27,20 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
+import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 
-public class EvolutionGui extends JPanel {
+public class EvolutionGui extends Gui {
 
 	private static final long serialVersionUID = -63231826531435127L;
 	private static final long PREVIEW_SLEEP = 10;
-
 	private Graph fitnessGraph;
-	
 	private JProgressBar evolutionProgressBar;
 	private JProgressBar generationsProgressBar;
-	
 	private JTextField configNameTextField;
 	private JTextField generationTextField;
 	private JTextField bestTextField;
@@ -59,9 +58,14 @@ public class EvolutionGui extends JPanel {
 	private JBotEvolver jBotEvolver;
 	private boolean enablePreview = true;
 	private JTextField previewGenerationTextField;
-	UpdateEvolutionThread updateThread;
+	private UpdateEvolutionThread updateThread;
 	
-	public EvolutionGui() {
+	public EvolutionGui(JBotSim jBotSim, Arguments args) {
+		super(jBotSim, args);
+		
+		if(jBotSim instanceof JBotEvolver)
+			this.jBotEvolver = (JBotEvolver)jBotSim;
+		
 		setLayout(new BorderLayout());
 		
 		fitnessGraph = new Graph();
@@ -83,6 +87,10 @@ public class EvolutionGui extends JPanel {
 		
 		updateThread = new UpdateEvolutionThread();
 		updateThread.start();
+	}
+	
+	public void init() {
+		init(jBotEvolver);
 	}
 	
 	public void init(JBotEvolver jBotEvolver) {
@@ -243,8 +251,9 @@ public class EvolutionGui extends JPanel {
 	}
 	
 	public void stopEvolution() {
-		if(evo != null)
+		if(evo != null) {
 			evo.stopEvolution();
+		}
 	}
 
 	private class UpdateEvolutionThread extends Thread{
@@ -300,14 +309,10 @@ public class EvolutionGui extends JPanel {
 				evolutionProgressBar.setValue(evolutionProgress);
 				evolutionProgressBar.setString(evolutionProgress + "%");
 				
-				double passedTime = (System.currentTimeMillis() - time);
-				double completePercentage = generation/(double)numberOfGenerations;
-				int eta = (int) (passedTime / completePercentage * (1 - completePercentage));
-				etaTextField.setText(new Time(eta- 3600000).toString());
-				
 				generationsProgressBar.setValue(100);
 				generationsProgressBar.setString("100%");
 				
+				updateETA();
 				newGeneration();
 				
 			}else{
@@ -318,6 +323,14 @@ public class EvolutionGui extends JPanel {
 				generationsProgressBar.setValue(generationProgress);
 				generationsProgressBar.setString(generationProgress + "%");
 			}
+			
+		}
+		
+		private void updateETA() {
+			double passedTime = (System.currentTimeMillis() - time);
+			double completePercentage = generation/(double)evo.getPopulation().getNumberOfGenerations();
+			int eta = (int) (passedTime / completePercentage * (1 - completePercentage));
+			etaTextField.setText(new Time(eta- 3600000).toString());
 		}
 
 		private double[] getFitnessFromFile() {
@@ -362,6 +375,11 @@ public class EvolutionGui extends JPanel {
 		} catch (InterruptedException e) {}
 	}
 	
+	@Override
+	public void dispose() {
+		stopEvolution();
+	}
+	
 	class ShowBestThread extends Thread implements Updatable {
 		
 		private int currentGenerationNumber = 0;
@@ -398,12 +416,11 @@ public class EvolutionGui extends JPanel {
 							renderer.drawFrame();
 							
 							sim.simulate(PREVIEW_SLEEP);
-						} else
+						}else
 							waitForNewGeneration();
 					}
-				} else {
-					waitForNewGeneration();
 				}
+				waitForNewGeneration();
 			}
 		}
 	}

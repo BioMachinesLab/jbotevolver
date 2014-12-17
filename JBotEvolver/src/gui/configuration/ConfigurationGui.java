@@ -41,6 +41,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.DefaultCaret;
 
+import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
@@ -55,9 +56,10 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.populations.Population;
+import gui.Gui;
 import gui.renderer.Renderer;
 
-public class ConfigurationAutomatorGui extends JPanel{
+public class ConfigurationGui extends Gui{
 	
 	private static final long serialVersionUID = -5613912585135405020L;
 	private static final int OPTIONS_GRID_LAYOUT_SIZE = 15;
@@ -102,16 +104,13 @@ public class ConfigurationAutomatorGui extends JPanel{
 	
 	private Arguments rendererArgs;
 
-	private ConfigurationAutomator configurationAutomator;
-	
 	private ArrayList<String> blackList;
 	
 	private boolean showPreview = true;
 	
-	public ConfigurationAutomatorGui(ConfigurationAutomator configurationAutomator) {
-//		super("Configuration File Automator");
-		this.configurationAutomator = configurationAutomator;
-		
+	public ConfigurationGui(JBotSim jBotSim, Arguments args) {
+		super(jBotSim,args);
+
 		optionsAttributes = new ArrayList<AutomatorOptionsAttribute>();
 		argumentsComponents = new HashMap<String, Component>();
 		
@@ -134,9 +133,7 @@ public class ConfigurationAutomatorGui extends JPanel{
 		previewFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		previewFrame.setVisible(false);
 		
-//		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setSize(1100, 800);
-//		setLocationRelativeTo(null);
 		setVisible(true);
 	}
 
@@ -485,11 +482,11 @@ public class ConfigurationAutomatorGui extends JPanel{
 					evo.executeEvolution();
 					taskExecutor.stopTasks();
 					
-					JOptionPane.showMessageDialog(ConfigurationAutomatorGui.this, "OK");
+					JOptionPane.showMessageDialog(ConfigurationGui.this, "OK");
 					
 				} catch (Exception e) {
 					e.printStackTrace();
-					JOptionPane.showMessageDialog(ConfigurationAutomatorGui.this, "ERROR " + e.getStackTrace() );
+					JOptionPane.showMessageDialog(ConfigurationGui.this, "ERROR " + e.getStackTrace() );
 				}finally{
 					File f = new File(output);
 					deleteDirectory(f);
@@ -534,7 +531,7 @@ public class ConfigurationAutomatorGui extends JPanel{
 					printWriter.write(result.toString());
 					printWriter.close ();
 					
-					configurationAutomator.startEvolution(outputText);
+//					configurationAutomator.startEvolution(outputText);
 					wakeUpWaitingThreads();
 			    } catch (FileNotFoundException e) {
 			    	e.printStackTrace();
@@ -1335,7 +1332,6 @@ public class ConfigurationAutomatorGui extends JPanel{
 			else
 				component.setEnabled(false);
 		}
-		
 	}
 	
 	public synchronized void wakeUpWaitingThreads() {
@@ -1348,6 +1344,13 @@ public class ConfigurationAutomatorGui extends JPanel{
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	@Override
+	public void dispose() {}
+
+	public String getConfigurationFileName() {
+		return result.getArgument("output").getCompleteArgumentString().trim();
 	}
 	
 }	

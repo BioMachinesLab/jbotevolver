@@ -128,9 +128,6 @@ public class CoEvolution extends Evolution {
 				tB.add(populationB.getChromosome(r.nextInt(populationB.getPopulationSize())));
 			}
 			
-			if(!populationA.evolutionDone() && !populationB.evolutionDone())
-				taskExecutor.prepareArguments(jBotEvolver.getArguments());
-
 			taskExecutor.setTotalNumberOfTasks((populationA.getNumberOfGenerations()-populationA.getNumberOfCurrentGeneration())*populationA.getPopulationSize()*tablesize*2);
 			
 			double highestFitnessA = 0;

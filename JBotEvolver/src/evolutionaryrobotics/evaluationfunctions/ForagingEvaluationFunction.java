@@ -37,7 +37,6 @@ public class ForagingEvaluationFunction extends EvaluationFunction{
 			} else 	if(distanceToNest > foragingArea){
 				numberOfRobotsBeyondForagingLimit++;
 			}
-
 			
 			if (((PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class)).preyCarried()) {
 				numberOfRobotsWithPrey++;

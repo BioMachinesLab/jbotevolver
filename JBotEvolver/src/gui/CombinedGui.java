@@ -1,17 +1,20 @@
 package gui;
 
 import evolutionaryrobotics.JBotEvolver;
-import gui.configuration.ConfigurationAutomator;
-import gui.configuration.ConfigurationAutomatorGui;
+import gui.configuration.ConfigurationGui;
 import gui.evolution.EvolutionGui;
+
 import javax.swing.JFrame;
 import javax.swing.JTabbedPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import simulation.util.Arguments;
+
 public class CombinedGui extends JFrame {
 	
 	private JTabbedPane tabbedPane;
+	private EvolutionGui evo;
 	
 	public CombinedGui(String[] args) {
 		
@@ -26,11 +29,6 @@ public class CombinedGui extends JFrame {
 		
 		tabbedPane = new JTabbedPane();
 		
-		EvolutionGui evolution = new EvolutionGui();
-		
-		ConfigurationAutomator configAutomator = new ConfigurationAutomator(evolution);
-		ConfigurationAutomatorGui configAutomatorGui = new ConfigurationAutomatorGui(configAutomator);
-		
 		JBotEvolver jbot = null;
 		try {
 			jbot = new JBotEvolver(args);
@@ -38,10 +36,12 @@ public class CombinedGui extends JFrame {
 			e.printStackTrace();
 		}
 		
-		tabbedPane.addTab("Configuration", configAutomatorGui);
+		evo = new EvolutionGui(jbot, new Arguments(""));
+		ConfigurationGui configAutomatorGui = new ConfigurationGui(jbot, new Arguments(""));
 		
-		tabbedPane.addTab("Evolution", evolution);
-		tabbedPane.addTab("Results", jbot.getGui().getGuiPanel());
+		tabbedPane.addTab("Configuration", configAutomatorGui);
+		tabbedPane.addTab("Evolution", evo);
+		tabbedPane.addTab("Results", jbot.getGui());
 		
 		add(tabbedPane);
 
@@ -63,9 +63,9 @@ public class CombinedGui extends JFrame {
 	
 	class WaitForEvolutionThread extends Thread {
 		
-		private ConfigurationAutomatorGui configAutomatorGui;
+		private ConfigurationGui configAutomatorGui;
 		
-		public WaitForEvolutionThread(ConfigurationAutomatorGui configAutomatorGui) {
+		public WaitForEvolutionThread(ConfigurationGui configAutomatorGui) {
 			this.configAutomatorGui = configAutomatorGui;
 		}
 		
@@ -73,9 +73,31 @@ public class CombinedGui extends JFrame {
 		public void run() {
 			while(true) {
 				configAutomatorGui.waitUntilEvolutionLaunched();
+				new EvolutionGuiThread(configAutomatorGui.getConfigurationFileName()).start();
 				tabbedPane.setSelectedIndex(1);
 			}
 		}
 	}
+	
+	private class EvolutionGuiThread extends Thread{
+		
+		private String configFileName;
 
+		public EvolutionGuiThread(String configFileName) {
+			this.configFileName = configFileName;
+		}
+		
+		@Override
+		public void run() {
+			try {
+				evo.stopEvolution();
+				String[] args = new String[]{configFileName + ".conf"};
+				JBotEvolver jBotEvolver = new JBotEvolver(args);
+				evo.init(jBotEvolver);
+				evo.executeEvolution();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }

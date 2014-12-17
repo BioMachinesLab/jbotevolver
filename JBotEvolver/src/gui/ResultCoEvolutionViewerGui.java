@@ -28,21 +28,25 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		plotButton.removeActionListener(plotButton.getActionListeners()[0]);
 		plotButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if(validFile(currentFileTextField.getText())) {
-					if(simulator != null)
-						simulator.stopSimulation();
-					try{
-						simulationState = PAUSED;
-						jBotEvolver.loadFile(currentFileTextField.getText(), extraArguments.getText());
-						JOptionPane.showMessageDialog(getGuiPanel(), "This feature is not implemented for CoEvolution! Please implement it :)");
-//						new GraphPlotterCoEvolution(jBotEvolver,loadSimulator(),"--robots");
-//						new GraphPlotterCoEvolution(jBotEvolver,loadSimulator(),"--robots2");
-					}catch(Exception e){
-						e.printStackTrace();
-					}
-				}
+				plot();
 			}
 		});
+	}
+	
+	private void plot() {
+		if(validFile(currentFileTextField.getText())) {
+			if(simulator != null)
+				simulator.stopSimulation();
+			try{
+				simulationState = PAUSED;
+				jBotEvolver.loadFile(currentFileTextField.getText(), extraArguments.getText());
+				JOptionPane.showMessageDialog(this, "This feature is not implemented for CoEvolution! Please implement it :)");
+//				new GraphPlotterCoEvolution(jBotEvolver,loadSimulator(),"--robots");
+//				new GraphPlotterCoEvolution(jBotEvolver,loadSimulator(),"--robots2");
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	protected void updateStatus() {
@@ -88,7 +92,7 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		HashMap<String,Arguments> args = jBotEvolver.getArguments();
 		
 		if(renderer != null)
-			frame.remove(renderer);
+			this.remove(renderer);
 		
 		if(args.get("--gui") != null && args.get("--gui").getArgumentIsDefined("renderer"))
 			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
@@ -107,11 +111,6 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		
 		this.evaluationFunction = evaluationFunctionA;
 		
-
-		
-		if(networkViewer.isVisible())
-			simulator.addCallback(networkViewer);
-		
 		//Cria os melhores de A e B
 		jBotEvolver.setupBestCoIndividual(simulator);
 		
@@ -128,10 +127,10 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		if (renderer != null) {
 			renderer.enableInputMethods(true);
 			renderer.setSimulator(simulator);
-			frame.add(renderer);
+			this.add(renderer);
 			if(simulateUntil == 0)
 				renderer.drawFrame();
-			frame.validate();
+			this.validate();
 		}
 		
 		if(simulateUntil == 0) {
