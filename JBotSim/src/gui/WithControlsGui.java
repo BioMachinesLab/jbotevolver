@@ -23,9 +23,10 @@ import javax.swing.KeyStroke;
 
 import simulation.JBotSim;
 import simulation.Simulator;
+import simulation.Updatable;
 import simulation.util.Arguments;
 
-public class WithControlsGui extends Gui {
+public class WithControlsGui extends Gui implements Updatable{
 	JFrame      frame;
 	JTextField  simulationTimeTextField;
 	JTextField  controlStepTextField;	

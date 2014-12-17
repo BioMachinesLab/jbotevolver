@@ -7,14 +7,11 @@ import java.awt.RadialGradientPaint;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
-
 import mathutils.Vector2d;
 import net.jafama.FastMath;
-import simulation.robot.Epuck;
 import simulation.robot.LedState;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
-import simulation.robot.sensors.EpuckIRSensor;
 import simulation.robot.sensors.Sensor;
 import simulation.robot.sensors.WallRaySensor;
 import simulation.util.Arguments;
@@ -152,16 +149,6 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		}
 		if(paint)
 			graphics.fillOval(ledX, ledY, leadDiameter, leadDiameter);
-		
-		
-		
-		if(robot instanceof Epuck) {
-			Sensor s = robot.getSensorByType(EpuckIRSensor.class);
-			if(s != null) {
-				EpuckIRSensor ir = (EpuckIRSensor)s;
-				drawLines(ir.rayPositions, graphics);
-			}
-		}
 		
 		if(wallRay){
 			

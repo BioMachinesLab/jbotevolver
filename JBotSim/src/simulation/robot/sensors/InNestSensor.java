@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
+import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.checkers.AllowNestChecker;
 import simulation.robot.Robot;
@@ -13,16 +14,28 @@ import simulation.util.Arguments;
 public class InNestSensor extends Sensor {
 
 	private ClosePhysicalObjects closeObjects;
+	private Simulator simulator;
 
 	public InNestSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
-
-		this.closeObjects = new ClosePhysicalObjects(simulator.getEnvironment(),
-				0,//((NestEnvironment) simulator.getEnvironment()).getNestRadius(),
-				new AllowNestChecker());
+		this.simulator = simulator;
 	}
 
 	public boolean isInNest() {
+		
+		if(closeObjects == null) {
+			//first call
+			double radius = 0;
+			for(PhysicalObject p : simulator.getEnvironment().getAllObjects()) {
+				if(p instanceof Nest)
+					radius = Math.max(radius, p.getRadius());
+			}
+			
+			this.closeObjects = new ClosePhysicalObjects(simulator.getEnvironment(),
+					radius,
+					new AllowNestChecker());
+		}
+		
 		CloseObjectIterator nestIterator = closeObjects.iterator();
 
 		while (nestIterator.hasNext()) {
@@ -32,8 +45,6 @@ public class InNestSensor extends Sensor {
 				return true;
 		}
 		return false;
-		// return robot.getPosition().length() < ((NestEnvironment)
-		// simulator.getEnvironment()).getNestRadius();
 	}
 	
 	@Override

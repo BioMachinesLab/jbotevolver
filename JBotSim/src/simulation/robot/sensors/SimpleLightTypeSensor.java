@@ -26,12 +26,6 @@ public class SimpleLightTypeSensor extends ConeTypeSensor {
 		   (sensorInfo.getAngle() > (-openingAngle / 2.0))) {
 
 			return (getRange() - sensorInfo.getDistance()) / getRange();
-//			if (val > 1.0)
-//				val = 1.0;
-//			else if (val < 0.0)
-//				val = 0.0;
-//				
-//			return val;
 		}
  		return 0;
 	}

@@ -1,16 +1,20 @@
 package simulation.robot.sensors;
 
 import java.util.ArrayList;
+
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class NearRobotSensor extends Sensor {
 
+	@ArgumentsAnnotation(name = "range", defaultValue = ""+DEFAULT_RANGE)
 	private double range; 
 	private Environment env;
 	
+	@ArgumentsAnnotation(name = "turnoff", help="Only works once.", values={"0","1"})
 	private boolean turnOff = true;
 	private boolean seenRobot = false;
 	private double previousValue = 0;

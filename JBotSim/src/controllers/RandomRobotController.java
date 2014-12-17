@@ -3,7 +3,7 @@ package controllers;
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
-import simulation.robot.sensors.SimpleRobotSensor;
+import simulation.robot.sensors.RobotSensor;
 import simulation.util.Arguments;
 
 public class RandomRobotController extends Controller {

@@ -5,9 +5,9 @@ import simulation.physicalobjects.checkers.AllowTeamNestChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class SimpleTeamNestSensor extends SimpleLightTypeSensor {
+public class TeamNestSensor extends SimpleLightTypeSensor {
 
-	public SimpleTeamNestSensor(Simulator simulator, int id, Robot robot, Arguments args) {
+	public TeamNestSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 		String nest = (args.getArgumentIsDefined("nest")) ? args.getArgumentAsString("nest") : "self";
 		int nestNumber = robot.getParameterAsInteger("TEAM");

@@ -10,6 +10,7 @@ import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowAllRobotsChecker;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class RobotRGBColorSensor extends ConeTypeSensor {
 	protected boolean detectRed;
@@ -18,6 +19,7 @@ public class RobotRGBColorSensor extends ConeTypeSensor {
 
 	protected double r;
 
+	@ArgumentsAnnotation(name = "mode", values={"rgb","r","g","b"})
 	protected double[] redReadings;
 	protected double[] greenReadings;
 	protected double[] blueReadings;

@@ -3,12 +3,12 @@ package simulation.environment;
 import simulation.Simulator;
 import simulation.util.Arguments;
 
-public class NoLandmarksEnvironment extends Environment {
+public class EmptyEnvironment extends Environment {
 
 	private double forageLimit;
 	private double forbiddenArea;
 	
-	public NoLandmarksEnvironment(Simulator simulator, Arguments arguments) {
+	public EmptyEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 	}
 	

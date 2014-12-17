@@ -9,7 +9,7 @@ import simulation.util.Arguments;
 /**
  * @author miguelduarte
  */
-public class WallButtonSensor extends LightTypeSensor {
+public class WallButtonSensor extends SimpleLightTypeSensor {
 	
 	private int lagBufferSize = 0;
 	private double[][] lagBuffer;
