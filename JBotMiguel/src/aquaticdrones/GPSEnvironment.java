@@ -3,13 +3,13 @@ package aquaticdrones;
 import java.util.LinkedList;
 
 import mathutils.Vector2d;
-import controllers.DoNothingController;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.physicalobjects.LightPole;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
+import controllers.DummyController;
 
 public class GPSEnvironment extends Environment{
 	
@@ -56,7 +56,7 @@ public class GPSEnvironment extends Environment{
 		
 		for(i = 0 ; i < numberOfRobots ; i++) {
 			Robot rr = new Robot(simulator, new Arguments("x=0,y=0"));
-			rr.setController(new DoNothingController(simulator, rr, new Arguments("")));
+			rr.setController(new DummyController(simulator, rr, new Arguments("")));
 			addRobot(rr);
 			double x = pos.getX()*simulator.getRandom().nextDouble();
 			double y = -25.0+simulator.getRandom().nextDouble()*50.0;

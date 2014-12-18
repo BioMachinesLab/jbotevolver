@@ -232,7 +232,11 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 	private RuleHolder rules;
 	
 	private int maxOperationErrors = 500;
-
+	
+	private int genomesEvaluated = 0;
+	
+	private transient EAWorkerSequential worker;
+	
 	/**
 	 * Construct an EA.
 	 * 
@@ -278,6 +282,8 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 	@Override
 	public void iteration() {
 		
+		genomesEvaluated = 0;
+		
 		if (this.actualThreadCount == -1) {
 			preIteration();
 			
@@ -309,7 +315,7 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 		elitesToEvaluate[0] = bestGenome;
 		elitesEvaluated++;
 		
-		final EAWorkerSequential worker = new EAWorkerSequential(this, new Random(getRandomNumberFactory().factor().nextLong()));
+		worker = new EAWorkerSequential(this, new Random(getRandomNumberFactory().factor().nextLong()));
 		
 		for (final Species species : getPopulation().getSpecies()) {
 			int numToSpawn = species.getOffspringCount();
@@ -587,7 +593,9 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 	}
 	
 	public EvaluationResult getEvaluationResult() {
-		return ((CalculateScoreAsynchronous)getScoreFunction()).getEvaluationResult();
+		EvaluationResult result = ((CalculateScoreAsynchronous)getScoreFunction()).getEvaluationResult();
+		genomesEvaluated++;
+		return result;
 	}
 
 	/**
@@ -950,5 +958,13 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 	 */
 	public void setMaxOperationErrors(int maxOperationErrors) {
 		this.maxOperationErrors = maxOperationErrors;
-	}	
+	}
+	
+	public int getGenomesEvaluated() {
+		return genomesEvaluated;
+	}
+	
+	public void stopEvolution() {
+		worker.stopExecuting();
+	}
 }

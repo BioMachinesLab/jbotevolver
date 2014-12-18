@@ -13,6 +13,7 @@ import neat.continuous.NEATContinuousCODEC;
 import neat.continuous.NEATContinuousNetwork;
 import neat.continuous.SelectContinuousProportion;
 import neat.evaluation.NEATEvaluation;
+import neat.evaluation.SOEvaluationManager;
 import neat.evaluation.TaskStatistics;
 import neat.layerered.LayeredANN;
 import neat.layerered.LayeredNEATCODEC;
@@ -121,10 +122,12 @@ public class ERNEATPopulation extends Population implements Serializable{
 		population.reset();
 
 		//encog's structure requires the fitness function and the EA within the population
-		this.evaluator = (NEATEvaluation)EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get("--evalmanager"));
-
-		evaluator.setupObjectives(jBotEvolver.getArguments());
 		
+		if(jBotEvolver.getArguments().get("--evalmanager") != null)
+			this.evaluator = (NEATEvaluation)EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get("--evalmanager"));
+		else
+			this.evaluator  = new SOEvaluationManager(new Arguments(""));
+
 		trainer = constructPopulationTrainer();
 	}
 	
@@ -309,8 +312,14 @@ public class ERNEATPopulation extends Population implements Serializable{
 
 	@Override
 	public int getNumberOfChromosomesEvaluated() {
-		// TODO Auto-generated method stub
+		if(trainer != null)
+			return this.trainer.getGenomesEvaluated();
 		return 0;
+	}
+	
+	public void stopEvolution() {
+		if(trainer != null)
+			trainer.stopEvolution();
 	}
 
 	@Override
@@ -331,6 +340,10 @@ public class ERNEATPopulation extends Population implements Serializable{
 
 	@Override
 	public Chromosome getBestChromosome() {
+		
+		if(population.getBestGenome() == null)
+			return null;
+		
 		MLMethod net = population.getCODEC().decode(population.getBestGenome());
 
 		if(population.getCODEC() instanceof ParameterNEATCODEC)

@@ -35,8 +35,6 @@ public abstract class NEATEvaluation extends EvaluationFunction implements Calcu
 		this.statsManager.resetStatistics();
 	}
 	
-	public abstract void setupObjectives(HashMap<String, Arguments> arguments);
-	
 	public abstract void setupEvolution(JBotEvolver jBotEvolver, 
 			TaskExecutor taskExecutor, int numberOfSamples, long generationalSeed);
 	

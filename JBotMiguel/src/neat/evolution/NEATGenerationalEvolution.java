@@ -65,7 +65,7 @@ public class NEATGenerationalEvolution extends Evolution {
 		taskExecutor.setTotalNumberOfTasks(numberOfTasks);
 
 		print("GOING TO EVOLVE.\n");
-		while(!population.evolutionDone()) {
+		while(!population.evolutionDone() && executeEvolution) {
 			
 			String fitness = (""+population.getHighestFitness());
 			
@@ -76,25 +76,28 @@ public class NEATGenerationalEvolution extends Evolution {
 
 			population.evolvePopulation(jBotEvolver, taskExecutor);
 			
-			population.updateStatistics();
-
-			//print("\nSpecies " + population.getNumberOfSpecies() + "\n");
+			if(executeEvolution) {
 			
-			print("\nGeneration "+population.getNumberOfCurrentGeneration()+
-					"\tHighest: "+population.getHighestFitness()+
-					"\tAverage: "+population.getAverageFitness()+
-					"\tLowest: "+population.getLowestFitness()+"\n");
-			
-			try {
+				population.updateStatistics();
+	
+				//print("\nSpecies " + population.getNumberOfSpecies() + "\n");
 				
-				if(population.getNumberOfCurrentGeneration() % saveEveryGeneration == 0)
-					diskStorage.savePopulation(population);
-				else
-					diskStorage.updateFitnessOnly(population);
-				//this.storeGenerationStatistics();
-			} catch(Exception e) {e.printStackTrace();}
-			
-			population.resetStatistics();
+				print("\nGeneration "+population.getNumberOfCurrentGeneration()+
+						"\tHighest: "+population.getHighestFitness()+
+						"\tAverage: "+population.getAverageFitness()+
+						"\tLowest: "+population.getLowestFitness()+"\n");
+				
+				try {
+					
+					if(population.getNumberOfCurrentGeneration() % saveEveryGeneration == 0)
+						diskStorage.savePopulation(population);
+					else
+						diskStorage.updateFitnessOnly(population);
+					//this.storeGenerationStatistics();
+				} catch(Exception e) {e.printStackTrace();}
+				
+				population.resetStatistics();
+			}
 		}
 		
 		Encog.getInstance().shutdown();
@@ -109,6 +112,12 @@ public class NEATGenerationalEvolution extends Evolution {
 	@Override
 	public Population getPopulation() {
 		return population;
+	}
+	
+	@Override
+	public void stopEvolution() {
+		super.stopEvolution();
+		population.stopEvolution();
 	}
 
 }

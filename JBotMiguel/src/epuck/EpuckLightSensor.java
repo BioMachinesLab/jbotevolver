@@ -12,7 +12,7 @@ import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowLightChecker;
 import simulation.robot.Robot;
-import simulation.robot.sensors.SimpleLightTypeSensor;
+import simulation.robot.sensors.LightTypeSensor;
 import simulation.util.Arguments;
 
 /**
@@ -24,7 +24,7 @@ import simulation.util.Arguments;
  */
 
 @SuppressWarnings("serial")
-public class EpuckLightSensor extends SimpleLightTypeSensor {
+public class EpuckLightSensor extends LightTypeSensor {
 
 	private static double RANGE = 50;
 	private static double REAL_RANGE = 0.14;

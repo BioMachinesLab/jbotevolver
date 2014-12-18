@@ -7,13 +7,16 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
 import neat.NEATGenerationalTask;
 import neat.NEATNetworkController;
 import neat.SimpleObjectiveResult;
 import neat.continuous.NEATContinuousNetwork;
 import neat.continuous.NEATContinuousNetworkController;
+
 import org.encog.ml.MLMethod;
 import org.encog.neural.neat.NEATNetwork;
+
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import evolutionaryrobotics.JBotEvolver;
@@ -27,7 +30,6 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 
 	protected int numberOfSamples;
 	protected long generationalSeed;
-	protected Arguments objectiveArgs;
 	protected int objectiveId = 0;
 	protected transient JBotEvolver evolver;
 	protected transient TaskExecutor taskExecutor;
@@ -35,6 +37,8 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 	private boolean supressMessages = false;
 	
 	private boolean positiveFitness = true;
+	
+	private JBotEvolver jBotEvolver;
 	
 	private Map<Long,Stack<SimpleObjectiveResult>> synchronizedMap = Collections.synchronizedMap(new HashMap<Long,Stack<SimpleObjectiveResult>>());
 	private int asked = 0;
@@ -49,14 +53,6 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		this.positiveFitness = args.getArgumentAsIntOrSetDefault("positivefitness", 0) == 1;
 	}
 	
-	public void setupObjectives(HashMap<String, Arguments> arguments) {
-		Arguments objectiveArgs = arguments.get("--evaluation");
-		this.objectiveArgs = objectiveArgs;
-		
-		Arguments evolutionArgs = arguments.get("--evolution");
-		supressMessages = evolutionArgs.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
-	}
-
 	@Override
 	public boolean requireSingleThreaded() {
 		return false;
@@ -175,7 +171,6 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 
 	private int submitTasksForExecution(MLMethod net, int evalId, boolean useThreadId) {
 		
-		Arguments objectiveArgs = getObjectiveArgs();
 		int separateSamples = 1;
 		int aggregateSamples = numberOfSamples;
 		
@@ -183,7 +178,7 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		
 		for(int i = 0; i < separateSamples; i++){
 			
-			this.taskExecutor.addTask(new NEATGenerationalTask(new JBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), i, objectiveArgs, net, generationalSeed+i, useThreadId ? threadId : evalId, aggregateSamples));
+			this.taskExecutor.addTask(new NEATGenerationalTask(new JBotEvolver(evolver.getArgumentsCopy(),evolver.getRandomSeed()), i, net, generationalSeed+i, useThreadId ? threadId : evalId, aggregateSamples));
 			print(".");
 		}
 		
@@ -194,19 +189,16 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 		return separateSamples;
 	}
 	
-	private Arguments getObjectiveArgs() {
-		Arguments objectiveArgs = this.evolver.getArguments().get("--evaluation");
-		return objectiveArgs;
-	}
-
 	public void setupEvolution(JBotEvolver jBotEvolver,
 			TaskExecutor taskExecutor, int numberOfSamples, long generationalSeed) {
 		this.evolver = jBotEvolver;
 		this.taskExecutor = taskExecutor;
 		this.numberOfSamples = numberOfSamples;
 		this.generationalSeed = generationalSeed;
+		
+		supressMessages = evolver.getArguments().get("--evolution").getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
 	}
-
+	
 	@Override
 	public void resetStatistics() {
 		this.statsManager.resetStatistics();
@@ -252,4 +244,5 @@ public class SOEvaluationManager extends SOEvaluation<NEATNetwork> {
 				System.out.print(s);
 		}
 	}
+
 }

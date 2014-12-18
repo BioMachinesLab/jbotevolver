@@ -22,6 +22,7 @@ public class EAWorkerSequential {
 	private HashMap<Species,Integer> speciesMap = new HashMap<Species, Integer>();
 	private ArrayList<Species> order = new ArrayList<Species>();
 	private ArrayList<GenomeEvaluation> results = new ArrayList<GenomeEvaluation>();
+	private boolean stopExecuting = false;
 	
 	public EAWorkerSequential(final BasicEAJBot theTrain, Random r) {
 		this.train = theTrain;
@@ -40,6 +41,10 @@ public class EAWorkerSequential {
 	
 	public void run() {
 		for(Species s : order) {
+			
+			if(stopExecuting)
+				break;
+			
 			int children = speciesMap.get(s);
 			submitEvaluationSamples(s, children);
 		}
@@ -47,11 +52,15 @@ public class EAWorkerSequential {
 		getResults();
 	}
 	
+	public void stopExecuting() {
+		stopExecuting = true;
+	}
+	
 	private void getResults() {
 		
 		int resultsLeft = results.size();
 		
-		while(resultsLeft-- > 0) {
+		while(resultsLeft-- > 0 && !stopExecuting) {
 			EvaluationResult r = train.getEvaluationResult();
 			
 			boolean success = false;

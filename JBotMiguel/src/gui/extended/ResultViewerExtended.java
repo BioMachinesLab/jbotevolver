@@ -1,6 +1,7 @@
-package gui;
+package gui.extended;
 
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
+import gui.ResultViewerGui;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.util.Arguments;

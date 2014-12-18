@@ -24,22 +24,19 @@ public class NEATGenerationalTask extends JBotEvolverTask {
 	protected Random random;
 	private JBotEvolver jBotEvolver;
 	protected MLMethod method;
-	protected Arguments objectiveArgs;
 	protected double fitness = 0;
 	protected long threadId;
 	protected int nSamples = 1;
 	protected int objectiveId = 1;
 
-	public NEATGenerationalTask(JBotEvolver jBotEvolver, int sampleNumber, Arguments objectiveArgs, MLMethod method, long seed, long threadId, int nSamples) {
+	public NEATGenerationalTask(JBotEvolver jBotEvolver, int sampleNumber, MLMethod method, long seed, long threadId, int nSamples) {
 		super(jBotEvolver);
 		this.sampleNumber = sampleNumber;
 		this.method = method;
 		this.jBotEvolver = jBotEvolver;
-		this.objectiveArgs = objectiveArgs;
 		this.random = new Random(seed);
 		this.threadId = threadId;
 		this.nSamples = nSamples;
-		objectiveId = objectiveArgs.getArgumentAsIntOrSetDefault("id", 1);
 	}
 	
 	@Override
@@ -59,7 +56,7 @@ public class NEATGenerationalTask extends JBotEvolverTask {
 	
 			EvaluationFunction eval;
 			
-			eval = EvaluationFunction.getEvaluationFunction(objectiveArgs);
+			eval = EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get("--evaluation"));
 			
 			simulator.addCallback(eval);
 			simulator.simulate();

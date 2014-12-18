@@ -5,10 +5,10 @@ import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowAllRobotsChecker;
 import simulation.robot.Robot;
-import simulation.robot.sensors.SimpleLightTypeSensor;
+import simulation.robot.sensors.LightTypeSensor;
 import simulation.util.Arguments;
 
-public class RobotOrientationDistanceSensor extends SimpleLightTypeSensor {
+public class RobotOrientationDistanceSensor extends LightTypeSensor {
 
 	private int robotId = 0;
 
