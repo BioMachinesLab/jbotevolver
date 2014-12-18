@@ -182,7 +182,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 				
 				Scanner sc = new Scanner(generationsFile);
 				
-				totalGenerations = sc.nextInt() + 1;
+				totalGenerations = Math.max(sc.nextInt() + 1,totalGenerations);
 				
 				sc.close();
 				

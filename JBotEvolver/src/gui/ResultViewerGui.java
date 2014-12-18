@@ -775,6 +775,7 @@ public class ResultViewerGui extends Gui implements Updatable{
 
 		protected static final long serialVersionUID = 1L;
 		protected String currentFilename = "";
+		protected String currentFolder = "";
 		protected JTree tree;
 		protected DefaultTreeModel model;
 
@@ -785,6 +786,8 @@ public class ResultViewerGui extends Gui implements Updatable{
 
 			model = new DefaultTreeModel(nodes);
 			tree = new JTree(model);
+			
+			currentFolder = dir.getAbsolutePath();
 			
 			addTree();
 		}
@@ -842,7 +845,7 @@ public class ResultViewerGui extends Gui implements Updatable{
 		}
 		
 		public void refresh() {
-			changeDirectory(".");
+			changeDirectory(currentFolder);
 		}
 		
 		public void changeDirectory(String dir) {
@@ -854,6 +857,7 @@ public class ResultViewerGui extends Gui implements Updatable{
 				addTree();
 				treeWrapper.revalidate();
 				invalidate();
+				currentFolder = dir;
 			}catch(Exception e){e.printStackTrace();}
 			
 			updateFitnessSummary(dir);

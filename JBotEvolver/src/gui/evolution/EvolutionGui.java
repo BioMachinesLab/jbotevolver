@@ -182,7 +182,7 @@ public class EvolutionGui extends Gui {
 		infoPanel.add(generationTextField);
 		
 		JLabel configNameLabel = new JLabel("Elapsed:");
-		elapsedTextField = new JTextField(configName);
+		elapsedTextField = new JTextField("N/A");
 		elapsedTextField.setEditable(false);
 		elapsedTextField.setHorizontalAlignment(JTextField.CENTER);
 		infoPanel.add(configNameLabel);
