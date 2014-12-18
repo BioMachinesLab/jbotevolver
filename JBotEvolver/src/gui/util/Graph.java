@@ -260,11 +260,13 @@ public class Graph extends JPanel {
 			int init = Math.max(0, data.size() - showLast);
 			g2.setPaint(COLORS[currentColor]);
 			for (int i = init; i < data.size() - 1; i++) {
-				double x1 = pad + (i - init) * xInc;
-				double y1 = h - pad - scale * data.get(i);
-				double x2 = pad + (i - init + 1) * xInc;
-				double y2 = h - pad - scale * data.get(i + 1);
-				g2.draw(new Line2D.Double(x1, y1, x2, y2));
+				if(data.get(i) != null && data.get(i-1) != null) {
+					double x1 = pad + (i - init) * xInc;
+					double y1 = h - pad - scale * data.get(i);
+					double x2 = pad + (i - init + 1) * xInc;
+					double y2 = h - pad - scale * data.get(i + 1);
+					g2.draw(new Line2D.Double(x1, y1, x2, y2));
+				}
 			}
 		}
 		g2.setStroke(originalStroke);

@@ -172,7 +172,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		Graph graph = new Graph();
 		graphPanel.add(graph);
 		
-		int numberOfPoints = 0;
+		int totalGenerations = 0;
 		
 		for (String file : files) {
 			try {
@@ -181,11 +181,13 @@ public class GraphPlotter extends JFrame implements Updatable {
 				File generationsFile = new File(fitnessFile.getParent() + folderSeparator +"_generationnumber");
 				
 				Scanner sc = new Scanner(generationsFile);
-				int totalGenerations = sc.nextInt();
+				
+				totalGenerations = sc.nextInt() + 1;
+				
 				sc.close();
 				
 		        sc = new Scanner(fitnessFile);
-		        Double[] dataList = new Double[totalGenerations+1];
+		        Double[] dataList = new Double[totalGenerations];
 		        
 		        while (sc.hasNextLine()) {
 		        	String line = sc.nextLine();
@@ -197,15 +199,14 @@ public class GraphPlotter extends JFrame implements Updatable {
 		            	String[] lineValues = line.trim().split("\t");
 		            	lineValues = removeBlankSpaceOnArray(lineValues);
 		            	int generation = Integer.valueOf(lineValues[0]);
-		            	Double value = Double.valueOf(lineValues[1]);
-		            	dataList[generation] = value;
+		            	if(generation < totalGenerations) {
+		            		Double value = Double.valueOf(lineValues[1]);
+		            		dataList[generation] = value;
+		            	}
 		            }
 		            	
 		        }
 		        sc.close();
-		        
-		        if(totalGenerations > numberOfPoints)
-		        	numberOfPoints = totalGenerations;
 		        
 		        graph.addDataList(dataList);
 		        graph.addLegend(fitnessFile.getAbsolutePath());
@@ -215,9 +216,9 @@ public class GraphPlotter extends JFrame implements Updatable {
 		    }
 		}
 
-		graph.setxLabel("Generations ("+(numberOfPoints+1)+")");
+		graph.setxLabel("Generations ("+(totalGenerations)+")");
 		graph.setyLabel("Fitness");
-        graph.setShowLast(numberOfPoints);
+        graph.setShowLast(totalGenerations);
 		
 		window.setSize(800,500+graph.getHeaderSize());
 		window.setLocationRelativeTo(null);
