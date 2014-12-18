@@ -213,7 +213,6 @@ public class ERNEATPopulation extends Population implements Serializable{
 
 	public void evolvePopulation(JBotEvolver jBotEvolver, TaskExecutor taskExecutor) {
 		
-		generationsElapsed++;
 		//System.out.println("GENERATION " + generationsElapsed);
 		randomNumberGenerator.setSeed(getGenerationRandomSeed());
 		
@@ -301,15 +300,12 @@ public class ERNEATPopulation extends Population implements Serializable{
 	public NEATPopulation getPopulation() {
 		return population;
 	}
-
-	/**************************************************************************
-	 **************************************************************************
-	 **************************************************************************
-	 * not used.
-	 **************************************************************************
-	 **************************************************************************
-	 **************************************************************************/
-
+	
+	@Override
+	public void createNextGeneration() {
+		generationsElapsed++;
+	}
+	
 	@Override
 	public int getNumberOfChromosomesEvaluated() {
 		if(trainer != null)
@@ -321,6 +317,14 @@ public class ERNEATPopulation extends Population implements Serializable{
 		if(trainer != null)
 			trainer.stopEvolution();
 	}
+
+	/**************************************************************************
+	 **************************************************************************
+	 **************************************************************************
+	 * not used.
+	 **************************************************************************
+	 **************************************************************************
+	 **************************************************************************/
 
 	@Override
 	public Chromosome getNextChromosomeToEvaluate() {
@@ -368,12 +372,6 @@ public class ERNEATPopulation extends Population implements Serializable{
 	public Chromosome getChromosome(int chromosomeId) {
 		// TODO Auto-generated method stub
 		return null;
-	}
-
-	@Override
-	public void createNextGeneration() {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

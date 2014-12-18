@@ -97,6 +97,8 @@ public class NEATGenerationalEvolution extends Evolution {
 				} catch(Exception e) {e.printStackTrace();}
 				
 				population.resetStatistics();
+				
+				population.createNextGeneration();
 			}
 		}
 		
