@@ -112,6 +112,7 @@ public class ConillonTaskExecutor extends TaskExecutor {
 		if(connected) {
 			client.cancelAllTasks();
 			client.disconnect();
+			connected = false;
 		}
 	}
 

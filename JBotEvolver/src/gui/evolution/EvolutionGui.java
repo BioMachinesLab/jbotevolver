@@ -18,6 +18,7 @@ import java.io.FileNotFoundException;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -41,7 +42,7 @@ public class EvolutionGui extends Gui {
 	private Graph fitnessGraph;
 	private JProgressBar evolutionProgressBar;
 	private JProgressBar generationsProgressBar;
-	private JTextField configNameTextField;
+	private JTextField elapsedTextField;
 	private JTextField generationTextField;
 	private JTextField bestTextField;
 	private JTextField averageTextField;
@@ -103,17 +104,20 @@ public class EvolutionGui extends Gui {
 		population = evo.getPopulation();
 		
 		configName = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
-		configNameTextField.setText(configName);
 		
 		fitnessGraph.setxLabel("Generations ("+population.getNumberOfGenerations()+")");
 		fitnessGraph.setyLabel("Fitness");
 		
 		time = System.currentTimeMillis();
+		elapsedTextField.setText(calculateTime(System.currentTimeMillis() - time));
+		
 	}
 	
 	public void executeEvolution() {
 		evolutionProgressBar.setValue(0);
+		evolutionProgressBar.setString("0%");
 		generationsProgressBar.setValue(0);
+		generationsProgressBar.setString("0%");
 		stopButton.setEnabled(true);
 		fitnessGraph.clear();
 		fitnessGraph.setShowLast(population.getNumberOfGenerations());
@@ -170,19 +174,19 @@ public class EvolutionGui extends Gui {
 		JPanel infoPanel = new JPanel(new GridLayout(2, 3));
 		infoPanel.setBorder(BorderFactory.createTitledBorder("Status"));
 		
-		JLabel configNameLabel = new JLabel("Configuration:");
-		configNameTextField = new JTextField(configName);
-		configNameTextField.setEditable(false);
-		configNameTextField.setHorizontalAlignment(JTextField.CENTER);
-		infoPanel.add(configNameLabel);
-		infoPanel.add(configNameTextField);
-		
 		JLabel generationLabel = new JLabel("Generations:");
 		generationTextField = new JTextField("0");
 		generationTextField.setEditable(false);
 		generationTextField.setHorizontalAlignment(JTextField.CENTER);
 		infoPanel.add(generationLabel);
 		infoPanel.add(generationTextField);
+		
+		JLabel configNameLabel = new JLabel("Elapsed:");
+		elapsedTextField = new JTextField(configName);
+		elapsedTextField.setEditable(false);
+		elapsedTextField.setHorizontalAlignment(JTextField.CENTER);
+		infoPanel.add(configNameLabel);
+		infoPanel.add(elapsedTextField);
 		
 		JLabel etaLabel = new JLabel("ETA:");
 		etaTextField = new JTextField("N/A");
@@ -330,7 +334,8 @@ public class EvolutionGui extends Gui {
 			double passedTime = (System.currentTimeMillis() - time);
 			double completePercentage = generation/(double)evo.getPopulation().getNumberOfGenerations();
 			int eta = (int) (passedTime / completePercentage * (1 - completePercentage));
-			etaTextField.setText(new Time(eta- 3600000).toString());
+			etaTextField.setText(calculateTime(eta));
+			elapsedTextField.setText(calculateTime(System.currentTimeMillis()-time));
 		}
 
 		private double[] getFitnessFromFile() {
@@ -423,5 +428,36 @@ public class EvolutionGui extends Gui {
 				waitForNewGeneration();
 			}
 		}
+	}
+	
+	public static String calculateTime(long mili) {
+		
+		long sec = mili/1000;
+		
+	    int day = (int) TimeUnit.SECONDS.toDays(sec);
+	    long hours = TimeUnit.SECONDS.toHours(sec) -
+	                 TimeUnit.DAYS.toHours(day);
+	    long minutes = TimeUnit.SECONDS.toMinutes(sec) - 
+	                  TimeUnit.DAYS.toMinutes(day) -
+	                  TimeUnit.HOURS.toMinutes(hours);
+	    long seconds = TimeUnit.SECONDS.toSeconds(sec) -
+	                  TimeUnit.DAYS.toSeconds(day) -
+	                  TimeUnit.HOURS.toSeconds(hours) - 
+	                  TimeUnit.MINUTES.toSeconds(minutes);
+	    
+	    while(day > 0) {
+	    	hours+=24;
+	    	day--;
+	    }
+	    
+	    String h = ""+hours;
+	    String m = ""+minutes;
+	    String s = ""+seconds;
+	    
+	    if(h.length() < 2) h = "0"+h;
+	    if(m.length() < 2) m = "0"+m;
+	    if(s.length() < 2) s = "0"+s;
+	    
+	    return h+":"+m+":"+s;
 	}
 }

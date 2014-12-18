@@ -4,9 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
-import javax.swing.tree.VariableHeightLayoutCache;
-
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -14,9 +11,7 @@ import simulation.util.Arguments;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
-import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import evolutionaryrobotics.populations.Population;
-import gui.Gui;
 
 public class JBotEvolver extends JBotSim {
 	
@@ -26,8 +21,6 @@ public class JBotEvolver extends JBotSim {
 	
 	public JBotEvolver(String[] args) throws Exception {
 		super(args);
-		if(arguments.get("--gui") != null)
-			Gui.getGui(this,arguments.get("--gui"));
 	}
 	
 	public EvaluationFunction getEvaluationFunction() {

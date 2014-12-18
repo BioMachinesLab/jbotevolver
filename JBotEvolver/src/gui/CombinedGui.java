@@ -41,7 +41,7 @@ public class CombinedGui extends JFrame {
 		
 		tabbedPane.addTab("Configuration", configAutomatorGui);
 		tabbedPane.addTab("Evolution", evo);
-		tabbedPane.addTab("Results", jbot.getGui());
+		tabbedPane.addTab("Results", Gui.getGui(jbot, jbot.getArguments().get("--gui")));
 		
 		add(tabbedPane);
 

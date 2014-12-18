@@ -68,8 +68,6 @@ public class ConfigurationGui extends Gui{
 		{"output","robots", "controllers", "population", "environment",
 			"executor","evolution", "evaluation", "random-seed"};
 
-	private JFrame previewFrame;
-	
 	private JPanel configurationPanelLeft;
 	private JPanel optionsPanelCenter;
 	private JPanel optionsPanelRight;
@@ -128,11 +126,6 @@ public class ConfigurationGui extends Gui{
 		
 		initListeners();
 
-		previewFrame = new JFrame("Preview");
-		previewFrame.setSize(800, 800);
-		previewFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		previewFrame.setVisible(false);
-		
 		setSize(1100, 800);
 		setVisible(true);
 	}
@@ -579,17 +572,6 @@ public class ConfigurationGui extends Gui{
 		return panel;
 	}
 	
-	private void amplifyPreview(Renderer renderer) {
-		if(renderer != null){
-			previewFrame.removeAll();
-			previewFrame.add(renderer);
-			previewFrame.setVisible(true);
-			previewFrame.invalidate();
-			previewFrame.validate();
-			previewFrame.repaint();
-		}
-	}
-	
 	private void seeSensors() {
 		try {
 			showPreview();
@@ -613,7 +595,11 @@ public class ConfigurationGui extends Gui{
 				public void mouseExited(MouseEvent e) {}
 				public void mouseEntered(MouseEvent e) {}
 				public void mouseClicked(MouseEvent e) {
-					amplifyPreview(setupRenderer());
+					try {
+						showPreview();
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
 				}
 			});
 			
