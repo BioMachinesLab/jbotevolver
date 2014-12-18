@@ -61,7 +61,7 @@ public class CombinedGui extends JFrame {
 		new CombinedGui();
 	}
 	
-	class WaitForEvolutionThread extends Thread {
+	protected class WaitForEvolutionThread extends Thread {
 		
 		private ConfigurationGui configAutomatorGui;
 		
@@ -79,7 +79,7 @@ public class CombinedGui extends JFrame {
 		}
 	}
 	
-	private class EvolutionGuiThread extends Thread{
+	protected class EvolutionGuiThread extends Thread{
 		
 		private String configFileName;
 

@@ -407,20 +407,23 @@ public class EvolutionGui extends Gui {
 						if(enablePreview && evoPopulation > 0 && evoPopulation != currentGenerationNumber){
 							currentGenerationNumber = evoPopulation;
 							
-							Simulator sim = jBotEvolver.createSimulator();
-							sim.addCallback(jBotEvolver.getEvaluationFunction());
-							sim.addCallback(this);
-							ArrayList<Robot> robots = jBotEvolver.createRobots(sim);
-							jBotEvolver.setChromosome(robots, evo.getPopulation().getBestChromosome());
-							sim.addRobots(robots);
+							if(evo.getPopulation().getBestChromosome() != null) {
 							
-							
-							previewGenerationTextField.setText(""+currentGenerationNumber);
-							
-							renderer.setSimulator(sim);
-							renderer.drawFrame();
-							
-							sim.simulate(PREVIEW_SLEEP);
+								Simulator sim = jBotEvolver.createSimulator();
+								sim.addCallback(jBotEvolver.getEvaluationFunction());
+								sim.addCallback(this);
+								ArrayList<Robot> robots = jBotEvolver.createRobots(sim);
+								jBotEvolver.setChromosome(robots, evo.getPopulation().getBestChromosome());
+								sim.addRobots(robots);
+								
+								
+								previewGenerationTextField.setText(""+currentGenerationNumber);
+								
+								renderer.setSimulator(sim);
+								renderer.drawFrame();
+								
+								sim.simulate(PREVIEW_SLEEP);
+							}
 						}else
 							waitForNewGeneration();
 					}

@@ -77,7 +77,7 @@ public class Graph extends JPanel {
 		for (int i = 0; i < dataList.length; i++) {
 			aux.add(dataList[i]);
 			
-			if(dataList[i] > max)
+			if(dataList[i] != null && dataList[i] > max)
 				max = dataList[i];
 		}
 		

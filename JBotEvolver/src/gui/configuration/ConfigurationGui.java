@@ -108,7 +108,16 @@ public class ConfigurationGui extends Gui{
 	
 	public ConfigurationGui(JBotSim jBotSim, Arguments args) {
 		super(jBotSim,args);
-
+		init();
+	}
+	
+	public ConfigurationGui(JBotSim jBotSim, Arguments args, String[] keys) {
+		super(jBotSim,args);
+		this.keys = keys;
+		init();
+	}
+	
+	public void init() {
 		optionsAttributes = new ArrayList<AutomatorOptionsAttribute>();
 		argumentsComponents = new HashMap<String, Component>();
 		
