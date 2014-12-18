@@ -610,7 +610,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 				for(String s : titlesList)
 					graph.addLegend(s);
 				
-				graph.setxLabel("Timesteps ("+(dataSize+1)+")");
+				graph.setxLabel("Timesteps ("+dataSize+")");
 				graph.setyLabel("Fitness");
 		        graph.setShowLast(dataSize);
 				

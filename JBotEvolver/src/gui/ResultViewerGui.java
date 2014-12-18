@@ -8,6 +8,7 @@ import gui.util.Editor;
 import gui.util.GraphPlotter;
 import gui.util.GraphViz;
 import gui.util.PostEvaluationData;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -15,6 +16,8 @@ import java.awt.GridLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedReader;
@@ -29,6 +32,7 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.Vector;
+
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -51,6 +55,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
+
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -67,7 +72,7 @@ public class ResultViewerGui extends Gui implements Updatable{
 	
 	protected int         sleepBetweenControlSteps = 10;
 	
-	JPanel treeWrapper;
+	protected JPanel treeWrapper;
 
 	protected JButton     pauseButton;
 	protected JButton		plotButton;
@@ -80,7 +85,7 @@ public class ResultViewerGui extends Gui implements Updatable{
 
 	protected FileTree fileTree;
 	protected JTextField currentFileTextField = new JTextField(18);
-	protected JButton	loadButton	= new JButton("Load");
+	protected JButton loadButton = new JButton("Load");
 	protected JButton editButton = new JButton("Edit");
 	protected JButton plotFitnessButton = new JButton("Plot Fitness");
 	protected JButton compareFitnessButton = new JButton("Compare Fitness");
@@ -345,6 +350,12 @@ public class ResultViewerGui extends Gui implements Updatable{
 	}
 
 	protected void initListeners() {
+		
+		addComponentListener ( new ComponentAdapter () {
+	        public void componentShown ( ComponentEvent e ) {
+	            fileTree.refresh();
+	        }
+	    });
 
 		sleepSlider.addMouseListener(new MouseListener() {
 			public void mouseReleased(MouseEvent arg0) {
@@ -828,6 +839,10 @@ public class ResultViewerGui extends Gui implements Updatable{
 
 			removeAll();
 			add(BorderLayout.CENTER, scroll);
+		}
+		
+		public void refresh() {
+			changeDirectory(".");
 		}
 		
 		public void changeDirectory(String dir) {
