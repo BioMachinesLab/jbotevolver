@@ -17,28 +17,28 @@ import simulation.util.ArgumentsAnnotation;
 
 public class GroupedPreyEnvironment extends Environment {
 
-	private static final double PREY_RADIUS = 0.025;
+	private static final double PREY_RADIUS = 0.05;
 	private static final double PREY_MASS = 1;
 	
 	@ArgumentsAnnotation(name="nestlimit", defaultValue="0.5")
 	private double nestLimit;
 	
-	@ArgumentsAnnotation(name="foragelimit", defaultValue="6.0")
+	@ArgumentsAnnotation(name="foragelimit", defaultValue="4")
 	private double forageLimit;
 	
-	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="7.0")
+	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="5")
 	private	double forbiddenArea;
 	
 	@ArgumentsAnnotation(name="preyangle", defaultValue="")
 	private	double preyAngle;
 	
-	@ArgumentsAnnotation(name="redeployprey", values={"0","1"})
+	@ArgumentsAnnotation(name="preyincreasedistance", values={"0","1"})
 	private boolean preyIncreaseDistance;
 	
 	@ArgumentsAnnotation(name="preymindistance", defaultValue="3")
 	private double preyMinDistance;
 	
-	@ArgumentsAnnotation(name="preymaxdistance", defaultValue="6")
+	@ArgumentsAnnotation(name="preymaxdistance", defaultValue="5")
 	private double preyMaxDistance;
 	
 	@ArgumentsAnnotation(name="amountoffood", defaultValue="10")
@@ -68,11 +68,13 @@ public class GroupedPreyEnvironment extends Environment {
 		this.simulator = simulator;
 
 		nestLimit       = arguments.getArgumentIsDefined("nestlimit") ? arguments.getArgumentAsDouble("nestlimit")			: .5;
-		forbiddenArea       = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")	: 7;
-		forageLimit     = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit")		: 6.0;
+		forbiddenArea       = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")	: 5;
+		this.width = forbiddenArea*2;
+		this.height = forbiddenArea*2;
+		forageLimit     = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit")		: 4;
 		preyAngle    = arguments.getArgumentIsDefined("preyangle") ? arguments.getArgumentAsDouble("preyangle")	: newRandomAngle();
 		preyMinDistance    = arguments.getArgumentIsDefined("preymindistance") ? arguments.getArgumentAsDouble("preymindistance")	: 3;
-		preyMaxDistance    = arguments.getArgumentIsDefined("preymaxdistance") ? arguments.getArgumentAsDouble("preymaxdistance")	: 6;
+		preyMaxDistance    = arguments.getArgumentIsDefined("preymaxdistance") ? arguments.getArgumentAsDouble("preymaxdistance")	: 5;
 		amountOfFood    = arguments.getArgumentIsDefined("amountoffood") ? arguments.getArgumentAsInt("amountoffood")	: 10;
 		preyIncreaseDistance    = arguments.getArgumentIsDefined("preyincreasedistance") ? (arguments.getArgumentAsInt("preyincreasedistance")==1)	: false;
 		totalSamples    = arguments.getArgumentIsDefined("totalsamples") ? arguments.getArgumentAsInt("totalsamples")	: 5;

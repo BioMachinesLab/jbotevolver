@@ -1,6 +1,5 @@
 package simulation;
 
-import gui.Gui;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -122,10 +121,6 @@ public class JBotSim implements Serializable{
 		loadArguments(args);
 	}
 
-	public Gui getGui() {
-		return Gui.getGui(this,arguments.get("--gui"));
-	}
-	
 	public synchronized HashMap<String,Arguments> getArgumentsCopy() {
 		
 		HashMap<String,Arguments> newArgs = new HashMap<String, Arguments>();
