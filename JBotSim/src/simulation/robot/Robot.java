@@ -26,6 +26,8 @@ import controllers.Controller;
  */
 public class Robot extends MovableObject {
 
+	private static final long serialVersionUID = -4226242258989368422L;
+
 	/**
 	 * All the robots sensors
 	 */

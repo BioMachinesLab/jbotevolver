@@ -19,6 +19,7 @@ import comm.FileProvider;
 
 public class Simulator implements Serializable {
 
+	private static final long serialVersionUID = -2453767907508994194L;
 	public static int maxNumberRobots = 100000;
 	protected Double time = Double.valueOf(0);
 	protected double timeDelta = 0.1;

@@ -18,7 +18,7 @@ public class AutoArgumentsGeneration {
 			
 			String fullAutoInputs = "";
 			
-			if(networkArgs.getArgumentAsString("inputs").equals("auto")) {
+			if(!networkArgs.getArgumentIsDefined("inputs") || networkArgs.getArgumentAsString("inputs").equals("auto")) {
 				Arguments sensorArgs = new Arguments(robotArgs.getArgumentAsString("sensors"));
 				for(int i = 0 ; i < sensorArgs.getNumberOfArguments() ; i++) {
 					String sensorName = sensorArgs.getArgumentAt(i);
@@ -81,7 +81,7 @@ public class AutoArgumentsGeneration {
                 
                 String fullAutoOutputs = "";
                 
-                if(networkArgs.getArgumentAsString("outputs").equals("auto")) {
+                if(!networkArgs.getArgumentIsDefined("outputs") || networkArgs.getArgumentAsString("outputs").equals("auto")) {
                         Arguments actuatorArgs = new Arguments(robotArgs.getArgumentAsString("actuators"));
                         for(int i = 0 ; i < actuatorArgs.getNumberOfArguments() ; i++) {
                         	String actuatorName = actuatorArgs.getArgumentAt(i);
