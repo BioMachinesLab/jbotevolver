@@ -712,8 +712,6 @@ public class ConfigurationGui extends Gui{
 	private void loadArgumentsFromFile() {
 		showPreview = false;
 		
-		cleanBeforeLoad();
-		
 		File file = chooseFile();
 		if(file != null){
 			Scanner scanner = null;
@@ -731,6 +729,7 @@ public class ConfigurationGui extends Gui{
 				}
 				scanner.close();
 				String[] transformedArgs = Arguments.readOptionsFromString(loadedFileArgs);
+				clear();
 				loadArgumentsToGui(transformedArgs);
 
 				cleanOptionsPanel();
@@ -745,7 +744,7 @@ public class ConfigurationGui extends Gui{
 		}
 	}
 	
-	private void cleanBeforeLoad(){
+	private void clear(){
 		while(!sensorsActuatorsListModel.isEmpty()){
 			robotConfig.remove(sensorsActuatorsListModel.get(0));
 			updateSensorsActuatorsList();
@@ -838,8 +837,6 @@ public class ConfigurationGui extends Gui{
 			arguments.removeArgument("network");
 			addLoadedArgumentsToConfigFile(key,arguments);
 			
-			networkArguments.removeArgument("inputs");
-			networkArguments.removeArgument("outputs");
 			addLoadedArgumentsToConfigFile("network",networkArguments);
 		}else{
 			addLoadedArgumentsToConfigFile(key,arguments);
@@ -956,7 +953,7 @@ public class ConfigurationGui extends Gui{
 				break;
 			case "network":
 				Arguments controllerArgs = result.getArgument("controllers");
-				controllerArgs.setArgument("network", arguments + ",inputs=auto,outputs=auto");
+				controllerArgs.setArgument("network", arguments);
 				break;
 			default:
 				result.setArgument(currentOptions, new Arguments(arguments, false));
