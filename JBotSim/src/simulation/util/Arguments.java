@@ -196,6 +196,10 @@ public class Arguments implements Serializable {
 	 *            the raw, unparsed argument string.
 	 */
 	protected void parseString(String unparsedArgumentString) {
+		
+		if(unparsedArgumentString==null)
+			return;
+		
 		this.unparsedArgumentString = unparsedArgumentString;
 
 		int stringIndex = 0;
@@ -204,7 +208,6 @@ public class Arguments implements Serializable {
 
 		StringBuffer currentArgument = new StringBuffer();
 		StringBuffer currentValue = new StringBuffer();
-
 		while (stringIndex < unparsedArgumentString.length()) {
 			char currentChar = unparsedArgumentString.charAt(stringIndex++);
 			if (currentChar == '(') {
@@ -248,7 +251,6 @@ public class Arguments implements Serializable {
 				values.add(currentValue.toString());
 			}
 		}
-		
 	}
 
 	/**
