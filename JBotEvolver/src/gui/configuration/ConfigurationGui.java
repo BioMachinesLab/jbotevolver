@@ -992,7 +992,7 @@ public class ConfigurationGui extends Gui{
 		
 		Class<?> cls = null;
 		for (Class<?> c : classesList) {
-			if(c.getName().contains(className)){
+			if(c.getSimpleName().equals(className)){
 				cls = Class.forName(c.getName());
 				break;
 			}
@@ -1027,6 +1027,7 @@ public class ConfigurationGui extends Gui{
 		configurationPanelLeft.add(new JLabel("classname"));
 		optionsPanelCenter.add(jtf);
 		optionsPanelRight.add(jcb);
+		
 		
 		for (ArgumentsAnnotation annotation : annotations) {
 			
