@@ -644,7 +644,7 @@ public class ConfigurationGui extends Gui{
 		if(result.getArgument("environment").getNumberOfArguments() > 0) {
 			environmentArgs = "--environment " + result.getArgument("environment");
 		} else {
-			environmentArgs = "--environment classname=NoLandmarksEnvironment,width=4,height=4";
+			environmentArgs = "--environment classname=EmptyEnvironment,width=4,height=4";
 		}
 		
 		try {
