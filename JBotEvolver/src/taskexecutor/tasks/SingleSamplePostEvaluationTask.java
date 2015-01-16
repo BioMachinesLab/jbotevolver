@@ -16,7 +16,6 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 	private int sample;
 	private double fitness = 0;
 	private Chromosome chromosome;
-	private JBotEvolver jBotEvolver;
 	private double threshold = 0;
 	private int run;
 	
