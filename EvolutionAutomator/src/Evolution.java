@@ -235,7 +235,14 @@ public class Evolution extends Thread {
 				System.out.println(execute);
 				
 				JBotEvolver jBotEvolver = new JBotEvolver(execute.split(" "));
-				TaskExecutor taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
+				
+				TaskExecutor taskExecutor;
+				
+				if(controller.getArguments("--executor") != null) {
+					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, controller.getArguments("--executor"));
+				} else {
+					taskExecutor = TaskExecutor.getTaskExecutor(jBotEvolver, jBotEvolver.getArguments().get("--executor"));
+				}
 				taskExecutor.start();
 				evolutionaryrobotics.evolution.Evolution a = evolutionaryrobotics.evolution.Evolution.getEvolution(jBotEvolver, taskExecutor, jBotEvolver.getArguments().get("--evolution"));
 				a.executeEvolution();
