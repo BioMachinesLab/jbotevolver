@@ -45,7 +45,6 @@ public abstract class NeuralNetwork implements Serializable{
 		outputNeuronStates = new double[numberOfOutputNeurons];
 	}
 
-
 	public int getNumberOfInputNeurons() {
 		return numberOfInputNeurons;
 	}
