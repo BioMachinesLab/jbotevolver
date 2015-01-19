@@ -1,10 +1,10 @@
 package simulation.robot;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import net.jafama.FastMath;
-import objects.Waypoint;
+import objects.Entity;
 import simulation.Simulator;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.TwoWheelActuator;
@@ -12,6 +12,7 @@ import simulation.robot.sensors.CompassSensor;
 import simulation.util.Arguments;
 import commoninterface.AquaticDroneCI;
 import commoninterface.CILogger;
+import commoninterface.CISensor;
 import commoninterface.utils.CoordinateUtilities;
 
 public class AquaticDrone extends DifferentialDriveRobot implements AquaticDroneCI{
@@ -22,7 +23,8 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	private Simulator simulator;
 //	private double lat = 38.749365;
 //	private double lon = -9.153418;
-	private LinkedList<Waypoint> waypoints = new LinkedList<>();
+	private ArrayList<Entity> entities = new ArrayList<Entity>();
+	private ArrayList<CISensor> cisensors = new ArrayList<CISensor>();
 	
 	public AquaticDrone(Simulator simulator, Arguments args) {
 		super(simulator, args);
@@ -53,18 +55,18 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 
 	@Override
 	public double getGPSLatitude() {
-		return CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY())[0];
+		return CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY()).getX();
 	}
 
 	@Override
 	public double getGPSLongitude() {
-		return CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY())[1];
+		return CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY()).getY();
 	}
 	
 	@Override
 	public double getGPSOrientationInDegrees() {
-		// TODO how should we fake this? add ~3m error? 
-		return 0;
+		// TODO how should we fake this? add error? 
+		return getCompassOrientationInDegrees();
 	}
 
 	@Override
@@ -125,8 +127,13 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	}
 
 	@Override
-	public LinkedList<Waypoint> getWaypoints() {
-		return waypoints;
+	public ArrayList<Entity> getEntities() {
+		return entities;
+	}
+	
+	@Override
+	public ArrayList<CISensor> getCISensors() {
+		return cisensors;
 	}
 
 }
