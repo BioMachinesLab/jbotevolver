@@ -36,35 +36,39 @@ import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 public class GraphPlotter extends JFrame implements Updatable {
 
-	private static final long serialVersionUID = 1L;
+	protected static final long serialVersionUID = 1L;
 	
-	private LinkedList<JCheckBox> robotCheckboxes = new LinkedList<JCheckBox>();
-	private LinkedList<JCheckBox> inputCheckboxes = new LinkedList<JCheckBox>();
-	private LinkedList<JCheckBox> hiddenCheckboxes = new LinkedList<JCheckBox>();
-	private LinkedList<JCheckBox> outputCheckboxes = new LinkedList<JCheckBox>();
+	protected LinkedList<JCheckBox> robotCheckboxes = new LinkedList<JCheckBox>();
+	protected LinkedList<JCheckBox> inputCheckboxes = new LinkedList<JCheckBox>();
+	protected LinkedList<JCheckBox> hiddenCheckboxes = new LinkedList<JCheckBox>();
+	protected LinkedList<JCheckBox> outputCheckboxes = new LinkedList<JCheckBox>();
 	
-	private LinkedList<JTextField> inputTextFields = new LinkedList<JTextField>();
-	private LinkedList<JTextField> hiddenTextFields = new LinkedList<JTextField>();
-	private LinkedList<JTextField> outputTextFields = new LinkedList<JTextField>();
+	protected LinkedList<JTextField> inputTextFields = new LinkedList<JTextField>();
+	protected LinkedList<JTextField> hiddenTextFields = new LinkedList<JTextField>();
+	protected LinkedList<JTextField> outputTextFields = new LinkedList<JTextField>();
 	
-	private JEditorPane console = new JEditorPane();
+	protected JEditorPane console = new JEditorPane();
 	
-	private ArrayList<Robot> robots;
-	private Vector<NNInput> inputs;
-	private double[] hidden;
-	private Vector<NNOutput> outputs;
+	protected ArrayList<Robot> robots;
+	protected Vector<NNInput> inputs;
+	protected double[] hidden;
+	protected Vector<NNOutput> outputs;
 	
-	private ArrayList<double[][]> valuesList = new ArrayList<double[][]>();
-	private ArrayList<String> titlesList = new ArrayList<String>();
+	protected ArrayList<double[][]> valuesList = new ArrayList<double[][]>();
+	protected ArrayList<String> titlesList = new ArrayList<String>();
 	
-	private double currentStep = 0;
-	private int currentIndex = 0;
+	protected double currentStep = 0;
+	protected int currentIndex = 0;
 	
-	private boolean saveToFile = false;
-	private Simulator simulator;
-	private NeuralNetwork network;
+	protected boolean saveToFile = false;
+	protected Simulator simulator;
+	protected NeuralNetwork network;
 	
-	private JBotEvolver jBotEvolver;
+	protected JBotEvolver jBotEvolver;
+	
+	public GraphPlotter() {
+		super("Graph Plotter");
+	}
 
 	/**
 	 * Currently this only works for robots that use a NeuralNetwork as a controller.
@@ -228,7 +232,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		dispose();
 	}
 	
-	private String[] removeBlankSpaceOnArray(String[] lineValues) {
+	protected String[] removeBlankSpaceOnArray(String[] lineValues) {
 		ArrayList<String> list = new ArrayList<String>();
 		
 		for (int i = 0; i < lineValues.length; i++) {
@@ -244,7 +248,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		return result;
 	}
 
-	private void changeAllCheckboxes(boolean value) {
+	protected void changeAllCheckboxes(boolean value) {
 		
 		for(JCheckBox c : robotCheckboxes)
 			c.setSelected(value);
@@ -259,7 +263,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 			c.setSelected(value);
 	}
 	
-	private void plotGraph() {
+	protected void plotGraph() {
 		
 		valuesList = new ArrayList<double[][]>();
 		titlesList = new ArrayList<String>();
@@ -382,7 +386,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		}
 	}
 	
-	private void processLayer(LinkedList<JCheckBox> checkboxes, LinkedList<JTextField> textFields, double[] states, int[] numberOfNeurons) {
+	protected void processLayer(LinkedList<JCheckBox> checkboxes, LinkedList<JTextField> textFields, double[] states, int[] numberOfNeurons) {
 		
 		int currentNeuron = 0;
 		
@@ -412,7 +416,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		}
 	}
 	
-	private JPanel initRobotPanel() {
+	protected JPanel initRobotPanel() {
 		JPanel robotPanel = new JPanel();
 		int number = (int)Math.ceil(simulator.getRobots().size()/2);
 		robotPanel.setLayout(new GridLayout(number,2));
@@ -427,7 +431,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		return robotPanel;
 	}
 
-	private JPanel initInputsPanel() {
+	protected JPanel initInputsPanel() {
 		JPanel inputPanel = new JPanel();
 		inputPanel.setLayout(new GridLayout(inputs.size(),2));
 		inputPanel.setBorder(BorderFactory.createTitledBorder("Inputs"));
@@ -452,7 +456,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		return inputPanel;
 	}
 	
-	private void printHiddenTaus() {
+	protected void printHiddenTaus() {
 		
 		String text = "";
 		
@@ -473,7 +477,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		new ConsoleFrame(text);
 	}
 	
-	private JPanel initHiddenPanel() {
+	protected JPanel initHiddenPanel() {
 		try{
 			JPanel hiddenPanel = new JPanel();
 			hiddenPanel.setLayout(new GridLayout(2,2));
@@ -513,7 +517,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		return null;
 	}
 
-	private JPanel initOutputsPanel() {
+	protected JPanel initOutputsPanel() {
 		JPanel outputPanel = new JPanel();
 		outputPanel.setLayout(new GridLayout(outputs.size(),2));
 		outputPanel.setBorder(BorderFactory.createTitledBorder("Outputs"));
@@ -537,7 +541,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		return outputPanel;
 	}
 	
-	private class ConsoleFrame extends JFrame {
+	protected class ConsoleFrame extends JFrame {
 		
 		public ConsoleFrame(String s) {
 			JTextArea a = new JTextArea(s);
@@ -549,7 +553,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 	}
 	
 	public class GraphSimulationRunner implements Runnable {
-		private Simulator sim;
+		protected Simulator sim;
 		public GraphSimulationRunner(Simulator sim) {
 			this.sim = sim;
 		}

@@ -992,7 +992,7 @@ public class ConfigurationGui extends Gui{
 		
 		Class<?> cls = null;
 		for (Class<?> c : classesList) {
-			if(c.getSimpleName().equals(className)){
+			if(c.getSimpleName().equals(className) || c.getName().equals(className)){
 				cls = Class.forName(c.getName());
 				break;
 			}

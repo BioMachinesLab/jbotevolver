@@ -6,7 +6,6 @@ import evolutionaryrobotics.populations.Population;
 import gui.Gui;
 import gui.renderer.Renderer;
 import gui.util.Graph;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -15,11 +14,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -27,7 +25,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
-
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -360,7 +357,7 @@ public class EvolutionGui extends Gui {
 				} catch(NumberFormatException e){}
 				
 				return fitnessValeus;
-			} catch (FileNotFoundException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}finally{
 				if(scanner != null)
@@ -409,13 +406,12 @@ public class EvolutionGui extends Gui {
 							
 							if(evo.getPopulation().getBestChromosome() != null) {
 							
-								Simulator sim = jBotEvolver.createSimulator();
+								Simulator sim = jBotEvolver.createSimulator(new Random());
 								sim.addCallback(jBotEvolver.getEvaluationFunction());
 								sim.addCallback(this);
 								ArrayList<Robot> robots = jBotEvolver.createRobots(sim);
 								jBotEvolver.setChromosome(robots, evo.getPopulation().getBestChromosome());
 								sim.addRobots(robots);
-								
 								
 								previewGenerationTextField.setText(""+currentGenerationNumber);
 								

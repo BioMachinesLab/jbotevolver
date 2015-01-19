@@ -413,7 +413,7 @@ public class ResultViewerGui extends Gui implements Updatable{
 					try{
 						simulationState = PAUSED;
 						jBotEvolver.loadFile(currentFileTextField.getText(), extraArguments.getText());
-						new GraphPlotter(jBotEvolver,loadSimulator());
+						launchGraphPlotter(jBotEvolver,loadSimulator());
 					}catch(Exception e){
 						e.printStackTrace();
 					}
@@ -482,6 +482,10 @@ public class ResultViewerGui extends Gui implements Updatable{
 			});
 		*/
 		}
+	}
+	
+	protected void launchGraphPlotter(JBotEvolver jbot, Simulator sim) {
+		new GraphPlotter(jbot,sim);
 	}
 	
 	protected void plotFitness() {
