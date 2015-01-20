@@ -25,11 +25,13 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 //	private double lon = -9.153418;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private ArrayList<CISensor> cisensors = new ArrayList<CISensor>();
+	private TwoWheelActuator wheels;
 	
 	public AquaticDrone(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		this.simulator = simulator;
 
+		//OLD
 //		double[] start = CoordinateUtilities.GPSToCartesian(lat, lon);
 //		System.out.println(start[0]+" "+start[1]);
 //		setPosition(start[0], start[1]);
@@ -41,8 +43,9 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 
 	@Override
 	public void setMotorSpeeds(double leftMotor, double rightMotor) {
-		TwoWheelActuator twoWheelActuator = (TwoWheelActuator) getActuatorByType(TwoWheelActuator.class);
-		twoWheelActuator.setWheelSpeed(leftMotor, rightMotor);
+		if(wheels == null)
+			wheels = (TwoWheelActuator) getActuatorByType(TwoWheelActuator.class);
+		wheels.setWheelSpeed(leftMotor, rightMotor);
 	}
 
 	//Create drone compass sensor

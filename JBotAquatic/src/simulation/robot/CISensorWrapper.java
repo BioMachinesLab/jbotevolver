@@ -18,13 +18,9 @@ public class CISensorWrapper extends Sensor{
 	
 	public CISensorWrapper(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
-		String name = args.getArgumentValue("ci");
+		String ciString = args.getArgumentValue("ci");
 		
-		args.removeArgument("classname");
-		args.removeArgument("ci");
-		args.setArgument("classname", name);
-		
-		CIArguments ciargs = new CIArguments(args.getCompleteArgumentString(),true);
+		CIArguments ciargs = new CIArguments(ciString);
 		
 		cisensor = CISensor.getSensor(((AquaticDroneCI)this.robot), ciargs.getArgumentAsString("classname"), ciargs);
 		((AquaticDroneCI)this.robot).getCISensors().add(cisensor);
