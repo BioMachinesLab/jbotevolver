@@ -2,18 +2,23 @@ package neat.parameters;
 
 import java.util.ArrayList;
 import java.util.Vector;
+
 import neat.layerered.ANNNeuron;
 import neat.layerered.ANNSynapse;
 import neat.layerered.LayeredANN;
 import neat.layerered.continuous.ANNNeuronContinuous;
 import neat.layerered.continuous.LayeredContinuousNEATCODEC;
 import neat.layerered.continuous.LayeredContinuousNeuralNetwork;
+
 import org.encog.engine.network.activation.ActivationSteepenedSigmoid;
+import org.encog.ml.MLMethod;
 import org.encog.ml.ea.codec.GeneticCODEC;
 import org.encog.ml.ea.genome.GenomeFactory;
+
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
+import evolutionaryrobotics.neuralnetworks.outputs.SimpleNNOutput;
 
 public class ParameterNeuralNetwork extends LayeredContinuousNeuralNetwork {
 	
@@ -26,6 +31,18 @@ public class ParameterNeuralNetwork extends LayeredContinuousNeuralNetwork {
 	
 	public ParameterNeuralNetwork(LayeredANN network){
 		super(network);
+	}
+	
+	public void setNetwork(MLMethod network) {
+		this.network = (LayeredANN)network;
+		
+		numberOfInputNeurons = 0;
+		numberOfOutputNeurons = 0;
+		
+		Vector<NNOutput> outputs = new Vector<NNOutput>();
+		
+		outputs.add(new SimpleNNOutput(new Arguments("numberofoutputs="+this.network.getOutputCount())));
+		this.create(inputs, outputs);
 	}
 	
 	@Override
@@ -79,7 +96,7 @@ public class ParameterNeuralNetwork extends LayeredContinuousNeuralNetwork {
 		
 		int nNeurons = (int)weights[pos++];
 		int nSynapses = (int)weights[pos++];
-		
+
 		ArrayList<ANNSynapse> synapses = new ArrayList<ANNSynapse>();
 		ArrayList<ANNNeuron> neurons = new ArrayList<ANNNeuron>();
 		
@@ -100,7 +117,6 @@ public class ParameterNeuralNetwork extends LayeredContinuousNeuralNetwork {
 				
 				double bias = weights[pos++];
 				double parameter = weights[pos++];
-				
 				neuron = new ParameterNeuron(id, type, new ActivationSteepenedSigmoid(), bias, parameter);
 			} else { 
 				neuron = new ANNNeuron(id, type, new ActivationSteepenedSigmoid());

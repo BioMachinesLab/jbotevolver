@@ -25,6 +25,7 @@ package neat.evolution;
  */
 
 import java.io.Serializable;
+import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -37,6 +38,7 @@ import neat.continuous.NEATContinuousGenome;
 import neat.evaluation.CalculateScoreAsynchronous;
 import neat.evaluation.EvaluationResult;
 import neat.evaluation.MinimumScoreAdjuster;
+import neat.parameters.ParameterNeuronGene;
 
 import org.encog.Encog;
 import org.encog.EncogError;
@@ -67,7 +69,9 @@ import org.encog.ml.ea.species.Speciation;
 import org.encog.ml.ea.species.Species;
 import org.encog.ml.ea.train.EvolutionaryAlgorithm;
 import org.encog.ml.genetic.GeneticError;
+import org.encog.neural.neat.NEATNeuronType;
 import org.encog.neural.neat.training.NEATGenome;
+import org.encog.neural.neat.training.NEATNeuronGene;
 import org.encog.neural.neat.training.species.OriginalNEATSpeciation;
 import org.encog.util.concurrency.MultiThreadable;
 import org.encog.util.logging.EncogLogging;
@@ -291,7 +295,7 @@ public class BasicEAJBot implements EvolutionaryAlgorithm, MultiThreadable, Enco
 		if (getPopulation().getSpecies().size() == 0) {
 			throw new EncogError("Population is empty, there are no species.");
 		}
-
+		
 		this.iteration++;
 
 		// Clear new population to just best genome.

@@ -26,7 +26,11 @@ public class NEATMutateRemoveParameterNode extends NEATMutateAddNode implements 
 			}
 		}
 		
-		int index = rnd.nextInt(choices.size());
+		//don't remove the last output neuron!
+		if(choices.size() <= 1)
+			return;
+		
+		int index = choices.get(rnd.nextInt(choices.size()));
 		long neuronId = target.getNeuronsChromosome().get(index).getId(); 
 		
 		Iterator<NEATLinkGene> i = target.getLinksChromosome().iterator();
@@ -36,10 +40,9 @@ public class NEATMutateRemoveParameterNode extends NEATMutateAddNode implements 
 			if(g.getToNeuronID() == neuronId) {
 				//TODO maybe I should just disable the links, but the amount of dead links will be huge
 				g.setEnabled(false);
-//				i.remove();
+				i.remove();
 			}
 		}
-		
 		target.getNeuronsChromosome().remove(index);
 		
 		target.sortGenes();

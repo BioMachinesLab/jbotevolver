@@ -88,7 +88,6 @@ public class TMazeEnvironment extends Environment {
 		
 		forbiddenArea = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")	: 7;
 		currentSample = arguments.getArgumentIsDefined("fitnesssample") ? arguments.getArgumentAsInt("fitnesssample")	: 0;
-		
 		randomize = arguments.getArgumentAsIntOrSetDefault("randomize",1) == 1;
 		squareSize = arguments.getArgumentAsDoubleOrSetDefault("squaresize",squareSize);
 		

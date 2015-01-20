@@ -33,7 +33,7 @@ public class NEATMutateAddParameterNode extends NEATMutateAddContinuousNode impl
 		double parameter = rnd.nextDouble()*(2*pop.getWeightRange()) - pop.getWeightRange();
 		
 		final NEATInnovation innovation = ((NEATPopulation)getOwner().getPopulation()).getInnovations().findInnovation(pop.assignGeneID());
-		target.getNeuronsChromosome().add(new ParameterNeuronGene(NEATNeuronType.Hidden, af, innovation.getNeuronID(), innovation.getInnovationID(), 0, bias, parameter));
+		target.getNeuronsChromosome().add(new ParameterNeuronGene(NEATNeuronType.Output, af, innovation.getNeuronID(), innovation.getInnovationID(), 0, bias, parameter));
 		
 		ArrayList<Long> choices = new ArrayList<Long>();
 		
@@ -81,9 +81,8 @@ public class NEATMutateAddParameterNode extends NEATMutateAddContinuousNode impl
 			int index = rnd.nextInt(choices.size());
 			long fromId = choices.get(index);
 			choices.remove(index);
-			final NEATInnovation innovation = ((NEATPopulation)getOwner().getPopulation()).getInnovations().findInnovation(fromId, outputNeuronId);
 			
-			createLink(g, fromId, innovation.getNeuronID(), rnd.nextDouble()*CONNECTION_RANGE);
+			createLink(g, fromId, outputNeuronId, rnd.nextDouble()*CONNECTION_RANGE);
 		}
 	}
 }

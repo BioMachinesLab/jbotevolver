@@ -117,6 +117,8 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 		for(ANNNeuron n : neurons){
 			int depth = n.getNeuronDepth();
 			//disconnected pieces? may happen.
+			
+			
 			if(depth == -1){
 				if(n.getType() == ANNNeuron.INPUT_NEURON){
 					depth = Integer.MAX_VALUE;
@@ -127,6 +129,7 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 				//disconnected piece? convention = 2nd layer
 				else if(n.getIncomingConnections().isEmpty()  || (n.getIncomingNeurons().size() == 1 && n.getIncomingNeurons().get(0).getId() == n.getId())){
 					depth = Integer.MAX_VALUE - 1;
+					 
 					n.setNeuronDepth(depth);
 				}
 				else {
@@ -137,7 +140,8 @@ public class LayeredNEATCODEC implements GeneticCODEC, Serializable {
 			}
 			
 			if(depth == Integer.MAX_VALUE && n.getType() == ANNNeuron.HIDDEN_NEURON) {
-				throw new NeuralNetworkError("Hidden neuron in the input layer!");
+				//This can happen if the neuron has no outbound connection!
+//				throw new NeuralNetworkError("Hidden neuron in the input layer!");
 			}
 			
 			if(depth != -1 && !ids.contains(depth))

@@ -115,6 +115,7 @@ public class BehaviorController extends NeuralNetworkController implements Fixed
 		for(int i = maxIndex+1 ; i < outputStates.length ; i++)
 			if((outputStates[i] > outputStates[maxIndex] && !parallelController[i]) || (debugMax && outputStates[i] >= outputStates[maxIndex]))
 				maxIndex = i;
+
 		return maxIndex;
 	}
 	

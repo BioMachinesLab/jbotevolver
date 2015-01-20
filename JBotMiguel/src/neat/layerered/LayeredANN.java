@@ -23,6 +23,14 @@ public class LayeredANN implements MLRegression, MLError, Serializable  {
 		this.inputCount = layers[0].getNeurons().size() - 1;
 		this.outputCount = layers[layers.length - 1].getNeurons().size();
 		
+		if(inputCount <= 0) {
+			throw new NeuralNetworkError("No input neurons!!");
+		}
+		
+		if(outputCount <= 0) {
+			throw new NeuralNetworkError("No output neurons!!");
+		}
+		
 		if(layers[0].getNeurons().get(inputCount).getType() != ANNNeuron.BIAS_NEURON) {
 			throw new NeuralNetworkError("Bias neuron is not in the correct place!");
 		}

@@ -3,6 +3,7 @@ package epuck;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
@@ -23,9 +24,10 @@ import simulation.util.Arguments;
  * @author miguelduarte
  */
 
-@SuppressWarnings("serial")
 public class EpuckLightSensor extends LightTypeSensor {
 
+	private static final long serialVersionUID = 3083908290165398312L;
+	
 	private static double RANGE = 50;
 	private static double REAL_RANGE = 0.14;
 	private int[] chosenReferences;
@@ -60,6 +62,8 @@ public class EpuckLightSensor extends LightTypeSensor {
 //		super(simulator, id, robot, positions, openingAngle, RANGE, allowedSources);
 	public EpuckLightSensor(Simulator simulator,int id, Robot robot, Arguments arguments) {
 		super(simulator,id,robot,arguments);
+		setupPositions(2,Math.toRadians(90));
+		
 		((Epuck) robot).setLightSensor(this);
 		
 		this.random = simulator.getRandom();
@@ -78,6 +82,15 @@ public class EpuckLightSensor extends LightTypeSensor {
 		lastTimeStep = new int[numberOfSensors];
 		
 		setAllowedObjectsChecker(new AllowLightChecker());
+	}
+	
+	public void setupPositions(int numberSensors, double offset) {
+		double delta = 2 * Math.PI / numberSensors;
+		double angle = offset;
+		for (int i=0;i< numberSensors;i++){
+			angles[i] = angle;
+			angle+=delta;
+		}
 	}
 	
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {

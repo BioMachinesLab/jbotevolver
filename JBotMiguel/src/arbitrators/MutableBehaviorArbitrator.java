@@ -1,7 +1,7 @@
 package arbitrators;
 
+import java.util.LinkedList;
 import neat.layerered.ANNNeuron;
-import neat.layerered.LayeredANN;
 import neat.parameters.ParameterNeuralNetwork;
 import neat.parameters.ParameterNeuron;
 import simulation.Simulator;
@@ -9,15 +9,19 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 import controllers.BehaviorController;
 import controllers.Controller;
+import controllers.ParameterController;
 import controllers.ParameterLocomotionController;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 
 public class MutableBehaviorArbitrator extends BehaviorController {
 	
 	private boolean configured = false;
+	private Simulator sim;
+	private LinkedList<Controller> configControllers; 
 
 	public MutableBehaviorArbitrator(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
+		this.sim = simulator;
 	}
 	
 	@Override
@@ -26,14 +30,22 @@ public class MutableBehaviorArbitrator extends BehaviorController {
 			ParameterNeuralNetwork net = (ParameterNeuralNetwork)neuralNetwork;
 			//Setting up the sub-controllers
 			
-			int index = 0;
-			
 			for(ANNNeuron n : net.getNetwork().getAllNeurons()) {
 				if(n instanceof ParameterNeuron) {
 					double p = ((ParameterNeuron)n).getParameter();
-					((ParameterLocomotionController)(subControllers.get(index++))).setParameter(p);
+					ParameterController c;
+					if(configControllers == null) {
+						c = new ParameterLocomotionController(sim, robot, new Arguments(""));
+					} else {
+						c = new ParameterController(sim, robot, new Arguments(""));
+						c.setSubControllers(configControllers);
+					}
+					c.setParameter(p);
+					subControllers.add(c);
 				}
 			}
+			
+			parallelController = new boolean[subControllers.size()];
 			
 			configured = true;
 		}
@@ -57,16 +69,31 @@ public class MutableBehaviorArbitrator extends BehaviorController {
 		if(!(neuralNetwork instanceof ParameterNeuralNetwork))
 			throw new RuntimeException("This controller is not ready for any other type of network!");
 		
-		for(int i = 0 ; i < neuralNetwork.getOutputNeuronStates().length ; i++) {
-			ParameterLocomotionController c = new ParameterLocomotionController(simulator, robot, new Arguments(""));
-			subControllers.add(c);
-		}
 		
-		parallelController = new boolean[neuralNetwork.getOutputNeuronStates().length];
+		if(args.getArgumentIsDefined("subcontrollers")) {
+			configControllers = new LinkedList<Controller>();
+			Arguments subControllerArgs = new Arguments(args.getArgumentAsString("subcontrollers"));
+			
+//			parallelController = new boolean[subControllerArgs.getNumberOfArguments()];
+			
+			for(int i = 0 ; i < subControllerArgs.getNumberOfArguments() ; i++) {
+				
+//				boolean parallel = subControllerArgs.getArgumentAt(i).startsWith("_");
+//				parallelController[i] = parallel;
+				
+				Arguments currentSubControllerArgs = new Arguments(subControllerArgs.getArgumentAsString(subControllerArgs.getArgumentAt(i)));
+				
+				Controller c = Controller.getController(simulator, robot, currentSubControllerArgs);
+				
+//				if(parallel) 
+//					parallelSubControllers.add(c);
+				
+				configControllers.add(c);
+			}
+		}
 		
 		resetChosen = args.getArgumentAsIntOrSetDefault("resetchosen", 1) == 1;
 		keepFeeding = args.getArgumentAsIntOrSetDefault("keepfeeding", 0) == 1;
 		debugMax = args.getArgumentAsIntOrSetDefault("debugmax", 0) == 1;
-	}
-	
+	}	
 }

@@ -9,7 +9,7 @@ import gui.evolution.EvolutionGui;
 public class EMain {
 	public static void main(String[] args) throws Exception {
 		
-		String configName = "drone_test.conf";
+		String configName = "neat_parameter_test.conf";
 		
 		try {
 			args = new String[]{configName};
@@ -17,7 +17,7 @@ public class EMain {
 			EvolutionGui evo = new EvolutionGui(jBotEvolver,new Arguments(""));
 			JFrame frame = new JFrame();
 			frame.add(evo);
-			frame.setSize(800, 300);
+			frame.setSize(1000, 600);
 			frame.setVisible(true);
 			frame.setLocationRelativeTo(null);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
