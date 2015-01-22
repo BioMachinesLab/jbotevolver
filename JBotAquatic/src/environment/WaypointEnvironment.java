@@ -37,10 +37,11 @@ public class WaypointEnvironment extends Environment{
 		
 		simulator.getRobots().get(0).setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
 		
+		distance+= distance*rand*simulator.getRandom().nextDouble()*2-rand;
+		
 		for(int i = 0 ; i < nWaypoints ; i++) {
 			double x = distance > 0 ? distance : width/2/3;
 			
-			distance+= distance*rand*simulator.getRandom().nextDouble()*2-rand;
 			double y = 0;
 			Vector2d latLon = CoordinateUtilities.cartesianToGPS(x, y);
 			Waypoint wp = new Waypoint(latLon.getX(), latLon.getY(), "wp"+i);

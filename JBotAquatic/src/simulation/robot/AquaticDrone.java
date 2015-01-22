@@ -43,9 +43,12 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 
 	@Override
 	public void setMotorSpeeds(double leftMotor, double rightMotor) {
+		
 		if(wheels == null)
 			wheels = (TwoWheelActuator) getActuatorByType(TwoWheelActuator.class);
-		wheels.setWheelSpeed(leftMotor, rightMotor);
+		wheels.setLeftWheelSpeed(leftMotor);
+		wheels.setRightWheelSpeed(rightMotor);
+		wheels.apply(this);
 	}
 
 	//Create drone compass sensor
@@ -100,24 +103,24 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 
 	@Override
 	public void updateActuators(Double time, double timeDelta) {
-		if (stopTimestep <= 0) {
+//		if (stopTimestep <= 0) {
+		System.out.println(leftWheelSpeed+" "+rightWheelSpeed);
+		orientation = MathUtils.modPI2(orientation + timeDelta * 0.5 / (distanceBetweenWheels / 2.0) * (rightWheelSpeed - leftWheelSpeed));
+		double lengthOfAcc = accelarationConstant * Math.pow(((leftWheelSpeed + rightWheelSpeed) / 2.0),2);
+		Vector2d accelaration = new Vector2d(lengthOfAcc * FastMath.cosQuick(orientation), lengthOfAcc * FastMath.sinQuick(orientation));
+		
+		velocity.setX(velocity.getX() * (1 - inertiaConstant));
+		velocity.setY(velocity.getY() * (1 - inertiaConstant));
+		
+		velocity.add(accelaration);
+		
+		position.set(
+				position.getX() + timeDelta * velocity.getX(), 
+				position.getY() + timeDelta * velocity.getY());
+			
+//		}
 
-			orientation = MathUtils.modPI2(orientation + timeDelta * 0.5 / (distanceBetweenWheels / 2.0) * (rightWheelSpeed - leftWheelSpeed));
-			double lengthOfAcc = accelarationConstant * Math.pow(((leftWheelSpeed + rightWheelSpeed) / 2.0),2);
-			Vector2d accelaration = new Vector2d(lengthOfAcc * FastMath.cosQuick(orientation), lengthOfAcc * FastMath.sinQuick(orientation));
-			
-			velocity.setX(velocity.getX() * (1 - inertiaConstant));
-			velocity.setY(velocity.getY() * (1 - inertiaConstant));
-			
-			velocity.add(accelaration);
-			
-			position.set(
-					position.getX() + timeDelta * velocity.getX(), 
-					position.getY() + timeDelta * velocity.getY());
-			
-		}
-
-		stopTimestep--;
+//		stopTimestep--;
 
 		for (Actuator actuator : actuators) {
 			actuator.apply(this);

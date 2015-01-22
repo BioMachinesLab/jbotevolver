@@ -50,6 +50,8 @@ public class DroneWaypointEvaluationFunction extends EvaluationFunction{
 			if(currentDistance < targetDistance) {
 				fitness = 1.0;
 				
+				bonus+=(0.5/steps);
+				
 				if(drone.getLeftWheelSpeed() == 0 && drone.getRightWheelSpeed() == 0) {
 					bonus+=(1.0/steps);
 				}
