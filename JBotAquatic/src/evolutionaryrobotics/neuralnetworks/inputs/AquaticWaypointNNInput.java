@@ -3,9 +3,9 @@ package evolutionaryrobotics.neuralnetworks.inputs;
 import simulation.robot.sensor.WaypointSensor;
 import simulation.robot.sensors.Sensor;
 
-public class WaypointNNInput extends NNInput {
+public class AquaticWaypointNNInput extends NNInput {
 
-	public WaypointNNInput(Sensor s) {
+	public AquaticWaypointNNInput(Sensor s) {
 		super(s);
 	}
 
