@@ -104,9 +104,11 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	@Override
 	public void updateActuators(Double time, double timeDelta) {
 //		if (stopTimestep <= 0) {
-		System.out.println(leftWheelSpeed+" "+rightWheelSpeed);
 		orientation = MathUtils.modPI2(orientation + timeDelta * 0.5 / (distanceBetweenWheels / 2.0) * (rightWheelSpeed - leftWheelSpeed));
-		double lengthOfAcc = accelarationConstant * Math.pow(((leftWheelSpeed + rightWheelSpeed) / 2.0),2);
+		
+		double direction = (rightWheelSpeed+leftWheelSpeed) < 0 ? -1 : 1;
+		double lengthOfAcc = accelarationConstant * Math.pow(((leftWheelSpeed + rightWheelSpeed) / 2.0),2) * direction;
+		
 		Vector2d accelaration = new Vector2d(lengthOfAcc * FastMath.cosQuick(orientation), lengthOfAcc * FastMath.sinQuick(orientation));
 		
 		velocity.setX(velocity.getX() * (1 - inertiaConstant));
@@ -141,5 +143,5 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	public ArrayList<CISensor> getCISensors() {
 		return cisensors;
 	}
-
+	
 }
