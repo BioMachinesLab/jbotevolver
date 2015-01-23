@@ -12,9 +12,9 @@ public class TwoWheelActuator extends Actuator {
 
 	public static final float NOISESTDEV = 0.05f;
 
-	private double leftSpeed = 0;
-	private double rightSpeed = 0;
-	private Random random;
+	protected double leftSpeed = 0;
+	protected double rightSpeed = 0;
+	protected Random random;
 	@ArgumentsAnnotation(name="maxspeed", defaultValue = "0.1")
 	protected double maxSpeed;
 	
@@ -62,5 +62,10 @@ public class TwoWheelActuator extends Actuator {
 	
 	public double getMaxSpeed() {
 		return maxSpeed;
+	}
+	
+	public double[] getSpeed(){
+		double[] velocities = {leftSpeed, rightSpeed};
+		return velocities;
 	}
 }

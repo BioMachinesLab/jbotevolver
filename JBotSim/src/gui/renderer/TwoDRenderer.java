@@ -255,7 +255,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		int y0 = transformY(l.getPointA().getY());
 		int y1 = transformY(l.getPointB().getY());
 		
-		graphics.setColor(Color.BLUE);
+		graphics.setColor(l.getColor());
 		graphics.drawLine(x0, y0, x1, y1);
 		graphics.setColor(Color.BLACK);
 	}
