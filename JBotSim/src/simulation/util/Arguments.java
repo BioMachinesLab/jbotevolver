@@ -796,6 +796,7 @@ public class Arguments implements Serializable {
 			sb.append(nextLine + " ");
 		}
 
+		bufferedReader.close();
 		return sb.toString();
 	}
 

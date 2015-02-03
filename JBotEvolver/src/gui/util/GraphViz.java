@@ -118,7 +118,8 @@ public class GraphViz
 	   String os = System.getProperty("os.name");
 	   
 	   if(os.contains("Windows")) {
-		   DOT = "c:/Program Files/Graphviz2.26.3/bin/dot.exe";
+		   DOT="C:/Program Files (x86)/Graphviz2.38/bin/dot.exe";
+		   //DOT = "c:/Program Files/Graphviz2.26.3/bin/dot.exe";
 	   }else if(os.contains("OS X")) {
 		  DOT = "/usr/local/bin/dot";
 	   }else {

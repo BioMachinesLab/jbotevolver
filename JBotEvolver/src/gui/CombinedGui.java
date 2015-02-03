@@ -45,7 +45,7 @@ public class CombinedGui extends JFrame {
 		
 		add(tabbedPane);
 
-		setSize(1100,750);
+		setSize(1100,680);
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setVisible(true);
