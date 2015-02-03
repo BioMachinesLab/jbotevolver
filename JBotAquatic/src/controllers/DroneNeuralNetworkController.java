@@ -96,7 +96,7 @@ protected CINeuralNetwork neuralNetwork;
 		}
 		
 		neuralNetwork.setWeights(weights);
-		
+
 		int currentIndex = weights.length - 1;
 		
 		for(Sensor s : robot.getSensors()) {

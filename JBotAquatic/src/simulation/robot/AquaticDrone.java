@@ -1,6 +1,7 @@
 package simulation.robot;
 
 import java.util.ArrayList;
+
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import net.jafama.FastMath;
@@ -13,6 +14,7 @@ import simulation.util.Arguments;
 import commoninterface.AquaticDroneCI;
 import commoninterface.CILogger;
 import commoninterface.CISensor;
+import commoninterface.network.broadcast.BroadcastHandler;
 import commoninterface.utils.CoordinateUtilities;
 
 public class AquaticDrone extends DifferentialDriveRobot implements AquaticDroneCI{
@@ -26,16 +28,12 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private ArrayList<CISensor> cisensors = new ArrayList<CISensor>();
 	private TwoWheelActuator wheels;
+	private SimulatedBroadcastHandler broadcastHandler;
 	
 	public AquaticDrone(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		this.simulator = simulator;
-
-		//OLD
-//		double[] start = CoordinateUtilities.GPSToCartesian(lat, lon);
-//		System.out.println(start[0]+" "+start[1]);
-//		setPosition(start[0], start[1]);
-//		waypoints.add(new Waypoint(38.74957,-9.153383));
+		broadcastHandler = new SimulatedBroadcastHandler(this);
 	}
 	
 	@Override
@@ -103,11 +101,15 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 
 	@Override
 	public void updateActuators(Double time, double timeDelta) {
-//		if (stopTimestep <= 0) {
 		orientation = MathUtils.modPI2(orientation + timeDelta * 0.5 / (distanceBetweenWheels / 2.0) * (rightWheelSpeed - leftWheelSpeed));
 		
 		double direction = (rightWheelSpeed+leftWheelSpeed) < 0 ? -1 : 1;
 		double lengthOfAcc = accelarationConstant * Math.pow(((leftWheelSpeed + rightWheelSpeed) / 2.0),2) * direction;
+		
+		//Backwards motion should be slower. This value here is just an
+		//estimate, and should be improved by taking real world samples
+		if(direction < 0)
+			lengthOfAcc*=0.2;
 		
 		Vector2d accelaration = new Vector2d(lengthOfAcc * FastMath.cosQuick(orientation), lengthOfAcc * FastMath.sinQuick(orientation));
 		
@@ -120,13 +122,11 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 				position.getX() + timeDelta * velocity.getX(), 
 				position.getY() + timeDelta * velocity.getY());
 			
-//		}
-
-//		stopTimestep--;
-
 		for (Actuator actuator : actuators) {
 			actuator.apply(this);
 		}
+		
+		broadcastHandler.update(time);
 	}
 
 	@Override
@@ -142,6 +142,20 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	@Override
 	public ArrayList<CISensor> getCISensors() {
 		return cisensors;
+	}
+	
+	@Override
+	public String getNetworkAddress() {
+		return getId()+":"+getId()+":"+getId()+":"+getId();
+	}
+	
+	@Override
+	public BroadcastHandler getBroadcastHandler() {
+		return broadcastHandler;
+	}
+	
+	public Simulator getSimulator() {
+		return simulator;
 	}
 	
 }
