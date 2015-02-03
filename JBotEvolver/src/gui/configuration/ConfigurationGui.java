@@ -106,6 +106,8 @@ public class ConfigurationGui extends Gui{
 	
 	private boolean showPreview = true;
 	
+	private String extraArgs = "";
+	
 	public ConfigurationGui(JBotSim jBotSim, Arguments args) {
 		super(jBotSim,args);
 		init();
@@ -530,7 +532,7 @@ public class ConfigurationGui extends Gui{
 				
 				try {
 					printWriter = new PrintWriter(new File(outputText + ".conf"));
-					printWriter.write(result.toString());
+					printWriter.write(result.toString()+extraArgs);
 					printWriter.close ();
 					
 //					configurationAutomator.startEvolution(outputText);
@@ -564,7 +566,7 @@ public class ConfigurationGui extends Gui{
 	}
 
 	private void updateConfigurationText() {
-		configResult.setText(result.toHTMLString());
+		configResult.setText(result.toHTMLString(extraArgs));
 //		for(String s:keys){
 //			tree.setArgumet(s,result.getArgument(s));
 //		}
@@ -766,6 +768,7 @@ public class ConfigurationGui extends Gui{
 			}
 		}
 		rendererPanel.removeAll();
+		extraArgs = "";
 	}
 	
 	private File chooseFile() {
@@ -784,7 +787,9 @@ public class ConfigurationGui extends Gui{
 	
 	private void loadArgumentsToGui(String[] args) throws ClassNotFoundException, IOException {
 		HashMap<String,Arguments> argumentsHash = Arguments.parseArgs(args);
+
 		for (String key : argumentsHash.keySet()) {
+			
 			String correctKey = key.replace("--", "");
 			Arguments completeArguments = argumentsHash.get(key);
 			String className = "";
@@ -794,8 +799,10 @@ public class ConfigurationGui extends Gui{
 				className = completeArguments.getArguments().get(0);;
 			}else{
 				className = completeArguments.getArgumentAsString("classname");
-				if(className == null)
+				if(className == null) {
+					extraArgs+=key+=" "+argumentsHash.get(key).getCompleteArgumentString()+"\n";
 					continue;
+				}
 				className = className.split("\\.")[className.split("\\.").length-1];
 				
 				specialAddToConfigFile(correctKey, completeArguments, className);

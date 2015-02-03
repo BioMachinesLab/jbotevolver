@@ -43,7 +43,7 @@ public class ConfigurationResult {
 		return res;
 	}
 	
-	public String toHTMLString(){
+	public String toHTMLString(String extraArgs){
 		String res = "<pre>";
 		
 		for(String s : keys) {
@@ -59,6 +59,8 @@ public class ConfigurationResult {
 			}
 
 		}
+		
+		res+=extraArgs;
 		
 		return res +"</pre>";
 	}

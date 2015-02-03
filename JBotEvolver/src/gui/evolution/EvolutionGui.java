@@ -412,6 +412,7 @@ public class EvolutionGui extends Gui {
 								ArrayList<Robot> robots = jBotEvolver.createRobots(sim);
 								jBotEvolver.setChromosome(robots, evo.getPopulation().getBestChromosome());
 								sim.addRobots(robots);
+								sim.setupEnvironment();
 								
 								previewGenerationTextField.setText(""+currentGenerationNumber);
 								
