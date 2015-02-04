@@ -11,11 +11,13 @@ import simulation.robot.actuators.Actuator;
 import simulation.robot.actuators.TwoWheelActuator;
 import simulation.robot.sensors.CompassSensor;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import commoninterface.AquaticDroneCI;
 import commoninterface.CILogger;
 import commoninterface.CISensor;
 import commoninterface.network.broadcast.BroadcastHandler;
 import commoninterface.utils.CoordinateUtilities;
+import commoninterface.utils.jcoord.LatLon;
 
 public class AquaticDrone extends DifferentialDriveRobot implements AquaticDroneCI{
 
@@ -23,17 +25,23 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	private double accelarationConstant = 0.1;
 	private Vector2d velocity = new Vector2d();
 	private Simulator simulator;
-//	private double lat = 38.749365;
-//	private double lon = -9.153418;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private ArrayList<CISensor> cisensors = new ArrayList<CISensor>();
 	private TwoWheelActuator wheels;
 	private SimulatedBroadcastHandler broadcastHandler;
 	
+	@ArgumentsAnnotation(name="gpserror", defaultValue = "0.0")
+	private double gpsError = 0;
+	
+	@ArgumentsAnnotation(name="compasserror", defaultValue = "0.0")
+	private double compassError = 0;
+	
 	public AquaticDrone(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		this.simulator = simulator;
 		broadcastHandler = new SimulatedBroadcastHandler(this);
+		gpsError = args.getArgumentAsDoubleOrSetDefault("gpserror", gpsError);
+		compassError = args.getArgumentAsDoubleOrSetDefault("compasserror", compassError);
 	}
 	
 	@Override
@@ -49,7 +57,6 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 		wheels.apply(this);
 	}
 
-	//Create drone compass sensor
 	@Override
 	public double getCompassOrientationInDegrees() {
 		CompassSensor compassSensor = (CompassSensor) getSensorByType(CompassSensor.class);
@@ -58,13 +65,25 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	}
 
 	@Override
-	public double getGPSLatitude() {
-		return CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY()).getX();
-	}
+	public LatLon getGPSLatLon() {
+		
+		LatLon latLon = CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY());
+		
+		if(gpsError > 0) {
+			double lat = latLon.getLat();
+			double lon = latLon.getLon();
 
-	@Override
-	public double getGPSLongitude() {
-		return CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY()).getY();
+			//TODO check if this is right
+			double radius = simulator.getRandom().nextDouble()*gpsError;
+			double angle = simulator.getRandom().nextDouble()*Math.PI*2;
+
+			lat+=radius*Math.sin(angle);
+			lon+=radius*Math.cos(angle);
+			
+			return new LatLon(lat, lon);
+		}
+		
+		return latLon;
 	}
 	
 	@Override
@@ -157,5 +176,4 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	public Simulator getSimulator() {
 		return simulator;
 	}
-	
 }

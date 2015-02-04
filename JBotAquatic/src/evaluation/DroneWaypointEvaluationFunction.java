@@ -1,14 +1,13 @@
 package evaluation;
 
 import java.util.ArrayList;
-
 import commoninterface.mathutils.Vector2d;
 import commoninterface.utils.CoordinateUtilities;
+import commoninterface.utils.jcoord.LatLon;
 import objects.Entity;
 import objects.Waypoint;
 import simulation.Simulator;
 import simulation.robot.AquaticDrone;
-import simulation.robot.actuators.TwoWheelActuator;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
@@ -78,7 +77,7 @@ public class DroneWaypointEvaluationFunction extends EvaluationFunction{
 	}
 	
 	private double calculateDistance(Waypoint wp, AquaticDrone drone) {
-		Vector2d pos = CoordinateUtilities.GPSToCartesian(wp.getLatitude(), wp.getLongitude());
+		Vector2d pos = CoordinateUtilities.GPSToCartesian(new LatLon(wp.getLatitude(), wp.getLongitude()));
 		Vector2d robotPos = new Vector2d(drone.getPosition().getX(), drone.getPosition().getY());
 		return pos.distanceTo(robotPos);
 	}
