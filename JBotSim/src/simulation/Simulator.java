@@ -37,6 +37,8 @@ public class Simulator implements Serializable {
 	private ExecutorService pool;
 	private ArrayList<StagedParallelRobotCallable> runnables;
 	
+	private Network network;
+	
 	private HashMap<String,Arguments> arguments = new HashMap<String,Arguments>(); 
 	
 	public Simulator(Random random, HashMap<String,Arguments> arguments) {
@@ -49,11 +51,21 @@ public class Simulator implements Serializable {
 		if(args != null) {
 			timeDelta = args.getArgumentAsDoubleOrSetDefault("timedelta", timeDelta);
 			parallel = args.getArgumentAsIntOrSetDefault("parallel", 0) == 1;
+			
+			if(args.getArgumentIsDefined("network")) {
+				network = Network.getNetwork(this, new Arguments(args.getArgumentAsString("network"),true));
+			}
+			
+			parallel = args.getArgumentAsIntOrSetDefault("parallel", 0) == 1;
 		}
 		
 		if(parallel) {
 			pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 		}
+	}
+	
+	public Network getNetwork() {
+		return network;
 	}
 	
 	public Double getTime(){
@@ -188,6 +200,8 @@ public class Simulator implements Serializable {
 			performOneSimulationStep(time);
 		}
 		stopSimulation = true;
+		if(network != null)
+			network.shutdown();
 	}
 	
 	public void simulate(long sleepTime) {
@@ -200,6 +214,8 @@ public class Simulator implements Serializable {
 			} catch (InterruptedException e) {}
 		}
 		stopSimulation = true;
+		if(network != null)
+			network.shutdown();
 	}
 
 	public double getTimeDelta() {

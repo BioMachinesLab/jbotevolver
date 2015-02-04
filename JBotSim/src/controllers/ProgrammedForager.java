@@ -26,7 +26,7 @@ public class ProgrammedForager extends Controller {
 	private static final double MIN_NEST_SIGNAL = 0.8;
 	private static final int NUM_FULL_FORWARD_STEPS = 50;
 
-	private double moveForwardSpeed = MAXSPEED;
+	private double moveForwardSpeed = 1.0;
 
 	private ConeTypeSensor nestSensors;
 	private ConeTypeSensor foodSensors;
@@ -348,7 +348,8 @@ public class ProgrammedForager extends Controller {
 
 	private boolean lost() {
 		multFactor *= .995;
-		motors.setWheelSpeed(MAXSPEED, MAXSPEED * Math.min(.98, 1 - multFactor));
+		motors.setLeftWheelSpeed(1.0);
+		motors.setRightWheelSpeed(Math.min(.98, 1 - multFactor));
 		// if(++actionCounter==NUM_AVOID_STEPS){
 		// actionCounter=0;
 		return true;
@@ -385,24 +386,27 @@ public class ProgrammedForager extends Controller {
 	}
 
 	void stopMotors() {
-		motors.setWheelSpeed(0, 0);
+		motors.setLeftWheelSpeed(0.5);
+		motors.setRightWheelSpeed(0.5);
 	}
 
 	private void turnRight(double speed) {
-		motors.setWheelSpeed(speed, -speed * .9);
+		motors.setLeftWheelSpeed(speed);
+		motors.setRightWheelSpeed(-speed * .9);
 	}
 
 	private void turnLeft(double speed) {
-		motors.setWheelSpeed(-speed * .9, speed);
+		motors.setLeftWheelSpeed(-speed * .9);
+		motors.setRightWheelSpeed(speed);
 	}
 
 	private boolean move() {
 		if (right_sensor_measure < left_sensor_measure) {
-			motors.setWheelSpeed(moveForwardSpeed
-					/ (1 + (left_sensor_measure - right_sensor_measure)),
-					moveForwardSpeed);
+			motors.setLeftWheelSpeed(moveForwardSpeed / (1 + (left_sensor_measure - right_sensor_measure)));
+			motors.setRightWheelSpeed(moveForwardSpeed);
 		} else {
-			motors.setWheelSpeed(moveForwardSpeed, moveForwardSpeed
+			motors.setLeftWheelSpeed(moveForwardSpeed);
+			motors.setRightWheelSpeed(moveForwardSpeed
 					/ (1 + (right_sensor_measure - left_sensor_measure)));
 		}
 		return true;
@@ -410,8 +414,10 @@ public class ProgrammedForager extends Controller {
 
 	private boolean moveForward() {
 		factor = INIT_FACTOR_VALUE;
+		
+		motors.setLeftWheelSpeed(moveForwardSpeed);
+		motors.setRightWheelSpeed(moveForwardSpeed);
 
-		motors.setWheelSpeed(moveForwardSpeed, moveForwardSpeed);
 		// if(actionCounter++==2){
 		// actionCounter=0;
 		return true;
@@ -422,13 +428,16 @@ public class ProgrammedForager extends Controller {
 
 	private boolean run() {
 		factor = INIT_FACTOR_VALUE;
+		
+		motors.setLeftWheelSpeed(0);
+		motors.setRightWheelSpeed(0);
 
-		motors.setWheelSpeed(-MAXSPEED, -MAXSPEED);
 		return true;
 	}
 
 	private boolean moveBackward() {
-		motors.setWheelSpeed(-moveForwardSpeed, -moveForwardSpeed);
+		motors.setLeftWheelSpeed(0);
+		motors.setRightWheelSpeed(0);
 		if (++actionCounter == NUM_BACKWARD_STEPS) {
 			actionCounter = 0;
 			return true;
@@ -438,7 +447,8 @@ public class ProgrammedForager extends Controller {
 	}
 
 	private boolean moveFullForward() {
-		motors.setWheelSpeed(moveForwardSpeed, moveForwardSpeed);
+		motors.setLeftWheelSpeed(moveForwardSpeed);
+		motors.setRightWheelSpeed(moveForwardSpeed);
 		if (++actionCounter == NUM_FULL_FORWARD_STEPS) {
 			actionCounter = 0;
 			return true;
@@ -451,7 +461,7 @@ public class ProgrammedForager extends Controller {
 		if (actionCounter < NUM_AVOID_STEPS_TURN) {
 			run();
 		} else {
-			turnRight(MAXSPEED);
+			turnRight(1.0);
 		}
 		if (++actionCounter == NUM_AVOID_STEPS) {
 			actionCounter = 0;

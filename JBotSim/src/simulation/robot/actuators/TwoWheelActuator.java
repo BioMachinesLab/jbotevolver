@@ -32,11 +32,6 @@ public class TwoWheelActuator extends Actuator {
 		rightSpeed = (value - 0.5) * maxSpeed * 2.0;
 	}
 
-	public void setWheelSpeed(double leftSpeed, double rightSpeed) {
-		this.leftSpeed = leftSpeed;
-		this.rightSpeed = rightSpeed;
-	}
-
 	@Override
 	public void apply(Robot robot) {
 		leftSpeed*= (1 + random.nextGaussian() * NOISESTDEV);
