@@ -5,7 +5,7 @@ import commoninterface.AquaticDroneCI;
 import commoninterface.network.broadcast.BroadcastHandler;
 
 public class SimulatedBroadcastHandler extends BroadcastHandler {
-	
+
 	private SimulatedBroadcastMessageSender sender;
 
 	public SimulatedBroadcastHandler(AquaticDroneCI drone) {
@@ -21,8 +21,11 @@ public class SimulatedBroadcastHandler extends BroadcastHandler {
 			net.send(drone.getNetworkAddress(), message);
 	}
 
-	public void update(double time) {
-		sender.update(time);
+	@Override
+	public void update(double timestep) {
+		super.update(timestep);
+		sender.update(timestep);
 	}
+	
 
 }

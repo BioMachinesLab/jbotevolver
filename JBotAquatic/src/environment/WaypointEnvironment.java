@@ -39,7 +39,6 @@ public class WaypointEnvironment extends Environment{
 		
 		for(int i = 0 ; i < nWaypoints ; i++) {
 			double x = distance > 0 ? distance : width/2/3;
-			
 			double y = 0;
 			LatLon latLon = CoordinateUtilities.cartesianToGPS(new Vector2d(x,y));
 			Waypoint wp = new Waypoint(latLon.getLat(), latLon.getLon(), "wp"+i);

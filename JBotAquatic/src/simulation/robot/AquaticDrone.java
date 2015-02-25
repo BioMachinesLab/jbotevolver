@@ -16,6 +16,7 @@ import commoninterface.AquaticDroneCI;
 import commoninterface.CILogger;
 import commoninterface.CISensor;
 import commoninterface.network.broadcast.BroadcastHandler;
+import commoninterface.utils.CIArguments;
 import commoninterface.utils.CoordinateUtilities;
 import commoninterface.utils.jcoord.LatLon;
 
@@ -42,6 +43,9 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 		broadcastHandler = new SimulatedBroadcastHandler(this);
 		gpsError = args.getArgumentAsDoubleOrSetDefault("gpserror", gpsError);
 		compassError = args.getArgumentAsDoubleOrSetDefault("compasserror", compassError);
+		
+		sensors.add(new CompassSensor(simulator, sensors.size()+1, this, args));
+		actuators.add(new TwoWheelActuator(simulator, actuators.size()+1, args));
 	}
 	
 	@Override
@@ -52,8 +56,8 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 		
 		if(wheels == null)
 			wheels = (TwoWheelActuator) getActuatorByType(TwoWheelActuator.class);
-		wheels.setLeftWheelSpeed(leftMotor);
-		wheels.setRightWheelSpeed(rightMotor);
+		wheels.setLeftWheelSpeed(leftMotor/2.0 + 0.5);
+		wheels.setRightWheelSpeed(rightMotor/2.0 + 0.5);
 		wheels.apply(this);
 	}
 
@@ -88,13 +92,13 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	
 	@Override
 	public double getGPSOrientationInDegrees() {
-		// TODO how should we fake this? add error? 
+		// TODO how should we model this? add error? 
 		return getCompassOrientationInDegrees();
 	}
 
 	@Override
 	public double getTimeSinceStart() {
-		return simulator.getTime();
+		return simulator.getTime()*10;
 	}
 	
 	@Override
@@ -149,7 +153,7 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	}
 
 	@Override
-	public void begin(String[] args, CILogger logger) {
+	public void begin(CIArguments args, CILogger logger) {
 		
 	}
 
