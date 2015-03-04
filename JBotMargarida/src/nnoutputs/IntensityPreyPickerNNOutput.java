@@ -1,11 +1,9 @@
 package nnoutputs;
 
-import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
-import actuators.IntensityPreyPickerActuator;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.CellPainterActuator;
-import simulation.robot.actuators.PreyPickerActuator;
 import simulation.util.Arguments;
+import actuators.IntensityPreyPickerActuator;
+import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 public class IntensityPreyPickerNNOutput extends NNOutput {
 	private IntensityPreyPickerActuator preyPicker;
