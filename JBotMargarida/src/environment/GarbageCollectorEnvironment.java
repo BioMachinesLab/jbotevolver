@@ -2,6 +2,7 @@ package environment;
 
 import java.util.Random;
 
+import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
 import phisicalObjects.IntensityPrey;
 import actuators.IntensityPreyPickerActuator;
 import mathutils.Vector2d;
@@ -19,7 +20,7 @@ public class GarbageCollectorEnvironment extends Environment {
 
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1000;
-	public static final double PREY_INTENSITY = 10;
+	public static final int PREY_INTENSITY = 10;
 	@ArgumentsAnnotation(name = "nestlimit", defaultValue = "0.5")
 	private double nestLimit;
 
@@ -52,15 +53,16 @@ public class GarbageCollectorEnvironment extends Environment {
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
 		for (int i = 0; i < numberOfPreys; i++) {
+			
 			addPrey(new IntensityPrey(simulator, "Prey " + i,
 					newRandomPosition(), 0, PREY_MASS, PREY_RADIUS,
-					PREY_INTENSITY));
+					randomIntensity()));
 		}
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
 		addObject(nest);
-		
+
 		for (Robot r : robots)
-			r.setOrientation(random.nextDouble()*(2*Math.PI));
+			r.setOrientation(random.nextDouble() * (2 * Math.PI));
 	}
 
 	private Vector2d newRandomPosition() {
@@ -75,9 +77,13 @@ public class GarbageCollectorEnvironment extends Environment {
 
 		for (Prey nextPrey : simulator.getEnvironment().getPrey()) {
 			IntensityPrey prey = (IntensityPrey) nextPrey;
+
 			if (nextPrey.isEnabled() && prey.getIntensity() <= 0) {
-				prey.setIntensity(PREY_INTENSITY);
+
+				prey.setIntensity(randomIntensity());
+
 				prey.teleportTo(newRandomPosition());
+
 			}
 		}
 
@@ -98,6 +104,11 @@ public class GarbageCollectorEnvironment extends Environment {
 		}
 	}
 
+	public int randomIntensity(){
+		Random random = simulator.getRandom();
+		return (random.nextInt(PREY_INTENSITY)+1);
+		
+	}
 	public double getForageRadius() {
 		return forageRadius;
 	}

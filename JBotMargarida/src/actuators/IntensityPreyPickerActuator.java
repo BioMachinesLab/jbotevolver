@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import phisicalObjects.IntensityPrey;
 import mathutils.Vector2d;
 import sensors.SharedInformation;
-import sensors.SharedStateSensor;
+import sensors.SharedIntensitySensor;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;

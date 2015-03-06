@@ -50,9 +50,10 @@ public class IntensityPreySensor extends ConeTypeSensor {
 	private void sendInformation(SharedInformation information) {
 		
 		// enviar para o próprio
-		SharedStateSensor sharedSensor = (SharedStateSensor) this.robot
-				.getSensorByType(SharedStateSensor.class);
+		SharedIntensitySensor sharedSensor = (SharedIntensitySensor) this.robot
+				.getSensorByType(SharedIntensitySensor.class);
 		sharedSensor.addInformation(information);
+		//System.out.println("intensity adicionou info");
 	}
 
 	@Override

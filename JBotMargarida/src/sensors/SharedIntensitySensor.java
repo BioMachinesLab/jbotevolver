@@ -22,7 +22,7 @@ import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
-public class SharedStateSensor extends ConeTypeSensor {
+public class SharedIntensitySensor extends ConeTypeSensor {
 
 	private Simulator simulator;
 	private LinkedList<SharedInformation> memory;
@@ -35,11 +35,11 @@ public class SharedStateSensor extends ConeTypeSensor {
 	@ArgumentsAnnotation(name = "memoryrange", defaultValue = "10")
 	private double memoryRange;
 
-	public SharedStateSensor(Simulator simulator, int id, Robot robot,
+	public SharedIntensitySensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;
-		setAllowedObjectsChecker(new AllowAllRobotsChecker(id));
+		setAllowedObjectsChecker(new AllowAllRobotsChecker(robot.getId()));
 		memory = new LinkedList<SharedInformation>();
 		slices = numberOfSensors;
 		intensityReadings = new double[slices];
@@ -51,22 +51,22 @@ public class SharedStateSensor extends ConeTypeSensor {
 	@Override
 	public void update(double time, ArrayList<PhysicalObject> teleported) {
 
-/*		 System.out.println("robot id: " + robot.getId());
-		 for (SharedInformation info : memory) {
-		 System.out.print("[");
-		 System.out.print(String.format("%.02f", info.getPosition().getX())
-		 + ", "
-		 + String.format("%.02f", info.getPosition().getY())
-		 + " Intensity "
-		 + info.getIntensity()
-		 + " | time seen "
-		 + info.getTimeStep()
-		 + " | time left "
-		 + (info.getIntensity() * 50 - simulator.getTime() + info
-		 .getTimeStep()));
-		 System.out.print("] ");
-		 }
-		 System.out.println(" ");*/
+//		System.out.print("robot id: " + robot.getId());
+//		for (SharedInformation info : memory) {
+//			System.out.print("[");
+//			System.out.print(String.format("%.02f", info.getPosition().getX())
+//					+ ", "
+//					+ String.format("%.02f", info.getPosition().getY())
+//					+ " Intensity "
+//					+ info.getIntensity()
+//					+ " | time seen "
+//					+ info.getTimeStep()
+//					+ " | time left "
+//					+ (info.getIntensity() * 50 - simulator.getTime() + info
+//							.getTimeStep()));
+//			System.out.print("] ");
+//		}
+//		System.out.println(" ");
 
 		LinkedList<SharedInformation> infoToRemove = new LinkedList<SharedInformation>();
 		for (SharedInformation info : memory) {
@@ -95,8 +95,11 @@ public class SharedStateSensor extends ConeTypeSensor {
 					closeObjects.update(time, teleported);
 
 				CloseObjectIterator iterator = getCloseObjects().iterator();
+
 				while (iterator.hasNext()) {
+
 					PhysicalObjectDistance source = iterator.next();
+
 					if (source.getObject().isInvisible())
 						continue;
 					if (source.getObject().isEnabled()) {
@@ -115,7 +118,7 @@ public class SharedStateSensor extends ConeTypeSensor {
 					SharedInformation info = getClosestInfo(j, memory);
 					if (info != null) {
 						readings[j] = calculateDistanceValue(info.getPosition());
-//						System.out.println(readings[j]);
+						// System.out.println(readings[j]);
 
 						if (intensityInput)
 							intensityReadings[j] = calculateIntensityValue(info);
@@ -147,14 +150,13 @@ public class SharedStateSensor extends ConeTypeSensor {
 				&& (sensorInfo.getAngle() < (openingAngle / 2.0))
 				&& (sensorInfo.getAngle() > (-openingAngle / 2.0))) {
 
-			Robot robot = (Robot) source.getObject();
+			Robot r = (Robot) source.getObject();
 
-			SharedStateSensor sensor = (SharedStateSensor) robot
-					.getSensorByType(SharedStateSensor.class);
+			SharedIntensitySensor sensor = (SharedIntensitySensor) r
+					.getSensorByType(SharedIntensitySensor.class);
 
 			for (SharedInformation info : memory) {
 				sensor.addInformation(info);
-
 			}
 
 			return 0;

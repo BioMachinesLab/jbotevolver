@@ -28,5 +28,11 @@ public class IntensityPrey extends Prey {
 	public void setIntensity(double intensity) {
 		this.intensity = intensity;
 	}
+	
+	@Override
+	public void teleportTo(Vector2d pos) {
+		position = new Vector2d(pos);
+		env.addTeleported(this);
+	}
 
 }
