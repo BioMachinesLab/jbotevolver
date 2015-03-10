@@ -1,14 +1,13 @@
 package simulation.robot;
 
 import java.util.ArrayList;
-
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import net.jafama.FastMath;
 import objects.Entity;
 import simulation.Simulator;
+import simulation.robot.actuator.PropellersActuator;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.TwoWheelActuator;
 import simulation.robot.sensors.CompassSensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
@@ -22,13 +21,13 @@ import commoninterface.utils.jcoord.LatLon;
 
 public class AquaticDrone extends DifferentialDriveRobot implements AquaticDroneCI{
 
-	private double inertiaConstant = 0.05;
-	private double accelarationConstant = 0.1;
+	private double frictionConstant = 0.21;//0.05
+	private double accelarationConstant = 0.20;//0.1
 	private Vector2d velocity = new Vector2d();
 	private Simulator simulator;
 	private ArrayList<Entity> entities = new ArrayList<Entity>();
 	private ArrayList<CISensor> cisensors = new ArrayList<CISensor>();
-	private TwoWheelActuator wheels;
+	private PropellersActuator propellers;
 	private SimulatedBroadcastHandler broadcastHandler;
 	
 	@ArgumentsAnnotation(name="gpserror", defaultValue = "0.0")
@@ -45,20 +44,19 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 		compassError = args.getArgumentAsDoubleOrSetDefault("compasserror", compassError);
 		
 		sensors.add(new CompassSensor(simulator, sensors.size()+1, this, args));
-		actuators.add(new TwoWheelActuator(simulator, actuators.size()+1, args));
+		actuators.add(new PropellersActuator(simulator, actuators.size()+1, args));
 	}
 	
 	@Override
 	public void shutdown() {}
 
-	@Override
-	public void setMotorSpeeds(double leftMotor, double rightMotor) {
+	public void setMotorSpeeds(double leftMotorPercentage, double rightMotorPercentage) {
+		if(propellers == null)
+			propellers = (PropellersActuator) getActuatorByType(PropellersActuator.class);
 		
-		if(wheels == null)
-			wheels = (TwoWheelActuator) getActuatorByType(TwoWheelActuator.class);
-		wheels.setLeftWheelSpeed(leftMotor/2.0 + 0.5);
-		wheels.setRightWheelSpeed(rightMotor/2.0 + 0.5);
-		wheels.apply(this);
+		propellers.setLeftPercentage(leftMotorPercentage);
+		propellers.setRightPercentage(rightMotorPercentage);
+		propellers.apply(this);
 	}
 
 	@Override
@@ -121,23 +119,30 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 		
 		setLedState(robotState);
 	}
-
+	
+	private double motorModel(double d) {
+		return 0.0048*Math.exp(2.4912*Math.abs(d*2)) - 0.0048;
+	}
+	
 	@Override
 	public void updateActuators(Double time, double timeDelta) {
-		orientation = MathUtils.modPI2(orientation + timeDelta * 0.5 / (distanceBetweenWheels / 2.0) * (rightWheelSpeed - leftWheelSpeed));
 		
-		double direction = (rightWheelSpeed+leftWheelSpeed) < 0 ? -1 : 1;
-		double lengthOfAcc = accelarationConstant * Math.pow(((leftWheelSpeed + rightWheelSpeed) / 2.0),2) * direction;
+		double lw = Math.signum(rightWheelSpeed-leftWheelSpeed);
+		
+		orientation = MathUtils.modPI2(orientation + motorModel(rightWheelSpeed-leftWheelSpeed)*lw);//timeDelta * (Math.log(Math.abs(rightWheelSpeed - leftWheelSpeed) + 1) * a * lw));
+		
+		double accelDirection = (rightWheelSpeed+leftWheelSpeed) < 0 ? -1 : 1;
+		double lengthOfAcc = accelarationConstant * (leftWheelSpeed + rightWheelSpeed);
 		
 		//Backwards motion should be slower. This value here is just an
 		//estimate, and should be improved by taking real world samples
-		if(direction < 0)
+		if(accelDirection < 0)
 			lengthOfAcc*=0.2;
 		
 		Vector2d accelaration = new Vector2d(lengthOfAcc * FastMath.cosQuick(orientation), lengthOfAcc * FastMath.sinQuick(orientation));
 		
-		velocity.setX(velocity.getX() * (1 - inertiaConstant));
-		velocity.setY(velocity.getY() * (1 - inertiaConstant));
+		velocity.setX(velocity.getX() * (1 - frictionConstant));
+		velocity.setY(velocity.getY() * (1 - frictionConstant));    
 		
 		velocity.add(accelaration);
 		

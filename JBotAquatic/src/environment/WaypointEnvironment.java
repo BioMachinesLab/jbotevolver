@@ -32,8 +32,9 @@ public class WaypointEnvironment extends Environment{
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
 		
-		for(Robot r : simulator.getRobots())
-			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
+		//TODO
+//		for(Robot r : simulator.getRobots())
+//			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
 		
 		distance+= distance*rand*simulator.getRandom().nextDouble()*2-rand;
 		
