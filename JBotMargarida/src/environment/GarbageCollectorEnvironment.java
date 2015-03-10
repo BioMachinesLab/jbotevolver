@@ -1,5 +1,6 @@
 package environment;
 
+import java.awt.Color;
 import java.util.Random;
 
 import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
@@ -20,7 +21,7 @@ public class GarbageCollectorEnvironment extends Environment {
 
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1000;
-	public static final int PREY_INTENSITY = 10;
+	public static final int PREY_INTENSITY = 11;
 	@ArgumentsAnnotation(name = "nestlimit", defaultValue = "0.5")
 	private double nestLimit;
 
@@ -57,6 +58,7 @@ public class GarbageCollectorEnvironment extends Environment {
 			addPrey(new IntensityPrey(simulator, "Prey " + i,
 					newRandomPosition(), 0, PREY_MASS, PREY_RADIUS,
 					randomIntensity()));
+			
 		}
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
 		addObject(nest);
@@ -66,10 +68,9 @@ public class GarbageCollectorEnvironment extends Environment {
 	}
 
 	private Vector2d newRandomPosition() {
-		double radius = random.nextDouble() * (width / 5) + width / 3.5;
-		double angle = random.nextDouble() * 2 * Math.PI;
-		return new Vector2d(radius * FastMath.cosQuick(angle), radius
-				* FastMath.sinQuick(angle));
+		double x = random.nextDouble() * (width -0.3) - ((width-0.3) / 2);
+		double y = random.nextDouble() * (height -0.3) - ((height-0.3) / 2);
+		return new Vector2d(x,y);
 	}
 
 	@Override
@@ -85,6 +86,13 @@ public class GarbageCollectorEnvironment extends Environment {
 				prey.teleportTo(newRandomPosition());
 
 			}
+			
+			if (prey.getIntensity()< 4)
+				prey.setColor(Color.BLACK);
+			else if (prey.getIntensity() < 8)
+				prey.setColor(Color.GREEN.darker());
+			else 
+				prey.setColor(Color.RED);
 		}
 
 		for (Robot robot : robots) {
@@ -106,7 +114,7 @@ public class GarbageCollectorEnvironment extends Environment {
 
 	public int randomIntensity(){
 		Random random = simulator.getRandom();
-		return (random.nextInt(PREY_INTENSITY)+1);
+		return (random.nextInt(PREY_INTENSITY)+5);
 		
 	}
 	public double getForageRadius() {

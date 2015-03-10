@@ -62,8 +62,8 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 //					+ " | time seen "
 //					+ info.getTimeStep()
 //					+ " | time left "
-//					+ (info.getIntensity() * 50 - simulator.getTime() + info
-//							.getTimeStep()));
+//					+ ((info.getIntensity() * 200)
+//							- (simulator.getTime() - info.getTimeStep())));
 //			System.out.print("] ");
 //		}
 //		System.out.println(" ");

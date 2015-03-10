@@ -13,11 +13,13 @@ public class IntensityPrey extends Prey {
 			double angle, double mass, double radius, double intensity) {
 		super(simulator, name, x, y, angle, mass, radius);
 		this.intensity = intensity;
+		
 	}
 
 	public IntensityPrey(Simulator simulator, String name, Vector2d position,
 			int angle, double mass, double radius, double intensity) {
-		this(simulator, name, position.x, position.y, angle, mass, radius, intensity);
+		this(simulator, name, position.x, position.y, angle, mass, radius,
+				intensity);
 
 	}
 
@@ -28,7 +30,7 @@ public class IntensityPrey extends Prey {
 	public void setIntensity(double intensity) {
 		this.intensity = intensity;
 	}
-	
+
 	@Override
 	public void teleportTo(Vector2d pos) {
 		position = new Vector2d(pos);

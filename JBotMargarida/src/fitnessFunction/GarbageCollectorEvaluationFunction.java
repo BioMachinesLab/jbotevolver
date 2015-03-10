@@ -44,7 +44,8 @@ public class GarbageCollectorEvaluationFunction extends EvaluationFunction {
 
 			}
 
-			if (bestDistance < Double.MAX_VALUE && !actuator.isCarryingPrey()) {
+			if (bestDistance < environment.getForageRadius()
+					&& !actuator.isCarryingPrey()) {
 				fitness += (environment.getForageRadius() - bestDistance)
 						/ environment.getForageRadius() * 0.000001;
 				// System.out.println((environment.getForageRadius() -
