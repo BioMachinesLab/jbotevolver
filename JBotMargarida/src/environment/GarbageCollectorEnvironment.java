@@ -3,11 +3,8 @@ package environment;
 import java.awt.Color;
 import java.util.Random;
 
-import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
-import phisicalObjects.IntensityPrey;
-import actuators.IntensityPreyPickerActuator;
 import mathutils.Vector2d;
-import net.jafama.FastMath;
+import phisicalObjects.IntensityPrey;
 import sensors.IntensityPreyCarriedSensor;
 import simulation.Simulator;
 import simulation.environment.Environment;
@@ -16,6 +13,7 @@ import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
+import actuators.IntensityPreyPickerActuator;
 
 public class GarbageCollectorEnvironment extends Environment {
 
@@ -34,7 +32,9 @@ public class GarbageCollectorEnvironment extends Environment {
 	private Simulator simulator;
 	@ArgumentsAnnotation(name = "forageradius", defaultValue = "2")
 	private double forageRadius;
-
+	@ArgumentsAnnotation(name="scaledarena", defaultValue="0")
+	private boolean scaledArena;
+	
 	public GarbageCollectorEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 		this.simulator = simulator;
@@ -48,6 +48,8 @@ public class GarbageCollectorEnvironment extends Environment {
 
 		numberOfPreys = arguments.getArgumentIsDefined("numberofpreys") ? arguments
 				.getArgumentAsInt("numberofpreys") : 20;
+				
+		scaledArena = arguments.getArgumentAsIntOrSetDefault("scaledarena", 0) == 1;
 	}
 
 	@Override
@@ -55,9 +57,15 @@ public class GarbageCollectorEnvironment extends Environment {
 		super.setup(simulator);
 		for (int i = 0; i < numberOfPreys; i++) {
 			
-			addPrey(new IntensityPrey(simulator, "Prey " + i,
-					newRandomPosition(), 0, PREY_MASS, PREY_RADIUS,
-					randomIntensity()));
+			if(scaledArena){
+				addPrey(new IntensityPrey(simulator, "Prey " + i,
+						newRandomPosition(), 0, PREY_MASS, PREY_RADIUS,
+						randomIntensity()));
+			}else{
+				addPrey(new IntensityPrey(simulator, "Prey " + i,
+						newRandomPosition(), 0, PREY_MASS, (PREY_RADIUS*10),
+						randomIntensity()));
+			}
 			
 		}
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
