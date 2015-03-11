@@ -20,6 +20,7 @@ public class GarbageCollectorEnvironment extends Environment {
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1000;
 	public static final int PREY_INTENSITY = 11;
+	private double preyRadius;
 	@ArgumentsAnnotation(name = "nestlimit", defaultValue = "0.5")
 	private double nestLimit;
 
@@ -50,6 +51,11 @@ public class GarbageCollectorEnvironment extends Environment {
 				.getArgumentAsInt("numberofpreys") : 20;
 				
 		scaledArena = arguments.getArgumentAsIntOrSetDefault("scaledarena", 0) == 1;
+		
+		if(scaledArena)
+			preyRadius = PREY_RADIUS * 10;
+		else
+			preyRadius = PREY_RADIUS;
 	}
 
 	@Override
@@ -57,15 +63,9 @@ public class GarbageCollectorEnvironment extends Environment {
 		super.setup(simulator);
 		for (int i = 0; i < numberOfPreys; i++) {
 			
-			if(scaledArena){
-				addPrey(new IntensityPrey(simulator, "Prey " + i,
-						newRandomPosition(), 0, PREY_MASS, PREY_RADIUS,
-						randomIntensity()));
-			}else{
-				addPrey(new IntensityPrey(simulator, "Prey " + i,
-						newRandomPosition(), 0, PREY_MASS, (PREY_RADIUS*10),
-						randomIntensity()));
-			}
+			addPrey(new IntensityPrey(simulator, "Prey " + i,
+					newRandomPosition(), 0, PREY_MASS, preyRadius,
+					randomIntensity()));
 			
 		}
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
