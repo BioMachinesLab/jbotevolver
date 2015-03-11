@@ -12,12 +12,12 @@ import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;
-import simulation.robot.sensors.SimplePreySensor;
+import simulation.robot.sensors.PreySensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 import utils.SensorEstimation;
 
-public class SimplePreySharedSensor extends SimplePreySensor {
+public class SimplePreySharedSensor extends PreySensor {
 
 	private Simulator simulator;
 	private double metersAhead;

@@ -120,6 +120,7 @@ public class IntruderSensor extends ConeTypeSensor {
 		
 		if((sensorInfo.getDistance() < getCutOff()) && (sensorInfo.getAngle() < (openingAngle / 2.0)) && (sensorInfo.getAngle() > (-openingAngle / 2.0))) {
 			double orientation = geometricCalculator.getGeometricInfoBetweenPoints(robot.getPosition(), robot.getOrientation(),source.getObject().getPosition(), simulator.getTime()).getAngle();
+			
 			calculateEstimatedIntruderPosition(i,orientation,source.getObject());
 			
 			calculateRobotsCloseToPrey((Robot)source.getObject());

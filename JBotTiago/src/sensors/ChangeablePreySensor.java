@@ -4,10 +4,10 @@ import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.robot.Robot;
-import simulation.robot.sensors.SimplePreySensor;
+import simulation.robot.sensors.PreySensor;
 import simulation.util.Arguments;
 
-public class ChangeablePreySensor extends SimplePreySensor {
+public class ChangeablePreySensor extends PreySensor {
 	
 	private double[] ranges;
 	private double[] openingAngles;

@@ -1,13 +1,13 @@
 package sensors;
 
-import checkers.AllowSpecificNestChecker;
 import simulation.Simulator;
 import simulation.robot.Robot;
-import simulation.robot.sensors.SimpleLightTypeSensor;
+import simulation.robot.sensors.LightTypeSensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
+import checkers.AllowSpecificNestChecker;
 
-public class SpecificNestSensor extends SimpleLightTypeSensor {
+public class SpecificNestSensor extends LightTypeSensor {
 
 	@ArgumentsAnnotation(name="specificnest", help="Name of the nest that the robots will be able to sense.", defaultValue="N/A")
 	String specificNest;
