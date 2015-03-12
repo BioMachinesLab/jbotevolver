@@ -19,7 +19,9 @@ public class GarbageCollectorEnvironment extends Environment {
 
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1000;
-	public static final int PREY_INTENSITY = 11;
+	public static final int MAX_PREY_INTENSITY = 15;
+	public static final int MIN_PREY_INTENSITY = 5;
+	
 	private double preyRadius;
 	@ArgumentsAnnotation(name = "nestlimit", defaultValue = "0.5")
 	private double nestLimit;
@@ -76,8 +78,8 @@ public class GarbageCollectorEnvironment extends Environment {
 	}
 
 	private Vector2d newRandomPosition() {
-		double x = random.nextDouble() * (width -0.3) - ((width-0.3) / 2);
-		double y = random.nextDouble() * (height -0.3) - ((height-0.3) / 2);
+		double x = random.nextDouble() * (width - 0.3) - ((width-0.3) / 2);
+		double y = random.nextDouble() * (height - 0.3) - ((height-0.3) / 2);
 		return new Vector2d(x,y);
 	}
 
@@ -95,9 +97,9 @@ public class GarbageCollectorEnvironment extends Environment {
 
 			}
 			
-			if (prey.getIntensity()< 4)
+			if (prey.getIntensity()< 9)
 				prey.setColor(Color.BLACK);
-			else if (prey.getIntensity() < 8)
+			else if (prey.getIntensity() < 13)
 				prey.setColor(Color.GREEN.darker());
 			else 
 				prey.setColor(Color.RED);
@@ -122,8 +124,7 @@ public class GarbageCollectorEnvironment extends Environment {
 
 	public int randomIntensity(){
 		Random random = simulator.getRandom();
-		return (random.nextInt(PREY_INTENSITY)+5);
-		
+		return (random.nextInt((MAX_PREY_INTENSITY-MIN_PREY_INTENSITY)+1) + MIN_PREY_INTENSITY);
 	}
 	public double getForageRadius() {
 		return forageRadius;

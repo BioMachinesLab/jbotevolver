@@ -1,26 +1,20 @@
 package sensors;
 
-import java.awt.Color;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
-import phisicalObjects.IntensityPrey;
-import environment.GarbageCollectorEnvironment;
-import actuators.IntensityPreyPickerActuator;
-import net.jafama.FastMath;
 import mathutils.Vector2d;
 import simulation.Simulator;
+import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
-import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.physicalobjects.checkers.AllowAllRobotsChecker;
-import simulation.physicalobjects.checkers.AllowMouseChecker;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
+import environment.GarbageCollectorEnvironment;
 
 public class SharedIntensitySensor extends ConeTypeSensor {
 
@@ -35,8 +29,7 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 	@ArgumentsAnnotation(name = "memoryrange", defaultValue = "10")
 	private double memoryRange;
 
-	public SharedIntensitySensor(Simulator simulator, int id, Robot robot,
-			Arguments args) {
+	public SharedIntensitySensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;
 		setAllowedObjectsChecker(new AllowAllRobotsChecker(robot.getId()));
@@ -70,16 +63,13 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 
 		LinkedList<SharedInformation> infoToRemove = new LinkedList<SharedInformation>();
 		for (SharedInformation info : memory) {
-			if ((info.getIntensity() * 200)
-					- (simulator.getTime() - info.getTimeStep()) <= 0) {
+			if ((info.getIntensity() * 200) - (simulator.getTime() - info.getTimeStep()) <= 0) {
 				infoToRemove.add(info);
-
 			}
 		}
 
 		for (SharedInformation info : infoToRemove) {
 			memory.remove(info);
-
 		}
 
 		try {
@@ -113,6 +103,7 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 				if (checkObstacles)
 					checkObstacles(time, teleported);
 			}
+			 
 			for (int j = 0; j < readings.length; j++) {
 				if (openingAngle > 0.018) { // 1degree
 					SharedInformation info = getClosestInfo(j, memory);
@@ -191,15 +182,13 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 	}
 
 	private double calculateDistanceValue(Vector2d source) {
-
 		double dist = robot.getPosition().distanceTo(source);
 		return (memoryRange - dist) / memoryRange;
-
 	}
 
 	private double calculateIntensityValue(SharedInformation info) {
-		return (GarbageCollectorEnvironment.PREY_INTENSITY - info
-				.getIntensity()) / GarbageCollectorEnvironment.PREY_INTENSITY;
+		return (GarbageCollectorEnvironment.MAX_PREY_INTENSITY - info
+				.getIntensity()) / GarbageCollectorEnvironment.MAX_PREY_INTENSITY;
 	}
 
 	public void addInformation(SharedInformation information) {
@@ -237,9 +226,7 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 		if (intensityInput) {
 			if (sensorNumber >= slices) {
 				return intensityReadings[sensorNumber - slices];
-			}
-
-			else
+			}else
 				return readings[sensorNumber];
 		} else
 			return readings[sensorNumber];
