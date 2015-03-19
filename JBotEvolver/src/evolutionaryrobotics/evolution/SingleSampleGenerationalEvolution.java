@@ -79,5 +79,6 @@ public class SingleSampleGenerationalEvolution extends GenerationalEvolution {
 			}
 		}
 		evolutionFinished = true;
+		diskStorage.close();
 	}
 }
