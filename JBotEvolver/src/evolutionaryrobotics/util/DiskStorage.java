@@ -89,6 +89,7 @@ public class DiskStorage implements Serializable{
 	public void close() {
 		if (outputDirectory != null) {
 			fitnessLog.close();
+			
 		}
 	}
 
@@ -170,6 +171,10 @@ public class DiskStorage implements Serializable{
 	
 	private void openFitnessLog(boolean append) {
 		try {
+			
+			if(fitnessLog != null)
+				fitnessLog.close();
+			
 			fitnessLog = openForWriting(outputDirectory + "/" + fitnessLogFilename, append);
 			fitnessLog.println("# Evoluation started on " + new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 			fitnessLog.println("# Generation\t   Best \t   Average \t   Worst");
