@@ -36,7 +36,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	private double zoomFactor = 1.0;
 	
-	private boolean bigRobots = false;
+	protected boolean bigRobots = false;
 	
 	private boolean debug = false;
 	

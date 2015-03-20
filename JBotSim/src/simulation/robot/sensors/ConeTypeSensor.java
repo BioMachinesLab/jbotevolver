@@ -154,6 +154,10 @@ public abstract class ConeTypeSensor extends Sensor {
 		return angles;
 	}
 	
+	public double[] getSensorsOrientations() {
+		return angles;
+	}
+	
 	public double[] getOriginalAngles() {
 		return originalAngles;
 	}

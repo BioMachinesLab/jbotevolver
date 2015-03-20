@@ -39,6 +39,10 @@ public class PreyPickerActuator extends Actuator {
 		this.stopRobot = !arguments.getFlagIsFalse("stoprobot");
 	}
 
+	public double getMaxPickDistance() {
+		return maxPickDistance;
+	}
+	
 	public void pick() {
 		status = PickerStatus.PICK;
 	}
@@ -58,8 +62,7 @@ public class PreyPickerActuator extends Actuator {
 				if ((random.nextFloat() > NOISESTDEV) && !isCarryingPrey()) {
 					double bestLength = maxPickDistance;
 					Prey bestPrey = null;
-					ClosePhysicalObjects closePreys = robot.shape
-							.getClosePrey();
+					ClosePhysicalObjects closePreys = robot.shape.getClosePrey();
 					CloseObjectIterator iterator = closePreys.iterator();
 					while (iterator.hasNext()) {
 						Prey closePrey = (Prey) (iterator.next().getObject());

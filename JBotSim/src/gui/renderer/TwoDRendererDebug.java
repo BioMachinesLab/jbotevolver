@@ -7,6 +7,7 @@ import java.awt.RadialGradientPaint;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
+
 import mathutils.Vector2d;
 import net.jafama.FastMath;
 import simulation.robot.LedState;
@@ -33,7 +34,6 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		coneSensorId = args.getArgumentAsIntOrSetDefault("conesensorid",-1);
 		coneClass = args.getArgumentAsStringOrSetDefault("coneclass","");
 		robotId = args.getArgumentAsIntOrSetDefault("robotid",-1);
-		
 	}
 	
 	protected void drawLines(Vector2d[][][] positions, Graphics graphics) {
@@ -61,7 +61,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
 			createImage();
-		int circleDiameter = (int) Math.round(robot.getDiameter() * scale);
+		int circleDiameter = bigRobots ? (int)Math.max(10,Math.round(robot.getDiameter() * scale)) : (int) Math.round(robot.getDiameter() * scale);
 		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
 
@@ -181,7 +181,9 @@ public class TwoDRendererDebug extends TwoDRenderer {
 					if(s.getClass().getSimpleName().equals(coneClass) || s.getId() == coneSensorId){
 						if(s != null && s instanceof ConeTypeSensor){
 							ConeTypeSensor preySensor = (ConeTypeSensor)s;
-							for (Double angle : preySensor.getAngles()) {
+							for (int i = 0; i < preySensor.getAngles().length ; i++) {
+								double angle = preySensor.getAngles()[i];
+//							for (Double angle : preySensor.getAngles()) {
 							
 								double xi = robot.getPosition().getX()+robot.getRadius()*FastMath.cosQuick(angle + robot.getOrientation());
 								double yi = robot.getPosition().getY()+robot.getRadius()*FastMath.sinQuick(angle + robot.getOrientation());
@@ -204,7 +206,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 								int gx2 = transformX(xi+range*FastMath.cosQuick(angle + robot.getOrientation() - openingAngle/2.0));
 								int gy2 = transformY(yi+range*FastMath.sinQuick(angle + robot.getOrientation() - openingAngle/2.0));
 								
-								int a1 = (int)(FastMath.round(FastMath.toDegrees(angle + robot.getOrientation() - openingAngle/2)));
+								int a1 = (int)(FastMath.round(FastMath.toDegrees(preySensor.getSensorsOrientations()[i] + robot.getOrientation() - openingAngle/2)));
 								
 								Graphics2D graphics2D = (Graphics2D) graphics.create();
 
@@ -220,10 +222,10 @@ public class TwoDRendererDebug extends TwoDRenderer {
 									graphics2D.fillArc(x3, y3, (int)FastMath.round(cutOff*2*scale), (int)(FastMath.round(cutOff*2*scale)), a1, (int)FastMath.round(FastMath.toDegrees(openingAngle)));
 								}
 								
-								graphics2D.setColor(Color.BLACK);
-								graphics2D.drawArc(x2, y2, (int)FastMath.round(range*2*scale), (int)(FastMath.round(range*2*scale)), a1, (int)FastMath.round(FastMath.toDegrees(openingAngle)));
-								graphics2D.drawLine(x1, y1, gx1, gy1);
-								graphics2D.drawLine(x1, y1, gx2, gy2);
+//								graphics2D.setColor(Color.BLACK);
+//								graphics2D.drawArc(x2, y2, (int)FastMath.round(range*2*scale), (int)(FastMath.round(range*2*scale)), a1, (int)FastMath.round(FastMath.toDegrees(openingAngle)));
+//								graphics2D.drawLine(x1, y1, gx1, gy1);
+//								graphics2D.drawLine(x1, y1, gx2, gy2);
 							}
 						}
 					}
