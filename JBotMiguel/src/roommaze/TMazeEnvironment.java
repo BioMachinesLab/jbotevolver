@@ -6,6 +6,8 @@ import java.util.LinkedList;
 import java.util.Random;
 import java.util.Scanner;
 
+import comm.FileProvider;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
@@ -16,7 +18,6 @@ import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
-import comm.FileProvider;
 
 public class TMazeEnvironment extends Environment {
 
