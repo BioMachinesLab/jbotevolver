@@ -1,6 +1,7 @@
 package simulation.robot;
 
 import java.util.ArrayList;
+
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import net.jafama.FastMath;
@@ -49,7 +50,7 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 		broadcastHandler = new SimulatedBroadcastHandler(this, broadcastMessages);
 		
 		gpsError = args.getArgumentAsDoubleOrSetDefault("gpserror", gpsError);
-		compassError = args.getArgumentAsDoubleOrSetDefault("compasserror", compassError);
+		compassError = Math.toRadians(args.getArgumentAsDoubleOrSetDefault("compasserror", compassError));
 		
 		sensors.add(new CompassSensor(simulator, sensors.size()+1, this, args));
 		actuators.add(new PropellersActuator(simulator, actuators.size()+1, args));
@@ -61,7 +62,6 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	public void setMotorSpeeds(double leftMotorPercentage, double rightMotorPercentage) {
 		if(propellers == null)
 			propellers = (PropellersActuator) getActuatorByType(PropellersActuator.class);
-		
 		propellers.setLeftPercentage(leftMotorPercentage);
 		propellers.setRightPercentage(rightMotorPercentage);
 		propellers.apply(this);
@@ -71,7 +71,8 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	public double getCompassOrientationInDegrees() {
 		CompassSensor compassSensor = (CompassSensor) getSensorByType(CompassSensor.class);
 		double heading = (360-(compassSensor.getSensorReading(0) * 360) + 90) % 360;
-		return heading;
+		double error = compassError*simulator.getRandom().nextDouble()*2-compassError;
+		return heading+error;
 	}
 
 	@Override
@@ -80,17 +81,15 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 		LatLon latLon = CoordinateUtilities.cartesianToGPS(getPosition().getX(), getPosition().getY());
 		
 		if(gpsError > 0) {
-			double lat = latLon.getLat();
-			double lon = latLon.getLon();
-
-			//TODO check if this is right
+			
+			commoninterface.mathutils.Vector2d pos = CoordinateUtilities.GPSToCartesian(latLon);
 			double radius = simulator.getRandom().nextDouble()*gpsError;
 			double angle = simulator.getRandom().nextDouble()*Math.PI*2;
 
-			lat+=radius*Math.sin(angle);
-			lon+=radius*Math.cos(angle);
+			pos.setX(pos.getX()+radius*Math.cos(angle));
+			pos.setY(pos.getY()+radius*Math.sin(angle));
 			
-			return new LatLon(lat, lon);
+			return CoordinateUtilities.cartesianToGPS(pos);
 		}
 		
 		return latLon;
@@ -135,9 +134,15 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	@Override
 	public void updateActuators(Double time, double timeDelta) {
 		
+		if(stopTimestep > 0) {
+			rightWheelSpeed = 0;
+			leftWheelSpeed = 0;
+			stopTimestep--;
+		}
+		
 		double lw = Math.signum(rightWheelSpeed-leftWheelSpeed);
 		
-		orientation = MathUtils.modPI2(orientation + motorModel(rightWheelSpeed-leftWheelSpeed)*lw);//timeDelta * (Math.log(Math.abs(rightWheelSpeed - leftWheelSpeed) + 1) * a * lw));
+		orientation = MathUtils.modPI2(orientation + motorModel(rightWheelSpeed-leftWheelSpeed)*lw);
 		
 		double accelDirection = (rightWheelSpeed+leftWheelSpeed) < 0 ? -1 : 1;
 		double lengthOfAcc = accelarationConstant * (leftWheelSpeed + rightWheelSpeed);
@@ -163,6 +168,7 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 		}
 		
 		broadcastHandler.update(time);
+
 	}
 
 	@Override

@@ -23,6 +23,7 @@ public class PropellersActuator extends Actuator {
 	}
 
 	public void setLeftPercentage(double percentage) {
+		
 		leftSpeed = calculateSpeed(percentage);
 	}
 
@@ -36,7 +37,6 @@ public class PropellersActuator extends Actuator {
 			return 0;
 		} else {
 			double speed = getSpeedInMs(Math.abs(percentage));
-			
 			return percentage >= 0 ? speed : -speed*backwardSpeed;
 		}
 	}
@@ -45,7 +45,6 @@ public class PropellersActuator extends Actuator {
 	public void apply(Robot robot) {
 		leftSpeed*= (1 + random.nextGaussian() * NOISESTDEV);
 		rightSpeed*= (1 + random.nextGaussian() * NOISESTDEV);
-
 		((DifferentialDriveRobot) robot).setWheelSpeed(leftSpeed, rightSpeed);
 	}
 
