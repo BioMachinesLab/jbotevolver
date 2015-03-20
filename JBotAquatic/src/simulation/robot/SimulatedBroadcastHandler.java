@@ -1,16 +1,20 @@
+
 package simulation.robot;
 
+import java.util.ArrayList;
+
 import simulation.Network;
-import commoninterface.AquaticDroneCI;
+import commoninterface.RobotCI;
 import commoninterface.network.broadcast.BroadcastHandler;
+import commoninterface.network.broadcast.BroadcastMessage;
 
 public class SimulatedBroadcastHandler extends BroadcastHandler {
 
 	private SimulatedBroadcastMessageSender sender;
 
-	public SimulatedBroadcastHandler(AquaticDroneCI drone) {
-		super(drone);
-		sender = new SimulatedBroadcastMessageSender(this, broadcastMessages);
+	public SimulatedBroadcastHandler(RobotCI drone, ArrayList<BroadcastMessage> broadcastMessages) {
+		super(drone, broadcastMessages);
+		sender = new SimulatedBroadcastMessageSender(this, this.broadcastMessages);
 	}
 
 	@Override

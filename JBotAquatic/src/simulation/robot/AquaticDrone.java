@@ -15,6 +15,9 @@ import commoninterface.AquaticDroneCI;
 import commoninterface.CILogger;
 import commoninterface.CISensor;
 import commoninterface.network.broadcast.BroadcastHandler;
+import commoninterface.network.broadcast.BroadcastMessage;
+import commoninterface.network.broadcast.HeartbeatBroadcastMessage;
+import commoninterface.network.broadcast.PositionBroadcastMessage;
 import commoninterface.utils.CIArguments;
 import commoninterface.utils.CoordinateUtilities;
 import commoninterface.utils.jcoord.LatLon;
@@ -39,7 +42,12 @@ public class AquaticDrone extends DifferentialDriveRobot implements AquaticDrone
 	public AquaticDrone(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		this.simulator = simulator;
-		broadcastHandler = new SimulatedBroadcastHandler(this);
+		
+		ArrayList<BroadcastMessage> broadcastMessages = new ArrayList<BroadcastMessage>();
+		broadcastMessages.add(new HeartbeatBroadcastMessage(this));
+		broadcastMessages.add(new PositionBroadcastMessage(this));
+		broadcastHandler = new SimulatedBroadcastHandler(this, broadcastMessages);
+		
 		gpsError = args.getArgumentAsDoubleOrSetDefault("gpserror", gpsError);
 		compassError = args.getArgumentAsDoubleOrSetDefault("compasserror", compassError);
 		
