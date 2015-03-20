@@ -907,11 +907,24 @@ public class ResultViewerGui extends Gui implements Updatable{
 			Collections.sort(ol, new Comparator<String>() {
 			    @Override
 			    public int compare(String o1, String o2) {
-			       if(!o1.startsWith("showbest"))
-			    	   return o1.compareTo(o2);
-			       String oo1 = o1.substring(8, o1.indexOf("."));
-			       String oo2 = o2.substring(8, o2.indexOf("."));
-			       return Integer.parseInt(oo1)-Integer.parseInt(oo2);
+			    	if(o1.startsWith("showbest")){
+			    		String oo1 = o1.substring(8, o1.indexOf("."));
+			    		String oo2 = o2.substring(8, o2.indexOf("."));
+					    return Integer.parseInt(oo1)-Integer.parseInt(oo2);
+			    	}else if(o1.startsWith("population") && !o1.equals("populations")){
+			    		String oo1 = o1.substring(10, o1.length());
+			    		String oo2 = o2.substring(10, o2.length());
+					    return Integer.parseInt(oo1)-Integer.parseInt(oo2);
+			    	}else{
+			    		try {
+			    			int oo1 = Integer.parseInt(o1);
+			    			int oo2 = Integer.parseInt(o2);
+			    			return oo1-oo2;
+						} catch (Exception e) {
+							return o1.compareTo(o2);
+						}
+			    		
+			    	}
 			    }
 			});
 			

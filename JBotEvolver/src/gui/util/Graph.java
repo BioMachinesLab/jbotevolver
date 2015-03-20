@@ -37,6 +37,7 @@ public class Graph extends JPanel {
 	private String xLabel = "";
 	private String yLabel = "";
 	private double max = 0;
+	private double min = 0;
 	private double xInc = 0;
 	private double scale = 0;
 	private DecimalFormat df = new DecimalFormat("#.##");
@@ -52,6 +53,8 @@ public class Graph extends JPanel {
 		
 		if(value > max)
 			max = value;
+		else if(value < min)
+			min = value;
 		
 		simpleData.add(value);
 		if (simpleData.size() > MAX) {
@@ -79,6 +82,8 @@ public class Graph extends JPanel {
 			
 			if(dataList[i] != null && dataList[i] > max)
 				max = dataList[i];
+			else if (dataList[i] != null && dataList[i] < min)
+				min = dataList[i];
 		}
 		
 		listOfData.add(aux);
@@ -173,7 +178,7 @@ public class Graph extends JPanel {
 					g2.draw(new Line2D.Double(pos, lh+padTop-7, pos, lh+padTop));
 					g2.draw(new Line2D.Double(pos, padTop+7, pos, padTop));
 
-					String number = ""+(int)(showLast/divs*i);
+					String number = df.format((showLast/divs*i));
 					g2.drawString(number, pos - (number.length()*4), lh+padTop+15);
 				}
 			}
@@ -278,6 +283,7 @@ public class Graph extends JPanel {
 		legends.clear();
 		padTop = ORIGINAL_PAD_TOP;
 		max = 0;
+		min = 0;
 		repaint();
 	}
 
