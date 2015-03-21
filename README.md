@@ -1,5 +1,6 @@
-#About JBotEvolver
 JBotEvolver is a Java-based open-source and versatile simulation platform for education and research-driven experiments in evolutionary robotics (ER). JBotEvolver has been used in previous ER studies of our research group, from offline evolution to online evolution and learning, and from single to multi- robot systems, and in a number of undergraduate and graduate courses at ISCTE-IUL (http://iscte-iul.pt).
+
+![JBotEvolver Evolution Panel](http://miguelduarte.pt/media/jbotwiki/evolution.png)
 
 Information about how to install and use the simulator can be found in the wiki.
 
