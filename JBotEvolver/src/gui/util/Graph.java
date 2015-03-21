@@ -1,12 +1,16 @@
 package gui.util;
+
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.Stroke;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
@@ -15,6 +19,8 @@ import java.text.DecimalFormat;
 import java.util.Vector;
 
 import javax.swing.JPanel;
+
+import mathutils.Vector2d;
 
 public class Graph extends JPanel {
 	
@@ -49,6 +55,24 @@ public class Graph extends JPanel {
 	private Vector<Double> simpleData = new Vector<Double>();
 	private Vector<String> legends = new Vector<String>();
 
+	private Vector2d mousePosition = new Vector2d();
+	
+	public Graph() {
+		addMouseMotionListener(new MouseMotionListener() {
+			
+			@Override
+			public void mouseMoved(MouseEvent e) {
+				mousePosition.setX(e.getX());
+				mousePosition.setY(e.getY());
+				repaint();
+			}
+			
+			@Override
+			public void mouseDragged(MouseEvent e) { }
+		});
+		
+	}
+	
 	public void addData(Double value) {
 		
 		if(value > max)
@@ -109,8 +133,28 @@ public class Graph extends JPanel {
 		drawLines(g2);
 		drawLabels(g2);
 		drawLegends(g2);
+		drawMouseLine(g2);
 	}
 	
+	private void drawMouseLine(Graphics2D g2) {
+		int lh = getHeight()-pad;
+		int lw = getWidth()-pad;
+		
+		if(mousePosition.getX() >= pad && mousePosition.getX() <= (getWidth()-pad) && mousePosition.getY() >= padTop && mousePosition.getY() <= (getHeight()-pad)){
+			Stroke originalStroke = g2.getStroke();
+			
+			Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{5}, 0);
+	        g2.setStroke(dashed);
+	        setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+	        
+			g2.draw(new Line2D.Double(mousePosition.getX(), padTop, mousePosition.getX(), lh));
+			g2.draw(new Line2D.Double(pad, mousePosition.getY(), lw, mousePosition.getY()));
+			
+			g2.setStroke(originalStroke);
+		}else
+			repaint();
+	}
+
 	private void drawLegends(Graphics2D g2) {
 		
 		FontMetrics metrics = g2.getFontMetrics(g2.getFont());
@@ -162,7 +206,12 @@ public class Graph extends JPanel {
 		int lw = w-pad;
 		
 		g2.draw(new Line2D.Double(pad, padTop, pad, lh));
-		g2.draw(new Line2D.Double(pad, lh, lw, lh));
+		
+		double divisions = (double) (h - pad - padTop) / (max-min);
+		double yLine = h - pad - divisions * (0 - min);
+		g2.draw(new Line2D.Double(pad, yLine, lw, yLine));
+		
+		g2.drawString("0", 5 + (6-"0".length())*7, (int) (yLine+5));
 		
 		lh = h-pad-padTop;
 		lw = w-pad*2;
@@ -178,8 +227,11 @@ public class Graph extends JPanel {
 					g2.draw(new Line2D.Double(pos, lh+padTop-7, pos, lh+padTop));
 					g2.draw(new Line2D.Double(pos, padTop+7, pos, padTop));
 
-					String number = df.format((showLast/divs*i));
-					g2.drawString(number, pos - (number.length()*4), lh+padTop+15);
+					if(min >= 0 || i != 0){
+						String number = df.format((showLast/divs*i));
+						g2.drawString(number, pos - (number.length()*4), lh+padTop+15);
+					}
+					
 				}
 			}
 		}
@@ -192,7 +244,7 @@ public class Graph extends JPanel {
 					g2.draw(new Line2D.Double(lw+pad-7, pos, lw+pad, pos));
 					g2.draw(new Line2D.Double(pad+7, pos, pad, pos));
 
-					String number = df.format((max-max/divs*i));
+					String number = df.format(((max-min)-(max-min)/divs*i) + min);
 					g2.drawString(number, 5 + (6-number.length())*7, pos+5);
 				}
 			}
@@ -238,6 +290,20 @@ public class Graph extends JPanel {
 		float sx = (w - sw) / 2 +10;
 		g2.drawString(s, sx, sy);
 
+		if(mousePosition.getX() >= pad && mousePosition.getX() <= (getWidth()-pad) && mousePosition.getY() >= padTop && mousePosition.getY() <= (getHeight()-pad)){
+			double lw = getWidth() - pad * 2;
+			double mouseXShift = mousePosition.getX() - pad;
+			double mX = (mouseXShift * showLast) / lw;
+			
+			double lh = (getHeight() - pad) - padTop;
+			double mouseYShift = lh - (mousePosition.getY() - padTop);
+			double mY = mouseYShift*(max-min)/lh + min;
+			
+			String mousePoint = "X: " + df.format(mX) + ", Y: " + df.format(mY);
+			float halfDistance = ((getWidth()-pad) - sx)/2;
+			g2.drawString(mousePoint, sx+halfDistance, sy);
+		}
+		
 	}
 	
 	private void drawData(Graphics2D g2) {
@@ -247,7 +313,7 @@ public class Graph extends JPanel {
 		int h = getHeight();
 
 		xInc = (double) (w - 2 * pad) / (showLast - 1);
-		scale = (double) (h - pad - padTop) / max;
+		scale = (double) (h - pad - padTop) / (max-min);
 		
 		Stroke originalStroke = g2.getStroke();
 		
@@ -267,9 +333,9 @@ public class Graph extends JPanel {
 			for (int i = init; i < data.size() - 1; i++) {
 				if(i >= 0 && data.get(i) != null && data.get(i+1) != null) {
 					double x1 = pad + (i - init) * xInc;
-					double y1 = h - pad - scale * data.get(i);
+					double y1 = h - pad - scale * (data.get(i) - min);
 					double x2 = pad + (i - init + 1) * xInc;
-					double y2 = h - pad - scale * data.get(i + 1);
+					double y2 = h - pad - scale * (data.get(i + 1) - min);
 					g2.draw(new Line2D.Double(x1, y1, x2, y2));
 				}
 			}
