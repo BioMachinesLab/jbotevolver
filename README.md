@@ -2,7 +2,7 @@ JBotEvolver is a Java-based open-source and versatile simulation platform for ed
 
 ![JBotEvolver Evolution Panel](http://miguelduarte.pt/media/jbotwiki/evolution.png)
 
-Information about how to install and use the simulator can be found in the wiki.
+Information about how to install and use the simulator can be found in the [wiki](https://github.com/BioMachinesLab/jbotevolver/wiki).
 
 # References
 * M. Duarte, F. Silva, T. Rodrigues, S. M. Oliveira, and A. L. Christensen (2014), "JBotEvolver: A Versatile Simulation Platform for Evolutionary Robotics", in Proceedings of the 14th International Conference on the Synthesis and Simulation of Living Systems (ALIFE), MIT Press, Cambridge, MA, pages 210-211.
