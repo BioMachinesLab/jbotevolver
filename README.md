@@ -6,7 +6,9 @@ Information about how to install and use the simulator can be found in the [wiki
 
 # References
 * M. Duarte, F. Silva, T. Rodrigues, S. M. Oliveira, and A. L. Christensen (2014), "JBotEvolver: A Versatile Simulation Platform for Evolutionary Robotics", in Proceedings of the 14th International Conference on the Synthesis and Simulation of Living Systems (ALIFE), MIT Press, Cambridge, MA, pages 210-211.
-Studies that use JBotEvolver
+
+# Studies that use JBotEvolver
+
 ## 2015
 * F. Silva, L. Correia, and A. L. Christensen (2015). "R-HybrID: Evolution of Agent Controllers with a Hybridisation of Indirect and Direct Encodings". In: International Conference on Autonomous Agents and Multiagent Systems (AAMAS 2015). Accepted as full paper.
 * F. Silva, P. Urbano, L. Correia, and A. L. Christensen (2015). "odNEAT: An Algorithm for Decentralised Online Evolution of Robotic Controllers". Evolutionary Computation. In press.
