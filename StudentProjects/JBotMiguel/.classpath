@@ -6,7 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JBotSim"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Encog"/>
 	<classpathentry kind="lib" path="/JBotSim/jafama.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/JBotAquatic"/>
 	<classpathentry kind="lib" path="/JBotSim/BaseClient.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
