@@ -73,7 +73,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 	/**
 	 * Currently this only works for robots that use a NeuralNetwork as a controller.
 	 * This constructor creates a JFrame that allows you to choose which neural network
-	 * intpu/output activations to plot 
+	 * input/output activations to plot 
 	 * 
 	 * @param simulator The simulator should be initialized, not in the middle of a simulation.
 	 * @param evaluationFunction If this parameter is null, the graph will be plotted
@@ -616,7 +616,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 					graph.addLegend(s);
 				
 				graph.setxLabel("Timesteps ("+dataSize+")");
-				graph.setyLabel("Fitness");
+				graph.setyLabel("Activations");
 		        graph.setShowLast(dataSize);
 				
 				window.setSize(800,500+graph.getHeaderSize());

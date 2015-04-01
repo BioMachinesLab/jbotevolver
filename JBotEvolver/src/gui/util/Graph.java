@@ -141,6 +141,7 @@ public class Graph extends JPanel {
 		int lw = getWidth()-pad;
 		
 		if(mousePosition.getX() >= pad && mousePosition.getX() <= (getWidth()-pad) && mousePosition.getY() >= padTop && mousePosition.getY() <= (getHeight()-pad)){
+			g2.setColor(Color.BLACK);
 			Stroke originalStroke = g2.getStroke();
 			
 			Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{5}, 0);
