@@ -12,6 +12,9 @@ import simulation.util.ArgumentsAnnotation;
 public class ThymioTwoWheelActuator extends Actuator {
 
 	public static final float NOISESTDEV = 0.05f;
+	
+	private static double  MAX_RANDOM = 0.1;
+	private static double MIN_RANDOM = 0.03;
 
 	protected double previousLeftSpeed = 0;
 	protected double previousRightSpeed = 0;
@@ -22,11 +25,18 @@ public class ThymioTwoWheelActuator extends Actuator {
 	protected double maxSpeed = 0.155;
 	
 	private double speedIncrement;
+	private boolean randomIncrement;
 	
 	public ThymioTwoWheelActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
 		this.random = simulator.getRandom();
-		speedIncrement = args.getArgumentAsDoubleOrSetDefault("speedincrement", 0.05);
+		speedIncrement = args.getArgumentAsDoubleOrSetDefault("speedincrement", maxSpeed*2);
+		randomIncrement = args.getArgumentAsIntOrSetDefault("randomincrement", 0) == 1;
+		
+		if (randomIncrement)
+			speedIncrement = random.nextDouble()*(MAX_RANDOM - MIN_RANDOM) + MIN_RANDOM;
+		
+		System.out.println(speedIncrement);
 	}
 
 	public void setLeftWheelSpeed(double value) {
@@ -65,15 +75,14 @@ public class ThymioTwoWheelActuator extends Actuator {
 		double speedDiff = speed - previousSpeed;
 		double newSpeed;
 		
-		if (Math.abs(speedDiff) > speedIncrement)
-			newSpeed = previousSpeed + speedIncrement;
-		else
+		if (Math.abs(speedDiff) > speedIncrement){
+			if(speedDiff >= 0){
+				newSpeed = previousSpeed + speedIncrement;
+			}else{
+				newSpeed = previousSpeed + (-speedIncrement);
+			}
+		}else
 			newSpeed = previousSpeed + speedDiff;
-		
-		System.out.println("Previous Speed: " + previousSpeed);
-		System.out.println("Diff: " + speedDiff);
-		System.out.println("New Speed: " + newSpeed);
-		System.out.println();
 		
 		return newSpeed;
 	}

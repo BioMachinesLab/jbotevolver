@@ -45,7 +45,7 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         	Arguments irSensorsArgs = new Arguments("senserobot=0, cutoffangle=45, fixedsensor=0, noiseenabled=1, numberofrays=7, offsetnoise=0");	
         	sensors.add(new ThymioIRSensor(simulator, sensors.size()+1, this, irSensorsArgs));
         	
-        	Arguments twoWheelsArgs = new Arguments("");
+        	Arguments twoWheelsArgs = new Arguments("randomincrement=1");
         	actuators.add(new ThymioTwoWheelActuator(simulator, actuators.size()+1, twoWheelsArgs));
         }
         
