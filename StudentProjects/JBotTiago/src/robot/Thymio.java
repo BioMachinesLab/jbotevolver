@@ -5,20 +5,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 import network.SimulatedBroadcastHandler;
-import objects.Entity;
 import sensors.ThymioIRSensor;
 import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
-import simulation.robot.actuators.TwoWheelActuator;
 import simulation.util.Arguments;
 import actuator.ThymioTwoWheelActuator;
-
 import commoninterface.CILogger;
 import commoninterface.CISensor;
 import commoninterface.ThymioCI;
 import commoninterface.network.broadcast.BroadcastHandler;
 import commoninterface.network.broadcast.BroadcastMessage;
 import commoninterface.network.broadcast.HeartbeatBroadcastMessage;
+import commoninterface.objects.Entity;
 import commoninterface.utils.CIArguments;
 
 public class Thymio extends DifferentialDriveRobot implements ThymioCI {
@@ -42,10 +40,14 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         	
         	distanceBetweenWheels = 0.099;
         	
+        	if(getRadius() < 0.08)
+        		throw new RuntimeException("Radius lower than 0.08m");
+        	
         	Arguments irSensorsArgs = new Arguments("senserobot=0, cutoffangle=45, fixedsensor=0, noiseenabled=1, numberofrays=7, offsetnoise=0");	
         	sensors.add(new ThymioIRSensor(simulator, sensors.size()+1, this, irSensorsArgs));
         	
-        	Arguments twoWheelsArgs = new Arguments("randomincrement=1");
+//        	Arguments twoWheelsArgs = new Arguments("randomincrement=1");
+        	Arguments twoWheelsArgs = new Arguments("speedincrement=0.155");
         	actuators.add(new ThymioTwoWheelActuator(simulator, actuators.size()+1, twoWheelsArgs));
         }
         

@@ -152,19 +152,19 @@ public class ThymioIRSensor extends ConeTypeSensor {
 		this.angles = new double[numberOfSensors];
 		this.sensorsOrientations = new double[numberOfSensors];
 
-		angles[0] = Math.toRadians(323);
-		angles[1] = Math.toRadians(343);
+		angles[0] = Math.toRadians(37);
+		angles[1] = Math.toRadians(17);
 		angles[2] = Math.toRadians(0);
-		angles[3] = Math.toRadians(17);
-		angles[4] = Math.toRadians(37);
-		angles[5] = Math.toRadians(201);
-		angles[6] = Math.toRadians(159);
+		angles[3] = Math.toRadians(343);
+		angles[4] = Math.toRadians(323);
+		angles[5] = Math.toRadians(159);
+		angles[6] = Math.toRadians(201);
 		
-		sensorsOrientations[0] = Math.toRadians(323);
-		sensorsOrientations[1] = Math.toRadians(343);
+		sensorsOrientations[0] = Math.toRadians(37);
+		sensorsOrientations[1] = Math.toRadians(17);
 		sensorsOrientations[2] = Math.toRadians(0);
-		sensorsOrientations[3] = Math.toRadians(17);
-		sensorsOrientations[4] = Math.toRadians(37);
+		sensorsOrientations[3] = Math.toRadians(343);
+		sensorsOrientations[4] = Math.toRadians(323);
 		sensorsOrientations[5] = Math.PI;
 		sensorsOrientations[6] = Math.PI;
 		

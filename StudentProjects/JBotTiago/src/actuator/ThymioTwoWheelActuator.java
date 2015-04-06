@@ -7,14 +7,13 @@ import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
-import simulation.util.ArgumentsAnnotation;
 
 public class ThymioTwoWheelActuator extends Actuator {
 
 	public static final float NOISESTDEV = 0.05f;
 	
-	private static double  MAX_RANDOM = 0.1;
 	private static double MIN_RANDOM = 0.03;
+	private static double  MAX_RANDOM = 0.1;
 
 	protected double previousLeftSpeed = 0;
 	protected double previousRightSpeed = 0;
@@ -30,13 +29,12 @@ public class ThymioTwoWheelActuator extends Actuator {
 	public ThymioTwoWheelActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
 		this.random = simulator.getRandom();
-		speedIncrement = args.getArgumentAsDoubleOrSetDefault("speedincrement", maxSpeed*2);
+		speedIncrement = args.getArgumentAsDoubleOrSetDefault("speedincrement", maxSpeed);
 		randomIncrement = args.getArgumentAsIntOrSetDefault("randomincrement", 0) == 1;
 		
 		if (randomIncrement)
 			speedIncrement = random.nextDouble()*(MAX_RANDOM - MIN_RANDOM) + MIN_RANDOM;
 		
-		System.out.println(speedIncrement);
 	}
 
 	public void setLeftWheelSpeed(double value) {
