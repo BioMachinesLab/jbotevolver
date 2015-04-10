@@ -10,9 +10,10 @@ import simulation.Simulator;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.util.Arguments;
 import actuator.ThymioTwoWheelActuator;
-import commoninterface.CILogger;
+
 import commoninterface.CISensor;
 import commoninterface.ThymioCI;
+import commoninterface.mathutils.Vector2d;
 import commoninterface.network.broadcast.BroadcastHandler;
 import commoninterface.network.broadcast.BroadcastMessage;
 import commoninterface.network.broadcast.HeartbeatBroadcastMessage;
@@ -27,6 +28,8 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
 	
         private ThymioIRSensor irSensor;
         private ThymioTwoWheelActuator wheels;
+        
+        private Vector2d virtualPosition;
         
         private SimulatedBroadcastHandler broadcastHandler;
         
@@ -51,8 +54,8 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         	actuators.add(new ThymioTwoWheelActuator(simulator, actuators.size()+1, twoWheelsArgs));
         }
         
-		@Override
-		public void begin(CIArguments args, CILogger logger) { }
+        @Override
+		public void begin(CIArguments args) { }
 
 		@Override
 		public void shutdown() { } 
@@ -115,5 +118,15 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
 		public Simulator getSimulator() {
 			return simulator;
 		}
+
+		@Override
+		public Vector2d getVirtualPosition() {
+			return virtualPosition;
+		}
 		
+		@Override
+		public void setVirtualPosition(double x, double y) {
+			virtualPosition.set(x, y);
+		}
+
 }

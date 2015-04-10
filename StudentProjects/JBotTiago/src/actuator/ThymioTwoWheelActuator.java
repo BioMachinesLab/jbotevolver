@@ -12,9 +12,6 @@ public class ThymioTwoWheelActuator extends Actuator {
 
 	public static final float NOISESTDEV = 0.05f;
 	
-	private static double MIN_RANDOM = 0.03;
-	private static double  MAX_RANDOM = 0.1;
-
 	protected double previousLeftSpeed = 0;
 	protected double previousRightSpeed = 0;
 	
@@ -24,16 +21,11 @@ public class ThymioTwoWheelActuator extends Actuator {
 	protected double maxSpeed = 0.155;
 	
 	private double speedIncrement;
-	private boolean randomIncrement;
 	
 	public ThymioTwoWheelActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
 		this.random = simulator.getRandom();
 		speedIncrement = args.getArgumentAsDoubleOrSetDefault("speedincrement", maxSpeed);
-		randomIncrement = args.getArgumentAsIntOrSetDefault("randomincrement", 0) == 1;
-		
-		if (randomIncrement)
-			speedIncrement = random.nextDouble()*(MAX_RANDOM - MIN_RANDOM) + MIN_RANDOM;
 		
 	}
 

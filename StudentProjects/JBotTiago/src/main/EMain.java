@@ -9,7 +9,7 @@ public class EMain {
 
 public static void main(String[] args) throws Exception {
 		
-		String configName = "experiments/thymioci_test.conf";
+		String configName = "experiments/thymioci_forage.conf";
 //		long time = System.currentTimeMillis();
 		
 		try {
