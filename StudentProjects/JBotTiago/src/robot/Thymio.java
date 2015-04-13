@@ -143,7 +143,7 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
 
 		@Override
 		public double getThymioRadius() {
-			return radius;
+			return getRadius();
 		}
 		
 }

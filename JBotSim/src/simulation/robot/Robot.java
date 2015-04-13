@@ -1,3 +1,4 @@
+
 package simulation.robot;
 
 import java.awt.Color;
@@ -54,7 +55,7 @@ public class Robot extends MovableObject {
 	@ArgumentsAnnotation(name="description", defaultValue = "robot")
 	protected String description = "";
 	@ArgumentsAnnotation(name="radius", defaultValue = "0.05")
-	protected double radius;
+	private double radius;
 	@ArgumentsAnnotation(name="diameter", defaultValue = "0.1")
 	private double diameter;
 	@ArgumentsAnnotation(name = "relativex", defaultValue = "0")
@@ -318,7 +319,8 @@ public class Robot extends MovableObject {
 			a.keyPressed(e);
 		}
 
-		controller.keyPressed(e);
+		if(controller != null)
+			controller.keyPressed(e);
 	}
 
 	/**
@@ -333,7 +335,9 @@ public class Robot extends MovableObject {
 		for (Actuator a : actuators) {
 			a.keyReleased(e);
 		}
-		controller.keyReleased(e);
+		
+		if(controller != null)
+			controller.keyReleased(e);
 	}
 
 	/**
@@ -349,7 +353,8 @@ public class Robot extends MovableObject {
 			a.keyTyped(e);
 		}
 
-		controller.keyTyped(e);
+		if(controller != null)
+			controller.keyTyped(e);
 	}
 
 	/**
@@ -500,6 +505,4 @@ public class Robot extends MovableObject {
 	public void setLedState(LedState ledState) {
 		this.ledState = ledState;
 	}
-	
-	
 }
