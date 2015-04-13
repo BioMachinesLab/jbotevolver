@@ -54,7 +54,7 @@ public class Robot extends MovableObject {
 	@ArgumentsAnnotation(name="description", defaultValue = "robot")
 	protected String description = "";
 	@ArgumentsAnnotation(name="radius", defaultValue = "0.05")
-	private double radius;
+	protected double radius;
 	@ArgumentsAnnotation(name="diameter", defaultValue = "0.1")
 	private double diameter;
 	@ArgumentsAnnotation(name = "relativex", defaultValue = "0")

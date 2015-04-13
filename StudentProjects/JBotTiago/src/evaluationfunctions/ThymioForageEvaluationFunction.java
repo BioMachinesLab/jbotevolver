@@ -10,11 +10,14 @@ import simulation.util.Arguments;
 import commoninterface.objects.Entity;
 import commoninterface.objects.PreyEntity;
 
+import environment.CameraTrackerEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class ThymioForageEvaluationFunction extends EvaluationFunction {
 
-	private static final double FORAGE_DISTANCE = 5;
+	private static final double FORAGE_DISTANCE = 2;
+	int foodForaged = 0;
+	private double averageWheelSpeed, timesteps;
 
 	public ThymioForageEvaluationFunction(Arguments args) {
 		super(args);
@@ -25,30 +28,42 @@ public class ThymioForageEvaluationFunction extends EvaluationFunction {
 	public void update(Simulator simulator) {
 		ArrayList<Robot> robots = simulator.getEnvironment().getRobots();
 		
+		timesteps = simulator.getTime();
+		foodForaged = ((CameraTrackerEnvironment)simulator.getEnvironment()).getPreysCaught();
+		
 		for (Robot robot : robots) {
 			Thymio thymio = (Thymio)robot;
-			ArrayList<PreyEntity> preys = new ArrayList<PreyEntity>();
+			double closestPreyDistanceToRobot = Double.MAX_VALUE;			
 			
 			for(Entity entity : thymio.getEntities()){
-				if(entity instanceof PreyEntity)
-					preys.add((PreyEntity)entity);
-			}
-			
-			double closestPreyDistanceToRobot = Double.MAX_VALUE;
-			
-			for(PreyEntity p : preys) {
-				double distanceToRobot = p.getPosition().distanceTo(thymio.getVirtualPosition());
-				if(distanceToRobot < closestPreyDistanceToRobot) {
-					closestPreyDistanceToRobot = distanceToRobot;
+				if(entity instanceof PreyEntity){
+					double distanceToRobot = ((PreyEntity)entity).getPosition().distanceTo(thymio.getVirtualPosition());
+					if(distanceToRobot < closestPreyDistanceToRobot)
+						closestPreyDistanceToRobot = distanceToRobot;
 				}
 			}
+
+			if(closestPreyDistanceToRobot < Double.MAX_VALUE && closestPreyDistanceToRobot <= FORAGE_DISTANCE)
+				fitness += ((FORAGE_DISTANCE - closestPreyDistanceToRobot) / FORAGE_DISTANCE)/simulator.getEnvironment().getSteps()*0.0001;
 			
-			if(closestPreyDistanceToRobot < Double.MAX_VALUE && closestPreyDistanceToRobot <= FORAGE_DISTANCE){
-				fitness += (FORAGE_DISTANCE - closestPreyDistanceToRobot) / FORAGE_DISTANCE;
+			averageWheelSpeed += ((thymio.getLeftWheelSpeed() + thymio.getRightWheelSpeed())/2)/robots.size();
+			
+			if(robot.isInvolvedInCollison()){
+				fitness = -1;
+				foodForaged = 0;
+				simulator.stopSimulation();
 			}
 			
 		}
 		
 	}
 
+	@Override
+	public double getFitness() {
+		if (averageWheelSpeed/timesteps < 0)
+			return -1;
+		else
+			return super.getFitness() +  foodForaged;
+	}
+	
 }

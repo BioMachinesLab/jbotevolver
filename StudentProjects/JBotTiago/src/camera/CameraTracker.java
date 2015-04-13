@@ -8,9 +8,9 @@ import simulation.Simulator;
 import simulation.Updatable;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
-
 import commoninterface.mathutils.Vector2d;
 import commoninterface.network.broadcast.VirtualPositionBroadcastMessage;
+import commoninterface.network.broadcast.VirtualPositionBroadcastMessage.VirtualPositionType;
 
 public class CameraTracker implements Updatable, Serializable {
 
@@ -38,21 +38,23 @@ public class CameraTracker implements Updatable, Serializable {
 	public void update(Simulator simulator) {
 		for (Robot r : simulator.getRobots()) {
 			Vector2d currentThymioPosition = new Vector2d(r.getPosition().x, r.getPosition().y);
+			double currentThymioOrientation = r.getOrientation();
 			
-//			add lag
-//			currentPosition = getLaggedPosition(currentPosition);
+//			ADD LAG
+//			currentThymioPosition = getLaggedPosition(currentPosition);
+//			currentThymioOrientation = getLaggedPosition(currentPosition);
 			
-			VirtualPositionBroadcastMessage thymioMessage = new VirtualPositionBroadcastMessage(VirtualPositionBroadcastMessage.VirtualPositionType.ROBOT, ((Thymio)r).getNetworkAddress(), currentThymioPosition.x, currentThymioPosition.y);
+			VirtualPositionBroadcastMessage thymioMessage = new VirtualPositionBroadcastMessage(VirtualPositionType.ROBOT, ((Thymio)r).getNetworkAddress(), currentThymioPosition.x, currentThymioPosition.y, currentThymioOrientation);
 			network.send(ADDRESS, thymioMessage.encode());
 		}
 		
 		for (Prey p : simulator.getEnvironment().getPrey()) {
 			Vector2d currentPreyPosition = new Vector2d(p.getPosition().x, p.getPosition().y);
 			
-//			add lag
+//			ADD LAG
 //			currentPosition = getLaggedPosition(currentPosition);
 			
-			VirtualPositionBroadcastMessage preyMessage = new VirtualPositionBroadcastMessage(VirtualPositionBroadcastMessage.VirtualPositionType.PREY,p.getName(), currentPreyPosition.x, currentPreyPosition.y);
+			VirtualPositionBroadcastMessage preyMessage = new VirtualPositionBroadcastMessage(VirtualPositionType.PREY,p.getName(), currentPreyPosition.x, currentPreyPosition.y, 0);
 			network.send(ADDRESS, preyMessage.encode());
 		}
 		

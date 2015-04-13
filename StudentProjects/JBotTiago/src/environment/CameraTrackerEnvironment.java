@@ -69,21 +69,6 @@ public class CameraTrackerEnvironment extends Environment {
 	
 	@Override
 	public void update(double time) {
-		
-//		for (Robot r : getRobots()) {
-//			if(r.getId() == 0){
-//				Thymio thymio = (Thymio) r;
-//				
-//				for (Entity entity : thymio.getEntities()) {
-//					if(entity instanceof ThymioEntity){
-//						addObject(physicalObject);
-//					}else if(entity instanceof PreyEntity){
-//						
-//					}
-//				}
-//			}
-//		}
-		
 		for (Prey p : getPrey()) {
 			for(Robot r : getRobots()) {
 				if(r.getPosition().distanceTo(p.getPosition()) < consumingDistance){

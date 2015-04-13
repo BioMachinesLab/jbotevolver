@@ -30,6 +30,7 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         private ThymioTwoWheelActuator wheels;
         
         private Vector2d virtualPosition;
+        private Double virtualOrientation;
         
         private SimulatedBroadcastHandler broadcastHandler;
         
@@ -49,7 +50,6 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         	Arguments irSensorsArgs = new Arguments("senserobot=0, cutoffangle=45, fixedsensor=0, noiseenabled=1, numberofrays=7, offsetnoise=0");	
         	sensors.add(new ThymioIRSensor(simulator, sensors.size()+1, this, irSensorsArgs));
         	
-//        	Arguments twoWheelsArgs = new Arguments("randomincrement=1");
         	Arguments twoWheelsArgs = new Arguments("speedincrement=0.155");
         	actuators.add(new ThymioTwoWheelActuator(simulator, actuators.size()+1, twoWheelsArgs));
         }
@@ -70,7 +70,6 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
 			
 			wheels.setLeftWheelSpeed(leftSpeed);
 			wheels.setRightWheelSpeed(rightSpeed);
-//			wheels.apply(this);
 		}
 		
 		@Override
@@ -126,7 +125,25 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
 		
 		@Override
 		public void setVirtualPosition(double x, double y) {
-			virtualPosition.set(x, y);
+			if(virtualPosition == null)
+				virtualPosition = new Vector2d(x, y);
+			else
+				virtualPosition.set(x, y);
 		}
 
+		@Override
+		public Double getVirtualOrientation() {
+			return virtualOrientation;
+		}
+
+		@Override
+		public void setVirtualOrientation(double orientation) {
+			virtualOrientation = orientation;
+		}
+
+		@Override
+		public double getThymioRadius() {
+			return radius;
+		}
+		
 }

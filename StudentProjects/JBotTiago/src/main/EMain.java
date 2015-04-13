@@ -1,4 +1,5 @@
 package main;
+
 import javax.swing.JFrame;
 
 import simulation.util.Arguments;
@@ -7,13 +8,15 @@ import gui.evolution.EvolutionGui;
 
 public class EMain {
 
-public static void main(String[] args) throws Exception {
-		
-		String configName = "experiments/thymioci_forage.conf";
-//		long time = System.currentTimeMillis();
-		
+	private final static String FOLDER = "experiments/"; 
+	
+	public static void main(String[] args) throws Exception {
+
+		 String configName = "thymioci_forage.conf";
+		// long time = System.currentTimeMillis();
+
 		try {
-			args = new String[]{configName};
+			args = new String[] { FOLDER + configName };
 			JBotEvolver jBotEvolver = new JBotEvolver(args);
 			EvolutionGui evo = new EvolutionGui(jBotEvolver, new Arguments(""));
 			JFrame frame = new JFrame();
@@ -27,9 +30,10 @@ public static void main(String[] args) throws Exception {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	
-//		System.out.println("Final Time: " + (System.currentTimeMillis() - time));
-		
+
+		// System.out.println("Final Time: " + (System.currentTimeMillis() -
+		// time));
+
 	}
-	
+
 }
