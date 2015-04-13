@@ -154,7 +154,8 @@ public class Simulator implements Serializable {
 	protected void updateAllControllers(Double time) {
 		for (Robot r : environment.getRobots()) {
 			if(r.isEnabled())
-				r.getController().controlStep(time);
+				if(r.getController() != null)
+					r.getController().controlStep(time);
 		}
 	}
 

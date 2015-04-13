@@ -318,7 +318,8 @@ public class Robot extends MovableObject {
 			a.keyPressed(e);
 		}
 
-		controller.keyPressed(e);
+		if(controller != null)
+			controller.keyPressed(e);
 	}
 
 	/**
@@ -333,7 +334,9 @@ public class Robot extends MovableObject {
 		for (Actuator a : actuators) {
 			a.keyReleased(e);
 		}
-		controller.keyReleased(e);
+		
+		if(controller != null)
+			controller.keyReleased(e);
 	}
 
 	/**
@@ -349,7 +352,8 @@ public class Robot extends MovableObject {
 			a.keyTyped(e);
 		}
 
-		controller.keyTyped(e);
+		if(controller != null)
+			controller.keyTyped(e);
 	}
 
 	/**
