@@ -63,4 +63,12 @@ public class TwoWheelActuator extends Actuator {
 		double[] velocities = {leftSpeed, rightSpeed};
 		return velocities;
 	}
+	
+	public double[] getSpeedPrecentage(){
+		double leftPercentage = leftSpeed/maxSpeed;
+		double rightPercentage = rightSpeed/maxSpeed;
+		
+		return new double[]{leftPercentage, rightPercentage};
+	}
+	
 }

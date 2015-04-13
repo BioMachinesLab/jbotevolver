@@ -9,7 +9,7 @@ public class EMain {
 
 public static void main(String[] args) throws Exception {
 		
-		String configName = "drone_test.conf";
+		String configName = "experiments/thymioci_forage.conf";
 //		long time = System.currentTimeMillis();
 		
 		try {
@@ -18,7 +18,7 @@ public static void main(String[] args) throws Exception {
 			EvolutionGui evo = new EvolutionGui(jBotEvolver, new Arguments(""));
 			JFrame frame = new JFrame();
 			frame.add(evo);
-			frame.setSize(800, 300);
+			frame.setSize(800, 600);
 			frame.setVisible(true);
 			frame.setLocationRelativeTo(null);
 			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
