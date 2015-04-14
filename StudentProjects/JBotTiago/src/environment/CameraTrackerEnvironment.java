@@ -22,16 +22,16 @@ public class CameraTrackerEnvironment extends Environment {
 	private int preysCaught = 0;
 	private int numberOfPreys;
 	private double consumingDistance = 0.15;
-	private Simulator simulator;
+	private int lag;
 	
 	
 	public CameraTrackerEnvironment(Simulator simulator, Arguments args) {
 		super(simulator, args);
-		this.simulator = simulator;
 		this.random = simulator.getRandom();
 		
 		walls = new LinkedList<Wall>();
 		numberOfPreys = args.getArgumentAsIntOrSetDefault("numberofpreys", 1);
+		lag = args.getArgumentAsIntOrSetDefault("lag", 0);
 	}
 
 	@Override
@@ -56,9 +56,8 @@ public class CameraTrackerEnvironment extends Environment {
 			r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);	
 		}
 		
-		CameraTracker tracker = new CameraTracker(simulator);
+		CameraTracker tracker = new CameraTracker(simulator, lag);
 		simulator.addCallback(tracker);
-		
 	}
 	
 	private Vector2d newRandomPosition() {
