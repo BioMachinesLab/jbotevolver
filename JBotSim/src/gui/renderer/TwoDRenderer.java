@@ -41,6 +41,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	private boolean debug = false;
 	
 	private double drawFrames = 1;
+	private boolean darIds;
 	
 	public TwoDRenderer(Arguments args) {
 		super(args);
@@ -48,6 +49,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		createImage();
 		bigRobots = args.getArgumentAsIntOrSetDefault("bigrobots", 0) == 1;
 		drawFrames = args.getArgumentAsIntOrSetDefault("drawframes", 1);
+		darIds = args.getArgumentAsIntOrSetDefault("drawids", 1)==1;
 	}
 	
 	public void paint(Graphics g) {
@@ -117,7 +119,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				switch(m.getType()){
 				case ROBOT:
 					drawRobot(graphics, (Robot) m);
-					if(numberOfRobots > 1)
+					if(numberOfRobots > 1 && darIds)
 						drawRobotId(graphics, (Robot) m);
 				}
 			}
