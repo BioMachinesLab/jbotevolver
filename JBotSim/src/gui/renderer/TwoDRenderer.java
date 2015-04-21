@@ -267,7 +267,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		graphics.setColor(Color.BLACK);
 	}
 	
-	private void drawNest(Graphics graphics2, Nest nest) {
+	protected void drawNest(Graphics graphics2, Nest nest) {
 		int circleDiameter = (int) Math.round(0.5 + nest.getDiameter() * scale);
 		int x = (int) (transformX(nest.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(nest.getPosition().getY()) - circleDiameter / 2);

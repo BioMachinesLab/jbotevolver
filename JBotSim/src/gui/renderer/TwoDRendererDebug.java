@@ -10,6 +10,7 @@ import java.awt.geom.Point2D;
 
 import mathutils.Vector2d;
 import net.jafama.FastMath;
+import simulation.physicalobjects.Nest;
 import simulation.robot.LedState;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
@@ -176,6 +177,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		
 	}
 
+	@Override
 	protected void drawCones(Graphics graphics, Robot robot){
 		if(robotId != -1 && robot.getId() != robotId)
 			return;
@@ -238,6 +240,22 @@ public class TwoDRendererDebug extends TwoDRenderer {
 				}
 			}
 		}
+	}
+	
+	@Override
+	protected void drawNest(Graphics graphics2, Nest nest) {
+		int circleDiameter = (int) Math.round(0.5 + nest.getDiameter() * scale);
+		int x = (int) (transformX(nest.getPosition().getX()) - circleDiameter / 2);
+		int y = (int) (transformY(nest.getPosition().getY()) - circleDiameter / 2);
+
+		if(paperSensors)
+			graphics2.setColor(Color.GREEN.darker());
+		else
+			graphics2.setColor(nest.getColor());
+		
+		graphics2.fillOval(x, y, circleDiameter, circleDiameter);
+		graphics2.setColor(Color.BLACK);
+		
 	}
 	
 	public int getSelectedRobot() {
