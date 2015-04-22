@@ -253,7 +253,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		
 	}
 	
-	private void drawLine(Line l) {
+	protected void drawLine(Line l) {
 		int x0 = transformX(l.getPointA().getX());
 		int x1 = transformX(l.getPointB().getX());
 		

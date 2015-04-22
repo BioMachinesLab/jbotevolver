@@ -73,9 +73,10 @@ public class MuLambdaPopulation extends Population implements Serializable {
 		fitnessThresholdReached = checkFitnessThreshold(bestFitness);
 
 		LinkedList<Chromosome> sortedChromosomes = new LinkedList<Chromosome>();
-		for (int i = 0; i < populationSize; i++)
+		for (int i = 0; i < populationSize; i++) {
 			sortedChromosomes.add(chromosomes[i]);
-
+		}
+		
 		Collections.sort(sortedChromosomes,
 				new Chromosome.CompareChromosomeFitness());
 

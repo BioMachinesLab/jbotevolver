@@ -99,7 +99,7 @@ public class GenerationalEvolution extends Evolution {
 			}
 			
 			if(executeEvolution) {
-			
+				
 				print("\nGeneration "+population.getNumberOfCurrentGeneration()+
 						"\tHighest: "+population.getHighestFitness()+
 						"\tAverage: "+population.getAverageFitness()+
