@@ -28,6 +28,8 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 	private boolean share;
 	@ArgumentsAnnotation(name = "memoryrange", defaultValue = "10")
 	private double memoryRange;
+	@ArgumentsAnnotation(name = "stepstoforget", defaultValue = "200")
+	private int stepsToForget;
 
 	public SharedIntensitySensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
@@ -39,6 +41,7 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 		intensityInput = args.getArgumentAsIntOrSetDefault("intensityinput", 0) == 1;
 		share = args.getArgumentAsIntOrSetDefault("share", 1) == 1;
 		memoryRange = args.getArgumentAsIntOrSetDefault("memoryrange", 10);
+		stepsToForget = args.getArgumentAsIntOrSetDefault("stepstoforget", 200);
 	}
 
 	@Override
@@ -63,7 +66,7 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 
 		LinkedList<SharedInformation> infoToRemove = new LinkedList<SharedInformation>();
 		for (SharedInformation info : memory) {
-			if ((info.getIntensity() * 200) - (simulator.getTime() - info.getTimeStep()) <= 0) {
+			if ((info.getIntensity() * stepsToForget) - (simulator.getTime() - info.getTimeStep()) <= 0) {
 				infoToRemove.add(info);
 			}
 		}

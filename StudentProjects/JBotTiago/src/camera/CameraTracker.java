@@ -8,6 +8,7 @@ import simulation.Simulator;
 import simulation.Updatable;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
+
 import commoninterface.mathutils.Vector2d;
 import commoninterface.network.broadcast.VirtualPositionBroadcastMessage;
 import commoninterface.network.broadcast.VirtualPositionBroadcastMessage.VirtualPositionType;
@@ -18,31 +19,47 @@ public class CameraTracker implements Updatable, Serializable {
 	
 	private Network network;
 	private int numberOfRobots;
-	private int numberOfPreys;
 	
-	private Vector2d[][] lagBuffer;
-	private int lagBufferSize = 3;
-	private int lagBufferIndex = 0;
+	private int LagBufferSize;
 	
-	public CameraTracker(Simulator simulator) {
+	private Vector2d[][] positionLagBuffer;
+	private int positionLagBufferIndex = 0;
+	
+	private double[][] orientationLagBuffer;
+	private int orientationLagBufferIndex = 0;
+	
+	public CameraTracker(Simulator simulator, int lag) {
 		network = simulator.getNetwork();
 		numberOfRobots = simulator.getRobots().size();
-		numberOfPreys = simulator.getEnvironment().getPrey().size();
-		
-		if(lagBufferSize > 0)
-			lagBuffer = new Vector2d[numberOfRobots][lagBufferSize];
+		LagBufferSize = lag;
 	}
 
 
 	@Override
 	public void update(Simulator simulator) {
+		
+		if(simulator.getTime() == 1){
+			if(LagBufferSize > 0){
+				positionLagBuffer = new Vector2d[numberOfRobots][LagBufferSize];
+				orientationLagBuffer = new double[numberOfRobots][LagBufferSize];
+				
+				for (int x = 0; x < positionLagBuffer.length; x++) {
+					Robot r = simulator.getRobots().get(x);
+					for (int y = 0; y < positionLagBuffer[x].length; y++) {
+						positionLagBuffer[x][y] = new Vector2d(r.getPosition().x, r.getPosition().y);
+						orientationLagBuffer[x][y] = r.getOrientation();
+					}
+				}
+			}
+		}
+		
 		for (Robot r : simulator.getRobots()) {
 			Vector2d currentThymioPosition = new Vector2d(r.getPosition().x, r.getPosition().y);
 			double currentThymioOrientation = r.getOrientation();
 			
-//			ADD LAG
-//			currentThymioPosition = getLaggedPosition(currentPosition);
-//			currentThymioOrientation = getLaggedPosition(currentPosition);
+			//ADD LAG
+			currentThymioPosition = getLaggedPosition(r.getId(), currentThymioPosition);
+			currentThymioOrientation = getLaggedOrientation(r.getId(), currentThymioOrientation);
 			
 			VirtualPositionBroadcastMessage thymioMessage = new VirtualPositionBroadcastMessage(VirtualPositionType.ROBOT, ((Thymio)r).getNetworkAddress(), currentThymioPosition.x, currentThymioPosition.y, currentThymioOrientation);
 			network.send(ADDRESS, thymioMessage.encode());
@@ -50,29 +67,38 @@ public class CameraTracker implements Updatable, Serializable {
 		
 		for (Prey p : simulator.getEnvironment().getPrey()) {
 			Vector2d currentPreyPosition = new Vector2d(p.getPosition().x, p.getPosition().y);
-			
-//			ADD LAG
-//			currentPosition = getLaggedPosition(currentPosition);
-			
 			VirtualPositionBroadcastMessage preyMessage = new VirtualPositionBroadcastMessage(VirtualPositionType.PREY,p.getName(), currentPreyPosition.x, currentPreyPosition.y, 0);
 			network.send(ADDRESS, preyMessage.encode());
 		}
 		
 	}
 	
-	private Vector2d getLaggedPosition(Vector2d currentPosition) {
-		if(lagBuffer != null) {
+	private Vector2d getLaggedPosition(int robotID, Vector2d currentPosition) {
+		if(positionLagBuffer != null) {
+			Vector2d lagValue = positionLagBuffer[robotID][positionLagBufferIndex % LagBufferSize];
 			
-			Vector2d lagValue = lagBuffer[numberOfRobots][lagBufferIndex % lagBufferSize];
+			positionLagBuffer[robotID][positionLagBufferIndex] = currentPosition;
 			
-			lagBuffer[numberOfRobots][lagBufferIndex] = currentPosition;
-			
-			lagBufferIndex = (lagBufferIndex+1) % lagBufferSize;
+			positionLagBufferIndex = (positionLagBufferIndex+1) % LagBufferSize;
 			
 			return lagValue;
 		}
 		
 		return currentPosition;
+	}
+	
+	private double getLaggedOrientation(int robotID, double currentOrientation) {
+		if(orientationLagBuffer != null) {
+			double lagValue = orientationLagBuffer[robotID][orientationLagBufferIndex % LagBufferSize];
+			
+			orientationLagBuffer[robotID][orientationLagBufferIndex] = currentOrientation;
+			
+			orientationLagBufferIndex = (orientationLagBufferIndex+1) % LagBufferSize;
+			
+			return lagValue;
+		}
+		
+		return currentOrientation;
 	}
 	
 }
