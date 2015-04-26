@@ -229,7 +229,11 @@ public class Graph extends JPanel {
 					g2.draw(new Line2D.Double(pos, padTop+7, pos, padTop));
 
 					if(min >= 0 || i != 0){
-						String number = df.format((showLast/divs*i));
+						
+						
+						double toAdd = !listOfData.isEmpty() && listOfData.get(0).size() > showLast ? listOfData.get(0).size() - showLast : 0; 
+						
+						String number = df.format((showLast/divs*i) + toAdd);
 						g2.drawString(number, pos - (number.length()*4), lh+padTop+15);
 					}
 					
