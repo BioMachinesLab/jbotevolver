@@ -48,8 +48,6 @@ public class IntensityPreySensor extends ConeTypeSensor {
 	}
 
 	private void sendInformation(SharedInformation information) {
-		
-		// enviar para o próprio
 		SharedIntensitySensor sharedSensor = (SharedIntensitySensor) this.robot
 				.getSensorByType(SharedIntensitySensor.class);
 		sharedSensor.addInformation(information);

@@ -190,6 +190,7 @@ public class SharedIntensitySensor extends ConeTypeSensor {
 	}
 
 	private double calculateIntensityValue(SharedInformation info) {
+		//TODO: invert this function
 		return (GarbageCollectorEnvironment.MAX_PREY_INTENSITY - info
 				.getIntensity()) / GarbageCollectorEnvironment.MAX_PREY_INTENSITY;
 	}

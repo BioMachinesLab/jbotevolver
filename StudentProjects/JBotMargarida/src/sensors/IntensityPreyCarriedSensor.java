@@ -21,9 +21,9 @@ public class IntensityPreyCarriedSensor extends Sensor{
 		if(actuator == null)
 			actuator = (IntensityPreyPickerActuator) robot.getActuatorByType(IntensityPreyPickerActuator.class);
 		if (actuator.isCarryingPrey())
-			robot.setBodyColor(Color.red);
-		else
 			robot.setBodyColor(Color.black);
+		else
+			robot.setBodyColor(Color.red);
 		return actuator.isCarryingPrey();
 	}
 	
