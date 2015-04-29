@@ -11,6 +11,7 @@ import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import camera.CameraTracker;
 
 public class CameraTrackerEnvironment extends Environment {
@@ -20,18 +21,22 @@ public class CameraTrackerEnvironment extends Environment {
 	private LinkedList<Wall> walls;
 	private Random random;
 	private int preysCaught = 0;
-	private int numberOfPreys;
+	@ArgumentsAnnotation(name="numberofpreys", defaultValue = "1")
+	private int numberOfPreys = 1;
 	private double consumingDistance = 0.15;
-	private int lag;
-	
+	@ArgumentsAnnotation(name="lag", defaultValue = "0")
+	private int lag = 0;
+	@ArgumentsAnnotation(name="orientationerror", defaultValue = "0.0")
+	private double orientationError = 0;
 	
 	public CameraTrackerEnvironment(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		this.random = simulator.getRandom();
 		
 		walls = new LinkedList<Wall>();
-		numberOfPreys = args.getArgumentAsIntOrSetDefault("numberofpreys", 1);
-		lag = args.getArgumentAsIntOrSetDefault("lag", 0);
+		numberOfPreys = args.getArgumentAsIntOrSetDefault("numberofpreys", numberOfPreys);
+		lag = args.getArgumentAsIntOrSetDefault("lag", lag);
+		orientationError = args.getArgumentAsDoubleOrSetDefault("orientationerror", orientationError);
 	}
 
 	@Override
@@ -56,7 +61,7 @@ public class CameraTrackerEnvironment extends Environment {
 			r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);	
 		}
 		
-		CameraTracker tracker = new CameraTracker(simulator, lag);
+		CameraTracker tracker = new CameraTracker(simulator, lag, orientationError);
 		simulator.addCallback(tracker);
 	}
 	

@@ -8,7 +8,7 @@ import simulation.Simulator;
 import simulation.Updatable;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
-
+import simulation.robot.sensors.CompassSensor;
 import commoninterface.mathutils.Vector2d;
 import commoninterface.network.broadcast.VirtualPositionBroadcastMessage;
 import commoninterface.network.broadcast.VirtualPositionBroadcastMessage.VirtualPositionType;
@@ -27,8 +27,14 @@ public class CameraTracker implements Updatable, Serializable {
 	
 	private double[][] orientationLagBuffer;
 	private int orientationLagBufferIndex = 0;
+
+	private double orientationError;
+
+	private Simulator simulator;
 	
-	public CameraTracker(Simulator simulator, int lag) {
+	public CameraTracker(Simulator simulator, int lag, double orientationError) {
+		this.simulator = simulator;
+		this.orientationError = orientationError;
 		network = simulator.getNetwork();
 		numberOfRobots = simulator.getRobots().size();
 		LagBufferSize = lag;
@@ -61,7 +67,9 @@ public class CameraTracker implements Updatable, Serializable {
 			currentThymioPosition = getLaggedPosition(r.getId(), currentThymioPosition);
 			currentThymioOrientation = getLaggedOrientation(r.getId(), currentThymioOrientation);
 			
-			VirtualPositionBroadcastMessage thymioMessage = new VirtualPositionBroadcastMessage(VirtualPositionType.ROBOT, ((Thymio)r).getNetworkAddress(), currentThymioPosition.x, currentThymioPosition.y, currentThymioOrientation);
+			double orientationWithError = getOrientationWithError(currentThymioOrientation);
+			
+			VirtualPositionBroadcastMessage thymioMessage = new VirtualPositionBroadcastMessage(VirtualPositionType.ROBOT, ((Thymio)r).getNetworkAddress(), currentThymioPosition.x, currentThymioPosition.y, orientationWithError);
 			network.send(ADDRESS, thymioMessage.encode());
 		}
 		
@@ -99,6 +107,11 @@ public class CameraTracker implements Updatable, Serializable {
 		}
 		
 		return currentOrientation;
+	}
+	
+	public double getOrientationWithError(double heading) {
+		double error = orientationError*simulator.getRandom().nextDouble()*2-orientationError;
+		return heading+error;
 	}
 	
 }
