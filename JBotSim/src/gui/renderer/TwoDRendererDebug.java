@@ -249,7 +249,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		int y = (int) (transformY(nest.getPosition().getY()) - circleDiameter / 2);
 
 		if(paperSensors)
-			graphics2.setColor(Color.GREEN.darker());
+			graphics2.setColor(Color.GRAY.darker());
 		else
 			graphics2.setColor(nest.getColor());
 		
