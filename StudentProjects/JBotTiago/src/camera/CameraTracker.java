@@ -8,7 +8,7 @@ import simulation.Simulator;
 import simulation.Updatable;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
-import simulation.robot.sensors.CompassSensor;
+
 import commoninterface.mathutils.Vector2d;
 import commoninterface.network.broadcast.VirtualPositionBroadcastMessage;
 import commoninterface.network.broadcast.VirtualPositionBroadcastMessage.VirtualPositionType;
@@ -111,7 +111,7 @@ public class CameraTracker implements Updatable, Serializable {
 	
 	public double getOrientationWithError(double heading) {
 		double error = orientationError*simulator.getRandom().nextDouble()*2-orientationError;
-		return heading+error;
+		return heading+Math.toRadians(error);
 	}
 	
 }

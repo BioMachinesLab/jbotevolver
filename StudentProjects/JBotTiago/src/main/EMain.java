@@ -13,7 +13,7 @@ public class EMain {
 	public static void main(String[] args) throws Exception {
 
 //		 String configName = "thymioci_forage.conf";
-		 String configName = "thymioci_forage_lag.conf";
+		 String configName = "thymioci_camera.conf";
 		// long time = System.currentTimeMillis();
 
 		try {
