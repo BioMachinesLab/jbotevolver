@@ -409,8 +409,9 @@ public class EvolutionGui extends Gui {
 								Simulator sim = jBotEvolver.createSimulator(new Random());
 								sim.addCallback(jBotEvolver.getEvaluationFunction());
 								sim.addCallback(this);
-								ArrayList<Robot> robots = jBotEvolver.createRobots(sim);
-								jBotEvolver.setChromosome(robots, evo.getPopulation().getBestChromosome());
+//								ArrayList<Robot> robots = jBotEvolver.createRobots(sim);
+//								jBotEvolver.setChromosome(robots, evo.getPopulation().getBestChromosome());
+								ArrayList<Robot> robots = jBotEvolver.createRobots(sim, evo.getPopulation().getBestChromosome());
 								sim.addRobots(robots);
 								sim.setupEnvironment();
 								

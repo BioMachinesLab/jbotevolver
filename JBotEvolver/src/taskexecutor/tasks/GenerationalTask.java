@@ -33,8 +33,9 @@ public class GenerationalTask extends JBotEvolverTask {
 			Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
 			simulator.setFileProvider(getFileProvider());
 			
-			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
-			jBotEvolver.setChromosome(robots, chromosome);
+//			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
+//			jBotEvolver.setChromosome(robots, chromosome);
+			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator, chromosome);
 			simulator.addRobots(robots);
 			
 			EvaluationFunction eval = EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get("--evaluation"));

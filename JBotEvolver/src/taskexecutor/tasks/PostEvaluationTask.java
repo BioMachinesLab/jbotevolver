@@ -39,8 +39,9 @@ public class PostEvaluationTask extends JBotEvolverTask {
 			
 			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
 			
-			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
-			jBotEvolver.setChromosome(robots, chromosome);
+//			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
+//			jBotEvolver.setChromosome(robots, chromosome);
+			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator, chromosome);
 			simulator.addRobots(robots);
 			
 			EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
