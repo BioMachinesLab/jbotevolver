@@ -152,8 +152,7 @@ public class Graph extends JPanel {
 			g2.draw(new Line2D.Double(pad, mousePosition.getY(), lw, mousePosition.getY()));
 			
 			g2.setStroke(originalStroke);
-		}else
-			repaint();
+		}
 	}
 
 	private void drawLegends(Graphics2D g2) {
