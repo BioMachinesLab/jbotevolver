@@ -13,6 +13,7 @@ import java.awt.image.BufferedImage;
 import mathutils.Point2d;
 import mathutils.Vector2d;
 import net.jafama.FastMath;
+import simulation.environment.Environment;
 import simulation.physicalobjects.GroundBand;
 import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.Line;
@@ -124,6 +125,9 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				}
 			}
 		}
+		
+		drawArea(graphics, simulator.getEnvironment());
+		
 		repaint();
 	}
 	
@@ -132,6 +136,10 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	}
 	
 	protected void drawCones(Graphics g, Robot robot){
+		
+	}
+	
+	protected void drawArea(Graphics g, Environment environment){
 		
 	}
 	

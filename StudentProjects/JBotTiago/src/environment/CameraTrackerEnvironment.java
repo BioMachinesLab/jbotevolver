@@ -28,6 +28,8 @@ public class CameraTrackerEnvironment extends Environment {
 	private int lag = 0;
 	@ArgumentsAnnotation(name="orientationerror", defaultValue = "0.0")
 	private double orientationError = 0;
+	@ArgumentsAnnotation(name="randomsize", defaultValue = "0")
+	private boolean randomSize;
 	
 	public CameraTrackerEnvironment(Simulator simulator, Arguments args) {
 		super(simulator, args);
@@ -37,11 +39,19 @@ public class CameraTrackerEnvironment extends Environment {
 		numberOfPreys = args.getArgumentAsIntOrSetDefault("numberofpreys", numberOfPreys);
 		lag = args.getArgumentAsIntOrSetDefault("lag", lag);
 		orientationError = args.getArgumentAsDoubleOrSetDefault("orientationerror", orientationError);
+		randomSize = args.getArgumentAsIntOrSetDefault("randomsize", 0) == 1;
 	}
 
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
+		
+		if(randomSize){
+			//1.5 - 2.5
+			width = random.nextDouble() + 1.5;
+			//0.8 - 1
+			height = random.nextDouble() + 0.8;
+		}
 		
 		for (int i = 0; i < numberOfPreys; i++)
 			addPrey(new Prey(simulator, "Prey_"+i, newRandomPosition(), 0, PREY_MASS, PREY_RADIUS));

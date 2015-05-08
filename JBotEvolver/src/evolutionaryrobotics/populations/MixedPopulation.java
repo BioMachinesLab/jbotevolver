@@ -1,63 +1,28 @@
 package evolutionaryrobotics.populations;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import controllers.FixedLenghtGenomeEvolvableController;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
-import simulation.robot.Robot;
 import simulation.util.Arguments;
-import simulation.util.ArgumentsAnnotation;
+import evolutionaryrobotics.evolution.JoinedGenerationalEvolution;
+import evolutionaryrobotics.neuralnetworks.Chromosome;
+import evolutionaryrobotics.neuralnetworks.MultipleChromosome;
 
-/**
- * Implements a [mu, lambda] evolutionary algorithm with rank-based selection
- * and elitism.
- * 
- * @author alc
- */
+public class MixedPopulation extends MuLambdaPopulation{
 
-public class MuLambdaPopulation extends Population implements Serializable {
-	private static final long serialVersionUID = 1L;
+	protected int numberOfGenomes = JoinedGenerationalEvolution.CHROM_NUM;
+	protected int[] genomeLengths;
 
-	protected int genomelength;
-	@ArgumentsAnnotation(name="size", defaultValue="100")
-	protected int populationSize;
-	protected int currentGeneration;
-	protected Chromosome bestChromosome;
-	protected Chromosome chromosomes[];
-
-	protected double bestFitness;
-	protected double accumulatedFitness;
-	protected double worstFitness;
-	protected int numberOfChromosomesEvaluated;
-	protected int nextChromosomeToEvaluate;
-	protected int numberOfElites = 5;
-	protected int lambda = 5;
-	protected boolean fitnessThresholdReached = false;
-	
-	protected double[] initialWeights;
-	protected boolean fixedInitialPopulation = false;
-
-	public MuLambdaPopulation(Arguments arguments) {
+	public MixedPopulation(Arguments arguments) {
 		super(arguments);
-		populationSize = arguments.getArgumentAsIntOrSetDefault("size",100);
-		numberOfGenerations = arguments.getArgumentAsIntOrSetDefault("generations",100);
-		numberOfSamplesPerChromosome = arguments.getArgumentAsIntOrSetDefault("samples",5);
-		mutationRate = arguments.getArgumentAsDoubleOrSetDefault("mutationrate", 0.1);
 		
-		genomelength = arguments.getArgumentAsInt("genomelength");
-		
-		fixedInitialPopulation = arguments.getArgumentAsIntOrSetDefault("fixedinitialpopulation", 0) == 1;
-		
-		if(fixedInitialPopulation) {
-			if(arguments.getArgumentIsDefined("initialweights")) {
-				String[] rawArray = arguments.getArgumentAsString("initialweights").split(",");
-				initialWeights = new double[rawArray.length];
-				for(int i = 0 ; i < initialWeights.length ; i++)
-					initialWeights[i] = Double.parseDouble(rawArray[i]);
-			} 
+		//Getting the genome lengths
+		String values = arguments.getArgumentAsString("genomelengthstr");
+		String[] split = values.trim().split(":");
+		genomeLengths = new int[numberOfGenomes];
+		for(int i = 0; i < numberOfGenomes; i++){
+			genomeLengths[i] = Integer.parseInt(split[i+1].trim());
 		}
 	}
 
@@ -73,10 +38,9 @@ public class MuLambdaPopulation extends Population implements Serializable {
 		fitnessThresholdReached = checkFitnessThreshold(bestFitness);
 
 		LinkedList<Chromosome> sortedChromosomes = new LinkedList<Chromosome>();
-		for (int i = 0; i < populationSize; i++) {
+		for (int i = 0; i < populationSize; i++)
 			sortedChromosomes.add(chromosomes[i]);
-		}
-		
+
 		Collections.sort(sortedChromosomes,
 				new Chromosome.CompareChromosomeFitness());
 
@@ -105,9 +69,9 @@ public class MuLambdaPopulation extends Population implements Serializable {
 
 		for (int i = 0; i < numberOfElites; i++) {
 
-			Chromosome eliteChromosome = new Chromosome(sortedIterator.next()
-					.getAlleles(), i);
-			chromosomes[i] = eliteChromosome;
+			MultipleChromosome eliteChromosome = new MultipleChromosome(sortedIterator.next()
+					.getAlleles(), i, genomeLengths, numberOfGenomes);
+			chromosomes[i] =  eliteChromosome;
 		}
 
 		// Do the reproduction:
@@ -134,8 +98,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 				alleles[j] = allele;
 			}
 
-			chromosomes[numberOfElites + i] = new Chromosome(alleles,
-					numberOfElites + i);
+			chromosomes[numberOfElites + i] = new MultipleChromosome(alleles, numberOfElites + i, genomeLengths, numberOfGenomes);
 		}
 
 		resetGeneration();
@@ -159,11 +122,15 @@ public class MuLambdaPopulation extends Population implements Serializable {
 
 		randomNumberGenerator.setSeed(getGenerationRandomSeed());
 
-		chromosomes = new Chromosome[populationSize];
+		chromosomes = new MultipleChromosome[populationSize];
 		
 		if(fixedInitialPopulation) {
 			for (int i = 0; i < populationSize; i++) {
-				chromosomes[i] = new Chromosome(initialWeights, i);
+				double[] alleles = new double[initialWeights.length*numberOfGenomes];
+				for(int j = 0; j<numberOfGenomes; j++){
+					alleles = MultipleChromosome.concatArray(alleles, initialWeights);
+				}
+				chromosomes[i] = new MultipleChromosome(alleles, i, genomeLengths, numberOfGenomes);				
 			}
 			bestChromosome = chromosomes[0];
 		} else {
@@ -172,7 +139,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 				for (int j = 0; j < genomelength; j++) {
 					alleles[j] = randomNumberGenerator.nextGaussian() * 2;
 				}
-				chromosomes[i] = new Chromosome(alleles, i);
+				chromosomes[i] = new MultipleChromosome(alleles, i, genomeLengths, numberOfGenomes);
 			}
 		}
 
@@ -264,53 +231,5 @@ public class MuLambdaPopulation extends Population implements Serializable {
 		if (fitness < worstFitness) {
 			worstFitness = fitness;
 		}
-	}
 
-	@Override
-	public void setEvaluationResultForId(int pos, double fitness) {
-		if (pos >= populationSize) {
-			throw new java.lang.RuntimeException("No such position: " + pos
-					+ " on the population");
-		}
-
-		chromosomes[pos].setFitness(fitness);
-		numberOfChromosomesEvaluated++;
-		accumulatedFitness += fitness;
-
-		if (fitness > bestFitness) {
-			bestChromosome = chromosomes[pos];
-			bestFitness = fitness;
-		}
-
-		if (fitness < worstFitness) {
-			worstFitness = fitness;
-		}
-
-	}
-
-	// @Override
-	public boolean evolutionDone() {
-		if (currentGeneration >= numberOfGenerations ||
-				(currentGeneration == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == populationSize) ||
-				fitnessThresholdReached)
-			return true;
-		else
-			return false;
-	}
-
-	@Override
-	public Chromosome getChromosome(int chromosomeId) {
-		return chromosomes[chromosomeId];
-	}
-	
-	@Override
-	public void setupIndividual(Robot r) {
-		Chromosome c = getBestChromosome();
-		if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
-			FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
-			if(fc.getNNWeights() == null) {
-				fc.setNNWeights(c.getAlleles());
-			}
-		}
-	}
-}
+}}

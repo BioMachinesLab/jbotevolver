@@ -69,11 +69,11 @@ public class Robot extends MovableObject {
 	@ArgumentsAnnotation(name = "color", values={"black","blue","cyan","dark gray","gray"
 			,"green","light gray","magneta","orange","pink","red","white","yellow"})
 	private Color color;
-	@ArgumentsAnnotation(name="numberOfRobots", defaultValue = "1")
-	private static int numberOfRobots;
+	
 	@ArgumentsAnnotation(name="variablenumber", values={"0","1"})
 	private static int variableNumber;
 	
+	@ArgumentsAnnotation(name="numberOfRobots", defaultValue = "1")
 	private Color ledColor;
 	private LedState ledState;
 	
@@ -415,7 +415,7 @@ public class Robot extends MovableObject {
 	}
 	
 	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
-		numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+		int numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
 		variableNumber = arguments.getArgumentAsIntOrSetDefault("variablenumber", 0);
 		
 		if(variableNumber == 1) {

@@ -43,16 +43,6 @@ public class JBotSim implements Serializable{
 		return createSimulator(new Random(seed));
 	}
 	
-	public ArrayList<Robot> createRobots(Simulator simulator, int numberOfRobots) {
-		ArrayList<Robot> result = new ArrayList<Robot>(numberOfRobots);
-		
-		for (int i = 0; i < numberOfRobots; i++) {
-			Robot r = createOneRobot(simulator, arguments.get("--robots"), arguments.get("--controllers"));
-			result.add(r);
-		}
-		return result;
-	}
-	
 	public ArrayList<Robot> createRobots(Simulator simulator) {
 		ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
 		for(Robot r : robots) {

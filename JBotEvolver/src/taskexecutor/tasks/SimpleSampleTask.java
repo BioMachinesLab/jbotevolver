@@ -35,8 +35,9 @@ public class SimpleSampleTask extends JBotEvolverTask {
 		Simulator simulator = jBotEvolver.createSimulator(new Random(randomSeed));
 		simulator.setFileProvider(getFileProvider());
 		
-		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
-		jBotEvolver.setChromosome(robots, chromosome);
+//		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
+//		jBotEvolver.setChromosome(robots, chromosome);
+		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator, chromosome);
 		simulator.addRobots(robots);
 		
 		EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
