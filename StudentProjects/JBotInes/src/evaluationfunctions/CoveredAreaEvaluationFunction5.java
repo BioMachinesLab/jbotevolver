@@ -90,14 +90,11 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 			for(int i = downLeft.getY(); i < upLeft.getY()+1; i++){
 				for(int j = downLeft.getX(); j < downRight.getX(); j++){
 					Cell c = new Cell(j, i);
-					if(grid.contains(c)){
-						int index = grid.indexOf(c);
-						if(!grid.get(index).isVisited()){
-							grid.get(index).setVisited(true);
-							exploreFitness++;
-						}
+					int index = grid.indexOf(c);
+					if(index != -1 && !grid.get(index).isVisited()){
+						grid.get(index).setVisited(true);
+						exploreFitness++;
 					}
-
 				}
 			}
 			//System.out.println(exploreFitness);
@@ -110,7 +107,7 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 
 					//explore fitness
 					//						Cell c = new Cell((int)(r.getPosition().x/cell_width), (int)(r.getPosition().y/cell_width));
-					//						if(grid.contains(c)){
+					//						if(grid.contains(ca)){
 					//							int index = grid.indexOf(c);
 					//							if(!grid.get(index).isVisited()){
 					//								grid.get(index).setVisited(true);
@@ -145,14 +142,15 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 		//	*immediate neighbors
 		//	*get preys while connected; area is irrelevant -> covarea6
 
-		//explore1 0.001
-		//explore2 0.0001
 
 		//		System.out.println("Area fitness: " + (areaCovered* area_percentage));
 		//		System.out.println("Prey fitness: " + (preyFitness* prey_percentage));
 		//		System.out.println("Numb of cells explored: " + exploreFitness);
 		//		System.out.println("Total this step: " + ((areaCovered*area_percentage)+(preyFitness* prey_percentage)));
 
+		
+		//rita enviroment/samples -> porpotion of types -> sample
+		//miguel neural network weights
 	}
 
 	@Override

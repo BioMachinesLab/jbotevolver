@@ -23,48 +23,50 @@ public class OpenEnvironment extends Environment {
 	private ArrayList<Robot> typeARobots = new ArrayList<Robot>();
 	private ArrayList<Robot> typeBRobots = new ArrayList<Robot>();
 	private ArrayList<Robot> preyRobots = new ArrayList<Robot>();
-
+	
 	private int numberOfFoodSuccessfullyForaged = 0;
 
 	private boolean preysExist;
 	private boolean specialBehavior;
-	
+
 	private Random random;
-	
+
 	private double rangeB;
 	private boolean connected;
 	private Vector2d centerOfMass = new Vector2d(0,0);
 	private LinkedList<Cell> grid = new LinkedList<Cell>();
 	private static int CELLS = 50;
-	private boolean updateConnected;
 	
+	private ArrayList<Vertex> vertex = new ArrayList<Vertex>();
+
 	public OpenEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 		random = simulator.getRandom();
-		
+
 		preysExist = arguments.getArgumentAsIntOrSetDefault("preysexist", 0) == 1;
 		specialBehavior = arguments.getArgumentAsIntOrSetDefault("specialbehavior", 0)==1; 
-		updateConnected = arguments.getArgumentAsIntOrSetDefault("updateconnected", 1)==1;
-		
+
 		for(int i = -CELLS; i < CELLS; i++){
 			for(int j = -CELLS; j < CELLS; j++){
 				grid.add(new Cell(j, i));
 			}
 		}
-		
+
 		//System.out.println(grid.toString());
-	
+
 	}
 
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
-		
+
 		for(Robot r: getRobots()){
 			if(r.getDescription().equals(DESC_A))
 				typeARobots.add(r);
 			else if(r.getDescription().equals(DESC_B)) {
-					typeBRobots.add(r);
+				typeBRobots.add(r);
+				Vertex v = new Vertex(r.getId());
+				vertex.add(v);
 			} 
 		}
 
@@ -89,11 +91,11 @@ public class OpenEnvironment extends Environment {
 		double angle = random.nextDouble()*2*Math.PI;
 		return new Vector2d(radius*Math.cos(angle) + centerOfMass.x, radius*Math.sin(angle) + centerOfMass.y);
 	}
-	
+
 	private void updateCenterOfMass() {
 		double totalX = 0;
 		double totalY = 0;
-		
+
 		for(Robot b: typeBRobots){
 			totalX += b.getPosition().x;
 			totalY += b.getPosition().y;
@@ -104,36 +106,25 @@ public class OpenEnvironment extends Environment {
 		}
 		double centerX = totalX/(typeARobots.size() + typeBRobots.size());
 		double centerY = totalY/(typeARobots.size() + typeBRobots.size());
-		
+
 		centerOfMass = new Vector2d(centerX, centerY);	
 	}
 
 	@Override
 	public void update(double time) {
-		
-		if(updateConnected)
-			updateConnected();
-		
+		updateConnected();
 	}
 
 	private void updateConnected() {
 		updateCenterOfMass();
-		
+
 		TypeBRobotSensor sensorB = (TypeBRobotSensor) typeBRobots.get(0).getSensorByType(TypeBRobotSensor.class);
 		rangeB = sensorB.getRange();
 
-		ArrayList<Vertex> vertex = new ArrayList<Vertex>();
 		ArrayList<Edge> edges = new ArrayList<Edge>();
 
-		ArrayList<Robot> temp = new ArrayList<Robot>();
-		for(Robot b: typeBRobots){
-			temp.add(b);
-			Vertex v = new Vertex(b.getId());
-			vertex.add(v);
-		}
-
 		for(Robot b: typeBRobots) {
-			for(Robot r: temp) {
+			for(Robot r: typeBRobots) {
 				if(!r.equals(b) && r.getPosition().distanceTo(b.getPosition()) <= rangeB - r.getDiameter()) {
 					Edge edge = null;
 					if(r.getId() < b.getId())
@@ -159,8 +150,6 @@ public class OpenEnvironment extends Environment {
 				connected = false;
 		}
 
-
-
 		int numberOfNodes = vertex.size();
 		LinkedList<Vertex> closed = new LinkedList<Vertex>();
 
@@ -179,8 +168,6 @@ public class OpenEnvironment extends Environment {
 				int index = vertex.indexOf(edge.getNeighbour(closingVertex));
 				if(!closed.contains(vertex.get(index)))
 					openList.push(vertex.get(index));
-
-
 			}
 		}
 
@@ -191,8 +178,8 @@ public class OpenEnvironment extends Environment {
 
 		if(closed.size() != numberOfNodes) 
 			connected = false;
-		
-		
+
+
 		if(preysExist){
 			for(Robot r: getRobots()){
 				if(!r.getDescription().equals("prey")){
@@ -212,7 +199,7 @@ public class OpenEnvironment extends Environment {
 	public Vector2d getCenterOfMass() {
 		return centerOfMass;
 	}
-	
+
 	public int getNumberOfFoodSuccessfullyForaged() {
 		return numberOfFoodSuccessfullyForaged;
 	}
@@ -228,11 +215,11 @@ public class OpenEnvironment extends Environment {
 	public ArrayList<Robot> getPreyRobots() {
 		return preyRobots;
 	}
-	
+
 	public boolean isConnected() {
 		return connected;
 	}
-	
+
 	public LinkedList<Cell> getGrid() {
 		return grid;
 	}

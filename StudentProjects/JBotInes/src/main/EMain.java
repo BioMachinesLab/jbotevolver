@@ -10,7 +10,7 @@ import simulation.util.Arguments;
 public class EMain {
 
 	public static void main(String[] args) {
-		String configName="joined2.conf";
+		String configName="experiments/joined2.conf";
 //		String configName="sensor_tests/_restartevolution.conf";
 		try {
 			args = new String[]{configName};
