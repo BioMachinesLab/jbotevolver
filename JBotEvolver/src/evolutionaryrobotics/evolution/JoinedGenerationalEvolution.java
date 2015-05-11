@@ -18,20 +18,24 @@ import evolutionaryrobotics.util.DiskStorage;
 
 public class JoinedGenerationalEvolution extends Evolution{
 	
-	public static int CHROM_NUM = 2;
 	protected Population population;
 	@ArgumentsAnnotation(name="supressmessages", values={"0","1"}, help="Set to 1 to show information about the evolution on the java console")
 	protected boolean supressMessages = false;
 	protected DiskStorage diskStorage;
 	protected String output = "";
 	protected DecimalFormat df = new DecimalFormat("#.##");
+	private int numberOfChromossomes;
 
 	public JoinedGenerationalEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
 		
+		numberOfChromossomes = args.getArgumentAsIntOrSetDefault("numberofchromossomes", 2);
+		
 		Arguments populationArguments = jBotEvolver.getArguments().get("--population");
 		populationArguments.setArgument("genomelengthstr", getGenomeLengthStr());
 		populationArguments.setArgument("genomelength", getGenomeLength());
+		populationArguments.setArgument("numberofchromossomes", numberOfChromossomes);
+		
 		supressMessages = args.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
 		
 		try {
@@ -128,7 +132,7 @@ public class JoinedGenerationalEvolution extends Evolution{
 		
 		String genomeLengthInfo = "";
 		
-		for(int i = 0; i < CHROM_NUM; i++){
+		for(int i = 0; i < numberOfChromossomes; i++){
 			
 			Robot r = null;
 			
@@ -158,7 +162,7 @@ public class JoinedGenerationalEvolution extends Evolution{
 		
 		int totalGenomeLength = 0;
 		
-		for(int i = 0; i < CHROM_NUM; i++){
+		for(int i = 0; i < numberOfChromossomes; i++){
 			
 			Robot r = null;
 			
