@@ -15,6 +15,7 @@ public class PhysicalObject extends SimulatorObject implements
 	protected double orientation;
 	private int id;
 	private boolean involvedInCollison = false;
+	private boolean involvedInCollisonWall = false;
 	private PhysicalObjectType type;
 	public Shape shape = null;
 	private boolean invisible = false;
@@ -117,8 +118,16 @@ public class PhysicalObject extends SimulatorObject implements
 		return involvedInCollison;
 	}
 
+	public boolean isInvolvedInCollisonWall() {
+		return involvedInCollisonWall;
+	}
+	
 	public void setInvolvedInCollison(boolean involvedInCollison) {
 		this.involvedInCollison = involvedInCollison;
+	}
+	
+	public void setInvolvedInCollisonWall(boolean involvedInCollisonWall) {
+		this.involvedInCollisonWall = involvedInCollisonWall;
 	}
 
 	public boolean isEnabled() {
