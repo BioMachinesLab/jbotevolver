@@ -23,7 +23,7 @@ public class OpenEnvironment extends Environment {
 	private ArrayList<Robot> typeARobots = new ArrayList<Robot>();
 	private ArrayList<Robot> typeBRobots = new ArrayList<Robot>();
 	private ArrayList<Robot> preyRobots = new ArrayList<Robot>();
-	
+
 	private int numberOfFoodSuccessfullyForaged = 0;
 
 	private boolean preysExist;
@@ -36,7 +36,7 @@ public class OpenEnvironment extends Environment {
 	private Vector2d centerOfMass = new Vector2d(0,0);
 	private LinkedList<Cell> grid = new LinkedList<Cell>();
 	private static int CELLS = 50;
-	
+
 	private ArrayList<Vertex> vertex = new ArrayList<Vertex>();
 
 	public OpenEnvironment(Simulator simulator, Arguments arguments) {
@@ -181,17 +181,16 @@ public class OpenEnvironment extends Environment {
 
 
 		if(preysExist){
-			for(Robot r: getRobots()){
-				if(!r.getDescription().equals("prey")){
-					for(Robot prey: preyRobots){
-						double distance = prey.getPosition().distanceTo(r.getPosition());
-						if(distance < (r.getRadius() + 0.05)) {
-							if(connected)
-								numberOfFoodSuccessfullyForaged++;
-							prey.teleportTo(newRandomPosition());
-						}
+			for(Robot r: typeARobots){
+				for(Robot prey: preyRobots){
+					double distance = prey.getPosition().distanceTo(r.getPosition());
+					if(distance < (r.getRadius() + 0.05)) {
+						if(connected)
+							numberOfFoodSuccessfullyForaged++;
+						prey.teleportTo(newRandomPosition());
 					}
 				}
+
 			}
 		}
 	}
