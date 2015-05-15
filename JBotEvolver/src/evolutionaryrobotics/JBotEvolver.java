@@ -81,7 +81,10 @@ public ArrayList<Robot> createRobots(Simulator simulator, Chromosome chromosome)
 				}
 				
 				for(Robot r : robots) {
-					r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
+					if(i == 0)
+						r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
+					else
+						r.setController(Controller.getController(simulator, r, arguments.get("--controllers" + i)));
 					totalRobots.add(r);
 					
 					Chromosome subChromosome = c.getChromosome(i);

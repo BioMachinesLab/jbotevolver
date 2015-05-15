@@ -141,7 +141,12 @@ public class JoinedGenerationalEvolution extends Evolution{
 			else
 				 r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots" + i));
 			
-			Controller ctl = Controller.getController(sim, r, jBotEvolver.getArguments().get("--controllers"));
+			Controller ctl;
+			
+			if(i == 0)
+				ctl = Controller.getController(sim, r, jBotEvolver.getArguments().get("--controllers"));
+			else
+				ctl = Controller.getController(sim, r, jBotEvolver.getArguments().get("--controllers" + i));
 			
 			int genomeLength = 0;
 			
@@ -171,7 +176,12 @@ public class JoinedGenerationalEvolution extends Evolution{
 			else
 				 r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots" + i));
 			
-			Controller ctl = Controller.getController(sim, r, jBotEvolver.getArguments().get("--controllers"));
+			Controller ctl = null;
+			
+			if(i == 0)
+				ctl = Controller.getController(sim, r, jBotEvolver.getArguments().get("--controllers"));
+			else
+				ctl = Controller.getController(sim, r, jBotEvolver.getArguments().get("--controllers" + i));
 					
 			int genomeLength = 0;
 			
