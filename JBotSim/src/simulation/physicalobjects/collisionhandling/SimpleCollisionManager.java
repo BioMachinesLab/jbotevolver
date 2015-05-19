@@ -29,6 +29,7 @@ public class SimpleCollisionManager extends CollisionManager {
 
 		for (MovableObject mo : environment.getMovableObjects()) {
 			mo.setInvolvedInCollison(false);
+			mo.setInvolvedInCollisonWall(false);
 			mo.shape.computeNewPositionAndOrientationFromParent();
 			mo.shape.getCloseRobot().update(time, environment.getTeleported());
 			mo.shape.getClosePrey().update(time, environment.getTeleported());
@@ -69,7 +70,9 @@ public class SimpleCollisionManager extends CollisionManager {
 
 		//robot - wall
 		for (Robot robot : environment.getRobots()) {
-
+			if(robot.ignoreWallCollisions()){
+				continue;
+			}
 			ClosePhysicalObjects closeWalls = robot.shape.getCloseWalls();
 			CloseObjectIterator iterator = closeWalls.iterator();
 			while (iterator.hasNext()) {
@@ -81,6 +84,7 @@ public class SimpleCollisionManager extends CollisionManager {
 							status);
 					robot.moveTo(newPosition);
 					robot.setInvolvedInCollison(true);
+					robot.setInvolvedInCollisonWall(true);
 					
 					robot.getCollidingObjects().add(closeWall);
 					

@@ -22,7 +22,7 @@ public class PreyPickerActuator extends Actuator {
 	}
 
 	@ArgumentsAnnotation(name="maxpickdistance", defaultValue="0.1")
-	private double maxPickDistance;
+	protected double maxPickDistance;
 	private PickerStatus status = PickerStatus.OFF;
 	private Vector2d temp = new Vector2d();
 	@ArgumentsAnnotation(name="stoprobot", help="Set to 1 to force robot to stop to pick up something.", values={"0","1"})
@@ -33,10 +33,10 @@ public class PreyPickerActuator extends Actuator {
 
 	public PreyPickerActuator(Simulator simulator, int id, Arguments arguments) {
 		super(simulator, id, arguments);
-		this.random = simulator.getRandom();
+		this.setRandom(simulator.getRandom());
 		this.maxPickDistance = arguments.getArgumentAsDoubleOrSetDefault("maxpickdistance", 0.1);
 
-		this.stopRobot = !arguments.getFlagIsFalse("stoprobot");
+		this.setStopRobot(!arguments.getFlagIsFalse("stoprobot"));
 	}
 
 	public double getMaxPickDistance() {
@@ -44,22 +44,22 @@ public class PreyPickerActuator extends Actuator {
 	}
 	
 	public void pick() {
-		status = PickerStatus.PICK;
+		setStatus(PickerStatus.PICK);
 	}
 
 	public void drop() {
-		status = PickerStatus.DROP;
+		setStatus(PickerStatus.DROP);
 	}
 
 	public void reset() {
-		status = PickerStatus.OFF;
+		setStatus(PickerStatus.OFF);
 	}
 
 	@Override
 	public void apply(Robot robot) {
-		if (status != PickerStatus.OFF) {
-			if (status == PickerStatus.PICK) {
-				if ((random.nextFloat() > NOISESTDEV) && !isCarryingPrey()) {
+		if (getStatus() != PickerStatus.OFF) {
+			if (getStatus() == PickerStatus.PICK) {
+				if ((getRandom().nextFloat() > NOISESTDEV) && !isCarryingPrey()) {
 					double bestLength = maxPickDistance;
 					Prey bestPrey = null;
 					ClosePhysicalObjects closePreys = robot.shape.getClosePrey();
@@ -67,9 +67,9 @@ public class PreyPickerActuator extends Actuator {
 					while (iterator.hasNext()) {
 						Prey closePrey = (Prey) (iterator.next().getObject());
 						if (closePrey.isEnabled()) {
-							temp.set(closePrey.getPosition());
-							temp.sub(robot.getPosition());
-							double length = temp.length() - robot.getRadius();
+							getTemp().set(closePrey.getPosition());
+							getTemp().sub(robot.getPosition());
+							double length = getTemp().length() - robot.getRadius();
 							if (length < bestLength) {
 								bestPrey = closePrey;
 								bestLength = length;
@@ -79,11 +79,11 @@ public class PreyPickerActuator extends Actuator {
 					if (bestPrey != null) {
 						pickUpPrey(robot, bestPrey);
 					} else {
-						status = PickerStatus.OFF;
+						setStatus(PickerStatus.OFF);
 					}
 
 					// Stop robot
-					if (stopRobot) {
+					if (isStopRobot()) {
 						if(robot instanceof DifferentialDriveRobot) {
 							DifferentialDriveRobot ddr = (DifferentialDriveRobot)robot;
 							ddr.setWheelSpeed(0,0);
@@ -103,7 +103,7 @@ public class PreyPickerActuator extends Actuator {
 					prey.teleportTo(newPosition);
 
 					// Stop robot
-					if (stopRobot) {
+					if (isStopRobot()) {
 						if(robot instanceof DifferentialDriveRobot) {
 							DifferentialDriveRobot ddr = (DifferentialDriveRobot)robot;
 							ddr.setWheelSpeed(0,0);
@@ -164,7 +164,35 @@ public class PreyPickerActuator extends Actuator {
 	@Override
 	public String toString() {
 		return "PreyPickerActuator [maxPickDistance=" + maxPickDistance
-				+ ", status=" + status + "]";
+				+ ", status=" + getStatus() + "]";
+	}
+
+	public void setStatus(PickerStatus status) {
+		this.status = status;
+	}
+
+	public Vector2d getTemp() {
+		return temp;
+	}
+
+	public void setTemp(Vector2d temp) {
+		this.temp = temp;
+	}
+
+	public boolean isStopRobot() {
+		return stopRobot;
+	}
+
+	public void setStopRobot(boolean stopRobot) {
+		this.stopRobot = stopRobot;
+	}
+
+	public Random getRandom() {
+		return random;
+	}
+
+	public void setRandom(Random random) {
+		this.random = random;
 	}
 
 }
