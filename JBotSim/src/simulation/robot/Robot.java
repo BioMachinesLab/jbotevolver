@@ -511,4 +511,9 @@ public class Robot extends MovableObject {
 	public void setLedState(LedState ledState) {
 		this.ledState = ledState;
 	}
+	
+	public boolean ignoreWallCollisions() {
+		return false;
+	}
+	
 }
