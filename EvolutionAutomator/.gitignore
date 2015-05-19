@@ -5,4 +5,4 @@ bin
 .fatjar
 .project
 .settings
-.classpath
+/.classpath

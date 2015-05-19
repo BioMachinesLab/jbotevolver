@@ -38,8 +38,8 @@ public class SquaredWallEnvironment extends Environment {
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
 		
-		width = random.nextDouble() + 0.8;
-		height = random.nextDouble() + 0.8;
+		width = random.nextDouble() + 1.5;
+		height = random.nextDouble() + 1.5;
 
 		// Parede do mapa
 		walls.add(new Wall(simulator, "topWall", 0, height/2, Math.PI, 1, 1, 0, width, 0.05, PhysicalObjectType.WALL));
@@ -54,13 +54,38 @@ public class SquaredWallEnvironment extends Environment {
 			addObject(new Wall(simulator, "centralSquare", 0, 0, Math.PI, 1, 1, 0, squarelWidth, squareHeigth, PhysicalObjectType.WALL));
 		}
 		
+		int numRobots = getRobots().size();
+		
 		for (Robot r : getRobots()) {
 			r.setOrientation(random.nextDouble()*(2*Math.PI));
 			
 			double max = 0.5;
-			r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);
+			
+			if(numRobots > 1)
+				placeMultipleRobots(r, max);
+			else
+				r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);
+			
 		}
 		
+	}
+
+	private void placeMultipleRobots(Robot r, double max) {
+		double minDist = Double.MAX_VALUE;
+		
+		do{
+			r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);
+			
+			minDist = Double.MAX_VALUE;
+			for (Robot neighbor : getRobots()) {
+				if(r.getId() != neighbor.getId()){
+					double dist = r.getPosition().distanceTo(neighbor.getPosition());
+					if(dist < minDist)
+						minDist = dist;
+				}
+			}
+			
+		}while(minDist == Double.MAX_VALUE || minDist < 0.2);
 	}
 	
 	@Override

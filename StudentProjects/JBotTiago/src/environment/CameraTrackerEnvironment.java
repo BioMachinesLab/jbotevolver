@@ -67,7 +67,7 @@ public class CameraTrackerEnvironment extends Environment {
 		for (Robot r : getRobots()) {
 			r.setOrientation(random.nextDouble()*(2*Math.PI));
 			
-			double max = 0.5;
+			double max = 1;
 			r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);	
 		}
 		

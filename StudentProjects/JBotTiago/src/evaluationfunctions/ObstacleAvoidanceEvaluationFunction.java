@@ -32,10 +32,15 @@ public class ObstacleAvoidanceEvaluationFunction extends EvaluationFunction {
 			double p = percentages[0]+percentages[1];
 			fitness+=p/100;
 			
-			if(robot.isInvolvedInCollison())
+			if(robot.isInvolvedInCollison()){
+				fitness = -1;
 				simulator.stopSimulation();
+			}
 			
 		}
+		
+		fitness/=simulator.getRobots().size();
+		
 	}
 
 	@Override

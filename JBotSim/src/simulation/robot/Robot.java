@@ -73,7 +73,7 @@ public class Robot extends MovableObject {
 	@ArgumentsAnnotation(name="variablenumber", values={"0","1"})
 	private static int variableNumber;
 	
-	@ArgumentsAnnotation(name="numberOfRobots", defaultValue = "1")
+	@ArgumentsAnnotation(name="numberofrobots", defaultValue = "1")	
 	private Color ledColor;
 	private LedState ledState;
 	
@@ -425,7 +425,13 @@ public class Robot extends MovableObject {
 		
 		if(arguments.getArgumentIsDefined("randomizenumber")) {		
 			String[] rawArray = arguments.getArgumentAsString("randomizenumber").split(",");		
-			numberOfRobots = Integer.parseInt(rawArray[simulator.getRandom().nextInt(rawArray.length)]);		
+			numberOfRobots = Integer.parseInt(rawArray[simulator.getRandom().nextInt(rawArray.length)]);
+		}
+		
+		if(arguments.getArgumentIsDefined("totalrobots")) {		
+			int totalRobots = arguments.getArgumentAsInt("totalrobots");
+			int previousNumberOfRobots = arguments.getArgumentAsIntOrSetDefault("previousrobots", 0);
+			numberOfRobots = totalRobots - previousNumberOfRobots;
 		}
 		
 		if(arguments.getArgumentIsDefined("randomize")) {

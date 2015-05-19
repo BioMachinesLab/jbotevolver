@@ -212,7 +212,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		Main main = new Main(args);
-//		Main main = new Main(new String[]{"groundband_auto.conf"});
+//		Main main = new Main(new String[]{"boundaries_ea.conf"});
 		main.execute();
 	}
 }
