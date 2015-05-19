@@ -72,7 +72,7 @@ public class OpenEnvironment extends Environment {
 
 		if(preysExist){
 			Arguments programmedArgs = simulator.getArguments().get("--programmedrobots");
-			int programmedRobots = programmedArgs.getArgumentAsIntOrSetDefault("numberOfRobots", 1);
+			int programmedRobots = programmedArgs.getArgumentAsIntOrSetDefault("numberofrobots", 1);
 
 			for(int i = 0; i < programmedRobots; i++) {
 				Robot prey = Robot.getRobot(simulator, programmedArgs);

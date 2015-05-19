@@ -111,16 +111,52 @@ public class AutoArgumentsGeneration {
 }
 	
 	private static void configureNNOutputsAuto(HashMap<String,Arguments> arguments) {
-		if(arguments.get("--controllers") != null && arguments.get("--robots") != null) {
-			Arguments auto = getNNOutputsAutoForController(arguments.get("--controllers"),arguments.get("--robots"));
-			arguments.put("--controllers", auto);
-		}
+		
+		boolean keepExecuting = true;
+		int index = 0;
+		do{
+			String argName = "--controllers";
+			String robotArgName="--robots";
+			
+			if(index != 0){
+				argName+=index;
+				robotArgName+=index;
+			}
+			
+			index++;
+			
+			if(arguments.get(argName) != null && arguments.get(robotArgName) != null) {
+				Arguments auto = getNNOutputsAutoForController(arguments.get(argName),arguments.get(robotArgName));
+				arguments.put(argName, auto);
+			} else
+				keepExecuting = false;
+			
+		} while(keepExecuting);
+		
 	}
 	
 	private static void configureNNInputsAuto(HashMap<String,Arguments> arguments) {
-		if(arguments.get("--controllers") != null && arguments.get("--robots") != null) {
-			Arguments auto = getNNInputsAutoForController(arguments.get("--controllers"),arguments.get("--robots"));
-			arguments.put("--controllers", auto);
-		}
+		
+		boolean keepExecuting = true;
+		int index = 0;
+		do{
+			String argName = "--controllers";
+			String robotArgName="--robots";
+			
+			if(index != 0){
+				argName+=index;
+				robotArgName+=index;
+			}
+			
+			index++;
+			
+			if(arguments.get(argName) != null && arguments.get(robotArgName) != null) {
+				Arguments auto = getNNInputsAutoForController(arguments.get("--controllers"),arguments.get("--robots"));
+				arguments.put(argName, auto);
+			} else
+				keepExecuting = false;
+			
+		} while(keepExecuting);
+		
 	}
 }
