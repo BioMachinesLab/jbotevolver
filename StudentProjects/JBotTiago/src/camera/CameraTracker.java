@@ -70,13 +70,21 @@ public class CameraTracker implements Updatable, Serializable {
 			double orientationWithError = getOrientationWithError(currentThymioOrientation);
 			
 			VirtualPositionBroadcastMessage thymioMessage = new VirtualPositionBroadcastMessage(VirtualPositionType.ROBOT, ((Thymio)r).getNetworkAddress(), currentThymioPosition.x, currentThymioPosition.y, orientationWithError);
-			network.send(ADDRESS, thymioMessage.encode());
+			
+			String[] encodeMessages = thymioMessage.encode();
+			for (String em : encodeMessages)
+				network.send(ADDRESS, em);
+			
 		}
 		
 		for (Prey p : simulator.getEnvironment().getPrey()) {
 			Vector2d currentPreyPosition = new Vector2d(p.getPosition().x, p.getPosition().y);
 			VirtualPositionBroadcastMessage preyMessage = new VirtualPositionBroadcastMessage(VirtualPositionType.PREY,p.getName(), currentPreyPosition.x, currentPreyPosition.y, 0);
-			network.send(ADDRESS, preyMessage.encode());
+			
+			String[] encodeMessages = preyMessage.encode();
+			for (String em : encodeMessages)
+				network.send(ADDRESS, em);
+			
 		}
 		
 	}

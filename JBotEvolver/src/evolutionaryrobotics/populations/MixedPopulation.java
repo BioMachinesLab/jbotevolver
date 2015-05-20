@@ -11,7 +11,7 @@ import evolutionaryrobotics.neuralnetworks.MultipleChromosome;
 
 public class MixedPopulation extends MuLambdaPopulation{
 
-	protected int numberOfGenomes = JoinedGenerationalEvolution.CHROM_NUM;
+	protected int numberOfGenomes;
 	protected int[] genomeLengths;
 
 	public MixedPopulation(Arguments arguments) {
@@ -20,6 +20,8 @@ public class MixedPopulation extends MuLambdaPopulation{
 		//Getting the genome lengths
 		String values = arguments.getArgumentAsString("genomelengthstr");
 		String[] split = values.trim().split(":");
+		
+		numberOfGenomes = arguments.getArgumentAsInt("numberofchromossomes");
 		genomeLengths = new int[numberOfGenomes];
 		for(int i = 0; i < numberOfGenomes; i++){
 			genomeLengths[i] = Integer.parseInt(split[i+1].trim());

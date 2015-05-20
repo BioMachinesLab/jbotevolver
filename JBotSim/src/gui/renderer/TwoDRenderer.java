@@ -101,7 +101,6 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					break;
 				case ROBOT:
 					drawCones(graphics, (Robot) m);
-					drawEntities(graphics, (Robot) m);
 					numberOfRobots ++;
 					break;
 				case WALLBUTTON:
@@ -122,6 +121,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					drawRobot(graphics, (Robot) m);
 					if(numberOfRobots > 1 && darIds)
 						drawRobotId(graphics, (Robot) m);
+					drawEntities(graphics, (Robot) m);
 				}
 			}
 		}

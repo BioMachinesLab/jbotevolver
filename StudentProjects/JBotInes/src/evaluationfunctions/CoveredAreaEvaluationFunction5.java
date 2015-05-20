@@ -102,9 +102,12 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 
 			for(Robot r: simulator.getEnvironment().getRobots()){
 
-				if((r.getDescription().equals("type0") && r.getSensorByType(NearTypeBRobotSensor.class).getSensorReading(0)==1)
-						|| r.getDescription().equals("type1")) {
+				if((r.getDescription().equals("type0") && r.getSensorByType(NearTypeBRobotSensor.class).getSensorReading(0)==1)) {
 
+					
+//					if((r.getDescription().equals("type0") && r.getSensorByType(NearTypeBRobotSensor.class).getSensorReading(0)==1)
+//							|| r.getDescription().equals("type1")) {
+					
 					//explore fitness
 					//						Cell c = new Cell((int)(r.getPosition().x/cell_width), (int)(r.getPosition().y/cell_width));
 					//						if(grid.contains(ca)){
@@ -143,14 +146,13 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 		//	*get preys while connected; area is irrelevant -> covarea6
 
 
-		//		System.out.println("Area fitness: " + (areaCovered* area_percentage));
-		//		System.out.println("Prey fitness: " + (preyFitness* prey_percentage));
+		//		System.out.println("Area fitness: " + (areaCovered * area_percentage));
+		//		System.out.println("Prey fitness: " + (preyFitness * prey_percentage));
 		//		System.out.println("Numb of cells explored: " + exploreFitness);
-		//		System.out.println("Total this step: " + ((areaCovered*area_percentage)+(preyFitness* prey_percentage)));
+		//		System.out.println("Total this step: " + ((areaCovered*area_percentage)+(preyFitness * prey_percentage)));
 
 		
-		//rita enviroment/samples -> porpotion of types -> sample
-		//miguel neural network weights
+		//neural network weights
 	}
 
 	@Override

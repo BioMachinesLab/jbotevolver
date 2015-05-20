@@ -11,7 +11,6 @@ import simulation.physicalobjects.PhysicalObject;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.util.Arguments;
 import actuator.ThymioTwoWheelActuator;
-
 import commoninterface.CIBehavior;
 import commoninterface.CISensor;
 import commoninterface.ThymioCI;
@@ -25,6 +24,7 @@ import commoninterface.network.ConnectionHandler;
 import commoninterface.network.broadcast.BroadcastHandler;
 import commoninterface.network.broadcast.BroadcastMessage;
 import commoninterface.network.broadcast.HeartbeatBroadcastMessage;
+import commoninterface.network.broadcast.SharedThymioBroadcastMessage;
 import commoninterface.network.messages.Message;
 import commoninterface.network.messages.MessageProvider;
 import commoninterface.objects.Entity;
@@ -50,6 +50,8 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         
         private RobotLogger logger;
     	
+        private double leftPercentage = 0;
+    	private double rightPercentage = 0;
         
         public Thymio(Simulator simulator, Arguments args) {
         	super(simulator, args);
@@ -57,6 +59,8 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         	
         	ArrayList<BroadcastMessage> broadcastMessages = new ArrayList<BroadcastMessage>();
         	broadcastMessages.add(new HeartbeatBroadcastMessage(this));
+        	broadcastMessages.add(new SharedThymioBroadcastMessage(this));
+        	
         	broadcastHandler = new SimulatedBroadcastHandler(this, broadcastMessages);
         	alwaysActiveBehaviors = new ArrayList<CIBehavior>();
         	
@@ -65,7 +69,15 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         	if(getRadius() < 0.08)
         		throw new RuntimeException("Radius lower than 0.08m");
         	
-        	Arguments irSensorsArgs = new Arguments("senserobot=0, cutoffangle=45, fixedsensor=0, noiseenabled=1, numberofrays=7, offsetnoise=0");	
+        	boolean irSenseRobots = args.getArgumentAsIntOrSetDefault("irsenserobot", 0)==1;
+        	
+        	Arguments irSensorsArgs;
+        	
+        	if(irSenseRobots)
+        		irSensorsArgs = new Arguments("senserobot=1, cutoffangle=45, fixedsensor=0, noiseenabled=1, numberofrays=7, offsetnoise=0");	
+        	else
+        		irSensorsArgs = new Arguments("senserobot=0, cutoffangle=45, fixedsensor=0, noiseenabled=1, numberofrays=7, offsetnoise=0");
+        	
         	sensors.add(new ThymioIRSensor(simulator, sensors.size()+1, this, irSensorsArgs));
         	
         	Arguments twoWheelsArgs = new Arguments("speedincrement=0.155");
@@ -94,6 +106,9 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
 			
 			double leftSpeed = leftMotor/2 + 0.5;
 			double rightSpeed = rightMotor/2 + 0.5;
+			
+			leftPercentage = leftSpeed;
+			rightPercentage = rightSpeed;
 			
 			wheels.setLeftWheelSpeed(leftSpeed);
 			wheels.setRightWheelSpeed(rightSpeed);
@@ -262,6 +277,24 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
 		private void log(String msg) {
 			if(logger != null)
 				logger.logMessage(msg);
+		}
+
+		@Override
+		public double getLeftMotorSpeed() {
+			return leftPercentage;
+		}
+
+		@Override
+		public double getRightMotorSpeed() {
+			return rightPercentage;
+		}
+
+		@Override
+		public void replaceEntity(Entity e) {
+			synchronized(entities){
+				entities.remove(e);
+				entities.add(e);
+			}
 		}
 		
 }

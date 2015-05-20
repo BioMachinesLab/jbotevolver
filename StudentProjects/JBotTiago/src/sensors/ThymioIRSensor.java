@@ -27,6 +27,7 @@ import simulation.util.ArgumentsAnnotation;
 public class ThymioIRSensor extends ConeTypeSensor {
 	private static double RANGE = 5;
 	private static double REAL_RANGE = 0.18;
+	private static double THYMIO_RADIUS = 0.08;
 	private int[] chosenReferences;
 	@ArgumentsAnnotation(name = "numberofrays", defaultValue = "7")
 	private int numberOfRays = 7;
@@ -178,8 +179,8 @@ public class ThymioIRSensor extends ConeTypeSensor {
 		for (int sensorNumber = 0; sensorNumber < numberOfSensors; sensorNumber++) {
 			double orientation = angles[sensorNumber] + robot.getOrientation();
 
-			sensorPositions[sensorNumber].set(FastMath.cosQuick(orientation) * robot.getRadius() + robot.getPosition().getX(),
-					FastMath.sinQuick(orientation) * robot.getRadius() + robot.getPosition().getY());
+			sensorPositions[sensorNumber].set(FastMath.cosQuick(orientation) * THYMIO_RADIUS + robot.getPosition().getX(),
+					FastMath.sinQuick(orientation) * THYMIO_RADIUS + robot.getPosition().getY());
 
 			double alpha = (this.fullOpeningAngle) / (numberOfRays - 1);
 
