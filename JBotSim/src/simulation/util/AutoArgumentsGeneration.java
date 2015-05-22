@@ -151,7 +151,7 @@ public class AutoArgumentsGeneration {
 			index++;
 			
 			if(arguments.get(argName) != null && arguments.get(robotArgName) != null) {
-				Arguments auto = getNNInputsAutoForController(arguments.get("--controllers"),arguments.get("--robots"));
+				Arguments auto = getNNInputsAutoForController(arguments.get(argName),arguments.get(robotArgName));
 				arguments.put(argName, auto);
 			} else
 				keepExecuting = false;
