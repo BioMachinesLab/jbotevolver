@@ -17,6 +17,7 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 	private double explore_percentage;
 	private double prey_percentage;
 	private double area_percentage;
+	private boolean preyarea;
 
 	private ArrayList<Robot> typeA = new ArrayList<Robot>();
 	private ArrayList<Robot> typeB = new ArrayList<Robot>();
@@ -26,6 +27,7 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 	private OpenEnvironment env;
 	private LinkedList<Cell> grid;
 	private int exploreFitness = 0;
+	private int totalAreaFitness;
 
 	public CoveredAreaEvaluationFunction5(Arguments args) {
 		super(args);
@@ -33,6 +35,7 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 		prey_percentage = args.getArgumentIsDefined("preypercentage") ? args.getArgumentAsDouble("preypercentage") : 0.001;
 		area_percentage = args.getArgumentIsDefined("areapercentage") ? args.getArgumentAsDouble("areapercentage") : 0.001;
 		cell_width = args.getArgumentIsDefined("cellwidth") ? args.getArgumentAsInt("cellwidth") : 1;
+		preyarea = args.getArgumentAsIntOrSetDefault("preyarea", 0) == 1;
 	}
 
 	@Override
@@ -133,10 +136,15 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 
 		if(!infinity)
 			areaCovered = Math.abs(xmin - xmax) * Math.abs(ymax - ymin);
-
-		//System.out.println(numberOfPreysForaged);
-		fitness += areaCovered * area_percentage + preyFitness * prey_percentage;
-
+		
+		if(preyarea && simulator.getTime() != 0){
+			totalAreaFitness += areaCovered * area_percentage;
+			fitness += (areaCovered * area_percentage / simulator.getTime()) + preyFitness * prey_percentage;
+			//System.out.println(areaCovered * area_percentage / simulator.getTime());
+		} else		
+			fitness += areaCovered * area_percentage + preyFitness * prey_percentage;
+			
+			
 		//		if(fitness == Double.POSITIVE_INFINITY)
 		//			System.out.println("NOOO");
 
@@ -146,20 +154,21 @@ public class CoveredAreaEvaluationFunction5 extends EvaluationFunction{
 		//	*get preys while connected; area is irrelevant -> covarea6
 
 
-		//		System.out.println("Area fitness: " + (areaCovered * area_percentage));
-		//		System.out.println("Prey fitness: " + (preyFitness * prey_percentage));
-		//		System.out.println("Numb of cells explored: " + exploreFitness);
-		//		System.out.println("Total this step: " + ((areaCovered*area_percentage)+(preyFitness * prey_percentage)));
-
+		//System.out.println("Area fitness: " + (areaCovered * area_percentage));
+		//System.out.println("Prey fitness: " + (preyFitness * prey_percentage));
+		//System.out.println("Numb of cells explored: " + exploreFitness);
+		//System.out.println("Total this step: " + ((areaCovered*area_percentage)+(preyFitness * prey_percentage)));
+		//System.out.println("Total: " + fitness);
 		
 		//neural network weights
 	}
 
 	@Override
 	public double getFitness() {
-		//		System.out.println("Total fitness: " + fitness);
-		//		System.out.println("Total explore: " + exploreFitness*explore_percentage);
-		return fitness + env.getNumberOfFoodSuccessfullyForaged()*50 + exploreFitness*explore_percentage;
+		if(preyarea)
+			return fitness + env.getNumberOfFoodSuccessfullyForaged()*(totalAreaFitness/env.getSteps()) + exploreFitness*explore_percentage;
+		else
+			return fitness + env.getNumberOfFoodSuccessfullyForaged()*50 + exploreFitness*explore_percentage;
 	}
 
 
