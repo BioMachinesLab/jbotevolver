@@ -125,7 +125,7 @@ public class OpenEnvironment extends Environment {
 
 		for(Robot b: typeBRobots) {
 			for(Robot r: typeBRobots) {
-				if(!r.equals(b) && r.getPosition().distanceTo(b.getPosition()) <= rangeB - r.getDiameter()) {
+				if(!r.equals(b) && r.getPosition().distanceTo(b.getPosition()) <= rangeB - r.getRadius()) {
 					Edge edge = null;
 					if(r.getId() < b.getId())
 						edge = new Edge(new Vertex(r.getId()), new Vertex(b.getId()));

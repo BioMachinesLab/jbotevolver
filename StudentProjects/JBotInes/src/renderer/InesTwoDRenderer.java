@@ -41,13 +41,13 @@ public class InesTwoDRenderer extends TwoDRendererDebug {
 				TypeARobotSensor sensorA = (TypeARobotSensor) robot.getSensorByType(TypeARobotSensor.class);
 				for(Robot r: env.getRobots()) {
 					if(!r.equals(robot) && r.getDescription().equals("type1") && 
-							r.getPosition().distanceTo(robot.getPosition()) <= sensorB.getRange() - robot.getDiameter()) {								
+							r.getPosition().distanceTo(robot.getPosition()) <= sensorB.getRange() - robot.getRadius()) {								
 						g.setColor(Color.BLUE);
 						g.drawLine((int) transformX(r.getPosition().x), (int) transformY(r.getPosition().y), 
 								(int) transformX(robot.getPosition().x), (int) transformY(robot.getPosition().y));
 
 					} else if(r.getDescription().equals("type0") &&
-							r.getPosition().distanceTo(robot.getPosition()) <= sensorA.getRange() - robot.getDiameter()){
+							r.getPosition().distanceTo(robot.getPosition()) <= sensorA.getRange() - robot.getRadius()){
 						g.setColor(Color.BLACK);
 						g.drawLine((int) transformX(r.getPosition().x), (int) transformY(r.getPosition().y), 
 								(int) transformX(robot.getPosition().x), (int) transformY(robot.getPosition().y));
@@ -64,7 +64,7 @@ public class InesTwoDRenderer extends TwoDRendererDebug {
 			if(env.isConnected()){
 				for(Robot b: typeB) {
 					for(Robot a: typeA){
-						if (a.getPosition().distanceTo(b.getPosition()) <= ((TypeBRobotSensor) a.getSensorByType(TypeBRobotSensor.class)).getRange() - a.getDiameter()){
+						if (a.getPosition().distanceTo(b.getPosition()) <= ((TypeBRobotSensor) a.getSensorByType(TypeBRobotSensor.class)).getRange() - a.getRadius()){
 
 							infinity = false;
 
