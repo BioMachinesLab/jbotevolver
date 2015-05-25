@@ -113,13 +113,14 @@ public class RunawayController extends Controller {
 			}else{
 				boolean inRange = false;
 				for(Robot r: simulator.getRobots()){
-					if(!r.getDescription().equals("prey")){
+					if(!r.getDescription().equals("prey") && !r.getDescription().equals("type1")){
 						double distance = r.getPosition().distanceTo(robot.getPosition());
 						
 						if(distance < ((MouseSensor) r.getSensorByType(MouseSensor.class)).getRange())
 							inRange = true;
 					}
 				}
+				
 				double distance = robot.getPosition().distanceTo(((OpenEnvironment)simulator.getEnvironment()).getCenterOfMass());
 				if(!inRange && distance > MAX_ROBOT_DISTANCE)
 					robot.setPosition(((OpenEnvironment)simulator.getEnvironment()).newRandomPosition());

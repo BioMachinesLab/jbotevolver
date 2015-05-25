@@ -67,16 +67,24 @@ public ArrayList<Robot> createRobots(Simulator simulator, Chromosome chromosome)
 		
 			MultipleChromosome c = (MultipleChromosome) chromosome;
 			
+			int previousrobots = 0;
+			
 			for(int i = 0; i < c.getNumberOfChromosomes(); i++){
 				// get("robots" + i)
 				ArrayList<Robot> robots;
-				if(i == 0)
+				if(i == 0) {
 					robots = Robot.getRobots(simulator, arguments.get("--robots"));
-				else
+					previousrobots = robots.size();
+				} else{
+					arguments.get("--robots" + i).setArgument("previousrobots", previousrobots);
 					robots = Robot.getRobots(simulator, arguments.get("--robots" + i));
+				}
 				
 				for(Robot r : robots) {
-					r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
+					if(i == 0)
+						r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
+					else
+						r.setController(Controller.getController(simulator, r, arguments.get("--controllers" + i)));
 					totalRobots.add(r);
 					
 					Chromosome subChromosome = c.getChromosome(i);
