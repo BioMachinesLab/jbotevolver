@@ -117,8 +117,11 @@ public class ResultViewerGui extends Gui implements Updatable{
 	protected JCheckBox exportToBlender;
 	
 	private boolean enableDebugOptions = false;
+	private boolean showSleepError = false;
 	
 	protected EnvironmentKeyDispatcher dispatcher;
+	
+	protected long lastCycleTime = 0;
 
 	public ResultViewerGui(JBotSim jBotEvolver, Arguments args) {
 		super(jBotEvolver,args);
@@ -655,6 +658,8 @@ public class ResultViewerGui extends Gui implements Updatable{
 			simulationState = PAUSED;
 		else
 			simulationState = RUN;
+		
+		lastCycleTime = System.currentTimeMillis();
 	}
 
 	protected void shiftSimulationBy(int value, boolean percentage) {
@@ -704,8 +709,17 @@ public class ResultViewerGui extends Gui implements Updatable{
 			updateStatus();
 			
 			try {
-				if (sleepBetweenControlSteps > 0)
-					Thread.sleep(sleepBetweenControlSteps);
+				
+				long cycleTime = System.currentTimeMillis() - lastCycleTime;
+				
+				if (sleepBetweenControlSteps > 0) {
+					if(showSleepError && simulationState == RUN && sleepBetweenControlSteps - cycleTime < 0) {
+						System.err.println("Can't keep up! Simulation step is taking more than "+sleepBetweenControlSteps+" ("+cycleTime+")");
+					}
+					Thread.sleep(Math.max(sleepBetweenControlSteps - cycleTime,0));
+				}
+				
+				lastCycleTime = System.currentTimeMillis();
 				
 				while(simulationState != RUN)
 					Thread.sleep(10);
@@ -769,6 +783,8 @@ public class ResultViewerGui extends Gui implements Updatable{
 					playPosition.setValue(0);
 
 				launchSimulation();
+				
+				lastCycleTime = System.currentTimeMillis();
 			}
 		} catch(Exception e) {
 			e.printStackTrace();

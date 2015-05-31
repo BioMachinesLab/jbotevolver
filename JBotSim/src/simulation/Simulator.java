@@ -149,6 +149,7 @@ public class Simulator implements Serializable {
 		for (Updatable r : callbacks) {
 			r.update(this);
 		}
+		
 	}
 
 	protected void updateAllControllers(Double time) {
@@ -290,24 +291,24 @@ public class Simulator implements Serializable {
 	
 	class StagedParallelRobotCallable implements Runnable {
 		
-		private ArrayList<Robot> robots = new ArrayList<Robot>();
+//		private ArrayList<Robot> robots = new ArrayList<Robot>();
 		public int stage = 0;
+		public int start = 0;
+		public int end = 0;
 		
 		public StagedParallelRobotCallable(int i) {
 			int total = environment.getRobots().size()/Runtime.getRuntime().availableProcessors();
-			int start = total*i;
-			int end = total*(i+1);
+			start = total*i;
+			end = total*(i+1);
 			
 			if(i == Runtime.getRuntime().availableProcessors()-1)
 				end = environment.getRobots().size();
 			
-			for(int j = start ; j < end ; j++) {
-				robots.add(environment.getRobots().get(j));
-			}
 		}
 
 		public void run() {
-			for(Robot r : robots) {
+			for(int j = start ; j < end ; j++) {
+				Robot r = environment.getRobots().get(j); 
 				if(r.isEnabled()) {
 					r.updateSensors(time, environment.getTeleported());
 					r.getController().controlStep(time);
