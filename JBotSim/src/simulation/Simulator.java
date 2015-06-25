@@ -15,6 +15,7 @@ import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.Factory;
 import comm.FileProvider;
 
 public class Simulator implements Serializable {
@@ -61,6 +62,16 @@ public class Simulator implements Serializable {
 		
 		if(parallel) {
 			pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		}
+		
+		args = arguments.get("--updatables");
+		
+		
+		if(args != null) {
+			for(int i = 0 ; i < args.getNumberOfArguments() ; i++) {
+				Arguments updatableArgs = new Arguments(args.getArgumentAsString(args.getArgumentAt(i)));
+				addCallback((Updatable)Factory.getInstance(updatableArgs.getArgumentAsString("classname"), updatableArgs));
+			}
 		}
 	}
 	

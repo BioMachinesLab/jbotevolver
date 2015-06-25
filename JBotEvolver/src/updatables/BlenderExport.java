@@ -11,6 +11,7 @@ import simulation.Simulator;
 import simulation.Updatable;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Wall;
+import simulation.util.Arguments;
 
 public class BlenderExport implements Updatable {
 	
@@ -18,8 +19,16 @@ public class BlenderExport implements Updatable {
 	private String output = "";
 	private String filename = "blender.txt";
 	
+	public BlenderExport(Arguments args) {
+		filename = args.getArgumentAsStringOrSetDefault("filename", filename);
+		setup();
+	}
+	
 	public BlenderExport() {
-		
+		setup();
+	}
+	
+	private void setup() {
 		if(!(new File(filename).exists())) {
 			File f = new File(filename);
 			try {
