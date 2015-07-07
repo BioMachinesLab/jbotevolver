@@ -79,4 +79,13 @@ public class EvolvableMissionController extends PreprogrammedArbitrator implemen
 	public double[] getNNWeights() {
 		return ((NeuralNetworkController)subControllers.get(0)).getNNWeights();
 	}
+	@Override
+	public int getNumberOfInputs() {
+		return 0;
+	}
+	
+	@Override
+	public int getNumberOfOutputs() {
+		return 0;
+	}
 }

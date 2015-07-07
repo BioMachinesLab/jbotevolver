@@ -136,4 +136,14 @@ public class NeuralNetworkController extends Controller implements FixedLenghtGe
 			}
 		}
 	}
+	
+	@Override
+	public int getNumberOfInputs() {
+		return neuralNetwork.getNumberOfInputNeurons();
+	}
+	
+	@Override
+	public int getNumberOfOutputs() {
+		return neuralNetwork.getNumberOfOutputNeurons();
+	}
 }

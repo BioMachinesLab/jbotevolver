@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
 
-import simulation.util.Arguments;
-
 public class Main {
 	
 	private LinkedList<Controller> controllers = new LinkedList<Controller>();
@@ -212,7 +210,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		Main main = new Main(args);
-//		Main main = new Main(new String[]{"boundaries_ea.conf"});
+//		Main main = new Main(new String[]{"patrol.conf"});
 		main.execute();
 	}
 }

@@ -400,12 +400,9 @@ public class EvolutionGui extends Gui {
 					while(!evo.isEvolutionFinished()) {
 						
 						int evoPopulation = evo.getPopulation().getNumberOfCurrentGeneration();
-						
 						if(enablePreview && evoPopulation > 0 && evoPopulation != currentGenerationNumber){
 							currentGenerationNumber = evoPopulation;
-							
 							if(evo.getPopulation().getBestChromosome() != null) {
-							
 								Simulator sim = jBotEvolver.createSimulator(new Random());
 								sim.addCallback(jBotEvolver.getEvaluationFunction());
 								sim.addCallback(this);

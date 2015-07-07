@@ -15,7 +15,6 @@ public class SimpleSampleTask extends JBotEvolverTask {
 	private int fitnesssample;
 	private double fitness = 0;
 	private Chromosome chromosome;
-	private JBotEvolver jBotEvolver;
 	private int run;
 	private long randomSeed;
 	
