@@ -10,62 +10,54 @@ import sensors.NearTypeBRobotSensor;
 import sensors.TypeBRobotSensor;
 import simulation.Simulator;
 import simulation.environment.Environment;
+import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import utils.Cell;
 import utils.Edge;
 import utils.Vertex;
 import controllers.RunawayController;
 
-public class OpenEnvironment extends Environment {
+public class ForagingEnvironment extends OpenEnvironment {
 
+	private static final double PREY_RADIUS = 0.025;
+	private static final double PREY_MASS = 1;
 	private static final String DESC_A = "type0";
 	private static final String DESC_B = "type1";
 	private ArrayList<Robot> typeARobots = new ArrayList<Robot>();
 	private ArrayList<Robot> typeBRobots = new ArrayList<Robot>();
-	private ArrayList<Robot> preyRobots = new ArrayList<Robot>();
-
+	
+	private ArrayList<Vertex> vertex = new ArrayList<Vertex>();
+	
+	private boolean connected;
+	
+	@ArgumentsAnnotation(name="numberofpreys", defaultValue="20")
+	private int numberOfPreys;
+	
+	private Random random;
+	private Simulator simulator;
+	private Vector2d avgOrientation = new Vector2d(0,0); 
+	private double rangeB;
 	private int numberOfFoodSuccessfullyForaged = 0;
 
-	private boolean preysExist;
-	private boolean specialBehavior;
-
-	private Random random;
-
-	private double rangeB;
-	private boolean connected;
-	private Vector2d centerOfMass = new Vector2d(0,0);
-	private LinkedList<Cell> grid = new LinkedList<Cell>();
-	private static int CELLS = 50;
-
-	private ArrayList<Vertex> vertex = new ArrayList<Vertex>();
-
-	private Vector2d avgOrientation = new Vector2d(0,0);
-
-	private boolean variablePreysPerSample;
-
-	public OpenEnvironment(Simulator simulator, Arguments arguments) {
+	public ForagingEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
-		random = simulator.getRandom();
-
-		preysExist = arguments.getArgumentAsIntOrSetDefault("preysexist", 0) == 1;
-		specialBehavior = arguments.getArgumentAsIntOrSetDefault("specialbehavior", 0)==1; 
-		variablePreysPerSample = arguments.getArgumentAsIntOrSetDefault("variablepreys", 0)==1;
-
-		for(int i = -CELLS; i < CELLS; i++){
-			for(int j = -CELLS; j < CELLS; j++){
-				grid.add(new Cell(j, i));
-			}
-		}
-
-		//System.out.println(grid.toString());
-
+		
+		numberOfPreys = arguments.getArgumentIsDefined("numberofpreys") ? arguments.getArgumentAsInt("numberofpreys") : 20;
 	}
+	
 
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
-
+		this.simulator = simulator;
+		random = simulator.getRandom();
+		
+		for(int i = 0; i < numberOfPreys; i++ ){
+			addPrey(new Prey(simulator, "Prey "+i, newRandomStartPosition(), 0, PREY_MASS, PREY_RADIUS));
+		}
+		
 		for(Robot r: getRobots()){
 			if(r.getDescription().equals(DESC_A))
 				typeARobots.add(r);
@@ -73,91 +65,48 @@ public class OpenEnvironment extends Environment {
 				typeBRobots.add(r);
 				Vertex v = new Vertex(r.getId());
 				vertex.add(v);
-			}
+			} 
 		}
 
-		if(preysExist){
-			Arguments programmedArgs = simulator.getArguments().get("--programmedrobots");
-			int programmedRobots = programmedArgs.getArgumentAsIntOrSetDefault("numberofrobots", 1);
-
-			if(variablePreysPerSample){
-				int sample = simulator.getArguments().get("--environment").getArgumentAsInt("fitnesssample");
-				int i = sample % 4;
-				switch(i){
-				case 0: 
-					programmedRobots = 1;
-					break;
-				case 1: 
-					programmedRobots = 5;
-					break;
-				case 2: 
-					programmedRobots = 10;
-					break;
-				case 3: 
-					programmedRobots = 20;
-					break;
-				}
-			}			
-
-			for(int i = 0; i < programmedRobots; i++) {
-				Robot prey = Robot.getRobot(simulator, programmedArgs);
-				prey.setController(new RunawayController(simulator, prey, programmedArgs, specialBehavior));
-				prey.setPosition(newRandomPosition());
-				addRobot(prey);
-				preyRobots.add(prey);
-			}
-		}
 		//		typeBRobots.get(0).setPosition(0, 2);
 		//		typeBRobots.get(1).setPosition(0, 2.1);
 	}
 
+	@Override
 	public Vector2d newRandomPosition() {		
-		double radius = random.nextDouble()*46 + 4; //posiciona presas ente 4 e 50
+		double radius = random.nextDouble()*(width) + width/1; //posiciona presas ente 4 e 8
 		double angle = random.nextDouble()*2*Math.PI;
-		return new Vector2d(radius*Math.cos(angle) + centerOfMass.x, radius*Math.sin(angle) + centerOfMass.y);
+		return new Vector2d(radius*Math.cos(angle), radius*Math.sin(angle));
 	}
-
-	private void updateCenterOfMass() {
-		double totalX = 0;
-		double totalY = 0;
-
-		for(Robot b: typeBRobots){
-			totalX += b.getPosition().x;
-			totalY += b.getPosition().y;
-		}
-		for(Robot a: typeARobots){
-			totalX += a.getPosition().x;
-			totalY += a.getPosition().y;
-		}
-		double centerX = totalX/(typeARobots.size() + typeBRobots.size());
-		double centerY = totalY/(typeARobots.size() + typeBRobots.size());
-
-		centerOfMass = new Vector2d(centerX, centerY);	
+	
+	private Vector2d newRandomStartPosition() {
+		double radius = random.nextDouble()*(width-1) + width/4; //posiciona presas ente 1 e 4
+		double angle = random.nextDouble()*2*Math.PI;
+		return new Vector2d(radius*Math.cos(angle), radius*Math.sin(angle));
 	}
+	
+	private void updateAvgOrientation() {
+		double x = 0.0;
+		double y = 0.0;
+		
+		for(Robot r: robots) {
+			if(!r.getDescription().equals("prey")){
+				x += Math.cos(r.getOrientation());
+				y += Math.sin(r.getOrientation());
+			}
+		}
+		
+		avgOrientation = new Vector2d(x, y);
 
-//	private void updateAvgOrientation() {
-//		double x = 0.0;
-//		double y = 0.0;
-//
-//		for(Robot r: robots) {
-//			if(!r.getDescription().equals("prey")){
-//				x += Math.cos(r.getOrientation());
-//				y += Math.sin(r.getOrientation());
-//			}
-//		}
-//
-//		avgOrientation = new Vector2d(x, y);
-//
-//	}
+	}
 
 	@Override
 	public void update(double time) {
-		updateConnected();
+		updateEnvironment();
 	}
 
-	private void updateConnected() {
-		updateCenterOfMass();
-		//updateAvgOrientation();
+	private void updateEnvironment() {
+		updateAvgOrientation();
 
 		DistanceToBSensor sensorB = (DistanceToBSensor) typeBRobots.get(0).getSensorByType(DistanceToBSensor.class);
 		rangeB = sensorB.getRange();
@@ -221,50 +170,35 @@ public class OpenEnvironment extends Environment {
 			connected = false;
 
 
-		if(preysExist){
+		if(numberOfPreys > 0){
 			for(Robot r: typeARobots){
-				for(Robot prey: preyRobots){
+				for(Prey prey: simulator.getEnvironment().getPrey()){
 					double distance = prey.getPosition().distanceTo(r.getPosition());
 					if(distance < (r.getRadius() + 0.05)) {
+						prey.teleportTo(newRandomPosition());
 						if(connected)
 							numberOfFoodSuccessfullyForaged++;
-						prey.teleportTo(new Vector2d(120,120));
 					}
 				}
 
 			}
 		}
+		
 	}
 
-	public Vector2d getCenterOfMass() {
-		return centerOfMass;
-	}
-
+	@Override
 	public int getNumberOfFoodSuccessfullyForaged() {
 		return numberOfFoodSuccessfullyForaged;
 	}
 
-	public ArrayList<Robot> getTypeARobots() {
-		return typeARobots;
-	}
-
-	public ArrayList<Robot> getTypeBRobots() {
-		return typeBRobots;
-	}
-
-	public ArrayList<Robot> getPreyRobots() {
-		return preyRobots;
-	}
-
+	@Override
 	public boolean isConnected() {
 		return connected;
 	}
-
-	public LinkedList<Cell> getGrid() {
-		return grid;
-	}
-
+	
+	@Override
 	public Vector2d getAvgOrientation() {
 		return avgOrientation;
 	}
+
 }

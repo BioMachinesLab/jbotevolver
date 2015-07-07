@@ -7,7 +7,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
-import sensors.TypeARobotSensor;
+import sensors.DistanceToASensor;
+import sensors.DistanceToBSensor;
 import sensors.TypeBRobotSensor;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
@@ -37,8 +38,8 @@ public class InesTwoDRenderer extends TwoDRendererDebug {
 			}
 
 			for(Robot robot: typeB) {
-				TypeBRobotSensor sensorB = (TypeBRobotSensor) robot.getSensorByType(TypeBRobotSensor.class);
-				TypeARobotSensor sensorA = (TypeARobotSensor) robot.getSensorByType(TypeARobotSensor.class);
+				DistanceToBSensor sensorB = (DistanceToBSensor) robot.getSensorByType(DistanceToBSensor.class);
+				DistanceToASensor sensorA = (DistanceToASensor) robot.getSensorByType(DistanceToASensor.class);
 				for(Robot r: env.getRobots()) {
 					if(!r.equals(robot) && r.getDescription().equals("type1") && 
 							r.getPosition().distanceTo(robot.getPosition()) <= sensorB.getRange() - robot.getRadius()) {								
@@ -64,7 +65,7 @@ public class InesTwoDRenderer extends TwoDRendererDebug {
 			if(env.isConnected()){
 				for(Robot b: typeB) {
 					for(Robot a: typeA){
-						if (a.getPosition().distanceTo(b.getPosition()) <= ((TypeBRobotSensor) a.getSensorByType(TypeBRobotSensor.class)).getRange() - a.getRadius()){
+						if (a.getPosition().distanceTo(b.getPosition()) <= ((DistanceToBSensor) a.getSensorByType(DistanceToBSensor.class)).getRange() - a.getRadius()){
 
 							infinity = false;
 
@@ -97,8 +98,7 @@ public class InesTwoDRenderer extends TwoDRendererDebug {
 					int areaHeight = (int) Math.abs(areaYMax-areaYMin);
 
 					g.setColor(Color.BLACK);
-					//g.drawRect(areaXMin, areaYMin, (int)(areaWidth*scale), (int)(areaHeight*scale));
-					g.drawRect(areaXMin, areaYMin, areaWidth, areaHeight);
+//					g.drawRect(areaXMin, areaYMin, areaWidth, areaHeight);
 				}
 			}
 		}

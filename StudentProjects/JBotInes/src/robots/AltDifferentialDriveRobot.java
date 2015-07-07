@@ -3,6 +3,7 @@ package robots;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+import sensors.DistanceToASensor;
 import sensors.TypeARobotSensor;
 import simulation.Simulator;
 import simulation.physicalobjects.PhysicalObject;
@@ -36,11 +37,13 @@ public class AltDifferentialDriveRobot extends DifferentialDriveRobot {
 
 		for(Robot r: robots){
 			if(r instanceof AltDifferentialDriveRobot){
-				TypeARobotSensor sensor = (TypeARobotSensor) r.getSensorByType(TypeARobotSensor.class);
+				DistanceToASensor sensor = (DistanceToASensor) r.getSensorByType(DistanceToASensor.class);
 				if(r.getId() != this.getId() && this.getPosition().distanceTo(r.getPosition()) < sensor.getRange() - r.getDiameter()) {
 					AltDifferentialDriveRobot robot = (AltDifferentialDriveRobot) r;
-					if(!neighbors.contains(robot))
+					if(!neighbors.contains(robot)){
 						neighbors.add(robot);
+						//getNeighborsNeighbors(robot);
+					}
 				}
 
 			}

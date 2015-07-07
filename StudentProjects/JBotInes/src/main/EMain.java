@@ -10,8 +10,10 @@ import simulation.util.Arguments;
 public class EMain {
 
 	public static void main(String[] args) {
-		String configName="experiments/joined2.conf";
-//		String configName="sensor_tests/_restartevolution.conf";
+//		String configName="experiments/forage_environment.conf";
+		String configName="experiments/minimal_joined.conf";
+//		String configName="experiments/joined2.conf";
+//		String configName="experiments/chain_tests_4xSR3_2LR7/_restartevolution.conf";
 		try {
 			args = new String[]{configName};
 			JBotEvolver jBotEvolver = new JBotEvolver(args);

@@ -13,7 +13,7 @@ public class RunawayController extends Controller {
 
 	private static final double CONTINUE_EXTRA_STEPS = 60;
 
-	private static final double MAX_ROBOT_DISTANCE = 4;
+	private static final double MAX_ROBOT_DISTANCE = 100;
 
 	private double maxSpeed = 0.1;
 	private Random random;
@@ -65,7 +65,7 @@ public class RunawayController extends Controller {
 	public void controlStep(double time) {
 
 		//Robot Sensor
-		double frontRobotSensor = robot.getSensorWithId(2).getSensorReading(0);
+		/*double frontRobotSensor = robot.getSensorWithId(2).getSensorReading(0);
 		double leftRobotSensor = robot.getSensorWithId(2).getSensorReading(1);
 		double rightRobotSensor = robot.getSensorWithId(2).getSensorReading(2);
 		double backRobotSensor = robot.getSensorWithId(2).getSensorReading(3);
@@ -78,18 +78,18 @@ public class RunawayController extends Controller {
 			continueForward = true;
 			reset = true;
 
-			if(maxVal == frontRobotSensor){
-				((DifferentialDriveRobot)robot).setWheelSpeed(-maxSpeed, -maxSpeed);
-			} else if(maxVal == leftRobotSensor) {
-				((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed/2);
-			} else if(maxVal == rightRobotSensor) {
-				((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed/2, maxSpeed);
-			} else if(maxVal == backRobotSensor) {
-				((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed);
-			}
+//			if(maxVal == frontRobotSensor){
+//				((DifferentialDriveRobot)robot).setWheelSpeed(-maxSpeed, -maxSpeed);
+//			} else if(maxVal == leftRobotSensor) {
+//				((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed/2);
+//			} else if(maxVal == rightRobotSensor) {
+//				((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed/2, maxSpeed);
+//			} else if(maxVal == backRobotSensor) {
+//				((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed);
+//			}
 
 
-			//((DifferentialDriveRobot)robot).setWheelSpeed(maxSpeed, maxSpeed);
+			((DifferentialDriveRobot)robot).setWheelSpeed(0, 0);
 
 		}else{
 
@@ -129,7 +129,9 @@ public class RunawayController extends Controller {
 
 			}
 
-		}
+		} */
+		
+		((DifferentialDriveRobot)robot).setWheelSpeed(0,0);
 
 	}
 
