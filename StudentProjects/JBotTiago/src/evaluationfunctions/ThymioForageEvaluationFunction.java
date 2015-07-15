@@ -7,15 +7,15 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-import commoninterface.objects.Entity;
-import commoninterface.objects.PreyEntity;
+import commoninterface.entities.Entity;
+import commoninterface.entities.PreyEntity;
 
 import environment.CameraTrackerEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class ThymioForageEvaluationFunction extends EvaluationFunction {
 
-	private static final double FORAGE_DISTANCE = 2;
+	private static final double FORAGE_DISTANCE = 1;
 	int foodForaged = 0;
 	private double averageWheelSpeed, timesteps;
 

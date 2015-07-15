@@ -68,7 +68,11 @@ public class CameraTrackerEnvironment extends Environment {
 			r.setOrientation(random.nextDouble()*(2*Math.PI));
 			
 			double max = 1;
-			r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);	
+			
+			if(getRobots().size() > 1)
+				placeMultipleRobots(r, max);
+			else
+				r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);
 		}
 		
 		CameraTracker tracker = new CameraTracker(simulator, lag, orientationError);
@@ -97,6 +101,24 @@ public class CameraTrackerEnvironment extends Environment {
 		prey.teleportTo(newRandomPosition());
 	}
 
+	private void placeMultipleRobots(Robot r, double max) {
+		double minDist = Double.MAX_VALUE;
+		
+		do{
+			r.setPosition(random.nextDouble()*max-max/2,random.nextDouble()*max-max/2);
+			
+			minDist = Double.MAX_VALUE;
+			for (Robot neighbor : getRobots()) {
+				if(r.getId() != neighbor.getId()){
+					double dist = r.getPosition().distanceTo(neighbor.getPosition());
+					if(dist < minDist)
+						minDist = dist;
+				}
+			}
+			
+		}while(minDist == Double.MAX_VALUE || minDist < 0.2);
+	}
+	
 	public int getPreysCaught() {
 		return preysCaught;
 	}

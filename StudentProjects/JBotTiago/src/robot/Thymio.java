@@ -1,19 +1,23 @@
 package robot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import network.SimulatedBroadcastHandler;
+import sensors.ThymioCameraSensor;
 import sensors.ThymioIRSensor;
 import simulation.Simulator;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import actuator.ThymioTwoWheelActuator;
 import commoninterface.CIBehavior;
 import commoninterface.CISensor;
 import commoninterface.ThymioCI;
+import commoninterface.entities.Entity;
 import commoninterface.mathutils.Vector2d;
 import commoninterface.messageproviders.BehaviorMessageProvider;
 import commoninterface.messageproviders.EntitiesMessageProvider;
@@ -27,7 +31,6 @@ import commoninterface.network.broadcast.HeartbeatBroadcastMessage;
 import commoninterface.network.broadcast.SharedThymioBroadcastMessage;
 import commoninterface.network.messages.Message;
 import commoninterface.network.messages.MessageProvider;
-import commoninterface.objects.Entity;
 import commoninterface.utils.CIArguments;
 import commoninterface.utils.RobotLogger;
 
@@ -39,6 +42,7 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
 		private SimulatedBroadcastHandler broadcastHandler;
 		
         private ThymioIRSensor irSensor;
+        private ThymioCameraSensor cameraSensor;
         private ThymioTwoWheelActuator wheels;
         
         private Vector2d virtualPosition;
@@ -53,6 +57,12 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         private double leftPercentage = 0;
     	private double rightPercentage = 0;
         
+    	@ArgumentsAnnotation(name="irsenserobot", values={"0","1"})
+    	private boolean irSenseRobots;
+    	@ArgumentsAnnotation(name="camerasensor", values={"0","1"})
+    	private boolean activeCamera;
+    	
+    	
         public Thymio(Simulator simulator, Arguments args) {
         	super(simulator, args);
         	this.simulator = simulator;
@@ -69,16 +79,22 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
         	if(getRadius() < 0.08)
         		throw new RuntimeException("Radius lower than 0.08m");
         	
-        	boolean irSenseRobots = args.getArgumentAsIntOrSetDefault("irsenserobot", 0)==1;
+        	irSenseRobots = args.getFlagIsTrue("irsenserobot");
+        	activeCamera = args.getFlagIsTrue("camerasensor");
         	
         	Arguments irSensorsArgs;
         	
         	if(irSenseRobots)
-        		irSensorsArgs = new Arguments("senserobot=1, cutoffangle=45, fixedsensor=0, noiseenabled=1, numberofrays=7, offsetnoise=0");	
+        		irSensorsArgs = new Arguments("senserobot=1,cutoffangle=45,fixedsensor=0,noiseenabled=1,numberofrays=7,offsetnoise=0");	
         	else
-        		irSensorsArgs = new Arguments("senserobot=0, cutoffangle=45, fixedsensor=0, noiseenabled=1, numberofrays=7, offsetnoise=0");
+        		irSensorsArgs = new Arguments("senserobot=0,cutoffangle=45,fixedsensor=0,noiseenabled=1,numberofrays=7,offsetnoise=0");
         	
         	sensors.add(new ThymioIRSensor(simulator, sensors.size()+1, this, irSensorsArgs));
+        	
+        	if(activeCamera){
+        		Arguments cameraSensorArgs = new Arguments("numbersensors=2,range=0.2,eyes=1,share=1");
+        		sensors.add(new ThymioCameraSensor(simulator, sensors.size()+1, this, cameraSensorArgs));
+        	}
         	
         	Arguments twoWheelsArgs = new Arguments("speedincrement=0.155");
         	actuators.add(new ThymioTwoWheelActuator(simulator, actuators.size()+1, twoWheelsArgs));
@@ -132,12 +148,25 @@ public class Thymio extends DifferentialDriveRobot implements ThymioCI {
 		}       
 		
 		@Override
+		public double[] getCameraReadings() {
+			double[] readings = new double[2];
+				
+			if(cameraSensor == null)
+				cameraSensor = (ThymioCameraSensor)getSensorByType(ThymioCameraSensor.class);
+			
+			readings[0] = cameraSensor.getSensorReading(0);
+			readings[1] = cameraSensor.getSensorReading(1);
+			
+			return readings;
+		}
+		
+		@Override
 		public double getTimeSinceStart() {
 			return simulator.getTime()*10;
 		}
 
 		@Override
-		public void begin(CIArguments args) { }
+		public void begin(HashMap<String, CIArguments> args) { }
 		
 		@Override
 		public ArrayList<Entity> getEntities() {

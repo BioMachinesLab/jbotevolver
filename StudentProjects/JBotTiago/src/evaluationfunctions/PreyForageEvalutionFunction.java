@@ -11,9 +11,11 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 public class PreyForageEvalutionFunction  extends EvaluationFunction {
 
 	int foodForaged = 0;
+	private int multicationFactor = 2;
 	
 	public PreyForageEvalutionFunction(Arguments args) {
 		super(args);
+		multicationFactor = args.getArgumentAsIntOrSetDefault("multifactor", multicationFactor);
 	}
 
 	@Override
@@ -47,7 +49,7 @@ public class PreyForageEvalutionFunction  extends EvaluationFunction {
 	
 	@Override
 	public double getFitness() {
-		return super.getFitness() + foodForaged*2;
+		return super.getFitness() + foodForaged*multicationFactor;
 	}
 	
 }
