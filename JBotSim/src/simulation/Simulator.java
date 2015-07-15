@@ -35,7 +35,6 @@ public class Simulator implements Serializable {
 	private boolean setup = false;
 	
 	private boolean parallel = false;
-	private ExecutorService pool;
 	private ArrayList<StagedParallelRobotCallable> runnables;
 	
 	private Network network;
@@ -60,12 +59,7 @@ public class Simulator implements Serializable {
 			parallel = args.getArgumentAsIntOrSetDefault("parallel", 0) == 1;
 		}
 		
-		if(parallel) {
-			pool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-		}
-		
 		args = arguments.get("--updatables");
-		
 		
 		if(args != null) {
 			for(int i = 0 ; i < args.getNumberOfArguments() ; i++) {
@@ -203,7 +197,7 @@ public class Simulator implements Serializable {
 			robotIndexes[i] = i;
 	}
 
-	protected void updatePositions(double time) {
+	public void updatePositions(double time) {
 		environment.updateCollisions(time);
 	}
 
