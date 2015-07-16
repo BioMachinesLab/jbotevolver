@@ -424,8 +424,10 @@ public class Robot extends MovableObject {
 		
 		
 		if(arguments.getArgumentIsDefined("randomizenumber")) {		
-			String[] rawArray = arguments.getArgumentAsString("randomizenumber").split(",");		
-			numberOfRobots = Integer.parseInt(rawArray[simulator.getRandom().nextInt(rawArray.length)]);
+			String[] rawArray = arguments.getArgumentAsString("randomizenumber").split(",");
+			
+			if(rawArray.length > 1)
+				numberOfRobots = Integer.parseInt(rawArray[simulator.getRandom().nextInt(rawArray.length)]);
 		}
 		
 		if(arguments.getArgumentIsDefined("totalrobots")) {		
