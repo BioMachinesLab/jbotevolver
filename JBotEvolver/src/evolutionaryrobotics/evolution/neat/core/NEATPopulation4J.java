@@ -11,6 +11,7 @@ import java.io.Serializable;
 import evolutionaryrobotics.evolution.neat.ga.core.Chromosome;
 import evolutionaryrobotics.evolution.neat.ga.core.Gene;
 import evolutionaryrobotics.evolution.neat.ga.core.Population;
+import evolutionaryrobotics.evolution.neat.ga.core.Species;
 import evolutionaryrobotics.evolution.neat.utils.MathUtils;
 
 /**
@@ -27,6 +28,7 @@ public class NEATPopulation4J implements Population, Serializable {
 	private boolean featureSelection;
 	private int extraFeatureCount = 0;
     private InnovationDatabase db;
+    private Species species;
 	
 	public NEATPopulation4J(int popSize, int initialChromoSize, int inputs, int outputs, boolean featureSelection, int extraFeaturecount) {
 		this.popSize = popSize;
@@ -100,6 +102,14 @@ public class NEATPopulation4J implements Population, Serializable {
 	
 	public InnovationDatabase getInnovationDatabase() {
 		return db;
+	}
+	
+	public void setSpecies(Species species) {
+		this.species = species;
+	}
+	
+	public Species getSpecies() {
+		return species;
 	}
 
 }
