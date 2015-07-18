@@ -6,6 +6,7 @@
  */
 package evolutionaryrobotics.evolution.neat.ga.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import evolutionaryrobotics.evolution.neat.core.NEATChromosome;
@@ -19,7 +20,7 @@ import evolutionaryrobotics.evolution.neat.core.NEATNodeGene;
  *
  * Controls addition of specie members and provides specie behaviour. 
  */
-public abstract class Specie implements Comparable {
+public abstract class Specie implements Comparable, Serializable {
 	private ArrayList specieMembers;
 	private double bestFitness;
 	private double avFitness = 0;

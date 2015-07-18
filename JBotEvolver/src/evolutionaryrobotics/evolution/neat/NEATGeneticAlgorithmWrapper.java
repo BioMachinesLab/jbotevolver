@@ -4,10 +4,12 @@ import taskexecutor.results.SimpleFitnessResult;
 import taskexecutor.tasks.GenerationalTask;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evolution.NEATEvolution;
+import evolutionaryrobotics.evolution.neat.core.InnovationDatabase;
 import evolutionaryrobotics.evolution.neat.core.NEATGADescriptor;
 import evolutionaryrobotics.evolution.neat.core.NEATGeneticAlgorithm;
 import evolutionaryrobotics.evolution.neat.core.NEATPopulation4J;
 import evolutionaryrobotics.evolution.neat.ga.core.Chromosome;
+import evolutionaryrobotics.evolution.neat.ga.core.Species;
 import evolutionaryrobotics.populations.NEATPopulation;
 
 public class NEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithm {

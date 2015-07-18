@@ -15,16 +15,8 @@ import evolutionaryrobotics.evolution.neat.ga.core.Gene;
  * Manages speicie compatablity
  */
 public class NEATSpecieManager {
-	private static final NEATSpecieManager manager = new NEATSpecieManager();
 	
-	private NEATSpecieManager() {
-	}
-	
-	public static NEATSpecieManager specieManager() {
-		return (manager);
-	}
-	
-	public double compatibilityScore(Chromosome specieApplicant, Chromosome specieRepresentative, double excessCoeff, double disjointCoeff, double weightCoeff) {
+	public static double compatibilityScore(Chromosome specieApplicant, Chromosome specieRepresentative, double excessCoeff, double disjointCoeff, double weightCoeff) {
 		int disjoints = 0;
 		int excess = 0;
 		boolean genesToProcess = true;

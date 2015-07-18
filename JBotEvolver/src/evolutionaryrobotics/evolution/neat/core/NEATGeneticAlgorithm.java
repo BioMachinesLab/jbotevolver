@@ -99,6 +99,7 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
     public void loadPopulation(NEATPopulation4J pop) {
     	this.pop = pop;
     	this.innov = pop.getInnovationDatabase();
+    	setSpecies(pop.getSpecies());
     }
 
     /**
@@ -420,4 +421,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
     public Species getSpecies() {
         return specieList;
     }
+    
+    public void setSpecies(Species specieList) {
+		this.specieList = specieList;
+	}
 }

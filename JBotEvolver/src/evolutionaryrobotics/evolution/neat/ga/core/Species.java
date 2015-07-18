@@ -6,6 +6,7 @@
  */
 package evolutionaryrobotics.evolution.neat.ga.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import evolutionaryrobotics.evolution.neat.core.NEATChromosome;
@@ -16,7 +17,7 @@ import evolutionaryrobotics.evolution.neat.core.NEATSpecie;
  *
  * Generic specie handling
  */
-public class Species {
+public class Species implements Serializable {
 	private ArrayList specieList;
 	
 	public Species() {

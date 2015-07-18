@@ -53,28 +53,32 @@ public class NEATEvolution extends Evolution {
 	@Override
 	public void executeEvolution() {
 		
-		NEATGeneticAlgorithmWrapper algorithm = new NEATGeneticAlgorithmWrapper(descriptor, this);
+		NEATGeneticAlgorithmWrapper algorithm;
+		
+		int i = population.getNumberOfCurrentGeneration();
+		
+		if(i == 0) {
+			algorithm = new NEATGeneticAlgorithmWrapper(descriptor, this);
+		}else {
+			algorithm = new NEATGeneticAlgorithmWrapper(descriptor, this);
+			algorithm.loadPopulation(population.getNEATPopulation4J());
+		}
 		
 		algorithm.pluginFitnessFunction(new PreEvaluatedFitnessFunction(Collections.<Chromosome, Float> emptyMap()));
 		algorithm.pluginCrossOver(new NEATCrossover());
 		algorithm.pluginMutator(new NEATMutator());
 		algorithm.pluginParentSelector(new TournamentSelector());
-		algorithm.createPopulation();
 		
-		int i = population.getNumberOfCurrentGeneration();
-		
-		if(population.getNumberOfCurrentGeneration() == 0) {
+		if(i == 0) {
+			algorithm.createPopulation();
 			population.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
 			population.createRandomPopulation();
+			population.setNEATPopulation4J((NEATPopulation4J)algorithm.population());
+			population.getNEATPopulation4J().setSpecies(algorithm.getSpecies());
 		}
 		
 		if(!population.evolutionDone())
 			taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
-		
-		if(i == 0)
-			population.setNEATPopulation4J((NEATPopulation4J)algorithm.population());
-		else
-			algorithm.loadPopulation(population.getNEATPopulation4J());
 		
 		double highestFitness = 0;
 		

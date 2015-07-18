@@ -109,7 +109,7 @@ public class NEATSpecie extends Specie {
         if (specieRepresentative == null) {
             compatable = true;
         } else {
-            compatabilityScore = NEATSpecieManager.specieManager().compatibilityScore(specieApplicant, specieRepresentative, this.excessCoeff, this.disjointCoeff, this.weightCoeff);
+            compatabilityScore = NEATSpecieManager.compatibilityScore(specieApplicant, specieRepresentative, this.excessCoeff, this.disjointCoeff, this.weightCoeff);
             //cat.debug("compatabilityScore:" + compatabilityScore);
             compatable = compatabilityScore < this.specieThreshold();
         }
