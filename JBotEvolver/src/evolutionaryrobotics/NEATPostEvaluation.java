@@ -7,6 +7,7 @@ import java.util.Scanner;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.NEATPostEvaluationResult;
+import taskexecutor.tasks.NEATMultipleSamplePostEvaluationTask;
 import taskexecutor.tasks.NEATSingleSamplePostEvaluationTask;
 
 public class NEATPostEvaluation {
@@ -120,9 +121,13 @@ public class NEATPostEvaluation {
 					jBotEvolver = new JBotEvolver(newArgs);
 
 					for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
-						for(int sample = 0 ; sample < samples ; sample++) {
+						
+						int increment = 10;
+						
+						for(int sample = 0 ; sample < samples ; sample+=increment) {
 							JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
-							NEATSingleSamplePostEvaluationTask t = new NEATSingleSamplePostEvaluationTask(i,generation,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,targetfitness);
+							NEATMultipleSamplePostEvaluationTask t = new NEATMultipleSamplePostEvaluationTask(i,generation,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,sample+increment,targetfitness);
+//							NEATSingleSamplePostEvaluationTask t = new NEATSingleSamplePostEvaluationTask(i,generation,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,targetfitness);
 							taskExecutor.addTask(t);
 							if(showOutput)
 								System.out.print(".");
@@ -130,6 +135,20 @@ public class NEATPostEvaluation {
 						if(showOutput)
 							System.out.println();
 					}
+					
+					for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
+											
+						int increment = 10;
+											
+						for(int sample = 0 ; sample < samples ; sample+=increment) {
+							
+							NEATPostEvaluationResult sfr = (NEATPostEvaluationResult)taskExecutor.getResult();
+							if(showOutput)
+								System.out.println(sfr.getRun()+" "+sfr.getGeneration()+" "+sfr.getFitnesssample()+" "+sfr.getSample()+" "+sfr.getFitness());
+							result[sfr.getRun()-1][sfr.getFitnesssample()][sfr.getGeneration()]+= sfr.getFitness()*(double)increment/(double)samples;
+						}
+					}
+					
 					if(showOutput)
 						System.out.println();
 				}
@@ -138,6 +157,7 @@ public class NEATPostEvaluation {
 			if(showOutput)
 				System.out.println();
 			
+			/*
 			for(int i = startTrial ; i <= maxTrial ; i++) {
 				
 				if(singleEvaluation)
@@ -158,7 +178,7 @@ public class NEATPostEvaluation {
 					}
 				}
 				
-			}
+			}*/
 				
 			taskExecutor.stopTasks();
 			
