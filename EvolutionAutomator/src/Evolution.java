@@ -166,79 +166,57 @@ public class Evolution extends Thread {
 			throws Exception {
 		NEATPostEvaluation p = new NEATPostEvaluation(stringArguments.split(" "));
 		double[][][] values = p.runPostEval();
+
+		int[] bestGenerationIndex = new int[nRuns];
+		double[] bestFitness = new double[nRuns];
+		double[][] generationAverage = new double[nRuns][values[0].length];
+		double[][] generationStdDeviations = new double[nRuns][values[0].length];
 		
-		double[] results = new double[nRuns];
-		double[][] samplesAverages = new double[nRuns][fitnessSamples];
-		double[][] samplesStdDeviations = new double[nRuns][fitnessSamples];
+		int bestRunIndex = 0;
 		
-		int maxIndex = 0;
-		
-		for (int x = 0; x < values.length; x++) {
+		for (int run = 0; run < values.length; run++) {
 			double val = 0;
 
-			for (int y = 0; y < values[x].length; y++) {
-				for (int z = 0; z < values[x][y].length; z++) 
-					val+= values[x][y][z];
+			for (int generation = 0; generation < values[run].length; generation++) {
 				
-				samplesAverages[x][y] = getAverage(values[x][y]);
-				samplesStdDeviations[x][y] = getStdDeviation(values[x][y], samplesAverages[x][y]);
-			}
-			
-			results[x] = val;
-			
-			if(results[x] > results[maxIndex])
-				maxIndex = x;
-		}
-		
-		int best = maxIndex+1;
-		
-		int generationsNumber = values[0][0].length;
-		double[][] generationAverages = new double[nRuns][generationsNumber];
-		
-		for (int x = 0; x < values.length; x++) {
-			for (int z = 0; z < values[x][0].length; z++) {
-				double sampleAverage = 0;
-				for (int y = 0; y < values[x].length; y++) {
-					sampleAverage += values[x][y][z];
+				for (int fitnesssample = 0; fitnesssample < values[run][generation].length; fitnesssample++) {
+					val+= values[run][generation][fitnesssample];
 				}
-				sampleAverage /= values[x].length;
-				generationAverages[x][z] = sampleAverage; 
+
+				generationAverage[run][generation] = getAverage(values[run][generation]);
+				generationStdDeviations[run][generation] = getStdDeviation(values[run][generation], generationAverage[run][generation]);
+
+				val/=(double)values[run][generation].length;
+				
+				if(val > bestFitness[run]) {
+					bestGenerationIndex[run] = generation;
+					bestFitness[run] = val;
+				}
 				
 			}
-		}
-		
-		int[] bestGenerations = new int[nRuns];
-		
-		for (int x = 0; x < generationAverages.length; x++) {
-			double bestFitness = Double.MIN_VALUE;
-			for (int y = 0; y < generationAverages[x].length; y++) {
-				if(generationAverages[x][y] > bestFitness){
-					bestFitness= generationAverages[x][y];
-					bestGenerations[x] = y;
-				}
+			
+			if(bestFitness[run] > bestFitness[bestRunIndex]) {
+				bestRunIndex = run;
 			}
+			
 		}
 		
-		double[] runAverages = new double[nRuns];
-		double[] runStdDeviations = new double[nRuns];
-		
-		for(int x = 0 ; x < runAverages.length ; x++) {
-			runAverages[x] = getAverage(samplesAverages[x]);
-			runStdDeviations[x] = getStdDeviation(samplesAverages[x], runAverages[x]);
-		}
+		int best = bestRunIndex+1;
+		double overallAverage = 0;
 		
 		String result = "#best: "+best+"\n";
-		for(int i = 0 ; i < samplesAverages.length ; i++) {
-			result+=(i+1)+" ";
-			for(double j : samplesAverages[i])
-				result+=j+" ";
+		for(int run = 0 ; run < nRuns ; run++) {
+			result+=(run+1)+" ";
 			
-			result+="("+runAverages[i]+" +- "+runStdDeviations[i]+") " + bestGenerations[i] + "\n";
+			for(double fitnessSampleVal : values[run][bestGenerationIndex[run]])
+				result+=fitnessSampleVal+" ";
+			
+			overallAverage+= generationAverage[run][bestGenerationIndex[run]] / (double)nRuns;
+			
+			result+=" ("+generationAverage[run][bestGenerationIndex[run]]+" +- "+generationStdDeviations[run][bestGenerationIndex[run]]+") " + bestGenerationIndex[run] + "\n";
 		}
 		
-		double overallAverage = getOverallAverage(samplesAverages, nRuns);
-		
-		result+="Overall: "+overallAverage+" +- "+getOverallStdDeviation(samplesAverages, nRuns);
+		result+="Overall: "+overallAverage+" +- "+getOverallStdDeviation(generationAverage, nRuns);
 		
 		System.out.println(result);
 		

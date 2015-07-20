@@ -2,9 +2,12 @@ package evolutionaryrobotics;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Scanner;
 
 import simulation.util.Arguments;
+import taskexecutor.ConillonTaskExecutor;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.NEATPostEvaluationResult;
 import taskexecutor.tasks.NEATMultipleSamplePostEvaluationTask;
@@ -85,7 +88,7 @@ public class NEATPostEvaluation {
 				generationNumber = getGenerationNumberFromFile(dir+startTrial+"/_generationnumber");
 			}
 			
-			result = new double[maxTrial][fitnesssamples][generationNumber];
+			result = new double[maxTrial][generationNumber][fitnesssamples];
 			
 			String[] newArgs = args != null ? new String[args.length+1] : new String[1];
 			
@@ -104,8 +107,10 @@ public class NEATPostEvaluation {
 				taskExecutor.start();
 			}
 			
-			taskExecutor.setTotalNumberOfTasks((maxTrial-startTrial)*fitnesssamples*samples);
-		
+			boolean setNumberOfTasks = false;
+			int sampleIncrement = samples;
+			int totalTasks = 0;
+			
 			for(int i = startTrial ; i <= maxTrial ; i++) {
 				if(singleEvaluation)
 					file = dir+"/show_best/";
@@ -114,20 +119,29 @@ public class NEATPostEvaluation {
 				
 				File directory = new File(file);
 				
-				for (File f : directory.listFiles()) {
+				int numberOfGenerations = directory.listFiles().length;
+				
+				if(!setNumberOfTasks) {
+					totalTasks = (maxTrial - startTrial + 1)*fitnesssamples*samples*numberOfGenerations/sampleIncrement;
+					taskExecutor.setTotalNumberOfTasks(totalTasks);
+					setNumberOfTasks = true;
+				}
+				
+				
+				File[] files = directory.listFiles();
+				sortByNumber(files);
+				
+				for (File f : files) {
 					int generation = Integer.valueOf(f.getName().substring(8, f.getName().indexOf(".")));
 
 					newArgs[0] = file + f.getName();
 					jBotEvolver = new JBotEvolver(newArgs);
-
+					
 					for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
 						
-						int increment = 10;
-						
-						for(int sample = 0 ; sample < samples ; sample+=increment) {
+						for(int sample = 0 ; sample < samples ; sample+=sampleIncrement) {
 							JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
-							NEATMultipleSamplePostEvaluationTask t = new NEATMultipleSamplePostEvaluationTask(i,generation,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,sample+increment,targetfitness);
-//							NEATSingleSamplePostEvaluationTask t = new NEATSingleSamplePostEvaluationTask(i,generation,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,targetfitness);
+							NEATMultipleSamplePostEvaluationTask t = new NEATMultipleSamplePostEvaluationTask(i,generation,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,sample+sampleIncrement,targetfitness);
 							taskExecutor.addTask(t);
 							if(showOutput)
 								System.out.print(".");
@@ -136,21 +150,24 @@ public class NEATPostEvaluation {
 							System.out.println();
 					}
 					
-					for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
-											
-						int increment = 10;
-											
-						for(int sample = 0 ; sample < samples ; sample+=increment) {
-							
-							NEATPostEvaluationResult sfr = (NEATPostEvaluationResult)taskExecutor.getResult();
-							if(showOutput)
-								System.out.println(sfr.getRun()+" "+sfr.getGeneration()+" "+sfr.getFitnesssample()+" "+sfr.getSample()+" "+sfr.getFitness());
-							result[sfr.getRun()-1][sfr.getFitnesssample()][sfr.getGeneration()]+= sfr.getFitness()*(double)increment/(double)samples;
-						}
-					}
+					taskExecutor.setDescription(dir+i+"/"+(generation+1)+" out of "+numberOfGenerations+" (total tasks: "+totalTasks+")");
 					
 					if(showOutput)
 						System.out.println();
+				}
+				
+				for(int gen = 0 ; gen < numberOfGenerations ; gen++) {
+				
+					for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
+						
+						for(int sample = 0 ; sample < samples ; sample+=sampleIncrement) {
+							
+							NEATPostEvaluationResult sfr = (NEATPostEvaluationResult)taskExecutor.getResult();
+							result[sfr.getRun()-1][sfr.getGeneration()][sfr.getFitnesssample()]+= sfr.getFitness()*(double)sampleIncrement/(double)samples;
+							if(showOutput)
+								System.out.println(sfr.getRun()+" "+sfr.getGeneration()+" "+sfr.getFitnesssample()+" "+sfr.getSample()+" "+sfr.getFitness());
+						}
+					}
 				}
 			}
 			
@@ -189,6 +206,31 @@ public class NEATPostEvaluation {
 		
 		return result;
 	}
+	
+	 public void sortByNumber(File[] files) {
+	        Arrays.sort(files, new Comparator<File>() {
+	            @Override
+	            public int compare(File o1, File o2) {
+	                int n1 = extractNumber(o1.getName());
+	                int n2 = extractNumber(o2.getName());
+	                return n1 - n2;
+	            }
+
+	            private int extractNumber(String name) {
+	                int i = 0;
+	                name = name.replace("showbest", "");
+	                name = name.replace(".conf", "");
+	                try {
+	                    i = Integer.parseInt(name);
+	                } catch(Exception e) {
+	                    i = 0; // if filename does not match the format
+	                           // then default to 0
+	                }
+	                return i;
+	            }
+	        });
+
+	    }
 	
 	private int getGenerationNumberFromFile(String file) {
 		Scanner s = null;

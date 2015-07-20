@@ -210,7 +210,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		Main main = new Main(args);
-//		Main main = new Main(new String[]{"waypoint.conf"});
+//		Main main = new Main(new String[]{"rudder.conf"});
 		main.execute();
 	}
 }

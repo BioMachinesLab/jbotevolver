@@ -94,7 +94,7 @@ public class PostEvaluation {
 				taskExecutor.start();
 			}
 			
-			taskExecutor.setTotalNumberOfTasks((maxTrial-startTrial)*fitnesssamples*samples);
+			taskExecutor.setTotalNumberOfTasks((maxTrial - startTrial + 1)*fitnesssamples*samples);
 		
 			for(int i = startTrial ; i <= maxTrial ; i++) {
 				if(singleEvaluation)
