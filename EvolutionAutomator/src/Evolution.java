@@ -179,20 +179,22 @@ public class Evolution extends Thread {
 
 			for (int generation = 0; generation < values[run].length; generation++) {
 				
+				val = 0;
+				
 				for (int fitnesssample = 0; fitnesssample < values[run][generation].length; fitnesssample++) {
 					val+= values[run][generation][fitnesssample];
 				}
-
+				
 				generationAverage[run][generation] = getAverage(values[run][generation]);
 				generationStdDeviations[run][generation] = getStdDeviation(values[run][generation], generationAverage[run][generation]);
 
 				val/=(double)values[run][generation].length;
 				
+				
 				if(val > bestFitness[run]) {
 					bestGenerationIndex[run] = generation;
 					bestFitness[run] = val;
 				}
-				
 			}
 			
 			if(bestFitness[run] > bestFitness[bestRunIndex]) {
