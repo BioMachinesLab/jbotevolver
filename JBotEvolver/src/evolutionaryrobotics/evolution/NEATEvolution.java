@@ -34,6 +34,11 @@ public class NEATEvolution extends Evolution {
 	public NEATEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
 		population = (NEATPopulation)jBotEvolver.getPopulation();
+		
+		if(jBotEvolver.getArguments().get("--population").getArgumentIsDefined("generations"))
+			population.setNumberOfGenerations(jBotEvolver.getArguments().get("--population").getArgumentAsInt("generations"));
+		population.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
+		
 		descriptor = new NEATGADescriptor();
 		configureDescriptor(args);
 		

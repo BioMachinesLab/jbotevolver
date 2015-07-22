@@ -99,6 +99,7 @@ public class Graph extends JPanel {
 	}
 	
 	public void addDataList(Double[] dataList){
+		
 		Vector<Double> aux = new Vector<Double>();
 		
 		for (int i = 0; i < dataList.length; i++) {

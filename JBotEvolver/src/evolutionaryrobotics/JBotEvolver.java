@@ -59,7 +59,7 @@ public class JBotEvolver extends JBotSim {
 		return null;
 	}
 	
-public ArrayList<Robot> createRobots(Simulator simulator, Chromosome chromosome) {
+	public ArrayList<Robot> createRobots(Simulator simulator, Chromosome chromosome) {
 		
 		ArrayList<Robot> totalRobots = new ArrayList<Robot>();
 		
