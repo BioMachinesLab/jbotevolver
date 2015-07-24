@@ -145,8 +145,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	
 	protected void drawRobotId(Graphics g, Robot robot){
 		
-		int x = transformX(robot.getPosition().x + robot.getRadius());
-		int y = transformY(robot.getPosition().y - robot.getDiameter());
+		int x = transformX(robot.getPosition().x + robot.getRadius() + (bigRobots ? 1 : 0));
+		int y = transformY(robot.getPosition().y - robot.getDiameter() - (bigRobots ? 1 : 0));
 		
 		g.setColor(Color.WHITE);
 		g.fillRect(x, y-10, 8, 10);
@@ -337,16 +337,16 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		if (avgColor > 255/2) {
 			graphics.setColor(Color.BLACK);
 		} else {
-			graphics.setColor(Color.WHITE);
+			graphics.setColor(Color.RED);
 		}
 
 		double orientation  = robot.getOrientation();
 		Vector2d p0 = new Vector2d();
 		Vector2d p1 = new Vector2d();
 		Vector2d p2 = new Vector2d();
-		p0.set( 0, -robot.getRadius() / 3);
-		p1.set( 0, robot.getRadius() / 3);
-		p2.set( 6 * robot.getRadius() / 7, 0);
+		p0.set( 0, -(circleDiameter/3) / 3);
+		p1.set( 0, (circleDiameter/3) / 3);
+		p2.set( 6 * (circleDiameter/3) / 7, 0);
 
 		p0.rotate(orientation);
 		p1.rotate(orientation);
