@@ -42,8 +42,8 @@ public class Graph extends JPanel {
 	private int showLast = 2000;
 	private String xLabel = "";
 	private String yLabel = "";
-	private double max = 0;
-	private double min = 0;
+	private double max = -Double.MAX_VALUE;
+	private double min = Double.MAX_VALUE;
 	private double xInc = 0;
 	private double scale = 0;
 	private DecimalFormat df = new DecimalFormat("#.##");
@@ -99,6 +99,10 @@ public class Graph extends JPanel {
 	}
 	
 	public void addDataList(Double[] dataList){
+		
+//		for (int i = 0; i < dataList.length; i++)
+//			if(dataList[i] != null)
+//				dataList[i]-=10;
 		
 		Vector<Double> aux = new Vector<Double>();
 		
