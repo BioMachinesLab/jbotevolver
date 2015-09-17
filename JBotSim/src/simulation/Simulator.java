@@ -206,8 +206,9 @@ public class Simulator implements Serializable {
 		for (time = Double.valueOf(0); time < environment.getSteps() && !stopSimulation; time++) {
 			performOneSimulationStep(time);
 		}
-                terminate();
-                
+		stopSimulation = true;
+		if(network != null)
+			network.shutdown();
 	}
 	
 	public void simulate(long sleepTime) {
@@ -219,22 +220,10 @@ public class Simulator implements Serializable {
 				Thread.sleep(sleepTime);
 			} catch (InterruptedException e) {}
 		}
-		terminate();
-	}
-        
-        public void terminate() {
-            	stopSimulation = true;
+		stopSimulation = true;
 		if(network != null)
 			network.shutdown();
-                for(Updatable u : callbacks) {
-                    if(u instanceof Stoppable) {
-                        Stoppable s = (Stoppable) u;
-                        s.terminate(this);
-                    }
-                }
-        }
-        
-       
+	}
 
 	public double getTimeDelta() {
 		return timeDelta;
