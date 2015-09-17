@@ -7,11 +7,13 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.StringTokenizer;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 public class ClassSearchUtils {
-
+    
+        static private ConcurrentHashMap<String, List<String>> lookupMap = new ConcurrentHashMap<>();
 
 	public static String getClassFullName(String className){
 		List<String> names = ClassSearchUtils.searchFullNameInPath(className);
@@ -27,7 +29,10 @@ public class ClassSearchUtils {
 	
 	
 	public static List<String> searchFullNameInPath(String className) {
-		
+            List<String> get = lookupMap.get(className);
+            if(get != null) {
+                return get;
+            } else {		
 		ArrayList<String> classNames = new ArrayList<String>();
 		ClassLoader classloader = className.getClass().getClassLoader();
 		String classpath = System.getProperty("java.class.path");
@@ -71,8 +76,10 @@ public class ClassSearchUtils {
 				}
 			}
 		}
+                lookupMap.put(className, classNames);
 		return classNames;
 	}
+        }
 
 	/**
 	 * @param name
