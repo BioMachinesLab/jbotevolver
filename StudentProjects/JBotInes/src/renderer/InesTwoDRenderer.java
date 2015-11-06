@@ -1,6 +1,7 @@
 package renderer;
 
 import environment.OpenEnvironment;
+import environment.OpenEnvironment2;
 import gui.renderer.TwoDRendererDebug;
 
 import java.awt.Color;
@@ -26,9 +27,10 @@ public class InesTwoDRenderer extends TwoDRendererDebug {
 	@Override
 	protected void drawArea(Graphics g, Environment environment) {
 		if(drawArea){
-
-			OpenEnvironment env = (OpenEnvironment) environment;
-
+			
+			OpenEnvironment2 env = (OpenEnvironment2) environment;
+			//OpenEnvironment env = (OpenEnvironment) environment;
+			
 			ArrayList<Robot> typeA = env.getTypeARobots();
 			ArrayList<Robot> typeB = env.getTypeBRobots();
 
