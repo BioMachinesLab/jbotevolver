@@ -42,8 +42,4 @@ public class CoveredAreaEvaluationFunction8 extends EvaluationFunction{
 		//bonus * 6 (minimum numb of robots) / total numb of robots
 	}
 
-
-	
-
-
 }

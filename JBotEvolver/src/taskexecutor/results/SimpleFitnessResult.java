@@ -5,7 +5,7 @@ import result.Result;
 public class SimpleFitnessResult extends Result {
 	private int chromosomeId;
 	private double fitness = 0;
-
+	
 
 	public SimpleFitnessResult(int chromosomeId, double fitness) {
 		super();

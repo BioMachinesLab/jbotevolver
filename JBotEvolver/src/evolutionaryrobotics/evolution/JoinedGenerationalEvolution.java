@@ -1,13 +1,16 @@
 package evolutionaryrobotics.evolution;
 
 import java.text.DecimalFormat;
+import java.util.Random;
 
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 import taskexecutor.TaskExecutor;
+import taskexecutor.results.PostEvaluationResult;
 import taskexecutor.results.SimpleFitnessResult;
+import taskexecutor.tasks.MultipleChromosomeSingleSampleTask;
 import taskexecutor.tasks.MultipleChromosomeTask;
 import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
@@ -25,6 +28,7 @@ public class JoinedGenerationalEvolution extends Evolution{
 	protected String output = "";
 	protected DecimalFormat df = new DecimalFormat("#.##");
 	private int numberOfChromossomes;
+	private boolean singleSampleTask = false;
 
 	public JoinedGenerationalEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
@@ -35,6 +39,7 @@ public class JoinedGenerationalEvolution extends Evolution{
 		populationArguments.setArgument("genomelengthstr", getGenomeLengthStr());
 		populationArguments.setArgument("genomelength", getGenomeLength());
 		populationArguments.setArgument("numberofchromossomes", numberOfChromossomes);
+		singleSampleTask = args.getFlagIsTrue("singlesampletask");
 		
 		supressMessages = args.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
 		
@@ -81,26 +86,52 @@ public class JoinedGenerationalEvolution extends Evolution{
 			
 			MultipleChromosome c;
 			
-			int totalChromosomes = 0;
+			int totalTasks = 0;
+			
+			int samples = population.getNumberOfSamplesPerChromosome();
 			
 			while ((c = (MultipleChromosome) population.getNextChromosomeToEvaluate()) != null && executeEvolution) {
-				int samples = population.getNumberOfSamplesPerChromosome();
 				
-				taskExecutor.addTask(new MultipleChromosomeTask(
-						new JBotEvolver(jBotEvolver.getArgumentsCopy(), jBotEvolver.getRandomSeed()),
-						samples,c,population.getGenerationRandomSeed())
-				);
-				
-				totalChromosomes++;
-				print(".");
+				if(!singleSampleTask) {
+					
+					taskExecutor.addTask(new MultipleChromosomeTask(
+							new JBotEvolver(jBotEvolver.getArgumentsCopy(), jBotEvolver.getRandomSeed()),
+							samples,c,population.getGenerationRandomSeed())
+					);
+					
+					totalTasks++;
+					print(".");
+				} else {
+					Random r = new Random(population.getGenerationRandomSeed());
+					for(int s = 0 ; s < samples ; s++){
+						taskExecutor.addTask(new MultipleChromosomeSingleSampleTask(
+								new JBotEvolver(jBotEvolver.getArgumentsCopy(), jBotEvolver.getRandomSeed()),
+								s,c,r.nextLong())
+						);
+						
+						totalTasks++;
+						print(".");
+					}
+				}
 			}
 			
 			print("\n");
 			
-			while(totalChromosomes-- > 0 && executeEvolution) {
-				SimpleFitnessResult result = (SimpleFitnessResult)taskExecutor.getResult();
-				population.setEvaluationResultForId(result.getChromosomeId(), result.getFitness());
-				print("!");
+			if(!singleSampleTask) {
+				while(totalTasks-- > 0 && executeEvolution) {
+					SimpleFitnessResult result = (SimpleFitnessResult)taskExecutor.getResult();
+					population.setEvaluationResultForId(result.getChromosomeId(), result.getFitness());
+					print("!");
+				}
+			} else {
+				double[] results = new double[this.population.getPopulationSize()];
+				while(totalTasks-- > 0 && executeEvolution) {
+					PostEvaluationResult result = (PostEvaluationResult)taskExecutor.getResult();
+					results[result.getRun()]+=result.getFitness()/samples;
+					print("!");
+				}
+				for(int ch = 0 ; ch < results.length ; ch++)
+					population.setEvaluationResultForId(ch, results[ch]);
 			}
 			
 			if(executeEvolution) {
