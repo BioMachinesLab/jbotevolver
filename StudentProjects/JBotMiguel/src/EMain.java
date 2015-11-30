@@ -9,7 +9,7 @@ import gui.evolution.EvolutionGui;
 public class EMain {
 	public static void main(String[] args) throws Exception {
 		
-		String configName = "neat_parameter_test.conf";
+		String configName = "nsga2.conf";
 		
 		try {
 			args = new String[]{configName};

@@ -2,7 +2,7 @@ package evaluationfunctions;
 
 import mathutils.Vector2d;
 import roommaze.ClutteredMazeEnvironment;
-import roommaze.TMazeEnvironment.Square;
+import roommaze.Square;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.sensors.NearRobotSensor;

@@ -29,7 +29,7 @@ public class ButtonActuator extends Actuator {
 	}
 
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot, double timeDelta) {
 		
 		if(activation > 0.5) {
 			TwoRoomsEnvironment env = (TwoRoomsEnvironment)simulator.getEnvironment();

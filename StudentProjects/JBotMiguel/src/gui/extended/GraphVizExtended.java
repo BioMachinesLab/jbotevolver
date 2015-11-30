@@ -1,22 +1,10 @@
 package gui.extended;
 
-import java.util.ArrayList;
-
-import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
-import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import gui.util.GraphViz;
-import neat.ERNEATNetwork;
-import neat.continuous.NEATContinuousNetwork;
-import neat.layerered.ANNNeuron;
-import neat.layerered.ANNSynapse;
-import neat.layerered.LayeredANN;
-import neat.layerered.LayeredNeuralNetwork;
 
-import org.encog.neural.neat.NEATLink;
-import org.encog.neural.neat.NEATNetwork;
 
 public class GraphVizExtended extends GraphViz {
-	
+	/*	
    public GraphVizExtended() {
 	   super();
    }
@@ -158,5 +146,5 @@ public class GraphVizExtended extends GraphViz {
 		   		+ "];");
 	   }
 	   
-   }
+   }*/
 }

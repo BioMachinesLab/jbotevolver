@@ -83,7 +83,6 @@ public class TMazeEnvironment extends Environment {
 	public TMazeEnvironment(Simulator simulator, Arguments arguments, boolean firstWall) {
 		super(simulator, arguments);
 		this.random = simulator.getRandom();
-		//this.fileProvider = simulator.getFileProvider();
 		
 		this.firstWall = firstWall;
 		
@@ -365,34 +364,6 @@ public class TMazeEnvironment extends Environment {
 	
 	public double getImageSize() {
 		return imageSize;
-	}
-	
-	public static class Square {
-		double x;
-		double y;
-		int walls[] = {0,0,0,0};
-		double distanceToFinish = 0;
-		
-		public double getDistance() {
-			return distanceToFinish;
-		}
-		
-		public int[] getWalls() {
-			return walls;
-		}
-		
-		public double getX() {
-			return x;
-		}
-		
-		public double getY() {
-			return y;
-		}
-		
-		@Override
-		public String toString() {
-			return x+" "+y+" "+distanceToFinish;
-		}
 	}
 
 	public boolean killSample() {
