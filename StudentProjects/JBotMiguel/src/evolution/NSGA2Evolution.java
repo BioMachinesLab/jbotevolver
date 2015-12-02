@@ -123,17 +123,6 @@ public class NSGA2Evolution extends GenerationalEvolution{
 			for(PostEvaluator p : postEvaluators)
 				p.processPopulation(population);
 			
-			for(Chromosome c : population.getChromosomes()) {
-				MOChromosome moc = (MOChromosome)c;
-				EvaluationResult res = moc.getEvaluationResult();
-				ExpandedFitness exp = (ExpandedFitness)res;
-//				System.out.print(moc.getID()+" ");
-//				
-//				for(String s: evaluations) {
-//					System.out.print(exp.getScore(s)+" ");
-//				}
-//				System.out.println();
-			}
 			processPopulation();
 			
 			if(executeEvolution) {

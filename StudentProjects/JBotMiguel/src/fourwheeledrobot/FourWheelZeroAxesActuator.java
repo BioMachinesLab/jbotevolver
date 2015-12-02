@@ -10,7 +10,7 @@ import simulation.robot.actuators.TwoWheelActuator;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
-public class FourWheelActuator extends MultipleWheelAxesActuator{
+public class FourWheelZeroAxesActuator extends MultipleWheelAxesActuator{
 	
 	/**
 	 * Diagram of the robot (north pointing forward) and the positions of the 4 wheels
@@ -22,7 +22,7 @@ public class FourWheelActuator extends MultipleWheelAxesActuator{
 	 *  2.|_|.3
 	 */
 	
-	public FourWheelActuator(Simulator simulator, int id, Arguments args) {
+	public FourWheelZeroAxesActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator,id,args,4,0);
 		
 	}

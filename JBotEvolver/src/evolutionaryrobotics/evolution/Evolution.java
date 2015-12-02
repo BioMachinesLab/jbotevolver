@@ -12,10 +12,13 @@ public abstract class Evolution {
 	protected TaskExecutor taskExecutor;
 	protected boolean executeEvolution = true;
 	protected boolean evolutionFinished = false;
+	protected boolean supressMessages = false;
+	
 
 	public Evolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		this.taskExecutor = taskExecutor;
 		this.jBotEvolver = jBotEvolver;
+		supressMessages = args.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
 	}
 
 	public abstract void executeEvolution();
@@ -35,5 +38,10 @@ public abstract class Evolution {
 
 		return (Evolution) Factory.getInstance(
 				arguments.getArgumentAsString("classname"), jBotEvolver, taskExecutor, arguments);
+	}
+	
+	protected void print(String s) {
+		if(!supressMessages)
+			System.out.print(s);
 	}
 }

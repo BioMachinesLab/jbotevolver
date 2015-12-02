@@ -3,6 +3,7 @@ package gui.renderer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.RadialGradientPaint;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -11,6 +12,8 @@ import java.awt.geom.Point2D;
 import mathutils.Vector2d;
 import net.jafama.FastMath;
 import simulation.physicalobjects.Nest;
+import simulation.physicalobjects.Wall;
+import simulation.physicalobjects.collisionhandling.knotsandbolts.PolygonShape;
 import simulation.robot.LedState;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
@@ -60,6 +63,35 @@ public class TwoDRendererDebug extends TwoDRenderer {
 					}
 				}
 			}
+		}
+	}
+	
+	@Override
+	public void drawWall(Wall w) {
+		super.drawWall(w);
+		
+		graphics.setColor(Color.RED);
+		PolygonShape s = (PolygonShape)w.shape;
+		Polygon p = s.getPolygon();
+		
+		int[] xs = p.xpoints.clone();
+		int[] ys = p.ypoints.clone();
+		
+		for(int i = 0 ; i < xs.length ; i++) {
+			double x = xs[i]/10000.0;
+			double y = ys[i]/10000.0;
+			xs[i] = transformX(x);
+			ys[i] = transformY(y);
+		}
+		
+		Polygon e2 = new Polygon(xs,ys,4);
+		Graphics2D g2 = (Graphics2D) graphics;
+		
+		g2.draw(e2);
+		
+		if(s.collision) {
+			g2.fill(e2);
+			s.collision = false;
 		}
 	}
 	

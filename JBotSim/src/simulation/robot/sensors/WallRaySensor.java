@@ -80,9 +80,16 @@ public class WallRaySensor extends ConeTypeSensor {
 				for(int i = 0 ; i < numberOfRays ; i++) {
 					//the multiplication by 5 is necessary because of the close/far objects estimation
 					//the number 5 is arbitrary
+					
+					double angle = orientation - halfOpening + alpha*i;
+					
+					if(numberOfRays == 1) {
+						angle = orientation;
+					}
+					
 					cones[sensorNumber][i].set(
-							FastMath.cosQuick(orientation - halfOpening + alpha*i)* range*5 + sensorPositions[sensorNumber].getX(),
-							FastMath.sinQuick(orientation - halfOpening + alpha*i)* range*5 + sensorPositions[sensorNumber].getY()
+							FastMath.cosQuick(angle)* range*5 + sensorPositions[sensorNumber].getX(),
+							FastMath.sinQuick(angle)* range*5 + sensorPositions[sensorNumber].getY()
 						 );
 				}
 			}
@@ -181,6 +188,7 @@ public class WallRaySensor extends ConeTypeSensor {
 	
 	@Override
 	protected void calculateSourceContributions(PhysicalObjectDistance source) {
+		
 		for(int j=0; j<numberOfSensors; j++){
 			if(openingAngle > 0.018){ //1degree
 				calculateContributionToSensor(j, source);

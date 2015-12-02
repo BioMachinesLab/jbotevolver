@@ -1,8 +1,10 @@
-package novelty;
+package novelty.results;
 
 import java.util.Arrays;
 
 import net.jafama.FastMath;
+import novelty.BehaviourResult;
+import novelty.EvaluationResult;
 
 public class VectorBehaviourResult implements BehaviourResult {
 

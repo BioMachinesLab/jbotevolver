@@ -992,7 +992,7 @@ public class ResultViewerGui extends Gui implements Updatable{
 		
 		Simulator simulator = jBotEvolver.createSimulator();
 
-		evaluationFunction = jBotEvolver.getEvaluationFunction();
+		evaluationFunction = jBotEvolver.getEvaluationFunction()[0];
 
 		simulator.addCallback(evaluationFunction);
 		

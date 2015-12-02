@@ -11,10 +11,12 @@ public class MovableObject extends PhysicalObject {
 	public static final double  MAXIMUMSPEED      = 1000;
 	public static final double  TWICEMAXIMUMSPEEDPERTIMESTEP = 2.0 * MAXIMUMSPEED / NUMBER_OF_CYCLES_PER_SECOND;
 	protected Environment env;
+	protected Vector2d previousPosition;
 	
 	public MovableObject(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		this.env = simulator.getEnvironment();
+		this.previousPosition = position;
 	}
 	
 	public MovableObject(Simulator simulator, String name, double x, double y, double orientation, double mass, PhysicalObjectType type) {
@@ -39,5 +41,10 @@ public class MovableObject extends PhysicalObject {
 		
 	public void moveTo(Vector2d position) {
 		this.position.set(position);
+		this.previousPosition = position;
+	}
+	
+	public Vector2d getPreviousPosition() {
+		return previousPosition;
 	}
 }

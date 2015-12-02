@@ -111,14 +111,6 @@ public class MixedPopulation extends MuLambdaPopulation{
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 	}
 
-	private void resetGeneration() {
-		bestFitness = -1e10;
-		accumulatedFitness = 0;
-		worstFitness = 1e10;
-		numberOfChromosomesEvaluated = 0;
-		nextChromosomeToEvaluate = 0;
-	}
-
 	@Override
 	public void createRandomPopulation() {
 

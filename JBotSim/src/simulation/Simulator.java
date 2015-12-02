@@ -52,6 +52,10 @@ public class Simulator implements Serializable {
 			timeDelta = args.getArgumentAsDoubleOrSetDefault("timedelta", timeDelta);
 			parallel = args.getArgumentAsIntOrSetDefault("parallel", 0) == 1;
 			
+			if(args.getArgumentIsDefined("fixedseed")) {
+				this.random = new Random(args.getArgumentAsInt("fixedseed"));
+			}
+			
 			if(args.getArgumentIsDefined("network")) {
 				network = Network.getNetwork(this, new Arguments(args.getArgumentAsString("network"),true));
 			}

@@ -65,6 +65,9 @@ public abstract class ConeTypeSensor extends Sensor {
 	@ArgumentsAnnotation(name = "eyesangle", help="Value of the distance between the two front sensors of the robot.", defaultValue = "15")
 	protected int eyesAngle = 15;
 	
+	@ArgumentsAnnotation(name = "binary", help="", defaultValue = "0")
+	protected boolean binary = false;
+	
 	public ConeTypeSensor(Simulator simulator, int id, Robot robot, Arguments args) {
 		super(simulator,id, robot, args);
 		this.geoCalc = new GeometricCalculator();//simulator.getGeoCalculator();
@@ -90,6 +93,7 @@ public abstract class ConeTypeSensor extends Sensor {
 		eyesFrontBack = args.getArgumentAsIntOrSetDefault("eyesfront&back", 0) == 1;
 		eyesAngle = args.getArgumentAsIntOrSetDefault("eyesangle", eyesAngle);
 		epuckSensorsPosition = args.getArgumentAsIntOrSetDefault("epucksensorsposition", 0) == 1;
+		binary = args.getFlagIsTrue("binary");
 
 		cutOff = range;
 		
@@ -108,7 +112,7 @@ public abstract class ConeTypeSensor extends Sensor {
 			angles[2]= FastMath.toRadians(270);
 			angles[3]= FastMath.toRadians(343);
 		}else if(angleposition < 0)
-			setupPositions(numberOfSensors);
+			setupPositions(numberOfSensors, args);
 		else
 			angles[0] = FastMath.toRadians(angleposition);
 		
@@ -141,12 +145,21 @@ public abstract class ConeTypeSensor extends Sensor {
 		}
 	}
 	
-	public void setupPositions(int numberSensors) {
-		double delta = 2 * Math.PI / numberSensors;
-		double angle = 0;
-		for (int i=0;i< numberSensors;i++){
-			angles[i] = angle;
-			angle+=delta;
+	public void setupPositions(int numberSensors, Arguments args) {
+		
+		if(args.getArgumentIsDefined("angles")) {
+			
+			String[] split =args.getArgumentAsString("angles").split(","); 
+			for (int i = 0; i < numberSensors; i++){
+				angles[i] = Math.toRadians(Double.parseDouble(split[i]));
+			}
+		} else {
+			double delta = 2 * Math.PI / numberSensors;
+			double angle = 0;
+			for (int i = 0; i < numberSensors; i++){
+				angles[i] = angle;
+				angle+=delta;
+			}
 		}
 	}
 
@@ -205,6 +218,12 @@ public abstract class ConeTypeSensor extends Sensor {
 			
 			if(checkObstacles)
 				checkObstacles(time, teleported);
+			
+			if(binary) {
+				for(int j = 0; j < readings.length; j++){
+					readings[j] = readings[j] != 0 ? 1.0 : 0.0;
+				}
+			}
 
 		} catch (Exception e) {
 			e.printStackTrace(); 

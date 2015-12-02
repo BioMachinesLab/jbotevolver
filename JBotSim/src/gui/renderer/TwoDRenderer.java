@@ -1,26 +1,32 @@
 package gui.renderer;
 
 import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Polygon;
 import java.awt.RadialGradientPaint;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
+import java.awt.geom.Ellipse2D.Double;
 import java.awt.image.BufferedImage;
 
 import mathutils.Point2d;
 import mathutils.Vector2d;
-import net.jafama.FastMath;
 import simulation.environment.Environment;
 import simulation.physicalobjects.GroundBand;
 import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.Line;
+import simulation.physicalobjects.Marker;
 import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
+import simulation.physicalobjects.Wall.Edge;
+import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
+import simulation.physicalobjects.collisionhandling.knotsandbolts.PolygonShape;
+import simulation.physicalobjects.collisionhandling.knotsandbolts.Shape;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
@@ -86,6 +92,9 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 					case LIGHTPOLE:
 						drawLightPole(graphics, (LightPole)m);
 						break;
+					case MARKER:
+						drawMarker(graphics,(Marker)m);
+						break;
 				}
 				
 				if(m instanceof GroundBand) {
@@ -129,6 +138,27 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		drawArea(graphics, simulator.getEnvironment());
 		
 		repaint();
+	}
+	
+	protected void drawMarker(Graphics g, Marker m) {
+		
+		int markerSize = 2;
+		double markerLength = m.getLength();
+		
+		int x = transformX(m.getPosition().x);
+		int y = transformY(m.getPosition().y);
+		
+		g.setColor(m.getColor());
+		g.drawOval(x-markerSize/2, y-markerSize/2, markerSize, markerSize);
+		
+		double orientation = m.getOrientation();
+		Vector2d endPoint = new Vector2d(m.getPosition());
+		endPoint.add(new Vector2d(markerLength*Math.cos(orientation),markerLength*Math.sin(orientation)));
+		
+		int x2 = transformX(endPoint.x);
+		int y2 = transformY(endPoint.y);
+		
+		g.drawLine(x, y, x2, y2);
 	}
 	
 	protected void drawEntities(Graphics graphics2, Robot m) {
@@ -235,17 +265,44 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		
 	}
 
-    public void drawWall(Wall m) {
+    public void drawWall(Wall w) {
     	
-		graphics.setColor(m.color);
+		graphics.setColor(w.color);
 		
-    	int wallWidth = (int) (m.getWidth() * scale);
-		int wallHeight = (int) (m.getHeight()* scale);
-		int x = (int) transformX(m.getTopLeftX());
-		int y = (int) transformY(m.getTopLeftY());
+		Edge[] edges = w.getEdges();
 		
-		graphics.fillRect(x, y, wallWidth, wallHeight);
+//		for(int i = 0 ;  i < edges.length ; i++) {
+//			if(i==3)
+//			graphics.drawLine(
+//					(int)(transformX(edges[i].getP1().x)), 
+//					(int)(transformY(edges[i].getP1().y)), 
+//					(int)(transformX(edges[i].getP2().x)), 
+//					(int)(transformY(edges[i].getP2().y))
+//					);
+//		}
+		
+		int[] xs = new int[4];
+		xs[0] = transformX(edges[3].getP1().x);
+		xs[1] = transformX(edges[1].getP1().x);
+		xs[2] = transformX(edges[2].getP1().x);
+		xs[3] = transformX(edges[0].getP1().x);
+		
+		int[] ys = new int[4];
+		ys[0] = transformY(edges[3].getP1().y);
+		ys[1] = transformY(edges[1].getP1().y);
+		ys[2] = transformY(edges[2].getP1().y);
+		ys[3] = transformY(edges[0].getP1().y);
+		
+		graphics.fillPolygon(xs, ys, 4);
+		
+//    	int wallWidth = (int) (m.getWidth() * scale);
+//		int wallHeight = (int) (m.getHeight()* scale);
+//		int x = (int) transformX(m.getTopLeftX());
+//		int y = (int) transformY(m.getTopLeftY());
+//		
+//		graphics.fillRect(x, y, wallWidth, wallHeight);
 		graphics.setColor(Color.BLACK);
+		
 	}
 
 	//	@Override
@@ -320,6 +377,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
 			createImage();
+
 		int circleDiameter = bigRobots ? (int)Math.max(10,Math.round(robot.getDiameter() * scale)) : (int) Math.round(robot.getDiameter() * scale);
 		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
 		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
@@ -344,10 +402,11 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		Vector2d p0 = new Vector2d();
 		Vector2d p1 = new Vector2d();
 		Vector2d p2 = new Vector2d();
-		p0.set( 0, -(circleDiameter/3) / 3);
-		p1.set( 0, (circleDiameter/3) / 3);
-		p2.set( 6 * (circleDiameter/3) / 7, 0);
-
+		
+		p0.set( 0, -robot.getDiameter()/4);
+		p1.set( 0, robot.getDiameter()/4);
+		p2.set( robot.getDiameter()/2, 0);
+		
 		p0.rotate(orientation);
 		p1.rotate(orientation);
 		p2.rotate(orientation);
@@ -365,8 +424,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		yp[2] = transformY(p2.getY() + robot.getPosition().getY());
 
 		graphics.fillPolygon(xp, yp, 3);
-			
-		graphics.setColor(Color.BLACK);		
+		
+		graphics.setColor(Color.BLACK);
 	}
 	
 	protected int transformX(double x) {

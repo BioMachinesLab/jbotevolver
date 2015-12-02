@@ -4,16 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import controllers.Controller;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
-import evolutionaryrobotics.neuralnetworks.MultipleChromosome;
 import evolutionaryrobotics.populations.Population;
 
 public class JBotEvolver extends JBotSim {
@@ -26,13 +23,24 @@ public class JBotEvolver extends JBotSim {
 		super(args);
 	}
 	
-	public EvaluationFunction getEvaluationFunction() {
-		EvaluationFunction eval;
-		if(arguments.get("--evaluation") != null)
-			eval = EvaluationFunction.getEvaluationFunction(arguments.get("--evaluation"));
-		else
-			eval = EvaluationFunction.getEvaluationFunction(arguments.get("--evaluationa"));
-		return eval;
+	public EvaluationFunction[] getEvaluationFunction() {
+		EvaluationFunction[] evals = new EvaluationFunction[1];
+		Arguments evalArgs = arguments.get("--evaluation");
+		if(evalArgs != null) {
+			
+			if(!evalArgs.getArgumentIsDefined("multieval"))
+				evals[0] = EvaluationFunction.getEvaluationFunction(evalArgs);
+			else {
+				//for multiobjective EAs
+				Arguments multiObjectives = new Arguments(evalArgs.getArgumentAsString("multieval"));
+				evals = new EvaluationFunction[multiObjectives.getNumberOfArguments()];
+				for(int i = 0 ; i < evals.length ; i++) {
+					evals[i] = EvaluationFunction.getEvaluationFunction(new Arguments(multiObjectives.getArgumentAsString(multiObjectives.getArgumentAt(i))));
+				}
+			}
+		}else
+			evals[0] = EvaluationFunction.getEvaluationFunction(arguments.get("--evaluationa"));
+		return evals;
 	}
 	
 	public EvaluationFunction getSpecificEvaluationFunction(String name) {
@@ -60,63 +68,13 @@ public class JBotEvolver extends JBotSim {
 	}
 	
 	public ArrayList<Robot> createRobots(Simulator simulator, Chromosome chromosome) {
-		
-		ArrayList<Robot> totalRobots = new ArrayList<Robot>();
-		
-		if(chromosome instanceof MultipleChromosome){
-		
-			MultipleChromosome c = (MultipleChromosome) chromosome;
-			
-			int previousrobots = 0;
-			
-			for(int i = 0; i < c.getNumberOfChromosomes(); i++){
-				// get("robots" + i)
-				ArrayList<Robot> robots;
-				if(i == 0) {
-					robots = Robot.getRobots(simulator, arguments.get("--robots"));
-					previousrobots = robots.size();
-				} else{
-					arguments.get("--robots" + i).setArgument("previousrobots", previousrobots);
-					robots = Robot.getRobots(simulator, arguments.get("--robots" + i));
-				}
-				
-				for(Robot r : robots) {
-					if(i == 0)
-						r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
-					else
-						r.setController(Controller.getController(simulator, r, arguments.get("--controllers" + i)));
-					totalRobots.add(r);
-					
-					Chromosome subChromosome = c.getChromosome(i);
-					
-					if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
-						FixedLenghtGenomeEvolvableController controller = (FixedLenghtGenomeEvolvableController)r.getController();
-						controller.setNNWeights(subChromosome.getAlleles());
-					}
-				}
-			}
-			
-		} else {
-			totalRobots = createRobots(simulator);
-			for (Robot r : totalRobots) {
-				if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
-					FixedLenghtGenomeEvolvableController controller = (FixedLenghtGenomeEvolvableController)r.getController();
-					controller.setNNWeights(chromosome.getAlleles());
-				}
-			}
-		}
-		
-		return totalRobots;
+		return chromosome.setupRobots(this, simulator);
 	}
 	
 	public void setChromosome(ArrayList<Robot> robots, Chromosome chromosome) {
-		for (Robot r : robots) {
-			
-			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
-				FixedLenghtGenomeEvolvableController controller = (FixedLenghtGenomeEvolvableController)r.getController();
-				controller.setNNWeights(chromosome.getAlleles());
-			}
-		}	
+		
+		for (Robot r : robots)
+			chromosome.setupRobot(r);
 	}
 	
 	@Override

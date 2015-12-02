@@ -1,23 +1,33 @@
 package simulation.physicalobjects.collisionhandling;
 
+import java.awt.geom.Ellipse2D;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
-import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.ClosePhysicalObjects;
+import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
+import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.Prey;
-import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
-import simulation.physicalobjects.collisionhandling.knotsandbolts.CollisionManager;
 import simulation.physicalobjects.Wall;
-import simulation.robot.DifferentialDriveRobot;
+import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
+import simulation.physicalobjects.collisionhandling.knotsandbolts.CollisionManager;
+import simulation.physicalobjects.collisionhandling.knotsandbolts.PolygonShape;
 import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class SimpleCollisionManager extends CollisionManager {
+	
+	public boolean drag = false;
+	public double dragValue = 0.5;
 
 	public SimpleCollisionManager(Simulator simulator) {
 		super(simulator);
+		Arguments args = simulator.getArguments().get("--robots");
+		drag = args.getFlagIsTrue("drag");
+		dragValue = args.getArgumentAsDoubleOrSetDefault("dragvalue", dragValue);
 	}
 
 	@Override
@@ -28,6 +38,7 @@ public class SimpleCollisionManager extends CollisionManager {
 		}
 
 		for (MovableObject mo : environment.getMovableObjects()) {
+			
 			mo.setInvolvedInCollison(false);
 			mo.setInvolvedInCollisonWall(false);
 			mo.shape.computeNewPositionAndOrientationFromParent();
@@ -75,25 +86,55 @@ public class SimpleCollisionManager extends CollisionManager {
 			}
 			ClosePhysicalObjects closeWalls = robot.shape.getCloseWalls();
 			CloseObjectIterator iterator = closeWalls.iterator();
+			
 			while (iterator.hasNext()) {
 
 				Wall closeWall = (Wall) (iterator.next().getObject());
-				int status = checkIfCollided(closeWall, robot);
-				if (status != -1) {
-					Vector2d newPosition = handleCollision(robot, closeWall,
-							status);
-					robot.moveTo(newPosition);
+
+				PolygonShape ps = (PolygonShape) closeWall.shape;
+				
+				if(ps.checkCollisionWithShape(robot.shape)) {
+					
 					robot.setInvolvedInCollison(true);
 					robot.setInvolvedInCollisonWall(true);
-					
 					robot.getCollidingObjects().add(closeWall);
 					
-					if(robot.specialWallCollisions()) {
-						DifferentialDriveRobot rr = (DifferentialDriveRobot)robot;
-						rr.setWheelSpeed(rr.getLeftWheelSpeed()*0.5,rr.getRightWheelSpeed()*0.5);
-//						robot.setOrientation(this.simulator.getRandom().nextDouble()*Math.PI*2);
+					if(drag) {
+						
+						boolean leftFirst = simulator.getRandom().nextBoolean();
+						
+						double speed = robot.getPreviousPosition().distanceTo(robot.getPosition())*dragValue;
+						
+						double orientation = robot.getOrientation();
+						
+						Vector2d prev = robot.getPreviousPosition();
+						
+						Vector2d left = new Vector2d(robot.getPreviousPosition());
+						left.add(new Vector2d(speed*Math.cos(orientation-Math.PI/2), speed*Math.sin(orientation-Math.PI/2)));
+						
+						Vector2d right = new Vector2d(robot.getPreviousPosition());
+						right.add(new Vector2d(speed*Math.cos(orientation+Math.PI/2), speed*Math.sin(orientation+Math.PI/2)));
+						
+						Vector2d[] pos = new Vector2d[]{left,right};
+						
+						if(!leftFirst) {
+							pos[0] = right;
+							pos[1] = left;
+						}
+
+						if(validPosition(pos[0],robot.getRadius(),closeWalls))
+							robot.moveTo(pos[0]);
+						else if(validPosition(pos[1],robot.getRadius(),closeWalls))
+							robot.moveTo(pos[1]);
+						else
+							robot.moveTo(prev);
+						
+						
+					} else {
+						robot.moveTo(robot.getPreviousPosition());
+						break;
 					}
-				}
+				} 
 			}
 		}
 		
@@ -237,6 +278,19 @@ public class SimpleCollisionManager extends CollisionManager {
 			}
 		}
 	}
+	
+	private boolean validPosition(Vector2d pos, double radius, ClosePhysicalObjects closeWalls) {
+		CloseObjectIterator iterator = closeWalls.iterator();
+
+		while(iterator.hasNext()) {
+			Wall w = (Wall)iterator.next().getObject();
+			PolygonShape ps = (PolygonShape)w.shape;
+			Ellipse2D.Double ell = CircularShape.getEllipse2D(pos, new Vector2d(), radius);
+			if(ps.checkCollisionWithShape(ell))
+				return false;
+		}
+		return true;
+	}
 
 	private void setLength(Vector2d vector, double length) {
 		if (vector.x == 0 && vector.y == 0) {
@@ -247,9 +301,8 @@ public class SimpleCollisionManager extends CollisionManager {
 	}
 	
 	private Vector2d handleCollision(PhysicalObject obj, Wall wall, int collisionStatus) {
-
-		double valueX = obj.getPosition().getX(), valueY = obj
-				.getPosition().getY();
+		
+		double valueX = obj.getPosition().getX(), valueY = obj.getPosition().getY();
 		switch (collisionStatus) {
 		// robot comes from the right
 		case 0:

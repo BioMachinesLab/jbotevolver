@@ -1,5 +1,3 @@
-import java.awt.BorderLayout;
-
 import javax.swing.JFrame;
 
 import simulation.util.Arguments;
@@ -9,7 +7,7 @@ import gui.evolution.EvolutionGui;
 public class EMain {
 	public static void main(String[] args) throws Exception {
 		
-		String configName = "br_novelty.conf";
+		String configName = "br_pattern.conf";
 //		String configName = "nsga2_novelty.conf";
 //		String configName = "nsga2_fitness.conf";
 //		String configName = "nsga2_nf.conf";

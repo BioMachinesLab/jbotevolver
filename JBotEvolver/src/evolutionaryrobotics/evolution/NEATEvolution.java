@@ -25,8 +25,8 @@ import evolutionaryrobotics.util.DiskStorage;
 
 public class NEATEvolution extends Evolution {
 	
-	private NEATGADescriptor descriptor;
-	private NEATPopulation population;
+	protected NEATGADescriptor descriptor;
+	protected NEATPopulation population;
 	protected DiskStorage diskStorage;
 	protected String output = "";
 	protected DecimalFormat df = new DecimalFormat("#.##");
@@ -116,7 +116,7 @@ public class NEATEvolution extends Evolution {
 		
 	}
 	
-	private void configureDescriptor(Arguments args) {
+	protected void configureDescriptor(Arguments args) {
 
 		int popSize = population.getPopulationSize();
 		
@@ -194,7 +194,7 @@ public class NEATEvolution extends Evolution {
 		descriptor.setCopyBest(copyBest);
 	}
 	
-	private int[] getInputOutputNeurons() {
+	protected int[] getInputOutputNeurons() {
 		Simulator sim = jBotEvolver.createSimulator();
 		Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots"));
 		Controller c = Controller.getController(sim,r, jBotEvolver.getArguments().get("--controllers"));

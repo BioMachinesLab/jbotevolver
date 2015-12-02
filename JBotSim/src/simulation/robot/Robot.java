@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;
@@ -104,7 +105,6 @@ public class Robot extends MovableObject {
 	 */
 	public Robot(Simulator simulator, Arguments args) {
 		super(simulator, args);
-		
 		relativeX = args.getArgumentAsDoubleOrSetDefault("relativex",0);
 		relativeY = args.getArgumentAsDoubleOrSetDefault("relativey",0);
 		radius = args.getArgumentAsDoubleOrSetDefault("radius",0.05);
@@ -275,9 +275,10 @@ public class Robot extends MovableObject {
 	 * @param time the number of the current simulation step.
 	 * @param timeDelta      the time (in virtual seconds) between calls to this method. 
 	 */
-	public void updateActuators(Double time, double timeDelta) {			
+	public void updateActuators(Double time, double timeDelta) {
+		this.previousPosition = new Vector2d(position);
 		for(Actuator actuator: actuators){
-			actuator.apply(this);
+			actuator.apply(this, timeDelta);
 		}
 	}
 		

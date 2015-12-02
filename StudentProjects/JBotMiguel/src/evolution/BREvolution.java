@@ -52,6 +52,7 @@ public class BREvolution extends NSGA2Evolution{
 		
 		while(!population.evolutionDone() && executeEvolution) {
 			
+			//Execution of each controller in simulation
 			double d = Double.valueOf(df.format(highestFitness));
 			taskExecutor.setDescription(output+" "+population.getNumberOfCurrentGeneration()+"/"+population.getNumberOfGenerations() + " " + d);
 			
@@ -85,11 +86,6 @@ public class BREvolution extends NSGA2Evolution{
 			for(PostEvaluator p : postEvaluators)
 				p.processPopulation(population);
 			
-			for(Chromosome c : population.getChromosomes()) {
-				MOChromosome moc = (MOChromosome)c;
-				EvaluationResult res = moc.getEvaluationResult();
-				ExpandedFitness exp = (ExpandedFitness)res;
-			}
 			processPopulation();
 			
 			if(executeEvolution) {

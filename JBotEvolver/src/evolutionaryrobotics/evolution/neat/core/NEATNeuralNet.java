@@ -6,6 +6,7 @@
  */
 package evolutionaryrobotics.evolution.neat.core;
 
+import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -30,10 +31,12 @@ import evolutionaryrobotics.evolution.neat.nn.core.functions.TanhFunction;
  */
 public class NEATNeuralNet implements NeuralNet {
     
-        private static final long serialVersionUID = -1L;
+    private static final long serialVersionUID = -1L;
 	private NEATNetDescriptor descriptor;
 	private Synapse[] connections;
 	private NEATNeuron[] neurons;
+    private NEATNeuron[] outputNeurons;
+    private NEATFeatureGene[] featureGenes;
 	private int level = 0;
 	//private int depthLevel = 0;
 	
@@ -54,12 +57,10 @@ public class NEATNeuralNet implements NeuralNet {
 		this.level = 0;
 		int i;
 		// trawl through the graph bacwards from each output node
-		Object[] outputNeurons = this.outputNeurons().toArray();
 		if (outputNeurons.length == 0) {
 			System.err.println("No output neurons");
 		}
 		outputs = new double[outputNeurons.length];
-		
 		for (i = 0; i < outputs.length; i++) {
 			outputs[i] = this.neuronOutput((NEATNeuron)outputNeurons[i], netInput);
 		}
@@ -69,23 +70,15 @@ public class NEATNeuralNet implements NeuralNet {
 		return (opSet);
 	}
 	
-	public ArrayList outputNeurons() {
-		ArrayList outputNeurons = new ArrayList();
-		int i;
-		
-		for (i = 0; i < this.neurons.length; i++) {
-			if (this.neurons[i].neuronType() == NEATNodeGene.OUTPUT) {
-				outputNeurons.add(this.neurons[i]);
-			}
-		}
-		return (outputNeurons);
+	public NEATNeuron[] outputNeurons() {
+            return outputNeurons;
 	}
 	
 	private double neuronOutput(NEATNeuron neuron, NetworkInput netInput) {
 		double output = 0;
 		double[] inputPattern;
 		// find its inputs
-		Object[] sourceNodes = neuron.sourceNeurons().toArray();
+		NEATNeuron[] sourceNodes = neuron.sourceNeurons();
 		int i;
 		
 		this.level++;
@@ -98,19 +91,12 @@ public class NEATNeuralNet implements NeuralNet {
 			for (i = 0; i < sourceNodes.length; i++) {
 				if (neuron.id() == ((NEATNeuron)sourceNodes[i]).id()) {				
 					// Self Recurrent
-					//cat.debug("Self Recurrent:" + neuron.id() + ":" + ((NEATNeuron)sourceNodes.get(i)).id());
 					inputPattern[i] = neuron.lastActivation();
 				} else if (neuron.neuronDepth() > ((NEATNeuron)sourceNodes[i]).neuronDepth()) {
 					// Recurrent
-					//cat.debug("Recurrent:" + neuron.id() + ":" + ((NEATNeuron)sourceNodes.get(i)).id());
 					inputPattern[i] = ((NEATNeuron)sourceNodes[i]).lastActivation();
 				} else {
 					inputPattern[i] = this.neuronOutput((NEATNeuron)sourceNodes[i], netInput);
-//					if (((Synapse)incomingSynapses[i]).isEnabled()) {
-//						inputPattern[i] = this.neuronOutput((NEATNeuron)sourceNodes[i], netInput);
-//					} else {
-//						cat.info("Stop recursion");
-//					}
 				}
 			}
 		}
@@ -128,6 +114,7 @@ public class NEATNeuralNet implements NeuralNet {
 		Chromosome netStructure = this.descriptor.neatStructure();
 		ArrayList nodes = new ArrayList();
 		ArrayList links = new ArrayList();
+		ArrayList<NEATFeatureGene> features = new ArrayList<NEATFeatureGene>();
 		Gene[] genes = netStructure.genes();
 		int i;
 		
@@ -139,19 +126,32 @@ public class NEATNeuralNet implements NeuralNet {
 					// only add enabled links to the net structure
 					links.add(genes[i]);
 				}
+			} else if (genes[i] instanceof NEATFeatureGene) {	
+				features.add((NEATFeatureGene)genes[i]);
 			}
 		}
 		
 		this.connections = this.createLinks(links, this.createNeurons(nodes));
-		this.assignNeuronDepth(this.outputNeurons(), 0);
+                
+        ArrayList<NEATNeuron> outputNeuronsList = new ArrayList<NEATNeuron>();
+		for (i = 0; i < this.neurons.length; i++) {
+			if (this.neurons[i].neuronType() == NEATNodeGene.OUTPUT) {
+				outputNeuronsList.add(this.neurons[i]);
+			}
+		}
+        this.outputNeurons = new NEATNeuron[outputNeuronsList.size()];
+        outputNeuronsList.toArray(this.outputNeurons);
+		this.assignNeuronDepth(outputNeurons, 0);
+		
+		this.featureGenes = new NEATFeatureGene[features.size()];
+		features.toArray(featureGenes);
 	}
 	
-	private void assignNeuronDepth(ArrayList neurons, int depth) {
+	private void assignNeuronDepth(NEATNeuron[] neurons, int depth) {
 		int i;
 		NEATNeuron neuron;
-		
-		for (i = 0; i < neurons.size(); i++) {
-			neuron = (NEATNeuron)neurons.get(i);
+		for (i = 0; i < neurons.length; i++) {
+			neuron = (NEATNeuron)neurons[i];
 			if (neuron.neuronType() == NEATNodeGene.OUTPUT) {
 				if (neuron.neuronDepth() == -1) {
 					neuron.setNeuronDepth(depth);
@@ -265,5 +265,9 @@ public class NEATNeuralNet implements NeuralNet {
 
 	public Neuron neuronAt(int x, int y) {
 		return null;
+	}
+	
+	public NEATFeatureGene[] getFeatureGenes() {
+		return featureGenes;
 	}
 }

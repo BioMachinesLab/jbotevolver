@@ -404,7 +404,7 @@ public class EvolutionGui extends Gui {
 							currentGenerationNumber = evoPopulation;
 							if(evo.getPopulation().getBestChromosome() != null) {
 								Simulator sim = jBotEvolver.createSimulator(new Random());
-								sim.addCallback(jBotEvolver.getEvaluationFunction());
+								sim.addCallback(jBotEvolver.getEvaluationFunction()[0]);
 								sim.addCallback(this);
 //								ArrayList<Robot> robots = jBotEvolver.createRobots(sim);
 //								jBotEvolver.setChromosome(robots, evo.getPopulation().getBestChromosome());

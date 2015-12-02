@@ -56,7 +56,7 @@ public class PreyPickerActuator extends Actuator {
 	}
 
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot, double timeDelta) {
 		if (getStatus() != PickerStatus.OFF) {
 			if (getStatus() == PickerStatus.PICK) {
 				if ((getRandom().nextFloat() > NOISESTDEV) && !isCarryingPrey()) {

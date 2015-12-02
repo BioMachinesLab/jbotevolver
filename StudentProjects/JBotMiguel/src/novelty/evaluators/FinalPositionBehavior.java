@@ -1,24 +1,24 @@
-package novelty.metrics;
+package novelty.evaluators;
 
-import simulation.Simulator;
-import simulation.robot.Robot;
-import simulation.util.Arguments;
 import mathutils.Vector2d;
 import multiobjective.GenericEvaluationFunction;
 import novelty.EvaluationResult;
-import novelty.VectorBehaviourResult;
+import novelty.results.VectorBehaviourResult;
+import simulation.Simulator;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 /**
  * @author jorge
  */
-public class MazeBehaviourFinal extends GenericEvaluationFunction {
-
-    public MazeBehaviourFinal(Arguments args) {
-		super(args);
-	}
+public class FinalPositionBehavior extends GenericEvaluationFunction {
 
 	private VectorBehaviourResult vbr;
     private Vector2d pos;
+	
+    public FinalPositionBehavior(Arguments args) {
+		super(args);
+	}
 
     @Override
     public EvaluationResult getEvaluationResult() {
