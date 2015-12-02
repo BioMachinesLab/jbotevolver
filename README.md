@@ -10,14 +10,17 @@ Information about how to install and use the simulator can be found in the [wiki
 # Studies that use JBotEvolver
 
 ## 2015
-* F. Silva, L. Correia, and A. L. Christensen (2015). "A Case Study on the Scalability of Online Evolution of Robotic Controllers", in Proceedings of the 17th Portuguese Conference on Artificial Intelligence (EPIA). In press.
-* P. Romano, L. Nunes, A. L. Christensen, M. Duarte, S. M. Oliveira, "Genome Variations: Effects on the robustness of neuroevolved swarm controllers", in Proceedings of the Iberian Conference on Robotics (ROBOT), Springer, Berlin, Germany, 2015.
-* M. Duarte, S. M. Oliveira and A. L. Christensen, "Evolution of Hybrid Robotic Controllers for Complex Tasks", Journal of Intelligent and Robotic Systems, 78(3-4):463-484, 2015.
-* T. Rodrigues, M. Duarte, M. Figueiró, V. Costa, S. M. Oliveira, A. L. Christensen, "Overcoming Limited Onboard Sensing in Swarm Robotics through Local Communication", Transactions on Computational Collective Intelligence, 2015.
+
+* M. Duarte, V. Costa, J. Gomes, T. Rodrigues, F. Silva, S. M. Oliveira, A. L. Christensen (2016).
+"Evolution of Collective Behaviors for a Real Swarm of Aquatic Surface Robots". Preprint, url: http://arxiv.org/abs/1511.03154
+* F. Silva, L. Correia, and A. L. Christensen (2015). "A Caseo Study on the Scalability of Online Evolution of Robotic Controllers", in Proceedings of the 17th Portuguese Conference on Artificial Intelligence (EPIA), pp. 189–200, Springer International Publishing, Switzerland, 2015.
+* P. Romano, L. Nunes, A. L. Christensen, M. Duarte, S. M. Oliveira (2015). "Genome Variations: Effects on the robustness of neuroevolved swarm controllers", in Proceedings of the Iberian Conference on Robotics (ROBOT), Springer, Berlin, Germany.
+* M. Duarte, S. M. Oliveira and A. L. Christensen (2015). "Evolution of Hybrid Robotic Controllers for Complex Tasks", Journal of Intelligent and Robotic Systems, 78(3-4):463-484.
+* T. Rodrigues, M. Duarte, M. Figueiró, V. Costa, S. M. Oliveira, A. L. Christensen (2015). "Overcoming Limited Onboard Sensing in Swarm Robotics through Local Communication", Transactions on Computational Collective Intelligence, in press.
 * F. Silva, L. Correia, and A. L. Christensen (2015). "R-HybrID: Evolution of Agent Controllers with a Hybridisation of Indirect and Direct Encodings". In: International Conference on Autonomous Agents and Multiagent Systems (AAMAS 2015). Accepted as full paper.
-* F. Silva, P. Urbano, L. Correia, and A. L. Christensen (2015). "odNEAT: An Algorithm for Decentralised Online Evolution of Robotic Controllers". Evolutionary Computation. In press.
-* T. Rodrigues, M. Duarte, S. M. Oliveira, A. L. Christensen, "Beyond Onboard Sensors in Robotic Swarms: Local Collective Sensing through Situated Communication", in Proceedings of the International Conference on Agents and Artificial Intelligence (ICAART), SCITEPRESS, Lisbon, Portugal, 2015.
-* A. L. Christensen, S. Oliveira, O. Postolache, M. J. d. Oliveira, S. Sargento, P. Santana, L. Nunes, F. Velez, P. Sebastiao, V. Costa, M. Duarte, J. Gomes, T. Rodrigues, F. Silva, "Design of Communication and Control for Swarms of Aquatic Surface Drones", in Proceedings of the International Conference on Agents and Artificial Intelligence (ICAART), SCITEPRESS, Lisbon, Portugal, 2015.
+* F. Silva, P. Urbano, L. Correia, and A. L. Christensen (2015). "odNEAT: An Algorithm for Decentralised Online Evolution of Robotic Controllers", Evolutionary Computation, 23 (3), pp. 421–449, 2015.
+* T. Rodrigues, M. Duarte, S. M. Oliveira, A. L. Christensen (2015). "Beyond Onboard Sensors in Robotic Swarms: Local Collective Sensing through Situated Communication", in Proceedings of the International Conference on Agents and Artificial Intelligence (ICAART), pp. 111–118, SCITEPRESS, Lisbon, Portugal
+* A. L. Christensen, S. Oliveira, O. Postolache, M. J. d. Oliveira, S. Sargento, P. Santana, L. Nunes, F. Velez, P. Sebastiao, V. Costa, M. Duarte, J. Gomes, T. Rodrigues, F. Silva (2015). "Design of Communication and Control for Swarms of Aquatic Surface Drones", in Proceedings of the International Conference on Agents and Artificial Intelligence (ICAART), SCITEPRESS, Lisbon, Portugal.
 
 ## 2014
 
