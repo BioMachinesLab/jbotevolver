@@ -9,7 +9,10 @@ import gui.evolution.EvolutionGui;
 public class EMain {
 	public static void main(String[] args) throws Exception {
 		
-		String configName = "nsga2.conf";
+		String configName = "br_novelty.conf";
+//		String configName = "nsga2_novelty.conf";
+//		String configName = "nsga2_fitness.conf";
+//		String configName = "nsga2_nf.conf";
 		
 		try {
 			args = new String[]{configName};

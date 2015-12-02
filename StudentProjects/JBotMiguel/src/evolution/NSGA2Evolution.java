@@ -1,31 +1,30 @@
 package evolution;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
-import controllers.Controller;
-import controllers.FixedLenghtGenomeEvolvableController;
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evolution.Evolution;
-import evolutionaryrobotics.evolution.GenerationalEvolution;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
-import evolutionaryrobotics.populations.Population;
-import simulation.Simulator;
-import simulation.robot.Robot;
+import multiobjective.MOChromosome;
+import multiobjective.MOFitnessResult;
+import multiobjective.MOTask;
+import novelty.EvaluationResult;
+import novelty.ExpandedFitness;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
-import taskexecutor.results.SimpleFitnessResult;
-import taskexecutor.tasks.GenerationalTask;
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evolution.GenerationalEvolution;
+import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 public class NSGA2Evolution extends GenerationalEvolution{
 
     protected ArrayList<Individual> allInds;
     protected boolean ordinalRanking;
     protected String[] objectives;
+    protected LinkedList<PostEvaluator> postEvaluators = new LinkedList<PostEvaluator>();
     
     public NSGA2Evolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
     	super(jBotEvolver, taskExecutor, arg);
@@ -34,27 +33,57 @@ public class NSGA2Evolution extends GenerationalEvolution{
     
     @Override
     protected void setupPopulation() {
-    	
-    	Arguments eval = jBotEvolver.getArguments().get("--evaluation");
-    	Arguments multiObj = new Arguments(eval.getArgumentAsString("objectives"));
-    	objectives = new String[multiObj.getNumberOfArguments()];
-    	
-    	for(int i = 0 ; i < objectives.length ; i++) {
-    		objectives[i] = multiObj.getArgumentAsString(multiObj.getArgumentAt(i));
-    	}
-    	
-    	jBotEvolver.getArguments().get("--population").setArgument("mainobjective",objectives[0]);
+    	Arguments eval = jBotEvolver.getArguments().get("--evolution");
+    	String obj = eval.getArgumentAsString("objectives");
+    	objectives = obj.split(",");
     	super.setupPopulation();
+    }
+    
+    protected LinkedList<PostEvaluator> getPostEvaluators() {
+    	
+    	LinkedList<PostEvaluator> postEvals = new LinkedList<PostEvaluator>();
+    	
+    	Arguments pArgs = jBotEvolver.getArguments().get("--postevaluator");
+    	
+    	for(int i = 0 ; i < pArgs.getNumberOfArguments() ; i++) {
+    		String name = pArgs.getArgumentAt(i);
+    		Arguments pA = new Arguments(pArgs.getArgumentAsString(name));
+    		pA.setArgument("score-name", name);
+    		pA.setArgument("seed", jBotEvolver.getRandomSeed());
+    		PostEvaluator post = PostEvaluator.getPostEvaluator(pA);
+    		postEvals.add(post);
+    	}
+    	return postEvals;
+    }
+    
+    protected void startOrResumeEvolution() {
+    	if(population.getNumberOfCurrentGeneration() == 0) {
+			population.createRandomPopulation();
+			
+			postEvaluators = getPostEvaluators();
+			for(PostEvaluator p : postEvaluators)
+				population.getSerializableObjects().add((Serializable)p);
+			
+		}else {
+			LinkedList<Serializable> objs = population.getSerializableObjects();
+			for(Serializable s : objs) {
+				if(s instanceof PostEvaluator)
+					postEvaluators.add((PostEvaluator)s);
+			}
+		}
+		
+		if(!population.evolutionDone()) {
+			taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
+		}
     }
     
     @Override
 	public void executeEvolution() {
     	
-		if(population.getNumberOfCurrentGeneration() == 0)
-			population.createRandomPopulation();
+    	startOrResumeEvolution();
 		
 		if(!population.evolutionDone()) {
-			taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize()*objectives.length);
+			taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
 		}
 		
 		double highestFitness = 0;
@@ -66,26 +95,20 @@ public class NSGA2Evolution extends GenerationalEvolution{
 			
 			int totalEvaluations = 0;
 			
-			for(int o = 0 ; o < objectives.length ; o++) {
-				
-				HashMap<String,Arguments> args = jBotEvolver.getArgumentsCopy();
-				String currentObj = objectives[o];
-				args.put("--evaluation", new Arguments(currentObj));
-				
-				for(Chromosome c : ((NSGA2Population)population).getChromosomes()) {
+			for(Chromosome c : ((NSGA2Population)population).getChromosomes()) {
 
-					if(!executeEvolution)
-						break;
-			
-					int samples = population.getNumberOfSamplesPerChromosome();
+				if(!executeEvolution)
+					break;
 				
-					taskExecutor.addTask(new MOTask(
-							new JBotEvolver(args, jBotEvolver.getRandomSeed()),
-							samples,c,population.getGenerationRandomSeed(),currentObj)
-					);
-					totalEvaluations++;
-					print(".");
-				}
+				JBotEvolver jbot = new JBotEvolver(jBotEvolver.getArgumentsCopy(), jBotEvolver.getRandomSeed());
+		
+				int samples = population.getNumberOfSamplesPerChromosome();
+			
+				taskExecutor.addTask(new MOTask(jbot,
+						samples,c,population.getGenerationRandomSeed())
+				);
+				totalEvaluations++;
+				print(".");
 				
 			}
 			
@@ -93,11 +116,25 @@ public class NSGA2Evolution extends GenerationalEvolution{
 			
 			while(totalEvaluations-- > 0 && executeEvolution) {
 				MOFitnessResult result = (MOFitnessResult)taskExecutor.getResult();
-				((NSGA2Population)population).setEvaluationResultForId(result.getChromosomeId(), result.getFitness(),result.getObjective());
+				((NSGA2Population)population).setEvaluationResultForId(result.getChromosomeId(), result.getEvaluationResult());
 				print("!");
 			}
 			
-			//TODO post-evaluators
+			for(PostEvaluator p : postEvaluators)
+				p.processPopulation(population);
+			
+			for(Chromosome c : population.getChromosomes()) {
+				MOChromosome moc = (MOChromosome)c;
+				EvaluationResult res = moc.getEvaluationResult();
+				ExpandedFitness exp = (ExpandedFitness)res;
+//				System.out.print(moc.getID()+" ");
+//				
+//				for(String s: evaluations) {
+//					System.out.print(exp.getScore(s)+" ");
+//				}
+//				System.out.println();
+			}
+			processPopulation();
 			
 			if(executeEvolution) {
 				
@@ -130,7 +167,8 @@ public class NSGA2Evolution extends GenerationalEvolution{
             double[] vals = new double[objectives.length];
             for(int j = 0 ; j < objectives.length ; j++) {
             	MOChromosome c = (MOChromosome)((NSGA2Population)population).getChromosomes()[k];
-                vals[j] = c.getFitness(objectives[j]);
+            	ExpandedFitness efit = (ExpandedFitness)c.getEvaluationResult();
+                vals[j] = efit.getScore(objectives[j]);
                 maxVals[j] = Math.max((float)vals[j], maxVals[j]);
                 minVals[j] = Math.min((float)vals[j], minVals[j]);
             }

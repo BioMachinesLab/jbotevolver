@@ -1,8 +1,11 @@
-package evolution;
+package multiobjective;
 
 import java.util.ArrayList;
 import java.util.Random;
 
+import novelty.EvaluationResult;
+import novelty.ExpandedFitness;
+import novelty.FitnessResult;
 import result.Result;
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -15,17 +18,17 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 public class MOTask extends JBotEvolverTask {
 	
 	private int samples;
-	private double fitness = 0;
 	private Chromosome chromosome;
 	private Random random;
-	private String objective;
+	private ExpandedFitness[] results;
 	
-	public MOTask(JBotEvolver jBotEvolver, int samples, Chromosome chromosome, long seed, String objective) {
+	public MOTask(JBotEvolver jBotEvolver, int samples, Chromosome chromosome, long seed) {
 		super(jBotEvolver);
 		this.samples = samples;
 		this.chromosome = chromosome;
 		this.random = new Random(seed);
-		this.objective = objective;
+		
+		results = new ExpandedFitness[samples];
 	}
 	
 	@Override
@@ -42,15 +45,30 @@ public class MOTask extends JBotEvolverTask {
 			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator, chromosome);
 			simulator.addRobots(robots);
 			
-			EvaluationFunction eval = EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get("--evaluation"));
-			simulator.addCallback(eval);
+			EvaluationFunction[] eval = jBotEvolver.getEvaluationFunction();
+			
+			for(EvaluationFunction e : eval)
+				simulator.addCallback(e);
+			
 			simulator.simulate();
 			
-			fitness+= eval.getFitness();
+			EvaluationResult[] sampleResults = new EvaluationResult[eval.length];
+			int index = 0;
+			
+			for(EvaluationFunction e : eval) {
+				if(e instanceof GenericEvaluationFunction) 
+					sampleResults[index++] = ((GenericEvaluationFunction)e).getEvaluationResult();
+				else
+					sampleResults[index++] = new FitnessResult(e.getFitness());
+			}
+			
+			ExpandedFitness ef = new ExpandedFitness();
+			ef.setEvaluationResults(sampleResults);
+			this.results[i] = ef;
 		}
 	}
 	public Result getResult() {
-		MOFitnessResult fr = new MOFitnessResult(chromosome.getID(), fitness/samples, objective);
+		MOFitnessResult fr = new MOFitnessResult(chromosome.getID(), ExpandedFitness.setToMeanOf(results));
 		return fr;
 	}
 }

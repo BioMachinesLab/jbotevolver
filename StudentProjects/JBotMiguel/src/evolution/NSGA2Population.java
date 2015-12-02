@@ -3,6 +3,9 @@ package evolution;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import novelty.EvaluationResult;
+import novelty.ExpandedFitness;
+import multiobjective.MOChromosome;
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.MuLambdaPopulation;
@@ -66,7 +69,7 @@ public class NSGA2Population extends MuLambdaPopulation{
 		        // Copy this best half to the archive
 		        for (int j = 0; j < bestParents.length; j++) {
 		            bestParents[j] = chromosomes[j].clone();
-		            bestParents[j].setId(i);
+		            bestParents[j].setId(j);
 		        }
 	        } catch(Exception e) {
 	        	throw new RuntimeException(e.getMessage());
@@ -81,10 +84,10 @@ public class NSGA2Population extends MuLambdaPopulation{
 	        Chromosome child = mutate(parent,i+getPopulationSize());
 	        children[i] = child;
         }
-
+        
         // Join the recently bred population with the best parents
-        Chromosome[] inds = Arrays.copyOf(children, getPopulationSize() * 2);
-        System.arraycopy(bestParents, 0, inds, getPopulationSize(), bestParents.length);
+        Chromosome[] inds = Arrays.copyOf(bestParents, getPopulationSize() * 2);
+        System.arraycopy(children, 0, inds, getPopulationSize(), children.length);
         setChromosomes(inds);
         
         resetGeneration();
@@ -127,30 +130,41 @@ public class NSGA2Population extends MuLambdaPopulation{
 		return new MOChromosome(alleles, id);
 	}
 	
-	public void setEvaluationResultForId(int pos, double fitness, String objective) {
-		setEvaluationResult(chromosomes[pos], fitness, objective);
+	public void setEvaluationResultForId(int pos, EvaluationResult result) {
+		setEvaluationResult(chromosomes[pos], result);
 	}
 	
-	public void setEvaluationResult(Chromosome chromosome, double fitness, String objective) {
+	public void setEvaluationResult(Chromosome chromosome, EvaluationResult result) {
 		MOChromosome moc = (MOChromosome)chromosome;
-		moc.setFitness(objective,fitness);
-		numberOfChromosomesEvaluated++;
+		moc.setEvaluationResult(result);
 		
-		if(objective.equals(mainObjective)) {
-			accumulatedFitness += fitness;
-	
-			if (fitness > bestFitness) {
-				bestChromosome = chromosome;
-				bestFitness = fitness;
-			}
-	
-			if (fitness < worstFitness) {
-				worstFitness = fitness;
-			}
+		double fitness = ((ExpandedFitness)result).getFitness();
+			
+		accumulatedFitness += fitness;
+
+		if (fitness > bestFitness) {
+			bestChromosome = chromosome;
+			bestFitness = fitness;
+		}
+
+		if (fitness < worstFitness) {
+			worstFitness = fitness;
 		}
 	}
 	
-	public void setMainObjective(String mainObjective) {
-		this.mainObjective = mainObjective;
+	@Override
+	public void setEvaluationResult(Chromosome chromosome, double fitness) {
+		chromosome.setFitness(fitness);
+		numberOfChromosomesEvaluated++;
 	}
+
+	@Override
+	public void setEvaluationResultForId(int pos, double fitness) {
+		if (pos >= chromosomes.length) {
+			throw new java.lang.RuntimeException("No such position: " + pos
+					+ " on the population");
+		}
+		setEvaluationResult(chromosomes[pos],fitness);
+	}
+	
 }
