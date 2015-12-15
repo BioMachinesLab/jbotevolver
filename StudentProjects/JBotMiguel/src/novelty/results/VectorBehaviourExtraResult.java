@@ -42,5 +42,5 @@ public class VectorBehaviourExtraResult extends VectorBehaviourResult {
     public double getExtraValue() {
 		return extraValue;
 	}
-
+    
 }

@@ -10,33 +10,38 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 public class OrientationEvaluationFunction extends EvaluationFunction{
 	
 	private double orientation = 0;
-	private double targetOrientation = 0;
-	private boolean target = false;
 	private Vector2d position;
+	private double distanceTraveled = 0;
+	private double maxSpeed = 0.1;
+	private double maxDistance;
 	
 	public OrientationEvaluationFunction(Arguments args) {
 		super(args);
-		
-		if(args.getArgumentIsDefined("target")) {
-			this.target = true;
-			this.targetOrientation = Math.toRadians(args.getArgumentAsDouble("target"));
-		}
 	}
 
 	@Override
 	public void update(Simulator simulator) {
 		Robot r = simulator.getRobots().get(0);
+		
+		if(position != null) {
+			distanceTraveled+=position.distanceTo(r.getPosition());
+		} else {
+			maxDistance = simulator.getEnvironment().getSteps()*maxSpeed*simulator.getTimeDelta();
+		}
+		
 		orientation = r.getOrientation();
-		position = r.getPosition();
+		position = new Vector2d(r.getPosition());
 	}
 	
 	@Override
 	public double getFitness() {
-		
-		if(!target)
-			targetOrientation = getOrientationFromCircle(position);
-		
-		double result = targetOrientation - MathUtils.modPI2(orientation);
+		double resultDistance = (maxDistance - distanceTraveled)/(maxDistance);
+		double resultOrientation = calculateOrientationFitness(position, orientation);
+		return resultOrientation + resultDistance;
+	}
+	
+	public static double calculateOrientationFitness(Vector2d pos, double orientation) {
+		double result = getOrientationFromCircle(pos) - MathUtils.modPI2(orientation);
 		result = MathUtils.modPI(result);
 		result = Math.abs((Math.PI-result)/(Math.PI));
 		return result;

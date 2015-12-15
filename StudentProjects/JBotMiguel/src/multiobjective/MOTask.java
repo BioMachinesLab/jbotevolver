@@ -18,17 +18,17 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 public class MOTask extends JBotEvolverTask {
 	
 	private int samples;
-	private Chromosome chromosome;
+	private MOChromosome chromosome;
 	private Random random;
-	private ExpandedFitness[] results;
+	private ArrayList<ExpandedFitness> results;
 	
 	public MOTask(JBotEvolver jBotEvolver, int samples, Chromosome chromosome, long seed) {
 		super(jBotEvolver);
 		this.samples = samples;
-		this.chromosome = chromosome;
+		this.chromosome = (MOChromosome)chromosome;
 		this.random = new Random(seed);
 		
-		results = new ExpandedFitness[samples];
+		results = new ArrayList<ExpandedFitness>();
 	}
 	
 	@Override
@@ -52,23 +52,23 @@ public class MOTask extends JBotEvolverTask {
 			
 			simulator.simulate();
 			
-			EvaluationResult[] sampleResults = new EvaluationResult[eval.length];
+			ArrayList<EvaluationResult> sampleResults = new ArrayList<EvaluationResult>();
 			int index = 0;
 			
 			for(EvaluationFunction e : eval) {
 				if(e instanceof GenericEvaluationFunction) 
-					sampleResults[index++] = ((GenericEvaluationFunction)e).getEvaluationResult();
+					sampleResults.add(index++,((GenericEvaluationFunction)e).getEvaluationResult());
 				else
-					sampleResults[index++] = new FitnessResult(e.getFitness());
+					sampleResults.add(index++,new FitnessResult(e.getFitness()));
 			}
 			
 			ExpandedFitness ef = new ExpandedFitness();
 			ef.setEvaluationResults(sampleResults);
-			this.results[i] = ef;
+			this.results.add(ef);
 		}
 	}
 	public Result getResult() {
-		MOFitnessResult fr = new MOFitnessResult(chromosome.getID(), ExpandedFitness.setToMeanOf(results));
+		MOFitnessResult fr = new MOFitnessResult(chromosome, ExpandedFitness.setToMeanOf(results));
 		return fr;
 	}
 }

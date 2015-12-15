@@ -5,12 +5,12 @@ import result.Result;
 
 public class MOFitnessResult extends Result {
 	
-	private int chromosomeId;
+	private MOChromosome chromosome;
 	private EvaluationResult result;
 	
-	public MOFitnessResult(int chromosomeId, EvaluationResult result) {
+	public MOFitnessResult(MOChromosome chromosome, EvaluationResult result) {
 		super();
-		this.chromosomeId = chromosomeId;
+		this.chromosome = chromosome;
 		this.result = result;
 	}
 	
@@ -19,6 +19,10 @@ public class MOFitnessResult extends Result {
 	}
 
 	public int getChromosomeId() {
-		return chromosomeId;
+		return chromosome.getID();
+	}
+	
+	public MOChromosome getChromosome() {
+		return chromosome;
 	}
 }

@@ -14,8 +14,8 @@ public class MultipleWheelAxesNNOutput extends NNOutput {
 	public MultipleWheelAxesNNOutput(Actuator actuator, Arguments args) {
 		super(actuator,args);
 		this.actuator  = (MultipleWheelAxesActuator)actuator;
-		speed = new double[this.actuator.getNumberOfWheels()];
-		rotation = new double[this.actuator.getNumberOfAxes()];
+		speed = new double[this.actuator.getNumberOfSpeeds()];
+		rotation = new double[this.actuator.getNumberOfRotations()];
 	}
 	
 	@Override

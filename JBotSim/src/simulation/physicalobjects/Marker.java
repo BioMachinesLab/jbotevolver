@@ -16,6 +16,7 @@ public class Marker extends PhysicalObject{
 		this.shape = new CircularShape(simulator, name + "CollisionObject", this, 0, 0, radius*2, radius);
 		this.length = length;
 		this.radius = radius;
+		this.color = color;
 	}
 	
 	public Color getColor() {

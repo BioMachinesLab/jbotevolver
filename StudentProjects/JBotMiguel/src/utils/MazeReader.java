@@ -38,6 +38,8 @@ public class MazeReader {
     private final SVGDiagram diagram;
     private double scale = 0.01;
     private double wallSize = 0.01;
+    private double offsetX = 0;
+    private double offsetY = 0;
     
     public MazeReader(ByteArrayInputStream byteArrayInputStreamS) throws FileNotFoundException,IOException {
         SVGUniverse univ = new SVGUniverse();
@@ -61,7 +63,7 @@ public class MazeReader {
                 while(!iter.isDone()) {
                     double[] coords = new double[2];
                     iter.currentSegment(coords);
-                    Vector2d curr = new Vector2d(coords[0]*scale,coords[1]*scale*-1);
+                    Vector2d curr = new Vector2d((coords[0]+offsetX)*scale,(coords[1]+offsetY)*scale*-1);
                     if(last != null) {
                         segs.add(new Wall(simulator, last, curr,wallSize));
                         System.out.println(last.x+" "+last.y+" "+curr.x+" "+curr.y+" "+wallSize);
@@ -87,7 +89,7 @@ public class MazeReader {
                 while(!iter.isDone()) {
                     double[] coords = new double[2];
                     iter.currentSegment(coords);
-                    Vector2d curr = new Vector2d(coords[0]*scale,coords[1]*scale*-1);
+                    Vector2d curr = new Vector2d((coords[0]+offsetX)*scale,(coords[1]+offsetY)*scale*-1);
                     if(last != null) {
                         segs.add(new Wall(simulator, last, curr,wallSize));
                         text+=last.x+" "+last.y+" "+curr.x+" "+curr.y+" "+wallSize+"\n";
@@ -113,14 +115,14 @@ public class MazeReader {
         SVGElement point = diagram.getElement(id);
         ShapeElement shape = (ShapeElement) point;
         Rectangle2D bb = shape.getBoundingBox();
-        return new Vector2d(bb.getX()*scale,bb.getY()*scale*-1);
+        return new Vector2d((bb.getX()+offsetX)*scale,(bb.getY()+offsetY)*scale*-1);
     }
     
     public static void main(String[] args) throws Exception{
-		String[] mazes = new String[]{"star","zigzag","hard","medium","multi","open","subset"};
+		String[] mazes = new String[]{/*"star","zigzag","hard","medium","multi","open","subset",*/"trumpet"};
 		for(String s : mazes) {
 			MazeReader m = new MazeReader(FileProvider.getDefaultFileProvider().getFile("mazes/svg/"+s+".svg"));
-			JBotEvolver j = new JBotEvolver(new String[]{"../../EvolutionAutomator/star/eight/eight.conf"});
+			JBotEvolver j = new JBotEvolver(new String[]{"../../EvolutionAutomator/wheels_maze/aws6/1/_showbest_current.conf"});
 			String txt = m.getSegmentsAsText(j.createSimulator());
 			FileWriter file = new FileWriter("mazes/svg/"+s+".txt");
 		    BufferedWriter output = new BufferedWriter(file);

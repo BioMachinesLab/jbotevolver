@@ -133,11 +133,20 @@ public class NoveltyEvaluation extends PostEvaluator {
 			   	 	distances.put(m,distance(m,moc));
 			    }
 			}
+			
 			Collections.sort(allInds,new Comparator<MOChromosome>() {
 				 public int compare(MOChromosome o1, MOChromosome o2) {
+					 
+					 if(distances.get(o1) == distances.get(o2))
+						 return 0;
+					 
 			         return distances.get(o1) < distances.get(o2) ? -1 : 1;
 				 };
 			});
+			
+//			for(MOChromosome m : allInds)
+//				System.out.println(distances.get(m));
+//			System.out.println();
 			
 			ArrayList<MOChromosome> neighbours = new ArrayList<MOChromosome>();
 			for (int i = 0; i < k && allInds.size() > i; i++) {

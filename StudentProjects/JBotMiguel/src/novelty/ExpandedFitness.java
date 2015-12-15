@@ -1,6 +1,8 @@
 package novelty;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 
@@ -15,18 +17,18 @@ public class ExpandedFitness extends FitnessResult {
     public static final String FITNESS_SCORE = "fitness";
     protected int fitnessIndex = 0;
 
-    protected EvaluationResult[] evalResults;
+    protected ArrayList<EvaluationResult> evalResults;
     protected LinkedHashMap<String,Double> scores;
     
     public ExpandedFitness() {
     	super();
 	}
     
-    public EvaluationResult[] getEvaluationResults() {
+    public ArrayList<EvaluationResult> getEvaluationResults() {
         return evalResults;
     }
     
-    public void setEvaluationResults(EvaluationResult[] br) {
+    public void setEvaluationResults(ArrayList<EvaluationResult> br) {
         this.evalResults = br;
         double fit = getFitnessScoreAux();
         this.setFitness(fit);
@@ -34,8 +36,8 @@ public class ExpandedFitness extends FitnessResult {
         scores.put(FITNESS_SCORE, fit);
         
         // Automatically add all fitness results as scores
-        for(int i = 0 ; i < br.length ; i++) {
-            EvaluationResult e = br[i];
+        for(int i = 0 ; i < br.size() ; i++) {
+            EvaluationResult e = br.get(i);
             if(e instanceof FitnessResult) {
                 FitnessResult fr = (FitnessResult) e;
                 scores.put(AUTO_FITNESS_PREFIX + i, fr.getFitness());
@@ -44,7 +46,7 @@ public class ExpandedFitness extends FitnessResult {
     }
     
     public EvaluationResult getCorrespondingEvaluation(int index) {
-        EvaluationResult er = evalResults[index];
+        EvaluationResult er = evalResults.get(index);
         return er;
     }   
     
@@ -76,28 +78,30 @@ public class ExpandedFitness extends FitnessResult {
      * @param state
      * @param fitnesses
      */
-    public static ExpandedFitness setToMeanOf(ExpandedFitness[] fitnesses) {
+    public static ExpandedFitness setToMeanOf(ArrayList<ExpandedFitness> fitnesses) {
     	
     	ExpandedFitness result = new ExpandedFitness();
     	
-        if (fitnesses.length == 1) {
+        if (fitnesses.size() == 1) {
             // Just one, pass the information
-        	result.setEvaluationResults(((ExpandedFitness) fitnesses[0]).evalResults);
+        	result.setEvaluationResults(((ExpandedFitness) fitnesses.get(0)).evalResults);
         } else {
             // Merge evaluation results
-            EvaluationResult[] evalFunctions = new EvaluationResult[((ExpandedFitness) fitnesses[0]).evalResults.length];
-            for (int i = 0; i < evalFunctions.length; i++) { // for each evaluation function
-                EvaluationResult[] evalTrials = new EvaluationResult[fitnesses.length];
-                for (int j = 0; j < fitnesses.length; j++) { // for each trial
-                    evalTrials[j] = ((ExpandedFitness) fitnesses[j]).evalResults[i];
+            ArrayList<EvaluationResult> evalFunctions = new ArrayList<EvaluationResult>();
+            for (int i = 0; i < ((ExpandedFitness) fitnesses.get(0)).evalResults.size(); i++) { // for each evaluation function
+                EvaluationResult[] evalTrials = new EvaluationResult[fitnesses.size()];
+                for (int j = 0; j < fitnesses.size(); j++) { // for each trial
+                    evalTrials[j] = ((ExpandedFitness) fitnesses.get(j)).evalResults.get(i);
                 }
-                evalFunctions[i] = (EvaluationResult) evalTrials[0].mergeEvaluations(evalTrials);
+                evalFunctions.add(i,(EvaluationResult) evalTrials[0].mergeEvaluations(evalTrials));
             }
             result.setEvaluationResults(evalFunctions);
             
             // Context corresponding to the individual with the median fitness score
-            FitnessResult[] sortedFits = Arrays.copyOf(fitnesses, fitnesses.length);
-            Arrays.sort(sortedFits, new Comparator<FitnessResult>() {
+            ArrayList<FitnessResult> sortedFits = new ArrayList<FitnessResult>();
+            Collections.copy(sortedFits, fitnesses);
+            
+            Collections.sort(sortedFits, new Comparator<FitnessResult>() {
                 @Override
                 public int compare(FitnessResult o1, FitnessResult o2) {
                     return Double.compare(((ExpandedFitness) o2).getFitness(), 

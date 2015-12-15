@@ -23,13 +23,13 @@ public class FixedMotionPatternController extends Controller implements FixedLen
 	@Override
 	public void controlStep(double time) {
 		
-		int numberOfWheels = mwaa.getNumberOfWheels();
+		int numberOfWheels = mwaa.getNumberOfSpeeds();
 		
 		for(int i = 0 ; i < numberOfWheels ; i++){
 			mwaa.setWheelSpeed(i, outputs[i]);
 		}
 		
-		for(int i = 0 ; i < mwaa.getNumberOfAxes() ; i++){
+		for(int i = 0 ; i < mwaa.getNumberOfRotations() ; i++){
 			mwaa.setRotation(i, outputs[i + numberOfWheels]);
 		}
 	}
@@ -39,7 +39,7 @@ public class FixedMotionPatternController extends Controller implements FixedLen
 		for(Actuator a : r.getActuators()) {
 			if(a instanceof MultipleWheelAxesActuator) {
 				mwaa = (MultipleWheelAxesActuator)a;
-				num+= mwaa.getNumberOfAxes() + mwaa.getNumberOfWheels();
+				num+= mwaa.getNumberOfRotations() + mwaa.getNumberOfSpeeds();
 				break;
 			}
 		}
@@ -54,9 +54,7 @@ public class FixedMotionPatternController extends Controller implements FixedLen
 		//output of the controller has to be between 0 and 1
 		for(int i = 0 ; i < weights.length ; i++) {
 			this.outputs[i] = (this.weights[i]+maxAlleleValue)/(maxAlleleValue*2);
-//			System.out.print(this.weights[i]+"\t"+outputs[i]+"\t\t");
 		}
-//		System.out.println();
 	}
 
 	@Override

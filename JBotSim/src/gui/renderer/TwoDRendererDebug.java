@@ -33,6 +33,8 @@ public class TwoDRendererDebug extends TwoDRenderer {
 
 	private boolean blink = true;
 	
+	private Vector2d selectedLocation;
+	
 	public TwoDRendererDebug(Arguments args) {
 		super(args);
 		this.addMouseListener(new MouseListenerSentinel());
@@ -306,7 +308,8 @@ public class TwoDRendererDebug extends TwoDRenderer {
 
 		//		@Override
 		public void mouseClicked(MouseEvent e) {
-			System.out.println(new Vector2d(screenToSimulationX(e.getX()),screenToSimulationY(e.getY())));
+			selectedLocation = new Vector2d(screenToSimulationX(e.getX()),screenToSimulationY(e.getY()));
+			System.out.println(selectedLocation);
 			for (Robot robot : simulator.getEnvironment().getRobots()) {
 				int circleDiameter = (int) FastMath.round(0.5 + robot.getDiameter() * scale);
 				int x1 = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
@@ -342,5 +345,13 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		public void mouseReleased(MouseEvent e) {
 			// TODO Auto-generated method stub
 		}
+	}
+	
+	public Vector2d getSelectedLocation() {
+		return selectedLocation;
+	}
+	
+	public void clearSelectedLocation() {
+		this.selectedLocation = null;
 	}
 }

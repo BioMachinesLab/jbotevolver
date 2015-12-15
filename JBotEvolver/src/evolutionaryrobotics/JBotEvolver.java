@@ -52,7 +52,6 @@ public class JBotEvolver extends JBotSim {
 			return Population.getPopulation(getArguments().get("--population"));
 		} catch(Exception e) {
 			e.printStackTrace();
-			System.exit(-1);
 		}
 		return null;
 	}

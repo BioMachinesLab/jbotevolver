@@ -21,7 +21,7 @@ public class FinalPositionWithOrientationBehavior extends GenericEvaluationFunct
 
     @Override
     public EvaluationResult getEvaluationResult() {
-    	vbr = new VectorBehaviourExtraResult(orientation,pos.getX(),  pos.getY());
+    	vbr = new VectorBehaviourExtraResult(orientation, pos.getX(),  pos.getY());
         return vbr;
     }
     

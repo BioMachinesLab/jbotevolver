@@ -85,7 +85,7 @@ public class NEATEvolution extends Evolution {
 		if(!population.evolutionDone())
 			taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
 		
-		double highestFitness = 0;
+		double highestFitness = population.getHighestFitness();
 		
 		while (!population.evolutionDone() && executeEvolution) {
 			
@@ -107,8 +107,12 @@ public class NEATEvolution extends Evolution {
 					} catch(Exception e) {e.printStackTrace();}
 					
 					highestFitness = population.getHighestFitness();
-					population.createNextGeneration();
 			}
+			
+			if(population.evolutionDone())
+				break;
+			
+			population.createNextGeneration();
 		}
 		
         InnovationDatabase db = algorithm.innovationDatabase();

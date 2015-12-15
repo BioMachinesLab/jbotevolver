@@ -7,7 +7,7 @@ import gui.evolution.EvolutionGui;
 public class EMain {
 	public static void main(String[] args) throws Exception {
 		
-		String configName = "br_pattern.conf";
+		String configName = "repertoire_nav.conf";
 //		String configName = "nsga2_novelty.conf";
 //		String configName = "nsga2_fitness.conf";
 //		String configName = "nsga2_nf.conf";

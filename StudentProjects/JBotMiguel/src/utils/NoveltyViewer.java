@@ -4,10 +4,13 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.Serializable;
 import java.util.LinkedList;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -15,7 +18,6 @@ import javax.swing.JSlider;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-import mathutils.MathUtils;
 import mathutils.Vector2d;
 import multiobjective.MOChromosome;
 import novelty.BehaviourResult;
@@ -36,25 +38,53 @@ import gui.renderer.TwoDRenderer;
 
 public class NoveltyViewer {
 	
+	protected String file;
 	protected JBotEvolver jbot;
 	protected String folder;
 	protected Renderer renderer;
 	protected JFrame frame;
 	protected JLabel genLabel;
 	protected Simulator sim;
+	protected int currentGens;
 	
-	public NoveltyViewer(String folder) throws Exception {
+	public static void main(String[] args) throws Exception {
+		
+		String[] folder = new String[]{
+//				"../../EvolutionAutomator/br/two/1/",
+				"../../EvolutionAutomator/br/four/1/",
+				"../../EvolutionAutomator/br/six/1/",
+//				"../../EvolutionAutomator/br/eight/1/",
+				};
+		
+		for(String s : folder)
+			new NoveltyViewer(s);
+	}
+	
+	public NoveltyViewer(String folder) {
 		this.folder = folder;
 		
-		String file = folder+"/_showbest_current.conf";
+		file = folder+"/_showbest_current.conf";
 		
-		jbot = new JBotEvolver(new String[]{file});
-		Population pop = jbot.getPopulation();
-		int gens = pop.getNumberOfCurrentGeneration();
+		load();
 		
 		renderer = new TwoDRenderer(new Arguments(""));
-		frame = createJFrame(gens);
-		setGeneration(gens);
+		frame = createJFrame();
+		setGeneration(currentGens);
+	}
+	
+	public void load() {
+		
+		int gens = 0;
+		
+		try {
+			jbot = new JBotEvolver(new String[]{file});
+			Population pop = jbot.getPopulation();
+			gens = pop.getNumberOfCurrentGeneration();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		currentGens = gens;
 	}
 	
 	public void setGeneration(int i) {
@@ -107,7 +137,7 @@ public class NoveltyViewer {
 				
 				double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
 				
-				Marker m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.01, 0.1, Color.RED);
+				Marker m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.RED);
 				sim.getEnvironment().addStaticObject(m);
 			}
 		}
@@ -122,13 +152,13 @@ public class NoveltyViewer {
 		return null;
 	}
 	
-	public JFrame createJFrame(int gens) {
+	public JFrame createJFrame() {
 		JFrame frame = new JFrame(folder);
 		frame.setLayout(new BorderLayout());
 		frame.add(renderer,BorderLayout.CENTER);
 		
 		JPanel bottomPanel = new JPanel();
-		JSlider slider = new JSlider(JSlider.HORIZONTAL,0,gens,0);
+		final JSlider slider = new JSlider(JSlider.HORIZONTAL,0,currentGens,0);
 		
 		slider.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
@@ -159,10 +189,29 @@ public class NoveltyViewer {
 			}
 		});
 		
+		for(int i = 0 ; i < 5 ; i++)
+			plus.doClick();
+		
+		final RefreshThread refreshThread = new RefreshThread(slider);
+		refreshThread.start();
+		
+		JCheckBox autoRefresh = new JCheckBox("Refresh");
+		autoRefresh.addItemListener(new ItemListener() {
+		    @Override
+		    public void itemStateChanged(ItemEvent e) {
+		        if(e.getStateChange() == ItemEvent.SELECTED) {
+		        	refreshThread.unpause();
+		        } else {
+		        	refreshThread.pause();
+		        };
+		    }
+		});
+		
 		bottomPanel.add(slider);
 		bottomPanel.add(genLabel);
 		bottomPanel.add(plus);
 		bottomPanel.add(minus);
+		bottomPanel.add(autoRefresh);
 		
 		frame.add(bottomPanel,BorderLayout.SOUTH);
 		
@@ -191,23 +240,60 @@ public class NoveltyViewer {
 		}
 	}
 	
-	public static void main(String[] args) throws Exception {
+	public class RefreshThread extends Thread{
 		
-//		String folder = "nsga2_nf";
-//		String folder = "nsga2_novelty";
-//		String folder = "../../EvolutionAutomator/br/ninety/1/";
+		private JSlider slider;
+		private long waitTime = 100;
+		private long minWaitTime = 100;
+		private long maxWaitTime = 10000;
+		private long timeIncrement = 100;
+		private boolean active = false;
 		
+		public RefreshThread(JSlider slider) {
+			this.slider = slider;
+		}
 		
-		String[] folder = new String[]{
-				"../../EvolutionAutomator/br/two/1/",
-//				"../../EvolutionAutomator/br/four/1/",
-//				"../../EvolutionAutomator/br/six/1/",
-//				"../../EvolutionAutomator/br/eight/1/",
-				};
+		@Override
+		public void run() {
+			while(true) {
+				try {
+					if(active) {
+						
+						int gens = currentGens;
+						
+						load();
+						
+						if(currentGens > gens) {
+							slider.setMaximum(currentGens);
+							slider.setValue(currentGens);
+							setGeneration(currentGens);
+							waitTime = minWaitTime;
+						} else {
+							waitTime+=timeIncrement;
+						}
+						
+						if(waitTime > maxWaitTime) waitTime = maxWaitTime;
+					
+						Thread.sleep(waitTime);
+						
+					} else {
+						synchronized (this) {
+							this.wait();
+						}
+					}
+				} catch(InterruptedException e) {}
+			}
+		}
 		
-		for(String s : folder)
-			new NoveltyViewer(s);
+		public void pause() {
+			active = false;
+		}
 		
+		public void unpause() {
+			if(!active) {
+				active = true;
+				this.interrupt();
+			}
+		}
 	}
-
 }
