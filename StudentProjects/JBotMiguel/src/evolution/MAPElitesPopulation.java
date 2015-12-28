@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import multiobjective.MOChromosome;
 import novelty.ExpandedFitness;
+import novelty.evaluators.FinalPositionBehavior;
+import novelty.evaluators.FinalPositionWithOrientationBehavior;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import controllers.FixedLenghtGenomeEvolvableController;

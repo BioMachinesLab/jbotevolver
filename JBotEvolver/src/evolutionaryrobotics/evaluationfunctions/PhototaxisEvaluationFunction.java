@@ -13,14 +13,20 @@ public class PhototaxisEvaluationFunction extends EvaluationFunction {
 	private double initialDistance = 0;
 	private double currentDistance = 0;
 	
+	private boolean countTime = false;
+	private int totalSteps = 0;
+	private double currentSteps = 0;
+	
 	public PhototaxisEvaluationFunction(Arguments args) {
 		super(args);
+		countTime = args.getFlagIsTrue("counttime");
 	}
 
 	@Override
 	public void update(Simulator simulator) {
 		if(r == null) {
 			r = simulator.getRobots().get(0);
+			totalSteps = simulator.getEnvironment().getSteps();
 			for(PhysicalObject o : simulator.getEnvironment().getAllObjects()) {
 				if(o instanceof LightPole) {
 					light = o;
@@ -29,6 +35,8 @@ public class PhototaxisEvaluationFunction extends EvaluationFunction {
 			}
 			initialDistance = r.getPosition().distanceTo(light.getPosition());
 		}
+		
+		currentSteps = simulator.getTime();
 		
 		currentDistance = r.getPosition().distanceTo(light.getPosition());
 		
@@ -40,7 +48,14 @@ public class PhototaxisEvaluationFunction extends EvaluationFunction {
 	
 	@Override
 	public double getFitness() {
-		fitness = 10 + (1 - currentDistance/initialDistance);
+		
+		double timeFactor = 0;
+		
+		if(countTime && currentDistance == 0) {
+			timeFactor = 1.0 - currentSteps/totalSteps;
+		}
+		
+		fitness = 10.0 + (1.0 - currentDistance/initialDistance) + timeFactor;
 		return fitness;
 	}
 

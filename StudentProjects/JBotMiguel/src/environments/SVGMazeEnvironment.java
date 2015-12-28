@@ -16,6 +16,8 @@ public class SVGMazeEnvironment extends Environment{
 	private String mazeName = "zigzag";
 	private double randomPosition = 0;
 	private Vector2d shiftMaze;
+	private double shiftX = 0;
+	private double shiftY = 0;
 	
 	public SVGMazeEnvironment(Simulator simulator, Arguments args) {
 		super(simulator,args);
@@ -27,6 +29,9 @@ public class SVGMazeEnvironment extends Environment{
 			shiftMaze = new Vector2d(Double.parseDouble(shift[0]),Double.parseDouble(shift[1]));
 		}
 		
+		shiftX = args.getArgumentAsDoubleOrSetDefault("shiftx", shiftX);
+		shiftY = args.getArgumentAsDoubleOrSetDefault("shifty", shiftY);
+		
 	}
 	
 	@Override
@@ -37,6 +42,8 @@ public class SVGMazeEnvironment extends Environment{
 		
 		    InputStream buffer = new BufferedInputStream(simulator.getFileProvider().getFile("mazes/svg/"+mazeName+".txt"));
 		    Scanner s = new Scanner(buffer);
+		    
+//		    System.out.print("MAZE!");
 		    
 		    int numberWalls = s.nextInt();
 		    
@@ -58,7 +65,17 @@ public class SVGMazeEnvironment extends Environment{
 		    	addObject(wall);
 		    }
 		    
-			Vector2d start = new Vector2d(readDouble(s) + shiftX,readDouble(s) + shiftY);
+		    double robotShiftX = 0;
+		    double robotShiftY = 0;
+		    
+		    if(Math.abs(this.shiftX) > 0) {
+		    	robotShiftX+= simulator.getRandom().nextDouble()*this.shiftX;
+		    }
+		    if(Math.abs(this.shiftY) > 0) {
+		    	robotShiftY+= simulator.getRandom().nextDouble()*this.shiftY;
+		    }
+		    
+			Vector2d start = new Vector2d(readDouble(s) + shiftX + robotShiftX,readDouble(s) + shiftY + robotShiftY);
 			Vector2d end = new Vector2d(readDouble(s) + shiftX,readDouble(s) + shiftY);
 			
 			s.close();
@@ -83,7 +100,9 @@ public class SVGMazeEnvironment extends Environment{
 	}
 	
 	private double readDouble(Scanner s) {
-		return Double.parseDouble(s.next().trim().replace(',','.'));
+		double d = Double.parseDouble(s.next().trim().replace(',','.'));
+//		System.out.print(d+" ");
+		return d;
 	}
 
 	@Override

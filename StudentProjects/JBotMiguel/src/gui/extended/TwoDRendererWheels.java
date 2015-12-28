@@ -1,8 +1,7 @@
 package gui.extended;
 
-import fourwheeledrobot.AWS_3Actuator;
-import fourwheeledrobot.FWS_3Actuator;
 import fourwheeledrobot.MultipleWheelAxesActuator;
+import fourwheeledrobot.MultipleWheelRepertoireActuator;
 import gui.renderer.TwoDRendererDebug;
 
 import java.awt.Color;
@@ -24,216 +23,35 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 		super.drawRobot(graphics, robot);
 		
 		Actuator act = robot.getActuatorWithId(1);
+
+		int spacing = 30;
 		
 		if(act instanceof MultipleWheelAxesActuator) {
 			MultipleWheelAxesActuator mwaa = (MultipleWheelAxesActuator)act;
-			
-			int speeds = mwaa.getNumberOfSpeeds();
-			int rotations = mwaa.getNumberOfRotations();
-			
-			int spacing = 30;
-			
-			if(speeds == 1 && rotations == 1)
-				draw1Speed1Rotation(mwaa, robot, spacing);
-			else if(speeds == 1 && rotations == 2 && mwaa instanceof FWS_3Actuator)
-				draw1Speed2RotationsFront(mwaa, robot, spacing);
-			else if(speeds == 1 && rotations == 2 && mwaa instanceof AWS_3Actuator)
-				draw1Speed2RotationsBoth(mwaa, robot, spacing);
-			else if(speeds == 2 && rotations == 2)
-				draw2Speed2Rotations(mwaa, robot, spacing);
-			else if(speeds == 4 && rotations == 4)
-				draw4Speed4Rotations(mwaa, robot, spacing);
-			else if(speeds == 2 && rotations == 4)
-				draw2Speed4Rotations(mwaa, robot, spacing);
-			
+			drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
+		} else if(act instanceof MultipleWheelRepertoireActuator) {
+			MultipleWheelRepertoireActuator mwaa = (MultipleWheelRepertoireActuator)act;
+			drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
 		}
 	}
 	
-	public void drawTwoWheelsZeroAxes(MultipleWheelAxesActuator mwaa, Robot r, int spacing) {
-		
-	}
-	
-	public void draw1Speed1Rotation(MultipleWheelAxesActuator mwaa, Robot r, int spacing) {
+	public void drawSpeedRotation(double[] speeds, double[] rotations, Robot r, int spacing, double maxSpeed) {
 		
 		double rO = -r.getOrientation();
-		double speed = mwaa.getSpeed()[0];
 		
-		double[] speeds = new double[]{speed,speed,speed,speed};
-		double[] rotations = mwaa.getRotation();
-		
-		Vector2d robotCenter = new Vector2d(spacing*2.5,spacing*2.5);
-		
-		double rotAngle = rO;
-		
-		for(int i = 0 ; i < 4 ; i++) {
-			
-			int row = getWheelRow(i);
-			int column = getWheelColumn(i);
-			
-			if(column == -1) {
-				rotAngle = rO;
-			} else {
-				rotAngle = rO-rotations[0];
-			}
-			
-			int len = (int)(spacing*speeds[i]/mwaa.getMaxSpeed());
-			drawRobotWheels(column, row, spacing, rO, robotCenter, rotAngle, len);
-		}
-		drawRobotOverlay(robotCenter, rO, spacing);		
-	}
-	
-	//CAR2
-	public void draw1Speed2RotationsFront(MultipleWheelAxesActuator mwaa, Robot r, int spacing) {
-		
-		double rO = -r.getOrientation();
-		double speed = mwaa.getSpeed()[0];
-		
-		double[] speeds = new double[]{speed,speed,speed,speed};
-		double[] rotations = mwaa.getRotation();
-		
-		Vector2d robotCenter = new Vector2d(spacing*2.5,spacing*2.5);
-		
-		double rotAngle = rO;
-		
-		for(int i = 0 ; i < 4 ; i++) {
-			
-			int row = getWheelRow(i);
-			int column = getWheelColumn(i);
-			
-			if(column == -1) {
-				rotAngle = rO;
-			} else {
-				if(row == -1) {
-					rotAngle = rO-rotations[0];
-				} else {
-					rotAngle = rO-rotations[1];
-				}
-			}
-			
-			int len = (int)(spacing*speeds[i]/mwaa.getMaxSpeed());
-			drawRobotWheels(column, row, spacing, rO, robotCenter, rotAngle, len);
-		}
-		drawRobotOverlay(robotCenter, rO, spacing);		
-	}
-	
-	//CAR2AS
-	public void draw1Speed2RotationsBoth(MultipleWheelAxesActuator mwaa, Robot r, int spacing) {
-		
-		double rO = -r.getOrientation();
-		double speed = mwaa.getSpeed()[0];
-		
-		double[] speeds = new double[]{speed,speed,speed,speed};
-		double[] rotations = mwaa.getRotation();
-		
-		Vector2d robotCenter = new Vector2d(spacing*2.5,spacing*2.5);
-		
-		double rotAngle = rO;
-		
-		for(int i = 0 ; i < 4 ; i++) {
-			
-			int row = getWheelRow(i);
-			int column = getWheelColumn(i);
-			
-			if(column == -1) {
-				rotAngle = rO-rotations[1];
-			} else {
-				rotAngle = rO-rotations[0];
-			}
-			
-			int len = (int)(spacing*speeds[i]/mwaa.getMaxSpeed());
-			drawRobotWheels(column, row, spacing, rO, robotCenter, rotAngle, len);
-		}
-		drawRobotOverlay(robotCenter, rO, spacing);		
-	}
-	
-	//CAR2DAS
-	public void draw2Speed2Rotations(MultipleWheelAxesActuator mwaa, Robot r, int spacing) {
-		
-		double rO = -r.getOrientation();
-		double[] speeds = new double[]{mwaa.getSpeed()[0],mwaa.getSpeed()[0],mwaa.getSpeed()[1],mwaa.getSpeed()[1]};
-		double[] rotations = mwaa.getRotation();
-		
-		Vector2d robotCenter = new Vector2d(spacing*2.5,spacing*2.5);
-		
-		double rotAngle = rO;
-		
-		for(int i = 0 ; i < 4 ; i++) {
-			
-			int row = getWheelRow(i);
-			int column = getWheelColumn(i);
-			
-			if(column == -1) {
-				rotAngle = rO-rotations[1];
-			} else {
-				rotAngle = rO-rotations[0];
-			}
-			
-			int len = (int)(spacing*speeds[i]/mwaa.getMaxSpeed());
-			drawRobotWheels(column, row, spacing, rO, robotCenter, rotAngle, len);
-		}
-		drawRobotOverlay(robotCenter, rO, spacing);		
-	}
-	
-	public void drawFourWheelsTwoAxes(MultipleWheelAxesActuator mwaa, Robot r, int spacing) {
-		double rO = -r.getOrientation();
-		
-		double[] speeds = mwaa.getSpeed();
-		double[] rotations = mwaa.getRotation();
+//		for(double s : speeds)
+//			System.out.print(s+" ");
+//		System.out.println();
+//		for(double s : rotations)
+//			System.out.print(s+" ");
+//		System.out.println();
+//		System.out.println();
 		
 		Vector2d robotCenter = new Vector2d(spacing*2.5,spacing*2.5);
 		
 		for(int i = 0 ; i < speeds.length ; i++) {
 			
-			int len = (int)(spacing*speeds[i]/mwaa.getMaxSpeed());
-			double rotAngle = -rotations[i/2] + rO;
-			
-			int row = getWheelRow(i);
-			int column = getWheelColumn(i);
-			
-			drawRobotWheels(column, row, spacing, rO, robotCenter, rotAngle, len);
-		}
-		
-		drawRobotOverlay(robotCenter, rO, spacing);
-	}
-	
-	//AWS_6
-		public void draw2Speed4Rotations(MultipleWheelAxesActuator mwaa, Robot r, int spacing) {
-			
-			double rO = -r.getOrientation();
-			
-			double[] speeds = new double[]{mwaa.getSpeed()[0],mwaa.getSpeed()[0],mwaa.getSpeed()[1],mwaa.getSpeed()[1]};
-			double[] rotations = mwaa.getRotation();
-			
-			Vector2d robotCenter = new Vector2d(spacing*2.5,spacing*2.5);
-			
-			for(int i = 0 ; i < speeds.length ; i++) {
-				
-				int len = (int)(spacing*speeds[i]/mwaa.getMaxSpeed());
-				
-				double rotAngle = -rotations[i] + rO;
-				
-				int row = getWheelRow(i);
-				int column = getWheelColumn(i);
-				
-				drawRobotWheels(column, row, spacing, rO, robotCenter, rotAngle, len);
-			}
-			
-			drawRobotOverlay(robotCenter, rO, spacing);
-		}
-	
-	//AWS_8
-	public void draw4Speed4Rotations(MultipleWheelAxesActuator mwaa, Robot r, int spacing) {
-		
-		double rO = -r.getOrientation();
-		
-		double[] speeds = mwaa.getSpeed();
-		double[] rotations = mwaa.getRotation();
-		
-		Vector2d robotCenter = new Vector2d(spacing*2.5,spacing*2.5);
-		
-		for(int i = 0 ; i < speeds.length ; i++) {
-			
-			int len = (int)(spacing*speeds[i]/mwaa.getMaxSpeed());
+			int len = (int)(spacing*speeds[i]/maxSpeed);
 			
 			double rotAngle = -rotations[i] + rO;
 			
@@ -268,9 +86,18 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 		Vector2d rot = new Vector2d(len*Math.cos(rotAngle),len*Math.sin(rotAngle));
 		posB.add(rot);
 		
+		Vector2d posC = new Vector2d(posA);
+		rot = new Vector2d(len*Math.cos(rO),len*Math.sin(rO));
+		posC.add(rot);
+		
+		//guiding line
+		graphics.setColor(Color.BLACK);
+		graphics.drawLine((int)posA.x, (int)posA.y, (int)posC.x, (int)posC.y);
+		
 		graphics.setColor(Color.RED);
 		graphics.drawOval((int)posA.x-wheelSize,(int)posA.y-wheelSize,wheelSize*2,wheelSize*2);
 		graphics.drawLine((int)posA.x, (int)posA.y, (int)posB.x, (int)posB.y);
+		
 	}
 	
 	protected void drawRobotOverlay(Vector2d robotCenter, double rO, int spacing) {

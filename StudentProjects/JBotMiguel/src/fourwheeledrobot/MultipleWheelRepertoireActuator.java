@@ -32,9 +32,39 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	public MultipleWheelRepertoireActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
 		Arguments a = new Arguments(args.getArgumentAsString("wheels"));
-		wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, a.getArgumentAsString("classname"), a);
-		nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
-		repertoire = loadRepertoire(simulator, args.getArgumentAsString("repertoire"));
+		
+		int numArgs = a.getNumberOfArguments();
+		
+		if(numArgs == 1) {
+			Arguments wheelArgs = new Arguments(a.getArgumentAsString(a.getArgumentAt(0)));
+			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
+			nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
+			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
+		} else {
+			
+			int fitnessSample = simulator.getArguments().get("--environment").getArgumentAsInt("fitnesssample");
+			
+			int actuatorChosen = fitnessSample % numArgs;
+			
+			boolean randomize = simulator.getArguments().get("--robots").getFlagIsTrue("randomizeactuator");
+			
+			if(randomize)
+				actuatorChosen = simulator.getRandom().nextInt(numArgs);
+			
+			Arguments wheelArgs = new Arguments(a.getArgumentAsString(a.getArgumentAt(actuatorChosen)));
+			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
+			nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
+			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
+//			System.out.println(actuatorChosen+" "+numArgs+" "+wheelArgs.getArgumentAsString("repertoire"));
+		}
+		
+//		for(int i = 0 ; i < repertoire.length ; i++) {
+//			for(int j = 0 ; j < repertoire[i].length ; j++) {
+//				System.out.print(repertoire[i][j] == null ? " " : "X");
+//			}
+//			System.out.println();
+//		}
+		
 		type = args.getArgumentAsIntOrSetDefault("type", type);
 	}
 
@@ -73,17 +103,21 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 //			int[] pos = getLocationFromBehaviorVector(new double[]{point.x,point.y});
 //			behavior = repertoire[pos[1]][pos[0]];
 			behavior = repertoire[(int)point.y][(int)point.x];
+			
 			//reduce the size of the circle to find an appropriate point
 			s*=0.95;
 			if(Math.abs(s) < 0.1)
 				break;
 		} while(behavior == null);
-
+		
 		return behavior;
 	}
 	
 	private Vector2d circlePoint(double percentageAngle, double speedPercentage) {
 		Vector2d res = null;
+		
+//		percentageAngle = 1;
+//		speedPercentage = 0.5;
 		
 		if(type == 0) {
 			
@@ -151,6 +185,18 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			e.printStackTrace();
 		}
 		
+//		System.out.print("BEHAVIOR! ");
+//		for(int i = 0 ; i < r.length ; i++) {
+//			for(int j = 0 ; j < r[i].length ; j++) {
+//				if(r[i][j] != null) {
+//					for(int z = 0 ; z < r[i][j].length ; z++) {
+//						System.out.print(r[i][j][z]+" ");
+//					}
+//				}
+//			}
+//		}
+//		System.out.println();
+		
 		return r;
 	}
 	
@@ -176,5 +222,17 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	
 	private double readDouble(Scanner s) {
 		return Double.parseDouble(s.next().trim().replace(',','.'));
+	}
+	
+	public double[] getCompleteRotations() {
+		return wheels.getCompleteRotations();
+	}
+	
+	public double[] getCompleteSpeeds() {
+		return wheels.getCompleteSpeeds();
+	}
+	
+	public double getMaxSpeed() {
+		return wheels.getMaxSpeed();
 	}
 }

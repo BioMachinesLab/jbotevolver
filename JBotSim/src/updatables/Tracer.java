@@ -85,10 +85,10 @@ public abstract class Tracer implements Stoppable {
         name = args.getArgumentAsStringOrSetDefault("name", name);
     }
 
-    protected class IntPos {
+    public class IntPos {
 
-        int x;
-        int y;
+        public int x;
+        public int y;
 
         IntPos(int x, int y) {
             this.x = x;

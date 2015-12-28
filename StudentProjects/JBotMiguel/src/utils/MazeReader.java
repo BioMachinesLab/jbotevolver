@@ -38,8 +38,8 @@ public class MazeReader {
     private final SVGDiagram diagram;
     private double scale = 0.01;
     private double wallSize = 0.01;
-    private double offsetX = 0;
-    private double offsetY = 0;
+    private double offsetX = -280;
+    private double offsetY = -40;
     
     public MazeReader(ByteArrayInputStream byteArrayInputStreamS) throws FileNotFoundException,IOException {
         SVGUniverse univ = new SVGUniverse();
@@ -119,10 +119,10 @@ public class MazeReader {
     }
     
     public static void main(String[] args) throws Exception{
-		String[] mazes = new String[]{/*"star","zigzag","hard","medium","multi","open","subset",*/"trumpet"};
+		String[] mazes = new String[]{/*"star","zigzag","hard","medium","multi","open","subset","trumpet",*/ "obstacle"};
 		for(String s : mazes) {
 			MazeReader m = new MazeReader(FileProvider.getDefaultFileProvider().getFile("mazes/svg/"+s+".svg"));
-			JBotEvolver j = new JBotEvolver(new String[]{"../../EvolutionAutomator/wheels_maze/aws6/1/_showbest_current.conf"});
+			JBotEvolver j = new JBotEvolver(new String[]{"../../EvolutionAutomator/wheels_maze/AWS_3Actuator_zigzag/1/_showbest_current.conf"});
 			String txt = m.getSegmentsAsText(j.createSimulator());
 			FileWriter file = new FileWriter("mazes/svg/"+s+".txt");
 		    BufferedWriter output = new BufferedWriter(file);

@@ -1,5 +1,6 @@
 package evolution;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -97,9 +98,21 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 			}
 		}
 		
-		prune();
-		expandToCircle();
-		saveRepertoireTxt();
+		prune((MAPElitesPopulation)population, pruneThreshold);
+		expandToCircle((MAPElitesPopulation)population);
+		
+		String dir = diskStorage.getOutputDirectory()+"/";
+		String hash = getRepertoireHash((MAPElitesPopulation)population);
+    	String file = "repertoire_"+hash+".txt";
+		
+		saveRepertoireTxt(dir,file,(MAPElitesPopulation)population);
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(dir+"repertoire_name.txt")));
+			bw.write(hash);
+			bw.close();
+		} catch(Exception e){
+			e.printStackTrace();
+		}
 		
 		try {
 			diskStorage.savePopulation(population);
@@ -110,8 +123,7 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		diskStorage.close();
 	}
     
-    private void drawRepertoire() {
-    	MAPElitesPopulation p = (MAPElitesPopulation)population;
+    public static void printRepertoire(MAPElitesPopulation p) {
     	for(int x = 0 ; x < p.getMap().length ; x++) {
 			System.out.println();
 			for(int y = 0 ; y < p.getMap()[x].length ; y++) {
@@ -123,19 +135,27 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		}
     }
     
-    private void expandToCircle() {
+    public static void expandToCircle(MAPElitesPopulation p) {
     	
-    	MAPElitesPopulation p = (MAPElitesPopulation)population;
     	MOChromosome[][] map = p.getMap();
     	double maxDist = 0;
 //    	double resolution = p.getMapResolution();
     	
-    	for(Chromosome c : p.getChromosomes()) {
-    		MOChromosome moc = (MOChromosome)c;
-    		int[] pos = p.positionInMap(moc);
-    		pos[0]-=map.length/2;
-    		pos[1]-=map[0].length/2;
-    		maxDist = Math.max(maxDist,new Vector2d(pos[0],pos[1]).length());
+    	int xx = 0;
+    	int yy = 0;
+    	
+    	for(int x = 0 ; x < map.length ; x++) {
+    		for(int y = 0 ; y < map[x].length ; y++) {
+    			if(map[x][y] != null) {
+	    			int posX = x;
+	    			int posY = y;
+	    			posX-= map.length/2;
+	        		posY-= map[0].length/2;
+	        		xx = posX;
+	        		yy = posY;
+	        		maxDist = Math.max(maxDist,new Vector2d(posX,posY).length());
+    			}
+    		}
     	}
     	
     	//create a copy of the map so that we only expand the map
@@ -166,7 +186,7 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     	
     }
     
-    private MOChromosome findNearest(int x, int y, MOChromosome[][] map) {
+    private static MOChromosome findNearest(int x, int y, MOChromosome[][] map) {
     	
     	MOChromosome nearest = null;
     	double nearestDistance = Double.MAX_VALUE;
@@ -187,16 +207,22 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     	return nearest;
     }
     
-    private void saveRepertoireTxt() {
-    	String dir = diskStorage.getOutputDirectory();
-    	String file = dir+"/repertoire.txt";
+    public static String getRepertoireHash(MAPElitesPopulation p) {
+    	StringBuffer sb = new StringBuffer();
+    	for(Chromosome c : p.getChromosomes()) {
+    		for(double d : c.getAlleles())
+    			sb.append(d+" ");
+    	}
+    	return ""+sb.toString().hashCode();
+    }
+    
+    public static void saveRepertoireTxt(String dir, String file, MAPElitesPopulation p) {
     	
-    	MAPElitesPopulation p = (MAPElitesPopulation)population;
     	MOChromosome[][] map = p.getMap();
     	
     	try {
     	
-    		FileWriter fw = new FileWriter(new File(file));
+    		FileWriter fw = new FileWriter(new File(dir+file));
     		StringBuffer buffer = new StringBuffer();
     		
     		buffer.append(map.length+" "+p.getMapResolution()+" ");
@@ -221,9 +247,8 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     }
     
     //TODO make this more abstract
-    private void prune() {
+    public static void prune(MAPElitesPopulation mapPop, double pruneThreshold) {
     	
-    	MAPElitesPopulation mapPop = ((MAPElitesPopulation)population); 
     	for(Chromosome c : mapPop.getChromosomes()) {
     		MOChromosome moc = (MOChromosome)c;
     		ExpandedFitness fit = (ExpandedFitness)moc.getEvaluationResult();
@@ -233,6 +258,7 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 			Vector2d pos = new Vector2d(behavior[0],behavior[1]);
 			double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
 			double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
+			
 			if(fitness < pruneThreshold) {
 				mapPop.removeFromMap(moc);
 			}

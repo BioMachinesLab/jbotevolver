@@ -60,7 +60,22 @@ public class MAPElitesViewer {
 	protected ArrayList<String> files = new ArrayList<String>();
 	
 	public static void main(String[] args) throws Exception {
-		new MAPElitesViewer("../../EvolutionAutomator/repertoires/");
+		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
+//		new MAPElitesViewer("bigdisk/december2015/intersected_repertoire_fwd/", true);
+//		new MAPElitesViewer("intersected_repertoires", true);
+		
+	}
+	
+	public MAPElitesViewer(String folder, boolean gui) {
+		this(folder);
+		
+		if(gui) {
+			renderer = new TwoDRendererWheels(new Arguments(""));
+			frame = createJFrame();
+			setGeneration(currentGens);
+			viewer = new ViewerThread();
+			viewer.start();
+		}
 	}
 	
 	public MAPElitesViewer(String folder) {
@@ -71,12 +86,6 @@ public class MAPElitesViewer {
 		this.folder = baseFolder+files.get(0);
 		
 		load();
-		
-		renderer = new TwoDRendererWheels(new Arguments(""));
-		frame = createJFrame();
-		setGeneration(currentGens);
-		viewer = new ViewerThread();
-		viewer.start();
 	}
 	
 	protected void searchFiles(File f) {
@@ -84,7 +93,7 @@ public class MAPElitesViewer {
 		if(f.isDirectory()) {
 			
 			for(String s : f.list()) {
-				if(s.endsWith("repertoire.txt")) {
+				if(s.equals("repertoire_name.txt") || s.equals("_showbest_current.conf")) {
 					files.add(f.getPath().replaceAll(this.baseFolder, ""));
 					return;
 				}
@@ -108,8 +117,9 @@ public class MAPElitesViewer {
 			jbot = new JBotEvolver(new String[]{file});
 			Population pop = jbot.getPopulation();
 			gens = pop.getNumberOfCurrentGeneration();
-			if(slider != null)
+			if(slider != null) {
 				slider.setMaximum(gens);
+			}
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -149,24 +159,26 @@ public class MAPElitesViewer {
 			
 //			circlePoint(-0.5,1.0*0.95,0,0.2,(MAPElitesPopulation)pop);
 			
-			genLabel.setText("Generation: "+i);
+			if(genLabel != null)
+				genLabel.setText("Generation: "+i);
 			
 			refresh();
 			
 			Thread.sleep(10);
 		} catch(Exception e) {
-			e.printStackTrace();
+			System.err.println("Can't find population file "+i);
+//			e.printStackTrace();
 		}
 	}
 	
 	public void refresh() {
-		renderer.setSimulator(sim);
-		renderer.drawFrame();
+		if(renderer != null) {
+			renderer.setSimulator(sim);
+			renderer.drawFrame();
+		}
 	}
 	
 	public void placeMarkers(MAPElitesPopulation pop) {
-		
-//		expandToCircle(pop);
 		
 		for(int x = 0 ; x < pop.getMap().length ; x++) {
 			for(int y = 0 ; y < pop.getMap()[x].length ; y++) {
@@ -212,45 +224,6 @@ public class MAPElitesViewer {
 				}
 			}
 		}
-	}
-	
-	private void circlePoint(double percentageAngle, double speedPercentage, int type, double circleRadius,MAPElitesPopulation pop) {
-		Vector2d res = null;
-		
-		if(type == 0) {
-			
-			double h =  percentageAngle * (Math.PI/2);
-		
-			if(speedPercentage < 0) {
-				h+=Math.PI;
-				speedPercentage*=-1;
-			}
-			res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
-		
-		} else if(type == 1){
-			
-			speedPercentage = speedPercentage/2.0 + 0.5;
-			
-			double h =  percentageAngle * (Math.PI);
-			res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
-			
-		}
-		
-//		int[] pos = getLocationFromBehaviorVector(new double[]{res.x,res.y},pop);
-//		play(res);
-		
-		LightPole p = new LightPole(sim,"l",res.x,res.y,0.05);
-		sim.getEnvironment().addStaticObject(p);
-	}
-	
-	private int[] getLocationFromBehaviorVector(double[] vec, MAPElitesPopulation pop) {
-		int[] mapLocation = new int[vec.length];
-		
-		for(int i = 0 ; i < vec.length ; i++) {
-			int pos = (int)(vec[i]/pop.getMapResolution() + pop.getMap().length/2.0);
-			mapLocation[i] = pos;
-		}
-		return mapLocation;
 	}
 	
 	protected void ellipsePoint(double angle, double percentage, MAPElitesPopulation po) {
@@ -376,7 +349,7 @@ public class MAPElitesViewer {
 		
 		final JList<String> list = new JList<String>(data);
 		JScrollPane pane = new JScrollPane(list);
-		pane.setPreferredSize(new Dimension(100, 600));
+		pane.setPreferredSize(new Dimension(200, 600));
 		sidePanel.add(pane);
 		frame.add(sidePanel,BorderLayout.WEST);
 		list.setSelectedIndex(0);
@@ -483,83 +456,6 @@ public class MAPElitesViewer {
 			if(!active) {
 				active = true;
 				this.interrupt();
-			}
-		}
-	}
-	
-	private void expandToCircle(Population population) {
-    	
-    	MAPElitesPopulation p = (MAPElitesPopulation)population;
-    	MOChromosome[][] map = p.getMap();
-    	double maxDist = 0;
-    	double resolution = p.getMapResolution();
-    	
-    	for(Chromosome c : p.getChromosomes()) {
-    		MOChromosome moc = (MOChromosome)c;
-    		double[] pos = p.getBehaviorVector(moc);
-    		maxDist = Math.max(maxDist,new Vector2d(pos[0],pos[1]).length());
-    	}
-    	
-    	//create a copy of the map so that we only expand the map
-    	//with some of the original behaviors
-    	MOChromosome[][] mapNew = new MOChromosome[map.length][map[0].length];
-    	
-    	for(double x = -maxDist ; x < maxDist ; x+=resolution) {
-    		for(double y = -maxDist ; y < maxDist ; y+=resolution) {
-    			double len = new Vector2d(x,y).length();
-    			if(len <= maxDist) {
-    				int[] pos = p.getLocationFromBehaviorVector(new double[]{x,y});
-    				if(map[pos[0]][pos[1]] == null) {
-    					mapNew[pos[0]][pos[1]] = findNearest(pos,map);
-    				}
-    			}
-    		}
-    	}
-    	
-    	//merge the two maps
-    	for(int i = 0 ; i < mapNew.length ; i++) {
-    		for(int j = 0 ; j < mapNew[i].length ; j++) {
-    			if(mapNew[i][j] != null) {
-    				p.addToMapForced(mapNew[i][j],new int[]{i,j});
-    			}
-    		}
-    	}
-    }
-    
-    private MOChromosome findNearest(int[] pos, MOChromosome[][] map) {
-    	
-    	MOChromosome nearest = null;
-    	double nearestDistance = Double.MAX_VALUE;
-    	Vector2d refPos = new Vector2d(pos[0],pos[1]);
-    	
-    	for(int i = 0 ; i < map.length ; i++) {
-    		for(int j = 0 ; j < map[i].length ; j++) {
-    			if(map[i][j] != null) {
-    				double dist = new Vector2d(i,j).distanceTo(refPos);
-    				if(dist < nearestDistance) {
-    					nearestDistance = dist;
-    					nearest = map[i][j];
-    				}
-    			}
-    		}
-    	}
-    	
-    	return nearest;
-    }
-	
-	private void testDirections() {
-		
-		double max = 2;
-		double inc = 0.05;
-		
-		for(double i = -max ; i < max ; i+=inc) {
-			for(double j = -max ; j < max ; j+=inc) {
-				Vector2d pos = new Vector2d(i,j);
-				
-				double orientation = OrientationEvaluationFunction.getOrientationFromCircle(pos);
-				
-				Marker m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.01, 0.05, Color.RED);
-				sim.getEnvironment().addStaticObject(m);
 			}
 		}
 	}

@@ -15,8 +15,13 @@ public class OrientationEvaluationFunction extends EvaluationFunction{
 	private double maxSpeed = 0.1;
 	private double maxDistance;
 	
+	private boolean ignoreDistance = false;
+	private boolean ignoreOrientation = false;
+	
 	public OrientationEvaluationFunction(Arguments args) {
 		super(args);
+		ignoreDistance = args.getFlagIsTrue("ignoredistance");
+		ignoreOrientation = args.getFlagIsTrue("ignoreorientation");
 	}
 
 	@Override
@@ -35,8 +40,8 @@ public class OrientationEvaluationFunction extends EvaluationFunction{
 	
 	@Override
 	public double getFitness() {
-		double resultDistance = (maxDistance - distanceTraveled)/(maxDistance);
-		double resultOrientation = calculateOrientationFitness(position, orientation);
+		double resultDistance = ignoreDistance ? 0 : (maxDistance - distanceTraveled)/(maxDistance);
+		double resultOrientation = ignoreOrientation ? 0 : calculateOrientationFitness(position, orientation);
 		return resultOrientation + resultDistance;
 	}
 	

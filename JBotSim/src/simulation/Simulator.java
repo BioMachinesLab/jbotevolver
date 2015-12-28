@@ -7,9 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import simulation.environment.Environment;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
@@ -52,7 +49,7 @@ public class Simulator implements Serializable {
 			timeDelta = args.getArgumentAsDoubleOrSetDefault("timedelta", timeDelta);
 			parallel = args.getArgumentAsIntOrSetDefault("parallel", 0) == 1;
 			
-			if(args.getArgumentIsDefined("fixedseed")) {
+			if(args.getArgumentIsDefined("fixedseed") && args.getArgumentAsDouble("fixedseed") != 0) {
 				this.random = new Random(args.getArgumentAsInt("fixedseed"));
 			}
 			
