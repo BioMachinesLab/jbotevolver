@@ -1,11 +1,13 @@
 package gui.evolution;
 
 import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evolution.CoEvolution;
 import evolutionaryrobotics.evolution.Evolution;
 import evolutionaryrobotics.populations.Population;
 import gui.Gui;
 import gui.renderer.Renderer;
 import gui.util.Graph;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -18,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -25,6 +28,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -408,7 +412,31 @@ public class EvolutionGui extends Gui {
 								sim.addCallback(this);
 //								ArrayList<Robot> robots = jBotEvolver.createRobots(sim);
 //								jBotEvolver.setChromosome(robots, evo.getPopulation().getBestChromosome());
-								ArrayList<Robot> robots = jBotEvolver.createRobots(sim, evo.getPopulation().getBestChromosome());
+								
+								ArrayList<Robot> robots;
+								
+								if(evo instanceof CoEvolution){
+									robots = jBotEvolver.createCoEvolutionRobots(sim);
+									
+									Arguments numbRobotsPreys= jBotEvolver.getArguments().get("--robots");
+									int numPreys = numbRobotsPreys.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+									
+									ArrayList<Robot> preys = new ArrayList<Robot>();
+									ArrayList<Robot> predators = new ArrayList<Robot>();
+									for (int j = 0; j < robots.size(); j++) {
+										if (j < numPreys) {
+											preys.add(robots.get(j));
+										} else {
+											predators.add(robots.get(j));
+										}
+									}
+													
+									jBotEvolver.setChromosome(preys,((CoEvolution) evo).getPopulationA().getBestChromosome());
+									jBotEvolver.setChromosome(predators, ((CoEvolution) evo).getPopulationB().getBestChromosome());
+									
+								} else								
+									robots= jBotEvolver.createRobots(sim, evo.getPopulation().getBestChromosome());
+								
 								sim.addRobots(robots);
 								sim.setupEnvironment();
 								
