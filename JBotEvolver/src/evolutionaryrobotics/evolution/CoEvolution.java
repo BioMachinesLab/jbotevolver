@@ -268,8 +268,8 @@ public class CoEvolution extends Evolution {
 		private int getGenomePredatorLength() {
 			
 			Simulator sim = jBotEvolver.createSimulator();
-			Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots2"));
-			Controller c = Controller.getController(sim,r, jBotEvolver.getArguments().get("--controllers2"));
+			Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots1"));
+			Controller c = Controller.getController(sim,r, jBotEvolver.getArguments().get("--controllers1"));
 			
 			int genomeLength = 0;
 			
@@ -304,6 +304,14 @@ public class CoEvolution extends Evolution {
 		@Override
 		public Population getPopulation() {
 			return populationA;
+		}
+		
+		public Population getPopulationA() {
+			return populationA;
+		}
+		
+		public Population getPopulationB() {
+			return populationB;
 		}
 		
 }
