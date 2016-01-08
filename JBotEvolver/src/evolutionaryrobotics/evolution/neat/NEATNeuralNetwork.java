@@ -7,6 +7,7 @@ import java.util.Vector;
 
 import simulation.util.Arguments;
 import evolutionaryrobotics.evolution.neat.core.NEATChromosome;
+import evolutionaryrobotics.evolution.neat.core.NEATFeatureGene;
 import evolutionaryrobotics.evolution.neat.core.NEATLinkGene;
 import evolutionaryrobotics.evolution.neat.core.NEATNetDescriptor;
 import evolutionaryrobotics.evolution.neat.core.NEATNeuralNet;
@@ -15,16 +16,15 @@ import evolutionaryrobotics.evolution.neat.data.core.NetworkInput;
 import evolutionaryrobotics.evolution.neat.data.core.NetworkOutputSet;
 import evolutionaryrobotics.evolution.neat.data.csv.CSVInput;
 import evolutionaryrobotics.evolution.neat.ga.core.Gene;
-import evolutionaryrobotics.evolution.neat.nn.core.NeuralNetFactory;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 public class NEATNeuralNetwork extends NeuralNetwork{
 
-	public static final double NODE = 0d, LINK = 1d;
-	private NEATNeuralNet network;
-
+	public static final double NODE = 0d, LINK = 1d, FEATURE = 2d;
+	protected NEATNeuralNet network;
+	
 	public NEATNeuralNetwork(Vector<NNInput> inputs, Vector<NNOutput> outputs, Arguments arguments) {
 		create(inputs, outputs);
 		if(arguments.getArgumentIsDefined("weights")) {
@@ -61,6 +61,10 @@ public class NEATNeuralNetwork extends NeuralNetwork{
         newNet.updateNetStructure();
         this.network = newNet;
     }
+	
+	public NEATFeatureGene[] getFeatureGenes() {
+		return network.getFeatureGenes();
+	}
 
     public static NEATNeuralNet deserialize(String ser) {
         String[] split = ser.split(",");
@@ -85,6 +89,10 @@ public class NEATNeuralNetwork extends NeuralNetwork{
                 int to = (int) (double) iter.next();
                 double weight = iter.next();
                 genes.add(new NEATLinkGene(0, enabled, from, to, weight));
+            } else if(type == FEATURE) {
+                double weight = iter.next();
+                int innov = iter.next().intValue();
+                genes.add(new NEATFeatureGene(innov, weight));
             }
 
         }

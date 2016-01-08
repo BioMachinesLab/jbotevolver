@@ -17,7 +17,7 @@ public class StateActuator extends Actuator{
 	}
 
 	@Override
-	public void apply(Robot robot) {}
+	public void apply(Robot robot,double timeDelta) {}
 
 	public void setState(int index, double value) {
 		states[index] = value;

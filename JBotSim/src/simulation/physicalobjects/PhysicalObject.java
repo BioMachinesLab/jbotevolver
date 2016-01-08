@@ -150,4 +150,5 @@ public class PhysicalObject extends SimulatorObject implements
 	public boolean isInvisible() {
 		return invisible;
 	}
+	
 }

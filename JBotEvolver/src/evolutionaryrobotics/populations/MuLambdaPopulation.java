@@ -66,8 +66,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 		randomNumberGenerator.setSeed(getGenerationRandomSeed());
 
 		if (numberOfChromosomesEvaluated < populationSize) {
-			throw new java.lang.RuntimeException(
-					"Trying to create a new generation before all chromosomes have been evaluated");
+			throw new java.lang.RuntimeException("Trying to create a new generation before all chromosomes have been evaluated");
 		}
 
 		fitnessThresholdReached = checkFitnessThreshold(bestFitness);
@@ -146,7 +145,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 	}
 
-	private void resetGeneration() {
+	protected void resetGeneration() {
 		bestFitness = -1e10;
 		accumulatedFitness = 0;
 		worstFitness = 1e10;
@@ -211,7 +210,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 
 	@Override
 	public double getAverageFitness() {
-		return accumulatedFitness / (double) populationSize;
+		return accumulatedFitness / (double) chromosomes.length;
 	}
 
 	@Override
@@ -223,7 +222,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 	public Chromosome getNextChromosomeToEvaluate() {
 //		randomNumberGenerator.setSeed(getGenerationRandomSeed());
 
-		if (nextChromosomeToEvaluate < populationSize) {
+		if (nextChromosomeToEvaluate < chromosomes.length) {
 			return chromosomes[nextChromosomeToEvaluate++];
 		} else {
 			return null;
@@ -245,7 +244,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 		return currentGeneration;
 	}
 
-	// @Override
+	@Override
 	public void setEvaluationResult(Chromosome chromosome, double fitness) {
 		if (chromosome.getFitnessSet()) {
 			throw new java.lang.RuntimeException("Fitness of " + chromosome
@@ -268,7 +267,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 
 	@Override
 	public void setEvaluationResultForId(int pos, double fitness) {
-		if (pos >= populationSize) {
+		if (pos >= chromosomes.length) {
 			throw new java.lang.RuntimeException("No such position: " + pos
 					+ " on the population");
 		}
@@ -291,7 +290,7 @@ public class MuLambdaPopulation extends Population implements Serializable {
 	// @Override
 	public boolean evolutionDone() {
 		if (currentGeneration >= numberOfGenerations ||
-				(currentGeneration == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == populationSize) ||
+				(currentGeneration == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == chromosomes.length) ||
 				fitnessThresholdReached)
 			return true;
 		else
@@ -312,5 +311,13 @@ public class MuLambdaPopulation extends Population implements Serializable {
 				fc.setNNWeights(c.getAlleles());
 			}
 		}
+	}
+	
+	public Chromosome[] getChromosomes() {
+		return chromosomes;
+	}
+	
+	public void setChromosomes(Chromosome[] c) {
+		this.chromosomes = c;
 	}
 }

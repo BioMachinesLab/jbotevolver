@@ -6,11 +6,12 @@
  */
 package evolutionaryrobotics.evolution.neat.core;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 
 import evolutionaryrobotics.evolution.neat.nn.core.ActivationFunction;
 import evolutionaryrobotics.evolution.neat.nn.core.Neuron;
 import evolutionaryrobotics.evolution.neat.nn.core.Synapse;
+
 
 /**
  * @author MSimmerson
@@ -25,33 +26,35 @@ public class NEATNeuron implements Neuron {
 	private int id;
 	private int type;
 	private int depth;
-	private ArrayList sourceNeurons;
-	private ArrayList incomingSynapses;
+	private NEATNeuron[] sourceNeurons;
+	private Synapse[] incomingSynapses;
 	private boolean isInput = false;
 
 	public NEATNeuron(ActivationFunction function, int id, int type) {		
 		this.activationFunction = function;
 		this.id = id;
 		this.type = type;
-		this.sourceNeurons = new ArrayList();
-		this.incomingSynapses = new ArrayList();
+		this.sourceNeurons = new NEATNeuron[0];
+		this.incomingSynapses = new Synapse[0];
 		this.isInput = (type == NEATNodeGene.INPUT);
 		this.depth = -1;
 	}
 	
 	public void addSourceNeuron(NEATNeuron neuron) {
-		this.sourceNeurons.add(neuron);
+            sourceNeurons = Arrays.copyOf(sourceNeurons, sourceNeurons.length + 1);
+            sourceNeurons[sourceNeurons.length - 1] = neuron;
 	}
 	
 	public void addIncomingSynapse(Synapse synapse) {
-		this.incomingSynapses.add(synapse);
+            incomingSynapses = Arrays.copyOf(incomingSynapses, incomingSynapses.length + 1);
+            incomingSynapses[incomingSynapses.length - 1] = synapse;
 	}
 	
-	public ArrayList incomingSynapses() {
+	public Synapse[] incomingSynapses() {
 		return (this.incomingSynapses);
 	}
 	
-	public ArrayList sourceNeurons() {
+	public NEATNeuron[] sourceNeurons() {
 		return (this.sourceNeurons);
 	}
 	
@@ -69,7 +72,6 @@ public class NEATNeuron implements Neuron {
 		double weight;
 		double input;
 		Synapse synapse;
-		Object[] incoming = this.incomingSynapses.toArray();
 		// acting as a bias neuron
 		this.lastActivation = -1;
 
@@ -77,7 +79,7 @@ public class NEATNeuron implements Neuron {
 			if (nInputs.length > 0) {
 				for (i = 0; i < nInputs.length; i++) {
 					input = nInputs[i];
-					synapse = (Synapse)incoming[i];
+					synapse = (Synapse)incomingSynapses[i];
 					if (synapse.isEnabled()) {
 						weight = synapse.getWeight();
 						neuronIp += (input * weight);

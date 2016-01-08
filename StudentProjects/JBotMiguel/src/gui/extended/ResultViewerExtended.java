@@ -1,17 +1,15 @@
 package gui.extended;
 
-import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import gui.ResultViewerGui;
 import simulation.JBotSim;
-import simulation.Simulator;
 import simulation.util.Arguments;
 
 public class ResultViewerExtended extends ResultViewerGui {
-
+	
 	public ResultViewerExtended(JBotSim jBotEvolver, Arguments args) {
 		super(jBotEvolver, args);
 	}
-	
+	/*
 	@Override
 	public synchronized void update(Simulator simulator) {
 		
@@ -33,5 +31,5 @@ public class ResultViewerExtended extends ResultViewerGui {
 			graphViz.changeNeuralNetwork(((NeuralNetworkController)simulator.getEnvironment().getRobots().get(0).getController()).getNeuralNetwork());
 			graphViz.show();
 		}
-	}
+	}*/
 }

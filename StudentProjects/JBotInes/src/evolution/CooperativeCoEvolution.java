@@ -281,11 +281,6 @@ public class CooperativeCoEvolution extends Evolution {
 			return genomeLength;
 		}
 		
-		private void print(String s) {
-			if(!supressMessages)
-				System.out.print(s);
-		}
-		
 		private void printTables(PopulationTable tableA, PopulationTable tableB) {
 			System.out.println("A Table");
 			for(int i = 0 ; i < tableA.getTable().size() ; i++)

@@ -22,6 +22,8 @@ public class ParameterController extends Controller {
 	public ParameterController(Simulator simulator, Robot robot, Arguments args) {
 		super(simulator, robot, args);
 		setParameter(args.getArgumentAsDoubleOrSetDefault("parameter", parameter));
+		parameterRange = args.getArgumentAsDoubleOrSetDefault("parameterrange", parameterRange);
+		numberOfBehaviors = args.getArgumentAsIntOrSetDefault("numberofbehaviors", numberOfBehaviors);
 		
 	}
 	

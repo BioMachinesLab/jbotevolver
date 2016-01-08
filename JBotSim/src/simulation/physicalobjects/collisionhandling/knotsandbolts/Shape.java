@@ -20,6 +20,7 @@ public abstract class Shape implements Serializable {
 	public static final int COLLISION_OBJECT_TYPE_COMPOUND   = 0;
 	public static final int COLLISION_OBJECT_TYPE_RECTANGLE  = 1;
 	public static final int COLLISION_OBJECT_TYPE_CIRCLE     = 2;
+	public static final int COLLISION_OBJECT_TYPE_POLYGON  = 3;
 	
 	protected boolean   			enabled;
 	protected PhysicalObject        parent;
@@ -163,7 +164,7 @@ public abstract class Shape implements Serializable {
 	public ClosePhysicalObjects getCloseWalls(){
 		return this.closeWalls;
 	}
-
+	
 	/*public ClosePhysicalObjects getCloseHoles() {
 		return this.closeHoles;
 	}*/

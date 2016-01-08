@@ -21,7 +21,7 @@ public class SoundActuator extends Actuator{
 	}
 
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot, double timeDelta) {
 		if(soundTimesteps > 0) {
 			soundTimesteps--;
 			setVolume(desiredVolume);

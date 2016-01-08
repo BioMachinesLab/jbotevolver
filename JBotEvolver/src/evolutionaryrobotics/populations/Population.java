@@ -24,7 +24,7 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 public abstract class Population implements Serializable {
 	//the UID is important for backwards compatibility
 	private static final long serialVersionUID = 5558128741655037815L;
-	
+
 	protected long generationRandomSeed;
 	@ArgumentsAnnotation(name="samples", defaultValue="5")
 	protected int numberOfSamplesPerChromosome;
@@ -421,4 +421,7 @@ public abstract class Population implements Serializable {
 	}
 	
 	public abstract void setupIndividual(Robot r);
+	
+	public abstract Chromosome[] getChromosomes();
+	
 }

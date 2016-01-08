@@ -2,7 +2,9 @@ package evolutionaryrobotics.evolution.neat;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
 import evolutionaryrobotics.evolution.neat.core.NEATChromosome;
+import evolutionaryrobotics.evolution.neat.core.NEATFeatureGene;
 import evolutionaryrobotics.evolution.neat.core.NEATLinkGene;
 import evolutionaryrobotics.evolution.neat.core.NEATNetDescriptor;
 import evolutionaryrobotics.evolution.neat.core.NEATNeuralNet;
@@ -15,13 +17,15 @@ import evolutionaryrobotics.evolution.neat.ga.core.Gene;
  */
 public class NEATSerializer {
     
-    public static final double NODE = 0d, LINK = 1d;
+    public static final double NODE = 0d, LINK = 1d, FEATURE = 2d;
 
     public static double[] serialize(NEATNeuralNet net) {
     	NEATNetDescriptor descr = (NEATNetDescriptor) net.netDescriptor();
         NEATChromosome chromo = (NEATChromosome) descr.neatStructure();
         Gene[] genes = chromo.genes();
-        double[] res = new double[genes.length*5];
+        
+        int length = (genes.length - net.getFeatureGenes().length)*5 + net.getFeatureGenes().length*3;
+        double[] res = new double[length];
         
         int i = 0;
         for(Gene gene : genes) {
@@ -40,6 +44,11 @@ public class NEATSerializer {
                 res[i++] = (double) neatGene.getFromId();
                 res[i++] = (double) neatGene.getToId();
                 res[i++] = neatGene.getWeight();
+            } else if (gene instanceof NEATFeatureGene) {
+            	NEATFeatureGene neatGene = (NEATFeatureGene) gene;
+                res[i++] = FEATURE;
+                res[i++] = neatGene.geneAsNumber().doubleValue();
+                res[i++] = neatGene.getInnovationNumber();
             }
         }
         return res;
@@ -68,6 +77,10 @@ public class NEATSerializer {
                 int to = (int) (double) iter.next();
                 double weight = iter.next();
                 genes.add(new NEATLinkGene(0, enabled, from, to, weight));
+            } else if(type == FEATURE) {
+                double weight = iter.next();
+                int innov = iter.next().intValue();
+                genes.add(new NEATFeatureGene(innov, weight));
             }
             
         }

@@ -17,10 +17,6 @@ public class LightPole extends PhysicalObject {
 		this.shape = new CircularShape(simulator, name + "CollisionObject", this, 0, 0, 2 * radius, radius);
 	}
 	
-	public Vector2d getPosition() {
-		return super.getPosition();
-	}
-	
 	public boolean isTurnedOn() {
 		return turnedOn;
 	}

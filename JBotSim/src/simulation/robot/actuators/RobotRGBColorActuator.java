@@ -89,7 +89,7 @@ public class RobotRGBColorActuator extends Actuator {
 	}
 	
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot, double timeDelta) {
 		robot.setBodyColor(red, green, blue);
 	}
 }

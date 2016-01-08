@@ -269,7 +269,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		titlesList = new ArrayList<String>();
 		
 		simulator = jBotEvolver.createSimulator();
-		simulator.addCallback(jBotEvolver.getEvaluationFunction());
+		simulator.addCallback(jBotEvolver.getEvaluationFunction()[0]);
 		jBotEvolver.setupBestIndividual(simulator);
 		
 		simulator.addCallback(this);

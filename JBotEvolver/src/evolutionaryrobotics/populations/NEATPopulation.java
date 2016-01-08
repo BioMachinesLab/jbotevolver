@@ -16,16 +16,17 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 public class NEATPopulation extends Population implements Serializable {
 	
-	private NEATPopulation4J pop;
-	private int size = 200;
-	private int generationNumber = 0;
+	private static final long serialVersionUID = 3149732524276911322L;
+	protected NEATPopulation4J pop;
+	protected int size = 200;
+	protected int generationNumber = 0;
 	protected Chromosome bestChromosome;
 	protected Chromosome chromosomes[];
 	
-	private double bestFitness;
-	private double accumulatedFitness;
-	private double worstFitness;
-	private int numberOfChromosomesEvaluated;
+	protected double bestFitness;
+	protected double accumulatedFitness;
+	protected double worstFitness;
+	protected int numberOfChromosomesEvaluated;
 
 	public NEATPopulation(Arguments arguments) {
 		super(arguments);
@@ -96,7 +97,7 @@ public class NEATPopulation extends Population implements Serializable {
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 	}
 	
-	private void resetGeneration() {
+	protected void resetGeneration() {
 		bestFitness = -1e10;
 		accumulatedFitness = 0;
 		worstFitness = 1e10;
@@ -151,17 +152,13 @@ public class NEATPopulation extends Population implements Serializable {
 	@Override
 	public void setupIndividual(Robot r) {
 		Chromosome c = getBestChromosome();
-		if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
-			FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
-			if(fc.getNNWeights() == null) {
-				fc.setNNWeights(c.getAlleles());
-			}
-		}
+		c.setupRobot(r);
 	}
 	
 	public boolean evolutionDone() {
 		if (generationNumber >= numberOfGenerations ||
-				(generationNumber == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == getPopulationSize()))
+				(generationNumber == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == getPopulationSize()) ||
+				checkFitnessThreshold(bestFitness))
 			return true;
 		else
 			return false;
@@ -174,5 +171,10 @@ public class NEATPopulation extends Population implements Serializable {
         network.createNetStructure(descr);
         network.updateNetStructure();
 		return new Chromosome(NEATSerializer.serialize(network), i);
+	}
+	
+	@Override
+	public Chromosome[] getChromosomes() {
+		return chromosomes;
 	}
 }

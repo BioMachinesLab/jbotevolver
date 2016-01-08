@@ -1,10 +1,9 @@
 package roommaze;
 
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import roommaze.TMazeEnvironment.Square;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class TMazeEvaluationFunction  extends EvaluationFunction {
 

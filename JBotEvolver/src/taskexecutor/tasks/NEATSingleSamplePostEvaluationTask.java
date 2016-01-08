@@ -41,7 +41,7 @@ public class NEATSingleSamplePostEvaluationTask extends JBotEvolverTask {
 //		jBotEvolver.setChromosome(robots, chromosome);
 		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator, chromosome);
 		simulator.addRobots(robots);
-		EvaluationFunction eval = jBotEvolver.getEvaluationFunction();
+		EvaluationFunction eval = jBotEvolver.getEvaluationFunction()[0];
 		simulator.addCallback(eval);
 		simulator.simulate();
 		if(threshold > 0)

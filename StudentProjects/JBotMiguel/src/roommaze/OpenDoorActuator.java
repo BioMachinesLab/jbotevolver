@@ -29,7 +29,7 @@ public class OpenDoorActuator extends Actuator {
 	}
 
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot, double timeDelta) {
 		openedDoor = false;
 		if(open) {
 			if(env == null)

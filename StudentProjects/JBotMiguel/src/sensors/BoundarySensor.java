@@ -30,9 +30,11 @@ public class BoundarySensor extends WallRaySensor {
 			for(int i = 0 ; i < numberOfRays ; i++) {
 				Vector2d cone = cones[sensorNumber][i];
 				
-				rayPositions[sensorNumber][i][0] = sensorPositions[sensorNumber];
-				if(rayPositions[sensorNumber][i][1] == null)
-					rayPositions[sensorNumber][i][1] = cone;
+				if(rayPositions != null) {
+					rayPositions[sensorNumber][i][0] = sensorPositions[sensorNumber];
+					if(rayPositions[sensorNumber][i][1] == null)
+						rayPositions[sensorNumber][i][1] = cone;
+				}
 				
 				Vector2d intersection = null;
 				intersection = l.intersectsWithLineSegment(sensorPositions[sensorNumber], cone);
@@ -46,7 +48,8 @@ public class BoundarySensor extends WallRaySensor {
 						inputValue = (range-distance)/range;
 						
 						if(inputValue > rayReadings[sensorNumber][i]) {
-							rayPositions[sensorNumber][i][1] = intersection;
+							if(rayPositions != null)
+								rayPositions[sensorNumber][i][1] = intersection;
 							rayReadings[sensorNumber][i] = Math.max(inputValue, rayReadings[sensorNumber][i]);
 						}
 					}
