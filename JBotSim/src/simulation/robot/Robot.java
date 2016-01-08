@@ -104,7 +104,6 @@ public class Robot extends MovableObject {
 	 */
 	public Robot(Simulator simulator, Arguments args) {
 		super(simulator, args);
-		
 		relativeX = args.getArgumentAsDoubleOrSetDefault("relativex",0);
 		relativeY = args.getArgumentAsDoubleOrSetDefault("relativey",0);
 		radius = args.getArgumentAsDoubleOrSetDefault("radius",0.05);
@@ -275,9 +274,10 @@ public class Robot extends MovableObject {
 	 * @param time the number of the current simulation step.
 	 * @param timeDelta      the time (in virtual seconds) between calls to this method. 
 	 */
-	public void updateActuators(Double time, double timeDelta) {			
+	public void updateActuators(Double time, double timeDelta) {
+		this.previousPosition = new Vector2d(position);
 		for(Actuator actuator: actuators){
-			actuator.apply(this);
+			actuator.apply(this, timeDelta);
 		}
 	}
 		
@@ -434,6 +434,40 @@ public class Robot extends MovableObject {
 			int totalRobots = arguments.getArgumentAsInt("totalrobots");
 			int previousNumberOfRobots = arguments.getArgumentAsIntOrSetDefault("previousrobots", 0);
 			numberOfRobots = totalRobots - previousNumberOfRobots;
+		}
+				
+		if(arguments.getArgumentIsDefined("isaytherulesnow")) {
+			int sample = simulator.getArguments().get("--environment").getArgumentAsInt("fitnesssample");
+			int i = sample % 2;
+			switch(i){
+			case 0: 
+				//numberOfRobots = 4;
+				numberOfRobots = 18;
+				if(arguments.getArgumentIsDefined("iamb")) 
+					numberOfRobots = 6;
+					//numberOfRobots = 2;
+				break;
+			case 1: 
+//				numberOfRobots = 8;
+//				if(arguments.getArgumentIsDefined("iamb")) 
+//					numberOfRobots = 2;
+				break;
+			case 2: 
+//				numberOfRobots = 8;
+//				if(arguments.getArgumentIsDefined("iamb")) 
+//					numberOfRobots = 4;
+				break;
+			case 3: 
+//				numberOfRobots = 16;
+//				if(arguments.getArgumentIsDefined("iamb")) 
+//					numberOfRobots = 2;
+				break;
+			case 4: 
+//				numberOfRobots = 16;
+//				if(arguments.getArgumentIsDefined("iamb")) 
+//					numberOfRobots = 8;
+				break;
+			}
 		}
 		
 		if(arguments.getArgumentIsDefined("randomize")) {

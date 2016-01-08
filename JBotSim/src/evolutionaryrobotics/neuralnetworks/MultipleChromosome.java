@@ -1,5 +1,13 @@
 package evolutionaryrobotics.neuralnetworks;
 
+import java.util.ArrayList;
+
+import controllers.Controller;
+import controllers.FixedLenghtGenomeEvolvableController;
+import simulation.JBotSim;
+import simulation.Simulator;
+import simulation.robot.Robot;
+
 public class MultipleChromosome extends Chromosome {
 
 	private int[] genomeLengths;
@@ -43,6 +51,40 @@ public class MultipleChromosome extends Chromosome {
 		return result;
 	}
 	
-	
-	
+	@Override
+	public ArrayList<Robot> setupRobots(JBotSim jbot, Simulator sim) {
+		
+		ArrayList<Robot> totalRobots = new ArrayList<Robot>();
+		
+		int previousrobots = 0;
+		
+		for(int i = 0; i < getNumberOfChromosomes(); i++){
+			// get("robots" + i)
+			ArrayList<Robot> robots;
+			if(i == 0) {
+				robots = Robot.getRobots(sim, jbot.getArguments().get("--robots"));
+				previousrobots = robots.size();
+			} else{
+				jbot.getArguments().get("--robots" + i).setArgument("previousrobots", previousrobots);
+				robots = Robot.getRobots(sim, jbot.getArguments().get("--robots" + i));
+			}
+			
+			for(Robot r : robots) {
+				if(i == 0)
+					r.setController(Controller.getController(sim, r, jbot.getArguments().get("--controllers")));
+				else
+					r.setController(Controller.getController(sim, r, jbot.getArguments().get("--controllers" + i)));
+				totalRobots.add(r);
+				
+				Chromosome subChromosome = getChromosome(i);
+				
+				if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
+					FixedLenghtGenomeEvolvableController controller = (FixedLenghtGenomeEvolvableController)r.getController();
+					controller.setNNWeights(subChromosome.getAlleles());
+				}
+			}
+		}
+		
+		return totalRobots;
+	}
 }

@@ -21,7 +21,6 @@ public class GenerationalEvolution extends Evolution {
 	
 	protected Population population;
 	@ArgumentsAnnotation(name="supressmessages", values={"0","1"}, help="Set to 1 to show information about the evolution on the java console")
-	protected boolean supressMessages = false;
 	protected DiskStorage diskStorage;
 	protected String output = "";
 	protected DecimalFormat df = new DecimalFormat("#.##");
@@ -29,32 +28,8 @@ public class GenerationalEvolution extends Evolution {
 	public GenerationalEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
 		
-		Arguments populationArguments = jBotEvolver.getArguments().get("--population");
-		populationArguments.setArgument("genomelength", getGenomeLength());
-		supressMessages = args.getArgumentAsIntOrSetDefault("supressmessages", 0) == 1;
-		
-		try {
-			population = Population.getPopulation(jBotEvolver.getArguments().get("--population"));
-			if(jBotEvolver.getArguments().get("--population").getArgumentIsDefined("generations"))
-				population.setNumberOfGenerations(jBotEvolver.getArguments().get("--population").getArgumentAsInt("generations"));
-			population.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
-		} catch(Exception e) {
-			System.out.println("Problem loading population "+populationArguments.getCompleteArgumentString());
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		
-		if (jBotEvolver.getArguments().get("--output") != null) {
-			output = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
-			diskStorage = new DiskStorage(jBotEvolver.getArguments().get("--output").getCompleteArgumentString());
-			try {
-				diskStorage.start();
-				diskStorage.saveCommandlineArguments(jBotEvolver.getArguments());
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
+		setupPopulation();
+		setupDiskStorage();
 	}
 	
 	@Override
@@ -133,14 +108,39 @@ public class GenerationalEvolution extends Evolution {
 		return genomeLength;
 	}
 	
-	protected void print(String s) {
-		if(!supressMessages)
-			System.out.print(s);
-	}
-	
 	@Override
 	public Population getPopulation() {
 		return population;
+	}
+	
+	protected void setupPopulation() {
+		Arguments populationArguments = jBotEvolver.getArguments().get("--population");
+		populationArguments.setArgument("genomelength", getGenomeLength());
+		
+		try {
+			population = Population.getPopulation(jBotEvolver.getArguments().get("--population"));
+			if(jBotEvolver.getArguments().get("--population").getArgumentIsDefined("generations"))
+				population.setNumberOfGenerations(jBotEvolver.getArguments().get("--population").getArgumentAsInt("generations"));
+			population.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
+		} catch(Exception e) {
+			System.out.println("Problem loading population "+populationArguments.getCompleteArgumentString());
+			e.printStackTrace();
+			System.exit(-1);
+		}
+	}
+	
+	protected void setupDiskStorage() {
+		if (jBotEvolver.getArguments().get("--output") != null) {
+			output = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
+			diskStorage = new DiskStorage(jBotEvolver.getArguments().get("--output").getCompleteArgumentString());
+			try {
+				diskStorage.start();
+				diskStorage.saveCommandlineArguments(jBotEvolver.getArguments());
+			} catch (Exception e) {
+				e.printStackTrace();
+				System.exit(-1);
+			}
+		}
 	}
 	
 }

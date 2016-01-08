@@ -5,11 +5,13 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
+
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import simulation.JBotSim;
 import simulation.Simulator;
@@ -49,10 +51,14 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		}
 	}
 	
+	
 	protected void updateStatus() {
-		super.updateStatus();
+		controlStepTextField.setText("" + simulator.getTime().intValue());
+		initBottomPanel();
 		fitnessTextFieldA.setText(String.format("%12.6f", evaluationFunctionA.getFitness()));
 		fitnessTextFieldB.setText(String.format("%12.6f", evaluationFunctionB.getFitness()));
+		updatePlaySlider(simulator.getTime(), simulator.getEnvironment().getSteps());
+		renderer.drawFrame();
 	}
 	
 	protected JPanel initBottomPanel() {
@@ -108,8 +114,6 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 //		 Obtem a evolução para a populaçãoB e adiciona ao callBack
 		evaluationFunctionB = jBotEvolver.getSpecificEvaluationFunction("b");
 		simulator.addCallback(evaluationFunctionB);
-		
-		this.evaluationFunction = evaluationFunctionA;
 		
 		//Cria os melhores de A e B
 		jBotEvolver.setupBestCoIndividual(simulator);

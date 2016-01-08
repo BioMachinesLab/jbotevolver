@@ -18,6 +18,7 @@ public class NEATPostEvaluation {
 	private int startTrial = 0;
 	private int maxTrial = 0;
 	private int samples = 100;
+	private int sampleIncrement = 100;
 	private int fitnesssamples = 1;
 	private int steps = 0;
 	private double targetfitness = 0;
@@ -47,6 +48,7 @@ public class NEATPostEvaluation {
 			if(a[0].equals("localevaluation")) localEvaluation = Integer.parseInt(a[1]) == 1;
 			if(a[0].equals("steps")) steps = Integer.parseInt(a[1]);
 			if(a[0].equals("showoutput")) showOutput = (Integer.parseInt(a[1]) == 1);
+			if(a[0].equals("sampleincrement")) sampleIncrement = Integer.parseInt(a[1]);
 		}
 		
 		if(steps != 0) {
@@ -108,7 +110,6 @@ public class NEATPostEvaluation {
 			}
 			
 			boolean setNumberOfTasks = false;
-			int sampleIncrement = samples;
 			int totalTasks = 0;
 			
 			for(int i = startTrial ; i <= maxTrial ; i++) {

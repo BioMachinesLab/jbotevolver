@@ -25,8 +25,8 @@ import evolutionaryrobotics.util.DiskStorage;
 
 public class NEATEvolution extends Evolution {
 	
-	private NEATGADescriptor descriptor;
-	private NEATPopulation population;
+	protected NEATGADescriptor descriptor;
+	protected NEATPopulation population;
 	protected DiskStorage diskStorage;
 	protected String output = "";
 	protected DecimalFormat df = new DecimalFormat("#.##");
@@ -85,7 +85,7 @@ public class NEATEvolution extends Evolution {
 		if(!population.evolutionDone())
 			taskExecutor.setTotalNumberOfTasks((population.getNumberOfGenerations()-population.getNumberOfCurrentGeneration())*population.getPopulationSize());
 		
-		double highestFitness = 0;
+		double highestFitness = population.getHighestFitness();
 		
 		while (!population.evolutionDone() && executeEvolution) {
 			
@@ -107,8 +107,12 @@ public class NEATEvolution extends Evolution {
 					} catch(Exception e) {e.printStackTrace();}
 					
 					highestFitness = population.getHighestFitness();
-					population.createNextGeneration();
 			}
+			
+			if(population.evolutionDone())
+				break;
+			
+			population.createNextGeneration();
 		}
 		
         InnovationDatabase db = algorithm.innovationDatabase();
@@ -116,7 +120,7 @@ public class NEATEvolution extends Evolution {
 		
 	}
 	
-	private void configureDescriptor(Arguments args) {
+	protected void configureDescriptor(Arguments args) {
 
 		int popSize = population.getPopulationSize();
 		
@@ -125,37 +129,38 @@ public class NEATEvolution extends Evolution {
 		int inputNodes = neurons[0];
 		int outputNodes = neurons[1];
 		
-		double pXover = 0.2;
-		double pAddLink = 0.05;
-		double pAddNode = 0.03;
-		double pToggleLink = 0.0;
-		double pMutation = 0.25;
-		double pMutateBias = 0.3;
-		double pWeightReplaced = 0.0;
-		double excessCoeff = 1;
-		double disjointCoeff = 1;
-		double weightCoeff = 0.4;
-		double threshold = 0.5;
-		double thresholdChange = 0.05;
-		boolean naturalOrder = false;
-		int maxSpecieAge = 15;
-		int specieAgeThreshold = 80;
-		int specieYouthThreshold = 10;
-		double agePenalty = 0.7;
-		double youthBoost = 1.2;
-		int specieCount = 5;
-		double survialThreshold = 0.2;
-		boolean featureSelection = false;
-		int extraAlleles = 0;
-		boolean eleEvents = false;
-		double eleSurvivalCount = 0.1;
-		int eleEventTime = 1000;
-		boolean recurrencyAllowed = true;
-		boolean keepBestEver = false;
-		double terminationValue = 0.1;
-		double maxPerturb = 0.5;
-		double maxBiasPerturb = 0.1;
-        boolean copyBest = true;
+		double pXover = args.getArgumentAsDoubleOrSetDefault("pXover", 0.2);
+		double pAddLink = args.getArgumentAsDoubleOrSetDefault("pAddLink", 0.05);
+		double pAddNode = args.getArgumentAsDoubleOrSetDefault("pAddNode", 0.03);
+		double pToggleLink = args.getArgumentAsDoubleOrSetDefault("pToggleLink", 0.0);
+		double pMutation = args.getArgumentAsDoubleOrSetDefault("pMutation", 0.25);
+		double pMutateBias = args.getArgumentAsDoubleOrSetDefault("pMutateBias", 0.3);
+		double pWeightReplaced = args.getArgumentAsDoubleOrSetDefault("pWeightReplaced", 0.0);
+		double excessCoeff = args.getArgumentAsIntOrSetDefault("excessCoeff", 1);
+		double disjointCoeff = args.getArgumentAsIntOrSetDefault("disjointCoeff", 1);
+		double weightCoeff = args.getArgumentAsDoubleOrSetDefault("weightCoeff", 0.4);
+		double threshold = args.getArgumentAsDoubleOrSetDefault("threshold", 0.5);
+		double thresholdChange = args.getArgumentAsDoubleOrSetDefault("thresholdChange", 0.05);
+		boolean naturalOrder = args.getArgumentAsIntOrSetDefault("naturalOrder", 0) == 1;
+		int maxSpecieAge = args.getArgumentAsIntOrSetDefault("maxSpecieAge", 15);
+		int specieAgeThreshold = args.getArgumentAsIntOrSetDefault("specieAgeThreshold", 80);
+		int specieYouthThreshold = args.getArgumentAsIntOrSetDefault("specieYouthThreshold", 10);
+		double agePenalty = args.getArgumentAsDoubleOrSetDefault("agePenalty",0.7);
+		double youthBoost = args.getArgumentAsDoubleOrSetDefault("youthBoost",1.2);
+		int specieCount = args.getArgumentAsIntOrSetDefault("specieCount",5);
+		double survialThreshold = args.getArgumentAsDoubleOrSetDefault("survialThreshold",0.2);
+		boolean featureSelection = args.getArgumentAsIntOrSetDefault("featureSelection", 0) == 1;
+		int extraAlleles = args.getArgumentAsIntOrSetDefault("extraAlleles",0);
+		boolean eleEvents = args.getArgumentAsIntOrSetDefault("eleEvents", 0) == 1;
+		double eleSurvivalCount = args.getArgumentAsDoubleOrSetDefault("eleSurvivalCount",0.1);
+		int eleEventTime = args.getArgumentAsIntOrSetDefault("eleEventTime",1000);
+		boolean recurrencyAllowed = args.getArgumentAsIntOrSetDefault("recurrencyAllowed", 1) == 1;
+		boolean keepBestEver = args.getArgumentAsIntOrSetDefault("keepBestEver", 0) == 1;
+		double terminationValue = args.getArgumentAsDoubleOrSetDefault("terminationValue",0.1);
+		double maxPerturb = args.getArgumentAsDoubleOrSetDefault("maxPerturb",0.5);
+		double maxBiasPerturb = args.getArgumentAsDoubleOrSetDefault("maxBiasPerturb",0.1);
+        boolean copyBest = args.getArgumentAsIntOrSetDefault("copyBest", 1) == 1;
+        
 		
 		descriptor.setPAddLink(pAddLink);
 		descriptor.setPAddNode(pAddNode);
@@ -193,7 +198,7 @@ public class NEATEvolution extends Evolution {
 		descriptor.setCopyBest(copyBest);
 	}
 	
-	private int[] getInputOutputNeurons() {
+	protected int[] getInputOutputNeurons() {
 		Simulator sim = jBotEvolver.createSimulator();
 		Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots"));
 		Controller c = Controller.getController(sim,r, jBotEvolver.getArguments().get("--controllers"));

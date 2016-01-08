@@ -47,7 +47,7 @@ public class JBotSim implements Serializable{
 		ArrayList<Robot> robots = Robot.getRobots(simulator, arguments.get("--robots"));
 		for(Robot r : robots) {
 			r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
-		}
+		}		
 		return robots;
 	}
 	
@@ -59,11 +59,12 @@ public class JBotSim implements Serializable{
 			r.setController(Controller.getController(simulator, r, arguments.get("--controllers")));
 			robots.add(r);
 		}
-		ArrayList<Robot> predators = Robot.getRobots(simulator, arguments.get("--robots2"));
+		ArrayList<Robot> predators = Robot.getRobots(simulator, arguments.get("--robots1"));
 		for(Robot r : predators) {
-			r.setController(Controller.getController(simulator, r, arguments.get("--controllers2")));
+			r.setController(Controller.getController(simulator, r, arguments.get("--controllers1")));
 			robots.add(r);
 		}
+		
 		return robots;
 	}
 	

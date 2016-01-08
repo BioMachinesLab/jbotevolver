@@ -2,6 +2,7 @@ package simulation.robot;
 
 import net.jafama.FastMath;
 import mathutils.MathUtils;
+import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
 import simulation.robot.actuators.Actuator;
@@ -37,6 +38,7 @@ public class DifferentialDriveRobot extends Robot {
 	}
 	
 	public void updateActuators(Double time, double timeDelta) {	
+		this.previousPosition = new Vector2d(position);
 		
 		if(stopTimestep <= 0) {
 			
@@ -52,7 +54,7 @@ public class DifferentialDriveRobot extends Robot {
 		stopTimestep--;
 		
 		for(Actuator actuator: actuators){
-			actuator.apply(this);
+			actuator.apply(this,timeDelta);
 		}
 	}
 
