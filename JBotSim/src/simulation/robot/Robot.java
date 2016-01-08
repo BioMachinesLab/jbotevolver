@@ -1,4 +1,3 @@
-
 package simulation.robot;
 
 import java.awt.Color;
@@ -435,40 +434,6 @@ public class Robot extends MovableObject {
 			int totalRobots = arguments.getArgumentAsInt("totalrobots");
 			int previousNumberOfRobots = arguments.getArgumentAsIntOrSetDefault("previousrobots", 0);
 			numberOfRobots = totalRobots - previousNumberOfRobots;
-		}
-				
-		if(arguments.getArgumentIsDefined("isaytherulesnow")) {
-			int sample = simulator.getArguments().get("--environment").getArgumentAsInt("fitnesssample");
-			int i = sample % 2;
-			switch(i){
-			case 0: 
-				//numberOfRobots = 4;
-				numberOfRobots = 18;
-				if(arguments.getArgumentIsDefined("iamb")) 
-					numberOfRobots = 6;
-					//numberOfRobots = 2;
-				break;
-			case 1: 
-//				numberOfRobots = 8;
-//				if(arguments.getArgumentIsDefined("iamb")) 
-//					numberOfRobots = 2;
-				break;
-			case 2: 
-//				numberOfRobots = 8;
-//				if(arguments.getArgumentIsDefined("iamb")) 
-//					numberOfRobots = 4;
-				break;
-			case 3: 
-//				numberOfRobots = 16;
-//				if(arguments.getArgumentIsDefined("iamb")) 
-//					numberOfRobots = 2;
-				break;
-			case 4: 
-//				numberOfRobots = 16;
-//				if(arguments.getArgumentIsDefined("iamb")) 
-//					numberOfRobots = 8;
-				break;
-			}
 		}
 		
 		if(arguments.getArgumentIsDefined("randomize")) {
