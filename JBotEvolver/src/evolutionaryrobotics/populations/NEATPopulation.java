@@ -1,28 +1,26 @@
 package evolutionaryrobotics.populations;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import controllers.FixedLenghtGenomeEvolvableController;
-import simulation.robot.Robot;
-import simulation.util.Arguments;
 import evolutionaryrobotics.evolution.neat.NEATSerializer;
 import evolutionaryrobotics.evolution.neat.core.NEATNetDescriptor;
 import evolutionaryrobotics.evolution.neat.core.NEATNeuralNet;
 import evolutionaryrobotics.evolution.neat.core.NEATPopulation4J;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 
-public class NEATPopulation extends Population implements Serializable {
-	
+public class NEATPopulation extends Population {
+
 	private static final long serialVersionUID = 3149732524276911322L;
 	protected NEATPopulation4J pop;
 	protected int size = 200;
 	protected int generationNumber = 0;
 	protected Chromosome bestChromosome;
 	protected Chromosome chromosomes[];
-	
+
 	protected double bestFitness;
 	protected double accumulatedFitness;
 	protected double worstFitness;
@@ -30,13 +28,13 @@ public class NEATPopulation extends Population implements Serializable {
 
 	public NEATPopulation(Arguments arguments) {
 		super(arguments);
-		size = arguments.getArgumentAsIntOrSetDefault("size",size);
+		size = arguments.getArgumentAsIntOrSetDefault("size", size);
 	}
-	
+
 	public void setNEATPopulation4J(NEATPopulation4J pop) {
 		this.pop = pop;
 	}
-	
+
 	public NEATPopulation4J getNEATPopulation4J() {
 		return pop;
 	}
@@ -73,21 +71,21 @@ public class NEATPopulation extends Population implements Serializable {
 	@Override
 	public void setEvaluationResult(Chromosome chromosome, double fitness) {
 		numberOfChromosomesEvaluated++;
-		accumulatedFitness+=fitness;
-		worstFitness = Math.min(worstFitness,fitness);
-		
-		if(bestFitness < fitness) {
+		accumulatedFitness += fitness;
+		worstFitness = Math.min(worstFitness, fitness);
+
+		if (bestFitness < fitness) {
 			bestChromosome = chromosome;
-			bestFitness = Math.max(bestFitness,fitness);
+			bestFitness = Math.max(bestFitness, fitness);
 		}
 	}
 
 	@Override
 	public void setEvaluationResultForId(int pos, double fitness) {
 		numberOfChromosomesEvaluated++;
-		accumulatedFitness+=fitness;
-		bestFitness = Math.max(bestFitness,fitness);
-		worstFitness = Math.min(worstFitness,fitness);
+		accumulatedFitness += fitness;
+		bestFitness = Math.max(bestFitness, fitness);
+		worstFitness = Math.min(worstFitness, fitness);
 	}
 
 	@Override
@@ -96,11 +94,11 @@ public class NEATPopulation extends Population implements Serializable {
 		generationNumber++;
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 	}
-	
+
 	protected void resetGeneration() {
-		bestFitness = -1e10;
+		bestFitness = Double.MIN_VALUE;
 		accumulatedFitness = 0;
-		worstFitness = 1e10;
+		worstFitness = Double.MAX_VALUE;
 		numberOfChromosomesEvaluated = 0;
 		chromosomes = new Chromosome[getPopulationSize()];
 	}
@@ -112,7 +110,7 @@ public class NEATPopulation extends Population implements Serializable {
 
 	@Override
 	public double getAverageFitness() {
-		return accumulatedFitness/getPopulationSize();
+		return accumulatedFitness / getPopulationSize();
 	}
 
 	@Override
@@ -132,8 +130,7 @@ public class NEATPopulation extends Population implements Serializable {
 		for (int i = 0; i < getPopulationSize(); i++)
 			sortedChromosomes.add(chromosomes[i]);
 
-		Collections.sort(sortedChromosomes,
-				new Chromosome.CompareChromosomeFitness());
+		Collections.sort(sortedChromosomes, new Chromosome.CompareChromosomeFitness());
 
 		Iterator<Chromosome> sortedIterator = sortedChromosomes.iterator();
 
@@ -154,25 +151,27 @@ public class NEATPopulation extends Population implements Serializable {
 		Chromosome c = getBestChromosome();
 		c.setupRobot(r);
 	}
-	
+
+	@Override
 	public boolean evolutionDone() {
-		if (generationNumber >= numberOfGenerations ||
-				(generationNumber == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == getPopulationSize()) ||
-				checkFitnessThreshold(bestFitness))
+		if (generationNumber >= numberOfGenerations
+				|| (generationNumber == numberOfGenerations - 1
+						&& getNumberOfChromosomesEvaluated() == getPopulationSize())
+				|| checkFitnessThreshold(bestFitness))
 			return true;
 		else
 			return false;
 	}
-	
+
 	public Chromosome convertChromosome(evolutionaryrobotics.evolution.neat.ga.core.Chromosome c, int i) {
 		NEATNetDescriptor descr = new NEATNetDescriptor(0, null);
-        descr.updateStructure(c);
-        NEATNeuralNet network = new NEATNeuralNet();
-        network.createNetStructure(descr);
-        network.updateNetStructure();
+		descr.updateStructure(c);
+		NEATNeuralNet network = new NEATNeuralNet();
+		network.createNetStructure(descr);
+		network.updateNetStructure();
 		return new Chromosome(NEATSerializer.serialize(network), i);
 	}
-	
+
 	@Override
 	public Chromosome[] getChromosomes() {
 		return chromosomes;
