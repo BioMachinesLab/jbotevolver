@@ -36,6 +36,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JSplitPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
@@ -71,6 +72,8 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 	protected int sleepBetweenControlSteps = 10;
 
+	protected JPanel leftWrapperPanel;
+	protected JPanel rightAndCenterWrapperPanel;
 	protected JPanel treeWrapper;
 
 	protected JButton pauseButton;
@@ -134,8 +137,23 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 		setLayout(new BorderLayout());
 
-		add(initRightWrapperPanel(), BorderLayout.EAST);
-		add(initLeftWrapperPanel(), BorderLayout.WEST);
+		leftWrapperPanel = initLeftWrapperPanel();
+		rightAndCenterWrapperPanel = new JPanel(new BorderLayout());
+		rightAndCenterWrapperPanel.add(initRightWrapperPanel(), BorderLayout.EAST);
+
+		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftWrapperPanel,
+				rightAndCenterWrapperPanel);
+		splitPane.setOneTouchExpandable(true);
+		splitPane.setDividerLocation(300);
+
+		// Provide minimum sizes for the two components in the split pane
+		Dimension minimumSize = new Dimension(300, 250);
+		leftWrapperPanel.setMinimumSize(minimumSize);
+		rightAndCenterWrapperPanel.setMinimumSize(minimumSize);
+
+		// add(initRightWrapperPanel(), BorderLayout.EAST);
+		// add(initLeftWrapperPanel(), BorderLayout.WEST);
+		add(splitPane);
 
 		initActions();
 		initListeners();
@@ -1093,7 +1111,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		if (renderer != null) {
 			renderer.enableInputMethods(true);
 			renderer.setSimulator(simulator);
-			add(renderer);
+			rightAndCenterWrapperPanel.add(renderer);
 			if (simulateUntil == 0)
 				renderer.drawFrame();
 			validate();
