@@ -1,8 +1,6 @@
 /*
  * Created on 20-Jun-2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package evolutionaryrobotics.evolution.neat.core;
 
@@ -61,6 +59,7 @@ public class NEATNodeGene implements NEATGene {
 		return type;
 	}
 
+	@Override
 	public int getInnovationNumber() {
 		return (this.innovationNumber);
 	}
@@ -73,10 +72,12 @@ public class NEATNodeGene implements NEATGene {
 		return (this.sigmoidFactor);
 	}
 	
+	@Override
 	public Number geneAsNumber() {
 		return (new Integer(this.innovationNumber));
 	}
 
+	@Override
 	public String geneAsString() {
 		return (this.innovationNumber + ":" + this.id + ":" + this.sigmoidFactor);
 	}

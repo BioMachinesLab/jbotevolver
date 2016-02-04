@@ -1,8 +1,7 @@
 /*
  * Created on 20-Jun-2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
  */
 package evolutionaryrobotics.evolution.neat.core;
 
@@ -43,6 +42,7 @@ public class NEATPopulation4J implements Population, Serializable {
 		this(popSize, initialChromoSize, inputs, outputs, featureSelection, 0);
 	}
 	
+	@Override
 	public Chromosome[] genoTypes() {
 		return (this.chromosomes);
 	}
@@ -54,6 +54,7 @@ public class NEATPopulation4J implements Population, Serializable {
 	/**
 	 * Creates an intial population
 	 */
+	@Override
 	public void createPopulation() {
 		this.chromosomes = new Chromosome[this.popSize];
 		int i;
@@ -92,6 +93,7 @@ public class NEATPopulation4J implements Population, Serializable {
 	/** 
 	 * @see org.neat4j.ailibrary.ga.core.Population#updatePopulation(org.neat4j.ailibrary.ga.core.Chromosome[])
 	 */
+	@Override
 	public void updatePopulation(Chromosome[] newGenoTypes) {
 		if (newGenoTypes.length == this.popSize) {
 			System.arraycopy(newGenoTypes, 0, this.chromosomes, 0, this.popSize);

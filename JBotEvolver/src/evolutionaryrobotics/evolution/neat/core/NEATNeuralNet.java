@@ -1,12 +1,10 @@
 /*
  * Created on 22-Jun-2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
  */
 package evolutionaryrobotics.evolution.neat.core;
 
-import java.beans.FeatureDescriptor;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -51,6 +49,7 @@ public class NEATNeuralNet implements NeuralNet {
 	/**
 	 * Exercises the network for the given input data set
 	 */
+	@Override
 	public NetworkOutputSet execute(NetworkInput netInput) {
 		NEATNetOutputSet opSet;
 		double[] outputs;
@@ -62,7 +61,7 @@ public class NEATNeuralNet implements NeuralNet {
 		}
 		outputs = new double[outputNeurons.length];
 		for (i = 0; i < outputs.length; i++) {
-			outputs[i] = this.neuronOutput((NEATNeuron)outputNeurons[i], netInput);
+			outputs[i] = this.neuronOutput(outputNeurons[i], netInput);
 		}
 		
 		opSet = new NEATNetOutputSet();
@@ -89,14 +88,14 @@ public class NEATNeuralNet implements NeuralNet {
 		} else {
 			inputPattern = new double[sourceNodes.length];
 			for (i = 0; i < sourceNodes.length; i++) {
-				if (neuron.id() == ((NEATNeuron)sourceNodes[i]).id()) {				
+				if (neuron.id() == sourceNodes[i].id()) {				
 					// Self Recurrent
 					inputPattern[i] = neuron.lastActivation();
-				} else if (neuron.neuronDepth() > ((NEATNeuron)sourceNodes[i]).neuronDepth()) {
+				} else if (neuron.neuronDepth() > sourceNodes[i].neuronDepth()) {
 					// Recurrent
-					inputPattern[i] = ((NEATNeuron)sourceNodes[i]).lastActivation();
+					inputPattern[i] = sourceNodes[i].lastActivation();
 				} else {
-					inputPattern[i] = this.neuronOutput((NEATNeuron)sourceNodes[i], netInput);
+					inputPattern[i] = this.neuronOutput(sourceNodes[i], netInput);
 				}
 			}
 		}
@@ -151,7 +150,7 @@ public class NEATNeuralNet implements NeuralNet {
 		int i;
 		NEATNeuron neuron;
 		for (i = 0; i < neurons.length; i++) {
-			neuron = (NEATNeuron)neurons[i];
+			neuron = neurons[i];
 			if (neuron.neuronType() == NEATNodeGene.OUTPUT) {
 				if (neuron.neuronDepth() == -1) {
 					neuron.setNeuronDepth(depth);
@@ -236,33 +235,41 @@ public class NEATNeuralNet implements NeuralNet {
 	/**
 	 * Updates the internal network structure
 	 */
+	@Override
 	public void createNetStructure(NeuralNetDescriptor descriptor) {
 		this.descriptor = (NEATNetDescriptor)descriptor;
 	}
 
+	@Override
 	public NeuralNetDescriptor netDescriptor() {
 		return (this.descriptor);
 	}
 
+	@Override
 	public Collection hiddenLayers() {
 		return null;
 	}
 
+	@Override
 	public NeuralNetLayer outputLayer() {
 		return null;
 	}
 
+	@Override
 	public void seedNet(double[] weights) {
 	}
 
+	@Override
 	public int requiredWeightCount() {
 		return 0;
 	}
 
+	@Override
 	public int netID() {
 		return 0;
 	}
 
+	@Override
 	public Neuron neuronAt(int x, int y) {
 		return null;
 	}

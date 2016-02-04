@@ -3,13 +3,10 @@ package gui.renderer;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
 import java.awt.RadialGradientPaint;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
-import java.awt.geom.Ellipse2D.Double;
 import java.awt.image.BufferedImage;
 
 import mathutils.Point2d;
@@ -24,9 +21,6 @@ import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
 import simulation.physicalobjects.Wall.Edge;
-import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
-import simulation.physicalobjects.collisionhandling.knotsandbolts.PolygonShape;
-import simulation.physicalobjects.collisionhandling.knotsandbolts.Shape;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
@@ -59,6 +53,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		darIds = args.getArgumentAsIntOrSetDefault("drawids", 1)==1;
 	}
 	
+	@Override
 	public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		synchronized (this) {
@@ -185,14 +180,17 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		g.drawString(String.valueOf(robot.getId()), x, y);
 	}
 
+	@Override
 	public void zoomIn() {
 		zoomFactor *= 1.1;
 	}
 	
+	@Override
 	public void zoomOut() {
 		zoomFactor /= 1.11;
 	}
 	
+	@Override
 	public void resetZoom() {
 		zoomFactor = 1.0;
 	}
@@ -223,8 +221,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		double h = (simulator.getEnvironment().getHeight());
 		
 		graphics.fillRect(
-			(int) transformX(-w/2.0), 
-			(int) transformY(h/2.0),
+			transformX(-w/2.0), 
+			transformY(h/2.0),
 			(int) (w*scale), 
 			(int) (h*scale)
 		);
@@ -306,13 +304,14 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	}
 
 	//	@Override
+	@Override
 	public void dispose() {
 	}
 
 	public void drawCircle(Point2d center, double radius) {
 		int circleDiameter = (int) Math.round(0.5 + 2 * radius * scale);
-		int x = (int) (transformX(center.getX()) - circleDiameter / 2);
-		int y = (int) (transformY(center.getY()) - circleDiameter / 2);
+		int x = transformX(center.getX()) - circleDiameter / 2;
+		int y = transformY(center.getY()) - circleDiameter / 2;
 
 		graphics.setColor(Color.LIGHT_GRAY);
 		graphics.drawOval(x, y, circleDiameter, circleDiameter);
@@ -334,8 +333,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	
 	protected void drawNest(Graphics graphics2, Nest nest) {
 		int circleDiameter = (int) Math.round(0.5 + nest.getDiameter() * scale);
-		int x = (int) (transformX(nest.getPosition().getX()) - circleDiameter / 2);
-		int y = (int) (transformY(nest.getPosition().getY()) - circleDiameter / 2);
+		int x = transformX(nest.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(nest.getPosition().getY()) - circleDiameter / 2;
 
 		graphics.setColor(nest.getColor());
 		graphics.fillOval(x, y, circleDiameter, circleDiameter);
@@ -346,8 +345,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	private void drawLightPole(Graphics graphics, LightPole lightPole){
 		int circleDiameter = (int) Math.round(0.5 + lightPole.getDiameter() * scale);
 		
-		int x = (int) (transformX(lightPole.getPosition().getX()) - circleDiameter / 2);
-		int y = (int) (transformY(lightPole.getPosition().getY()) - circleDiameter / 2);
+		int x = transformX(lightPole.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(lightPole.getPosition().getY()) - circleDiameter / 2;
 		
 		if(lightPole.isTurnedOn()) {
 			graphics.setColor(lightPole.getColor());
@@ -362,8 +361,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	private void drawPreys(Graphics graphics, Prey prey) {
 		
 		int circleDiameter = (int) Math.round(0.5 + prey.getDiameter() * scale);
-		int x = (int) (transformX(prey.getPosition().getX()) - circleDiameter / 2);
-		int y = (int) (transformY(prey.getPosition().getY()) - circleDiameter / 2);
+		int x = transformX(prey.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(prey.getPosition().getY()) - circleDiameter / 2;
 
 		if(prey.isEnabled()){
 			graphics.setColor(prey.getColor());
@@ -379,8 +378,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 			createImage();
 
 		int circleDiameter = bigRobots ? (int)Math.max(10,Math.round(robot.getDiameter() * scale)) : (int) Math.round(robot.getDiameter() * scale);
-		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
-		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
+		int x = transformX(robot.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(robot.getPosition().getY()) - circleDiameter / 2;
 
 //		if(robot.getId() == selectedRobot) {
 //			graphics.setColor(Color.yellow);
@@ -437,23 +436,26 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	}
 
 //	@Override
+	@Override
 	public void componentResized(ComponentEvent arg0) {
 		createImage();
 		drawFrame();
 	}
 
 //	@Override
+	@Override
 	public void componentHidden(ComponentEvent arg0) {
 		createImage();
 		drawFrame();
 	}
 
 //	@Override
+	@Override
 	public void componentMoved(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
 	}
 
 //	@Override
+	@Override
 	public void componentShown(ComponentEvent arg0) {
 		createImage();
 		drawFrame();
@@ -472,21 +474,25 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		return -1;
 	}
 	
+	@Override
 	public void moveLeft() {
 		horizontalMovement-=0.1/scale*100;
 		componentResized(null);
 	}
 	
+	@Override
 	public void moveRight() {
 		horizontalMovement+=0.1/scale*100;
 		componentResized(null);
 	}
 	
+	@Override
 	public void moveUp() {
 		verticalMovement+=0.1/scale*100;
 		componentResized(null);
 	}
 	
+	@Override
 	public void moveDown() {
 		verticalMovement-=0.1/scale*100;
 		componentResized(null);

@@ -1,12 +1,9 @@
 /*
  * Created on 21-Jun-2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package evolutionaryrobotics.evolution.neat.core;
 
-import java.io.File;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;

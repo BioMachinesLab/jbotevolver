@@ -1,8 +1,7 @@
 /*
  * Created on 21-Jun-2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
  */
 package evolutionaryrobotics.evolution.neat.core;
 
@@ -23,15 +22,17 @@ public class NEATLinkInnovation implements NEATInnovation {
 		this.toId = to;
 	}
 
+	@Override
 	public int innovationId() {
 		return (this.innovationId);
 	}
  
+	@Override
 	public int type() {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
+	@Override
 	public void setInnovationId(int id) {
 		this.innovationId = id;
 	}
@@ -48,6 +49,7 @@ public class NEATLinkInnovation implements NEATInnovation {
 		return toId;
 	}
 	
+	@Override
 	public boolean equals(Object test) {
 		boolean equals = false;
 		if (test instanceof NEATLinkInnovation) {
@@ -59,6 +61,7 @@ public class NEATLinkInnovation implements NEATInnovation {
 		
 	}
 	
+	@Override
 	public int hashCode() {
 		// this may have to change for very large nets.
 		return (this.fromId * 100000 + this.toId);
