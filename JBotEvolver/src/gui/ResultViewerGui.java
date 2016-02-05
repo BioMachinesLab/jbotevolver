@@ -1193,20 +1193,4 @@ public class ResultViewerGui extends Gui implements Updatable {
 		}
 
 	}
-<<<<<<< HEAD
-	
-	protected void displayNeuralNetwork() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	protected void updateNeuralNetworkDisplay() {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	
-=======
-
->>>>>>> branch 'master' of https://github.com/BioMachinesLab/jbotevolver.git
 }
