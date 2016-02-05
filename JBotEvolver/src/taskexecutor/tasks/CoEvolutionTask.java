@@ -41,13 +41,14 @@ public class CoEvolutionTask extends JBotEvolverTask {
 		for (int i = 0; i < samples; i++) {
 			
 			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
+			long seed = random
+					.nextLong();
 			
-			Simulator simulator = jBotEvolver.createSimulator(new Random(random
-					.nextLong()));
+			Simulator simulator = jBotEvolver.createSimulator(new Random(seed));
 			simulator.setFileProvider(getFileProvider());
 
 			ArrayList<Robot> robots = jBotEvolver.createCoEvolutionRobots(simulator);
-
+			
 			ArrayList<Robot> preys = new ArrayList<Robot>();
 			ArrayList<Robot> predators = new ArrayList<Robot>();
 			for (int j = 0; j < robots.size(); j++) {
@@ -66,7 +67,7 @@ public class CoEvolutionTask extends JBotEvolverTask {
 			EvaluationFunction eval = EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get(evaluation));
 			simulator.addCallback(eval);
 			simulator.simulate();
-
+			System.out.println(seed+" "+eval.getFitness());
 			fitness += eval.getFitness();
 		}
 	}

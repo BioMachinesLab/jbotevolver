@@ -8,9 +8,7 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.util.HashMap;
 
-import mathutils.Point2d;
 import mathutils.Vector2d;
-import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.Prey;
@@ -174,6 +172,7 @@ public class BlenderRenderer extends Renderer {
 		return new PrintStream(new FileOutputStream(filename, append));
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		g.drawString("Outputting to directory \"" + outputDirectory + "\", current frame: " + currentFrame, 10, 10);
 	}
@@ -231,7 +230,7 @@ public class BlenderRenderer extends Renderer {
 				radius      = m.getRadius();
 				switch(m.getType()) {
 				case PREY:
-					String preyName = preyNames.get((Prey) m);
+					String preyName = preyNames.get(m);
 					if (preyName == null) {
 						preyName = "prey" + (nextPreyNumber++);
 						preyNames.put((Prey) m, preyName);
@@ -246,7 +245,7 @@ public class BlenderRenderer extends Renderer {
 					break;
 				case ROBOT:
 					color       = ((Robot) m).getBodyColor();
-					String robotName = robotNames.get((Robot) m);
+					String robotName = robotNames.get(m);
 					if (robotName == null) {
 						robotName = "robot" + (nextRobotNumber++);
 						robotNames.put((Robot) m, robotName);
@@ -257,9 +256,9 @@ public class BlenderRenderer extends Renderer {
 							position.getY(),
 							orientation,
 							radius,
-							(double) color.getRed()   / 255.0,  
-							(double) color.getGreen() / 255.0, 
-							(double) color.getBlue()  / 255.0);
+							color.getRed()   / 255.0,  
+							color.getGreen() / 255.0, 
+							color.getBlue()  / 255.0);
 					break;
 				}
 			}
@@ -274,16 +273,13 @@ public class BlenderRenderer extends Renderer {
 
 	@Override
 	public void resetZoom() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void zoomIn() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void zoomOut() {
-		// TODO Auto-generated method stub
 	}
 }

@@ -85,6 +85,7 @@ public class TraceRenderer extends Renderer {
 		graphics = image.getGraphics();
 	}
 
+	@Override
 	public void paint(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.drawImage(image, (getWidth() - image.getWidth()) / 2, (getHeight() - image.getHeight()) / 2, this);
@@ -97,8 +98,8 @@ public class TraceRenderer extends Renderer {
 				switch(m.getType()) {
 				case PREY:
 					TracePoints preyTrace;
-					if (preyTraces.containsKey((Prey) m)) {
-						preyTrace = preyTraces.get((Prey) m);
+					if (preyTraces.containsKey(m)) {
+						preyTrace = preyTraces.get(m);
 					} else {
 						preyTrace = new TracePoints(tracePreySteps); 
 						preyTraces.put((Prey) m, preyTrace);
@@ -107,8 +108,8 @@ public class TraceRenderer extends Renderer {
 					break;
 				case ROBOT:
 					TracePoints robotTrace;
-					if (robotTraces.containsKey((Robot) m)) {
-						robotTrace = robotTraces.get((Robot) m);
+					if (robotTraces.containsKey(m)) {
+						robotTrace = robotTraces.get(m);
 					} else {
 						robotTrace = new TracePoints(traceRobotSteps); 
 						robotTraces.put((Robot) m, robotTrace);
@@ -162,14 +163,14 @@ public class TraceRenderer extends Renderer {
 				case ROBOT:
 					graphics.setColor(new Color(150, 150, 150));
 					
-					drawTrace(graphics, robotTraces.get((Robot) m));
+					drawTrace(graphics, robotTraces.get(m));
 					drawRobot(graphics, (Robot) m);
 					break;
 					
 				case PREY:
 					graphics.setColor(new Color(180, 180, 180));
 
-					drawTrace(graphics, preyTraces.get((Prey) m));
+					drawTrace(graphics, preyTraces.get(m));
 					drawPrey(graphics, (Prey) m);
 					break;
 				
@@ -202,8 +203,8 @@ public class TraceRenderer extends Renderer {
 
 	private void drawNest(Graphics graphics, Nest nest) {
 		int circleDiameter = (int) Math.round(0.5 + nest.getDiameter() * scale);
-		int x = (int) (transformX(nest.getPosition().getX()) - circleDiameter / 2);
-		int y = (int) (transformY(nest.getPosition().getY()) - circleDiameter / 2);
+		int x = transformX(nest.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(nest.getPosition().getY()) - circleDiameter / 2;
 
 		graphics.setColor(Color.LIGHT_GRAY);
 		graphics.fillOval(x, y, circleDiameter, circleDiameter);
@@ -213,8 +214,8 @@ public class TraceRenderer extends Renderer {
 
 	private void drawPrey(Graphics graphics, Prey prey) {
 		int circleDiameter = (int) Math.round(0.5 + prey.getDiameter() * scale);
-		int x = (int) (transformX(prey.getPosition().getX()) - circleDiameter / 2);
-		int y = (int) (transformY(prey.getPosition().getY()) - circleDiameter / 2);
+		int x = transformX(prey.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(prey.getPosition().getY()) - circleDiameter / 2;
 
 		if(prey.isEnabled()){
 			graphics.setColor(Color.CYAN);
@@ -230,8 +231,8 @@ public class TraceRenderer extends Renderer {
 
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		int circleDiameter = (int) Math.round(0.5 + robot.getDiameter() * scale);
-		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
-		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
+		int x = transformX(robot.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(robot.getPosition().getY()) - circleDiameter / 2;
 
 		graphics.setColor(robot.getBodyColor());
 		graphics.fillOval(x, y, circleDiameter, circleDiameter);
@@ -288,24 +289,20 @@ public class TraceRenderer extends Renderer {
 
 	@Override
 	public void resetZoom() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void zoomIn() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void zoomOut() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override
 	public void dispose() {
-		// TODO Auto-generated method stub
 		
 	}
 }

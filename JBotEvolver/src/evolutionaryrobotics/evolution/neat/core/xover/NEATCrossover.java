@@ -1,8 +1,6 @@
 /*
  * Created on 20-Jun-2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package evolutionaryrobotics.evolution.neat.core.xover;
 
@@ -11,7 +9,6 @@ import java.util.Random;
 
 import evolutionaryrobotics.evolution.neat.core.NEATChromosome;
 import evolutionaryrobotics.evolution.neat.core.NEATGene;
-import evolutionaryrobotics.evolution.neat.core.NEATLinkGene;
 import evolutionaryrobotics.evolution.neat.ga.core.Chromosome;
 import evolutionaryrobotics.evolution.neat.ga.core.ChromosomeSet;
 import evolutionaryrobotics.evolution.neat.ga.core.CrossOver;
@@ -27,10 +24,12 @@ public class NEATCrossover implements CrossOver {
 	private final Random rand = new Random();
 	private double pXOver;
 	
+	@Override
 	public void setProbability(double prob) {
 		this.pXOver = prob;
 	}
 
+	@Override
 	public ChromosomeSet crossOver(ChromosomeSet parents) {
 		ChromosomeSet childSet = new ChromosomeSet(false);
 		ArrayList childGenes = new ArrayList();

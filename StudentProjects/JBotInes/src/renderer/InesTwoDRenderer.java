@@ -13,11 +13,13 @@ import sensors.DistanceToBSensor;
 import sensors.TypeBRobotSensor;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
+import simulation.robot.sensors.RobotSensor;
 import simulation.util.Arguments;
 
 public class InesTwoDRenderer extends TwoDRendererDebug {
 
 	private boolean drawArea;
+	private boolean coevolution;
 	
 	public InesTwoDRenderer(Arguments args) {
 		super(args);
@@ -26,9 +28,11 @@ public class InesTwoDRenderer extends TwoDRendererDebug {
 
 	@Override
 	protected void drawArea(Graphics g, Environment environment) {
+		
 		if(drawArea){
 			
 			OpenEnvironment2 env = (OpenEnvironment2) environment;
+			//OpenEnvironment2 env = (OpenEnvironment2) environment;
 			//OpenEnvironment env = (OpenEnvironment) environment;
 			
 			ArrayList<Robot> typeA = env.getTypeARobots();

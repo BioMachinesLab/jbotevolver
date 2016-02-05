@@ -1,8 +1,6 @@
 /*
  * Created on 20-Jun-2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package evolutionaryrobotics.evolution.neat.core;
 
@@ -17,7 +15,6 @@ import evolutionaryrobotics.evolution.neat.ga.core.ChromosomeSet;
 import evolutionaryrobotics.evolution.neat.ga.core.CrossOver;
 import evolutionaryrobotics.evolution.neat.ga.core.FitnessFunction;
 import evolutionaryrobotics.evolution.neat.ga.core.GADescriptor;
-import evolutionaryrobotics.evolution.neat.ga.core.Gene;
 import evolutionaryrobotics.evolution.neat.ga.core.GeneticAlgorithm;
 import evolutionaryrobotics.evolution.neat.ga.core.Mutator;
 import evolutionaryrobotics.evolution.neat.ga.core.ParentSelector;
@@ -77,7 +74,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
         return xOver;
     }
 
-    public GADescriptor descriptor() {
+    @Override
+	public GADescriptor descriptor() {
         return (this.descriptor);
     }
 
@@ -88,7 +86,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
     /**
      * Creates the initial population
      */
-    public void createPopulation() {
+    @Override
+	public void createPopulation() {
         int popSize = this.descriptor.gaPopulationSize();
         int initialChromoSize = this.func.requiredChromosomeSize() + this.descriptor.getExtraFeatureCount();
         this.pop = new NEATPopulation4J(popSize, initialChromoSize, this.descriptor.getInputNodes(), this.descriptor.getOutputNodes(), this.descriptor.featureSelectionEnabled(), this.descriptor.getExtraFeatureCount());
@@ -193,7 +192,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
     /**
      * Runs an evaluation and evolution cycle
      */
-    public void runEpoch() {
+    @Override
+	public void runEpoch() {
         Chromosome[] currentGen = this.pop.genoTypes();
         this.setChromosomeNO(currentGen);
         //cat.debug("Evaluating pop");
@@ -330,7 +330,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
         return (specie);
     }
 
-    public Chromosome discoverdBestMember() {
+    @Override
+	public Chromosome discoverdBestMember() {
         return (this.discoveredBest);
     }
 
@@ -338,7 +339,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
      * @see
      * org.neat4j.ailibrary.ga.core.GeneticAlgorithm#pluginMutator(org.neat4j.ailibrary.ga.core.Mutator)
      */
-    public void pluginMutator(Mutator mut) {
+    @Override
+	public void pluginMutator(Mutator mut) {
         this.mut = (NEATMutator) mut;
         this.mut.setPAddLink(this.descriptor.getPAddLink());
         this.mut.setPAddNode(this.descriptor.getPAddNode());
@@ -357,7 +359,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
      * @see
      * org.neat4j.ailibrary.ga.core.GeneticAlgorithm#pluginFitnessFunction(org.neat4j.ailibrary.ga.core.Function)
      */
-    public void pluginFitnessFunction(FitnessFunction func) {
+    @Override
+	public void pluginFitnessFunction(FitnessFunction func) {
         this.func = func;
     }
 
@@ -365,7 +368,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
      * @see
      * org.neat4j.ailibrary.ga.core.GeneticAlgorithm#pluginParentSelector(org.neat4j.ailibrary.ga.core.ParentSelector)
      */
-    public void pluginParentSelector(ParentSelector selector) {
+    @Override
+	public void pluginParentSelector(ParentSelector selector) {
         this.selector = selector;
         this.selector.setOrderStrategy(this.descriptor.isNaturalOrder());
     }
@@ -374,7 +378,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
      * @see
      * org.neat4j.ailibrary.ga.core.GeneticAlgorithm#pluginCrossOver(org.neat4j.ailibrary.ga.core.CrossOver)
      */
-    public void pluginCrossOver(CrossOver xOver) {
+    @Override
+	public void pluginCrossOver(CrossOver xOver) {
         this.xOver = xOver;
         this.xOver.setProbability(this.descriptor.getPXover());
     }
@@ -383,7 +388,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
      * Saves the entire population. Especially useful for long running evolution
      * processes
      */
-    public void savePopulationState(String fileName) {
+    @Override
+	public void savePopulationState(String fileName) {
         FileOutputStream out = null;
         ObjectOutputStream s = null;
         try {
@@ -395,14 +401,12 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
                 s.flush();
             }
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } finally {
             try {
                 s.close();
                 out.close();
             } catch (IOException e1) {
-                // TODO Auto-generated catch block
                 e1.printStackTrace();
             }
         }
@@ -410,7 +414,8 @@ public class NEATGeneticAlgorithm implements GeneticAlgorithm {
         //cat.debug("Saving Population...Done");
     }
 
-    public Population population() {
+    @Override
+	public Population population() {
         return (this.pop);
     }
 

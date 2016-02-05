@@ -97,12 +97,13 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		}
 	}
 	
+	@Override
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
 			createImage();
 		int circleDiameter = bigRobots ? (int)Math.max(10,Math.round(robot.getDiameter() * scale)) : (int) Math.round(robot.getDiameter() * scale);
-		int x = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
-		int y = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
+		int x = transformX(robot.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(robot.getPosition().getY()) - circleDiameter / 2;
 
 //		if(robot.getId() == selectedRobot) {
 //			graphics.setColor(Color.yellow);
@@ -279,8 +280,8 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	@Override
 	protected void drawNest(Graphics graphics2, Nest nest) {
 		int circleDiameter = (int) Math.round(0.5 + nest.getDiameter() * scale);
-		int x = (int) (transformX(nest.getPosition().getX()) - circleDiameter / 2);
-		int y = (int) (transformY(nest.getPosition().getY()) - circleDiameter / 2);
+		int x = transformX(nest.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(nest.getPosition().getY()) - circleDiameter / 2;
 
 		if(paperSensors)
 			graphics2.setColor(Color.GRAY.darker());
@@ -292,6 +293,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		
 	}
 	
+	@Override
 	public int getSelectedRobot() {
 		return selectedRobot;
 	}
@@ -307,15 +309,16 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	public class MouseListenerSentinel implements MouseListener {
 
 		//		@Override
+		@Override
 		public void mouseClicked(MouseEvent e) {
 			selectedLocation = new Vector2d(screenToSimulationX(e.getX()),screenToSimulationY(e.getY()));
 			System.out.println(selectedLocation);
 			for (Robot robot : simulator.getEnvironment().getRobots()) {
 				int circleDiameter = (int) FastMath.round(0.5 + robot.getDiameter() * scale);
-				int x1 = (int) (transformX(robot.getPosition().getX()) - circleDiameter / 2);
-				int x2 = (int) (transformX(robot.getPosition().getX()) + circleDiameter / 2);
-				int y1 = (int) (transformY(robot.getPosition().getY()) - circleDiameter / 2);
-				int y2 = (int) (transformY(robot.getPosition().getY()) + circleDiameter / 2);
+				int x1 = transformX(robot.getPosition().getX()) - circleDiameter / 2;
+				int x2 = transformX(robot.getPosition().getX()) + circleDiameter / 2;
+				int y1 = transformY(robot.getPosition().getY()) - circleDiameter / 2;
+				int y2 = transformY(robot.getPosition().getY()) + circleDiameter / 2;
 
 				if(e.getX() > x1 && e.getX() < x2 &&
 						e.getY() > y1 && e.getY() < y2){
@@ -327,23 +330,23 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		}
 
 		//		@Override
+		@Override
 		public void mouseEntered(MouseEvent e) {
-			// TODO Auto-generated method stub
 		}
 
 		//		@Override
+		@Override
 		public void mouseExited(MouseEvent e) {
-			// TODO Auto-generated method stub
 		}
 
 		//		@Override
+		@Override
 		public void mousePressed(MouseEvent e) {
-			// TODO Auto-generated method stub
 		}
 
 		//		@Override
+		@Override
 		public void mouseReleased(MouseEvent e) {
-			// TODO Auto-generated method stub
 		}
 	}
 	

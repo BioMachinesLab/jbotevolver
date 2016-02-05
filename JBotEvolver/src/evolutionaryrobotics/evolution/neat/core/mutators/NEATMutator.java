@@ -1,8 +1,7 @@
 /*
  * Created on 20-Jun-2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
+ * 
  */
 package evolutionaryrobotics.evolution.neat.core.mutators;
 
@@ -13,7 +12,6 @@ import evolutionaryrobotics.evolution.neat.core.InnovationDatabase;
 import evolutionaryrobotics.evolution.neat.core.NEATChromosome;
 import evolutionaryrobotics.evolution.neat.core.NEATFeatureGene;
 import evolutionaryrobotics.evolution.neat.core.NEATLinkGene;
-import evolutionaryrobotics.evolution.neat.core.NEATNeuron;
 import evolutionaryrobotics.evolution.neat.core.NEATNodeGene;
 import evolutionaryrobotics.evolution.neat.ga.core.Chromosome;
 import evolutionaryrobotics.evolution.neat.ga.core.Gene;
@@ -61,7 +59,8 @@ public class NEATMutator implements Mutator {
         this.recurrencyAllowed = allowed;
     }
 
-    public void setProbability(double prob) {
+    @Override
+	public void setProbability(double prob) {
         this.pPerturb = prob;
     }
 
@@ -72,7 +71,8 @@ public class NEATMutator implements Mutator {
     /**
      * Mutates the chromsome based on the set of probabilities.
      */
-    public Chromosome mutate(Chromosome mutatee) {
+    @Override
+	public Chromosome mutate(Chromosome mutatee) {
         Gene[] genes = mutatee.genes();
         int originalSize = genes.length;
         NEATChromosome mutated;

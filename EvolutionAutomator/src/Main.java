@@ -1,3 +1,5 @@
+package src;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -210,7 +212,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		Main main = new Main(args);
-//		Main main = new Main(new String[]{"repertoire.conf"});
+//		Main main = new Main(new String[]{"rudder_final.conf"});
 		main.execute();
 	}
 }

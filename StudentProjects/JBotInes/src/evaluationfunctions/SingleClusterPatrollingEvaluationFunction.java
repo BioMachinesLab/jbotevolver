@@ -1,52 +1,39 @@
 package evaluationfunctions;
 
-import java.awt.Color;
-import java.awt.image.BufferedImage;
-
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-
 import mathutils.Vector2d;
-import sensors.NearTypeBRobotSensor;
 import simulation.Simulator;
 import simulation.physicalobjects.Line;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectType;
 import simulation.robot.Robot;
+import simulation.robot.sensors.RobotSensor;
 import simulation.util.Arguments;
-import environment.OpenEnvironment2;
+import environment.SquareAreaEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
-public class PatrollingEvaluationFunction extends EvaluationFunction{
+public class SingleClusterPatrollingEvaluationFunction extends EvaluationFunction{
 
-	private OpenEnvironment2 env;
+	private SquareAreaEnvironment env;
 	private int numberOfSteps=0;
 	private Double timestep= 0.0;
 	private int drawImage = 0;
-	//private BufferedImage map;
-	private double radiusType0 = 0.0;
-	private double radiusType1= 0.0;
-	private double penalty = 0;
 
 	private int width;
 	private int height;
 	private double decrease = 0; //0.001 =>1000 to go from 1.0 to 0.0
 	private double[][] grid; 
-	private double accum = 0;
-	private double max = 200*200/2; //for now, but not accurate
 	private int clustersSum = 0;
 	private int power = 1;
+	private double radius = 1;
 
-	public PatrollingEvaluationFunction(Arguments args) {
+	public SingleClusterPatrollingEvaluationFunction(Arguments args) {
 		super(args);
 		drawImage = args.getArgumentIsDefined("drawimage") ? args.getArgumentAsInt("drawimage") : 0;
 		width = args.getArgumentIsDefined("width") ? args.getArgumentAsInt("width") : 200;
 		height = args.getArgumentIsDefined("height") ? args.getArgumentAsInt("height") : 200;
 		grid = new double[height][width];
-		penalty = args.getArgumentIsDefined("penalty") ? args.getArgumentAsDouble("penalty") : 0;
 		decrease = args.getArgumentIsDefined("decay") ? args.getArgumentAsDouble("decay") : 0;
-		power = args.getArgumentIsDefined("power") ? args.getArgumentAsInt("power") : 1;
+		power = args.getArgumentIsDefined("power") ? args.getArgumentAsInt("power") : power;
 
 		//map = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_BINARY);
 		//map.getGraphics().setColor(Color.WHITE);
@@ -55,46 +42,24 @@ public class PatrollingEvaluationFunction extends EvaluationFunction{
 	@Override
 	public void update(Simulator simulator) {
 		timestep = simulator.getTime();
-		env = (OpenEnvironment2) simulator.getEnvironment();
-		numberOfSteps = env.getSteps();
 
 		if(timestep == 0){
-			// sensory range = 1/2 communication range
-//			radiusType0 = ((DistanceToBSensor) env.getTypeARobots().get(0).getSensorByType(DistanceToBSensor.class)).getRange() / 2;
-//			radiusType1 = ((DistanceToASensor) env.getTypeBRobots().get(0).getSensorByType(DistanceToASensor.class)).getRange() / 2;
-			radiusType0 =1;
-			radiusType1 =1;
-			
-			max = 2* Math.PI * (Math.pow((int)(radiusType0), 2)) * 9 * 12000;
-
+			env = (SquareAreaEnvironment) simulator.getEnvironment();
+			numberOfSteps = env.getSteps();
+			radius = ((RobotSensor) env.getRobots().get(0).getSensorByType(RobotSensor.class)).getRange() / 2;
 		}
 
 		if(timestep % 10 == 0){
 			clustersSum   += env.getNumberOfClusters();
-	
 		}
-		
+
 		//mapping robots coordinates to image coordinates: (0,0) = (99,99)
 		int factor = 1; // 1 meter = 1 px
 
 		int center = grid.length/2;
-		
-		for (Robot r : env.getRobots()) {
-			if(r.getDescription().equals("type1")){
-				continue;
-			}
-			
-			if(r.getDescription().equals("type0")){
-				if(r.getSensorByType(NearTypeBRobotSensor.class).getSensorReading(0) == 0){
-					if(timestep % 10 == 0)	
-						clustersSum++;
-					continue;
-				}
-			}
-			
-			if (insideLines(r.getPosition(), simulator)) {
 
-				double radius = radiusType0;
+		for (Robot r : env.getRobots()) {
+			if (insideLines(r.getPosition(), simulator)) {
 
 				Vector2d upperLeftCorner = toUpperLeftCorner(r.getPosition(), radius);
 				Vector2d ulcScaled = toPixels(upperLeftCorner, factor, center);
@@ -108,7 +73,7 @@ public class PatrollingEvaluationFunction extends EvaluationFunction{
 
 				//drawing circles
 				for (int y = minY; y < maxY; y++) {
-					
+
 					if (y >= grid.length || y < 0) {
 						continue;
 					}
@@ -125,62 +90,63 @@ public class PatrollingEvaluationFunction extends EvaluationFunction{
 						grid[y][x] = 1.0;
 					}
 				}
-			} 
+			}
 		}
-		
+
+
 	}
 
 	@Override
 	public double getFitness() {
 
-				if(timestep == numberOfSteps - 1){
-					
-					double sum = 0;
-					
-					for (int y = 0; y < grid.length; y++) {
-						for (int x = 0; x < grid[y].length; x++) {
+		if(timestep == numberOfSteps - 1){
 
-							//calculate sum 
-							if (grid[y][x] > 0) {
-								sum += grid[y][x];
-							}
+			double sum = 0;
 
-							//applying decrease
-							if (grid[y][x] > 0) {
-								if (grid[y][x] <= 1) {
-									grid[y][x] -= decrease;
-									if (grid[y][x] < 0) {
-										grid[y][x] = 0;
-									}
-								}
-							}
-						}
+			for (int y = 0; y < grid.length; y++) {
+				for (int x = 0; x < grid[y].length; x++) {
+
+					//calculate sum 
+					if (grid[y][x] > 0) {
+						sum += grid[y][x];
 					}
-					
-					fitness = sum / Math.pow((clustersSum/(numberOfSteps/10)), power) /1000;
-		
-//					if(drawImage == 1){
-//						
-//						System.out.println(clustersSum);
-//	
-//					BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-//						
-//						for (int y = 0; y < grid.length; y++) {
-//							for (int x = 0; x < grid[y].length; x++) {
-//								int color = (int) Math.round(grid[y][x]*255);
-//								//System.out.println("Color " + grid[y][x]);
-//								img.setRGB(x, y, new Color(color,color,color).getRGB());
-//							}
-//						}
-//						JFrame frame = new JFrame();
-//						//map.getGraphics().drawLine(10, 10, 60, 10);
-//						frame.getContentPane().add(new JLabel(new ImageIcon(img)));
-//						frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//						frame.setVisible(true);	
-//						
-//						//printGrid();
-//					}
+
+					//applying decrease
+					//					if (grid[y][x] > 0) {
+					//						if (grid[y][x] <= 1) {
+					//							grid[y][x] -= decrease;
+					//							if (grid[y][x] < 0) {
+					//								grid[y][x] = 0;
+					//							}
+					//						}
+					//					}
 				}
+			}
+
+			fitness = sum / Math.pow((clustersSum/(numberOfSteps/10)), power) /1000;
+
+//			if(drawImage == 1){
+//
+//				System.out.println(clustersSum);
+//
+//				BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+//
+//				for (int y = 0; y < grid.length; y++) {
+//					for (int x = 0; x < grid[y].length; x++) {
+//						int color = (int) Math.round(grid[y][x]*255);
+//						//System.out.println("Color " + grid[y][x]);
+//						img.setRGB(x, y, new Color(color,color,color).getRGB());
+//					}
+//				}
+//				JFrame frame = new JFrame();
+//				//map.getGraphics().drawLine(10, 10, 60, 10);
+//				frame.getContentPane().add(new JLabel(new ImageIcon(img)));
+//				frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+//				frame.setVisible(true);	
+//
+//				//printGrid();
+//			}
+		}
 
 		//			System.out.println("Fitness: " + fitness);
 		//			System.out.println("Penalty: " + penalty);

@@ -77,8 +77,11 @@ public class OpenEnvironment2 extends Environment {
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
+		
+		if(getRobots().size() < 12)
+			System.out.println("ENV: Create robots fail");
 
-		for(Robot r: getRobots()){
+		for(Robot r: simulator.getRobots()){
 			if(r.getDescription().equals(DESC_A))
 				typeARobots.add(r);
 			else if(r.getDescription().equals(DESC_B)) {
