@@ -1090,4 +1090,15 @@ public class ResultViewerGui extends Gui implements Updatable{
 
 	}
 	
+	protected void displayNeuralNetwork() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	protected void updateNeuralNetworkDisplay() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 }
