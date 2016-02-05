@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package updatables;
 
 import java.awt.BasicStroke;
@@ -119,7 +114,7 @@ public class PathTracer extends Tracer {
                     // DRAW POLYLINE
                     int alpha = Math.max(50, (int) Math.round((double) (s + 1) / steps * 255));
                     Color c = new Color(mainColor.getRed(), mainColor.getGreen(), mainColor.getBlue(), alpha);
-                    
+
                     gr.setPaint(c);
                     gr.setStroke(new BasicStroke(lineWidth));
                     gr.drawPolyline(xs, ys, xs.length);
@@ -128,7 +123,7 @@ public class PathTracer extends Tracer {
         }
         
         //size
-        gr.drawLine(0, 0, (int)(5*scale), 0);
+//        gr.drawLine(0, 0, (int)(5*scale), 0);
 
         Color color;
         

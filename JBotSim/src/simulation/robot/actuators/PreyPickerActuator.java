@@ -23,13 +23,13 @@ public class PreyPickerActuator extends Actuator {
 
 	@ArgumentsAnnotation(name="maxpickdistance", defaultValue="0.1")
 	protected double maxPickDistance;
-	private PickerStatus status = PickerStatus.OFF;
-	private Vector2d temp = new Vector2d();
+	protected PickerStatus status = PickerStatus.OFF;
+	protected Vector2d temp = new Vector2d();
 	@ArgumentsAnnotation(name="stoprobot", help="Set to 1 to force robot to stop to pick up something.", values={"0","1"})
-	private boolean stopRobot;
-	private Random random;
-	private Prey preyCarried;
-	private int numDrops;
+	protected boolean stopRobot;
+	protected Random random;
+	protected Prey preyCarried;
+	protected int numDrops;
 
 	public PreyPickerActuator(Simulator simulator, int id, Arguments arguments) {
 		super(simulator, id, arguments);
@@ -84,6 +84,7 @@ public class PreyPickerActuator extends Actuator {
 
 					// Stop robot
 					if (isStopRobot()) {
+						System.out.println("stop");
 						if(robot instanceof DifferentialDriveRobot) {
 							DifferentialDriveRobot ddr = (DifferentialDriveRobot)robot;
 							ddr.setWheelSpeed(0,0);

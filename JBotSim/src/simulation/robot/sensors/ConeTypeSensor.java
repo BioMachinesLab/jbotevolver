@@ -74,7 +74,6 @@ public abstract class ConeTypeSensor extends Sensor {
 		this.env = simulator.getEnvironment();
 		this.time = simulator.getTime();
 		this.random = simulator.getRandom();
-		
 		numberOfSensors = (args.getArgumentIsDefined("numbersensors")) ? args.getArgumentAsInt("numbersensors") : 1;
 		range = (args.getArgumentIsDefined("range")) ? args.getArgumentAsDouble("range") : 1;
 		openingAngle = Math.toRadians((args.getArgumentIsDefined("angle")) ? args.getArgumentAsDouble("angle") : 90);

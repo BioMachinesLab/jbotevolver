@@ -60,9 +60,11 @@ public class MAPElitesViewer {
 	protected ArrayList<String> files = new ArrayList<String>();
 	
 	public static void main(String[] args) throws Exception {
-		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
-//		new MAPElitesViewer("bigdisk/december2015/intersected_repertoire_fwd/", true);
-//		new MAPElitesViewer("intersected_repertoires", true);
+//		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
+//		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
+//		new MAPElitesViewer("bigdisk/december2015/10samples/intersected_repertoire_all/", true);
+//		new MAPElitesViewer("bigdisk/december2015/foraging/intersected_repertoire_all/", true);
+		new MAPElitesViewer("repertoire/", true);
 		
 	}
 	
@@ -120,6 +122,7 @@ public class MAPElitesViewer {
 			if(slider != null) {
 				slider.setMaximum(gens);
 			}
+			
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
@@ -164,6 +167,8 @@ public class MAPElitesViewer {
 			
 			refresh();
 			
+			System.out.println(((MAPElitesPopulation)pop).getNumberOfChromosomes());
+			
 			Thread.sleep(10);
 		} catch(Exception e) {
 			System.err.println("Can't find population file "+i);
@@ -179,6 +184,8 @@ public class MAPElitesViewer {
 	}
 	
 	public void placeMarkers(MAPElitesPopulation pop) {
+		
+		int count = 0;
 		
 		for(int x = 0 ; x < pop.getMap().length ; x++) {
 			for(int y = 0 ; y < pop.getMap()[x].length ; y++) {
@@ -208,9 +215,13 @@ public class MAPElitesViewer {
 						if(supposedLocation[0] != x || supposedLocation[1] != y) {
 							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.BLACK);
 						} else {
-							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, getColor(fitness));
+							if(fitness < 0.8)
+								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.RED);
+							else{
+								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, getColor(fitness));
+								count++;
+							}
 						}
-						
 						sim.getEnvironment().addStaticObject(m);
 					} else {
 						if(br instanceof VectorBehaviourResult) {
@@ -224,6 +235,7 @@ public class MAPElitesViewer {
 				}
 			}
 		}
+		System.out.println("Good ones: "+count);
 	}
 	
 	protected void ellipsePoint(double angle, double percentage, MAPElitesPopulation po) {

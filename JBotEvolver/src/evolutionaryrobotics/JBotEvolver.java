@@ -67,7 +67,9 @@ public class JBotEvolver extends JBotSim {
 	}
 	
 	public ArrayList<Robot> createRobots(Simulator simulator, Chromosome chromosome) {
+		//TODO debug
 		return chromosome.setupRobots(this, simulator);
+//		return createRobots(simulator);
 	}
 	
 	public void setChromosome(ArrayList<Robot> robots, Chromosome chromosome) {
@@ -100,6 +102,18 @@ public class JBotEvolver extends JBotSim {
 		Population p = getPopulation();
 		
 		if(simulator.getRobots().isEmpty()) {
+			
+			Chromosome c = p.getBestChromosome();
+			
+			if(c == null) {
+				int bestIndex = 0;
+				for(int i = 1 ; i < p.getChromosomes().length ; i++) {
+					if(p.getChromosomes()[i].getFitness() > p.getChromosomes()[bestIndex].getFitness())
+						bestIndex = i;
+				}
+				c = p.getChromosomes()[bestIndex];
+			}
+			
 			robots = createRobots(simulator, p.getBestChromosome());
 			simulator.addRobots(robots);
 		} else{

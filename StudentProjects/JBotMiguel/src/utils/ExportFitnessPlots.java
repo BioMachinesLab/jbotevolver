@@ -1,12 +1,7 @@
 package utils;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Scanner;
-
-import simulation.Simulator;
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class ExportFitnessPlots {
 	
@@ -14,9 +9,12 @@ public class ExportFitnessPlots {
 		
 		System.out.println("Type\tSetup\tRun\tGeneration\tHighestFitness\tAverageFitness\tLowestFitness");
 		
-		String f = "";
-		String m = "_obstacle/";
-		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"multiple_intersection_repertoire"+m,f+"all_repertoire"+m+"all_30_obstacle/"};
+//		String f = "bigdisk/december2015/10samples/";String m = "_obstacle/";
+//		String f = "bigdisk/december2015/foraging/";String m = "_foraging/";
+		String f = "";String m = "_obstacle/";
+		
+		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m+"all_30"+m};
+//		String[] setups = new String[]{f+"repertoire/"};
 		
 		for(String s : setups)
 			new ExportFitnessPlots(s);
@@ -73,11 +71,14 @@ public class ExportFitnessPlots {
 		
 		while(s.hasNextLine()) {
 			String line = s.nextLine().trim().replaceAll("\\s+", "\t");
+			line = line.replaceAll("_30_", "_");
+			line = line.replaceAll("_foraging", "");
+			line = line.replaceAll("_obstacle", "");
 			if(!line.startsWith("#") && !line.equals(prevLine) && !line.isEmpty()) {
 				prevLine = line;
 				result.append(prefix);
 				result.append("\t");
-				result.append(line);
+				result.append(line.replaceAll("_30", "").replaceAll("_foraging", "").replaceAll("_obstacle", ""));
 				result.append("\n");
 			}
 		}

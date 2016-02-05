@@ -2,10 +2,14 @@ package evolutionaryrobotics;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Scanner;
 
+import evolutionaryrobotics.evolution.neat.ga.core.Chromosome;
+import evolutionaryrobotics.populations.NEATPopulation;
+import evolutionaryrobotics.populations.Population;
 import simulation.util.Arguments;
 import taskexecutor.ConillonTaskExecutor;
 import taskexecutor.TaskExecutor;
@@ -31,6 +35,7 @@ public class NEATPostEvaluation {
 	private String[] args;
 	
 	private boolean showOutput = false;
+	private boolean saveOutput = true;
 	
 	public NEATPostEvaluation(String[] args, String[] extraArgs) {
 		this(args);
@@ -49,6 +54,7 @@ public class NEATPostEvaluation {
 			if(a[0].equals("steps")) steps = Integer.parseInt(a[1]);
 			if(a[0].equals("showoutput")) showOutput = (Integer.parseInt(a[1]) == 1);
 			if(a[0].equals("sampleincrement")) sampleIncrement = Integer.parseInt(a[1]);
+			if(a[0].equals("saveoutput")) saveOutput = Integer.parseInt(a[1]) == 1;
 		}
 		
 		if(steps != 0) {
@@ -112,6 +118,12 @@ public class NEATPostEvaluation {
 			boolean setNumberOfTasks = false;
 			int totalTasks = 0;
 			
+			StringBuffer data = new StringBuffer();
+			FileWriter fw = null;
+			
+			if(saveOutput)
+				 fw = new FileWriter(new File(dir+"/post_details.txt"));
+			
 			for(int i = startTrial ; i <= maxTrial ; i++) {
 				if(singleEvaluation)
 					file = dir+"/show_best/";
@@ -128,21 +140,21 @@ public class NEATPostEvaluation {
 					setNumberOfTasks = true;
 				}
 				
-				
 				File[] files = directory.listFiles();
 				sortByNumber(files);
 				
 				for (File f : files) {
 					int generation = Integer.valueOf(f.getName().substring(8, f.getName().indexOf(".")));
-
+					
 					newArgs[0] = file + f.getName();
 					jBotEvolver = new JBotEvolver(newArgs);
 					
 					for(int fitnesssample = 0 ; fitnesssample < fitnesssamples ; fitnesssample++) {
-						
 						for(int sample = 0 ; sample < samples ; sample+=sampleIncrement) {
 							JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),jBotEvolver.getRandomSeed());
-							NEATMultipleSamplePostEvaluationTask t = new NEATMultipleSamplePostEvaluationTask(i,generation,newJBot,fitnesssample,newJBot.getPopulation().getBestChromosome(),sample,sample+sampleIncrement,targetfitness);
+							Population pop = newJBot.getPopulation();
+							evolutionaryrobotics.neuralnetworks.Chromosome chr = pop.getBestChromosome();
+							NEATMultipleSamplePostEvaluationTask t = new NEATMultipleSamplePostEvaluationTask(i,generation,newJBot,fitnesssample,chr,sample,sample+sampleIncrement,targetfitness);
 							taskExecutor.addTask(t);
 							if(showOutput)
 								System.out.print(".");
@@ -165,8 +177,12 @@ public class NEATPostEvaluation {
 							
 							NEATPostEvaluationResult sfr = (NEATPostEvaluationResult)taskExecutor.getResult();
 							result[sfr.getRun()-1][sfr.getGeneration()][sfr.getFitnesssample()]+= sfr.getFitness()*(double)sampleIncrement/(double)samples;
-							if(showOutput)
-								System.out.println(sfr.getRun()+" "+sfr.getGeneration()+" "+sfr.getFitnesssample()+" "+sfr.getSample()+" "+sfr.getFitness());
+							String line = sfr.getRun()+" "+sfr.getGeneration()+" "+sfr.getFitnesssample()+" "+sfr.getSample()+" "+sfr.getFitness()+"\n";
+							data.append(line);
+							
+							if(showOutput) {
+								System.out.print(line);
+							}
 						}
 					}
 				}
@@ -174,6 +190,11 @@ public class NEATPostEvaluation {
 			
 			if(showOutput)
 				System.out.println();
+			
+			if(saveOutput) {
+				fw.append(data);
+				fw.close();
+			}
 			
 			/*
 			for(int i = startTrial ; i <= maxTrial ; i++) {

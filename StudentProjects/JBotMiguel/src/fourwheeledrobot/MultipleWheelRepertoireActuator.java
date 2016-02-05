@@ -28,6 +28,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	protected double resolution;
 	protected double circleRadius;
 	protected int type = 0;
+	protected double stop = 0;
 	
 	public MultipleWheelRepertoireActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
@@ -50,6 +51,9 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			
 			if(randomize)
 				actuatorChosen = simulator.getRandom().nextInt(numArgs);
+			
+			if(simulator.getArguments().get("--robots").getArgumentIsDefined("chosenactuator"))
+				actuatorChosen = simulator.getArguments().get("--robots").getArgumentAsInt("chosenactuator");
 			
 			Arguments wheelArgs = new Arguments(a.getArgumentAsString(a.getArgumentAt(actuatorChosen)));
 			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
@@ -88,8 +92,9 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 				wheels.setRotation(i, val);
 			}
 		}
-		
-		wheels.apply(robot, timeDelta);
+		if(stop-- <= 0) {
+			wheels.apply(robot, timeDelta);
+		}
 	}
 	
 	protected double[] selectBehaviorFromRepertoire() {
@@ -234,5 +239,9 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	
 	public double getMaxSpeed() {
 		return wheels.getMaxSpeed();
+	}
+	
+	public void stop(double val) {
+		this.stop = val;
 	}
 }

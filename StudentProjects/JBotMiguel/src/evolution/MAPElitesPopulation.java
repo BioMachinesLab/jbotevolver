@@ -29,6 +29,9 @@ public class MAPElitesPopulation extends Population{
 	protected int fitnessIndex;
 	protected int numberOfChromosomesRequested;
 	protected ArrayList<MOChromosome> chromosomes;
+	protected boolean randomMutation = false;
+	protected double gaussianStdDev = 1.0;
+	protected double maxAllele = 10;
 
 	public MAPElitesPopulation(Arguments arguments) {
 		super(arguments);
@@ -39,6 +42,9 @@ public class MAPElitesPopulation extends Population{
 		genomeLength = arguments.getArgumentAsInt("genomelength");
 		behaviorIndex = arguments.getArgumentAsInt("behavior-index");
 		fitnessIndex = arguments.getArgumentAsInt("fitness-index");
+		randomMutation = arguments.getFlagIsTrue("randommutation");
+		
+		gaussianStdDev = arguments.getArgumentAsDoubleOrSetDefault("gaussian", gaussianStdDev);
 
 		limit = arguments.getArgumentAsDouble("limit");
 		resolution = arguments.getArgumentAsDouble("resolution");
@@ -58,7 +64,7 @@ public class MAPElitesPopulation extends Population{
 		for (int i = 0; i < initialBatch; i++) {
 			double[] alleles = new double[genomeLength];
 			for (int j = 0; j < genomeLength; j++) {
-				alleles[j] = randomNumberGenerator.nextGaussian() * 2;
+				alleles[j] = randomNumberGenerator.nextDouble()*maxAllele * 2 - maxAllele;
 			}
 			chromosomes.add(new MOChromosome(alleles, currentChromosomeId++));
 		}
@@ -155,17 +161,28 @@ public class MAPElitesPopulation extends Population{
 		
 		double[] alleles = new double[c.getAlleles().length];
 		
-		for (int j = 0; j < c.getAlleles().length; j++) {
-			double allele = c.getAlleles()[j];
-			if (randomNumberGenerator.nextDouble() < mutationRate) {
-				allele = allele + randomNumberGenerator.nextGaussian();
-				if (allele < -10)
-					allele = -10;
-				if (allele > 10)
-					allele = 10;
+		boolean mutated = false;
+		
+		do {
+		
+			for (int j = 0; j < c.getAlleles().length; j++) {
+				double allele = c.getAlleles()[j];
+				if (randomNumberGenerator.nextDouble() < mutationRate) {
+					mutated = true;
+					if(!randomMutation)
+						allele = allele + randomNumberGenerator.nextGaussian()*gaussianStdDev;
+					else
+						allele = randomNumberGenerator.nextDouble()*maxAllele * 2 - maxAllele;
+					
+					if (allele < -maxAllele)
+						allele = -maxAllele;
+					if (allele > maxAllele)
+						allele = maxAllele;
+				}
+				alleles[j] = allele;
 			}
-			alleles[j] = allele;
-		}
+		}while(!mutated);
+		
 		return new MOChromosome(alleles, currentChromosomeId++);
 	}
 	

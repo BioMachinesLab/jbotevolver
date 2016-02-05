@@ -43,12 +43,13 @@ public class GeometricCalculator implements Serializable {
 		Vector2d light = toPoint;
 		lightDirection.set(light.getX()-fromPoint.getX(),light.getY()-fromPoint.getY());
 		double lightAngle=orientation-lightDirection.getAngle();
-
+		
 		if(lightAngle>Math.PI){
 			lightAngle-=2*Math.PI;
 		} else if(lightAngle<-Math.PI){ 
 			lightAngle+=2*Math.PI;
 		}
+		
 		return new GeometricInfo(lightAngle, lightDirection.length());
 	}
 

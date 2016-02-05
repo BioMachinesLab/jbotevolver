@@ -8,28 +8,28 @@ import simulation.util.Arguments;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
-public class CheckFitness {
+public class CheckFrontBack {
 	
-	int samples = 10;
+	int samples = 1;
 	boolean randomizeSeed = true;
 	boolean postEvalBest = true;
 //	static String prefix = "bigdisk/december2015/10samples/";static String m = "_obstacle/";private double subtract = 10;
-//	static String prefix = "bigdisk/december2015/foraging/";static String m = "_foraging/";private double subtract = 0;
+	static String prefix = "bigdisk/december2015/foraging/";static String m = "_foraging/";private double subtract = 0;
 	
-	static String prefix = "";static String m = "_obstacle/";private double subtract = 10;
+//	static String prefix = "";static String m = "_obstacle/";private double subtract = 10;
 	
 	public static void main(String[] args) throws Exception{
 		
 		String f = "";
-		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m};
+		String[] setups = new String[]{f+"repertoire"+m+"AWS_3Actuator_30_foraging/",f+"repertoire"+m+"AWS_5Actuator_30_foraging/",f+"repertoire"+m+"AWS_8Actuator_30_foraging/"};
 		
 		System.out.println("Type\tSetup\tRun\tSample\tRobot\tGeneration\tFitness");
 		
 		for(String s : setups)
-			new CheckFitness(prefix+s);
+			new CheckFrontBack(prefix+s);
 	}
 	
-	public CheckFitness(String folder) throws Exception{
+	public CheckFrontBack(String folder) throws Exception{
 		
 		File f = new File(folder);
 		
@@ -109,7 +109,7 @@ public class CheckFitness {
 			String randomizeSeed = this.randomizeSeed ? "\n--random-seed "+i : "";
 			randomizeSeed = randomizeSeed + (this.randomizeSeed ? "\n--simulator +fixedseed=0" : ""); 
 		
-			jbot.loadFile(filename, "--environment +fitnesssample="+i+randomizeSeed+"\n--robots +chosenactuator="+actNumber);
+			jbot.loadFile(filename, "--environment +fitnesssample="+i+randomizeSeed+"\n--robots +chosenactuator="+actNumber+"\n--evaluation classname=FrontBackEvaluationFunction");
 			
 			if(!postEvalBest && !jbot.getPopulation().evolutionDone())
 				return "";
@@ -132,7 +132,10 @@ public class CheckFitness {
 			line = line.replaceAll("_foraging", "");
 			line = line.replaceAll("_obstacle", "");
 			result+=line;
-			System.out.print(line);
+//			System.out.print(line);
+			if(res < 0) {
+				System.out.println(split[split.length-2]+"\t"+split[split.length-1]);
+			}
 		}
 		return result;
 	}

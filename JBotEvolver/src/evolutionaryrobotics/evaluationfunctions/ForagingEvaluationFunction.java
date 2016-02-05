@@ -8,8 +8,8 @@ import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 
 public class ForagingEvaluationFunction extends EvaluationFunction{
-	private Vector2d   nestPosition = new Vector2d(0, 0);
-	private int numberOfFoodForaged = 0;
+	protected Vector2d   nestPosition = new Vector2d(0, 0);
+	protected int numberOfFoodForaged = 0;
 
 	public ForagingEvaluationFunction(Arguments args) {
 		super(args);	

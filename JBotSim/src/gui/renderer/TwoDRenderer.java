@@ -1,5 +1,6 @@
 package gui.renderer;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -57,6 +58,10 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		bigRobots = args.getArgumentAsIntOrSetDefault("bigrobots", 0) == 1;
 		drawFrames = args.getArgumentAsIntOrSetDefault("drawframes", 1);
 		darIds = args.getArgumentAsIntOrSetDefault("drawids", 1)==1;
+	}
+	
+	public double getScale() {
+		return scale;
 	}
 	
 	public void paint(Graphics g) {
@@ -327,9 +332,12 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		int y0 = transformY(l.getPointA().getY());
 		int y1 = transformY(l.getPointB().getY());
 		
+		Graphics2D g2d = (Graphics2D)graphics;
+		g2d.setStroke(new BasicStroke(5.0f));
 		graphics.setColor(l.getColor());
 		graphics.drawLine(x0, y0, x1, y1);
 		graphics.setColor(Color.BLACK);
+		g2d.setStroke(new BasicStroke(1.0f));
 	}
 	
 	protected void drawNest(Graphics graphics2, Nest nest) {
@@ -428,11 +436,11 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		graphics.setColor(Color.BLACK);
 	}
 	
-	protected int transformX(double x) {
+	public int transformX(double x) {
 		return (int) Math.round((x-horizontalMovement) * scale + centerX);
 	}
 
-	protected int transformY(double y) {
+	public int transformY(double y) {
 		return (int) Math.round((-y+verticalMovement) * scale + centerY);
 	}
 

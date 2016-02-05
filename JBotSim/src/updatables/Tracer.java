@@ -29,6 +29,9 @@ import org.jfree.graphics2d.svg.SVGUtils;
 import simulation.Simulator;
 import simulation.Stoppable;
 import simulation.physicalobjects.Line;
+import simulation.physicalobjects.PhysicalObject;
+import simulation.physicalobjects.Wall;
+import simulation.physicalobjects.Wall.Edge;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
@@ -49,6 +52,7 @@ public abstract class Tracer implements Stoppable {
     protected double width, height;
     protected List<Line> lines;
     protected boolean drawGeofence = true;
+    protected boolean drawWalls = true;
     protected String name = "";
 
     protected boolean usePNG = false;
@@ -78,6 +82,9 @@ public abstract class Tracer implements Stoppable {
         }
         if (args.getArgumentIsDefined("drawgeofence")) {
             drawGeofence = args.getFlagIsTrue("drawgeofence");
+        }
+        if (args.getArgumentIsDefined("drawwalls")) {
+            drawWalls = args.getFlagIsTrue("drawwalls");
         }
         
         snapshotFrequency = args.getArgumentAsIntOrSetDefault("snapshotfrequency", snapshotFrequency);
@@ -144,6 +151,9 @@ public abstract class Tracer implements Stoppable {
             drawGeofence(gr, sim);
         }
         
+        if(drawWalls)
+        	drawWalls(gr,sim);
+        
         if(!folder.exists())
         	folder.mkdirs();
         
@@ -177,6 +187,42 @@ public abstract class Tracer implements Stoppable {
         } else {
             gr.fillOval(iPos.x - size / 2, iPos.y - size / 2, size, size);
         }
+    }
+    
+    protected void drawWalls(Graphics2D gr, Simulator sim) {
+    	
+    	for(PhysicalObject p : sim.getEnvironment().getAllObjects()) {
+    		if(p instanceof Wall) {
+    			Wall w = (Wall)p;
+    			gr.setColor(w.color);
+    			
+    			Edge[] edges = w.getEdges();
+    			
+    			int[] xs = new int[4];
+    			int[] ys = new int[4];
+    			
+    			IntPos pos = transform(edges[3].getP1().x,edges[3].getP1().y);
+    			xs[0] = pos.x;
+    			ys[0] = pos.y;
+    			
+    			pos = transform(edges[1].getP1().x,edges[1].getP1().y);
+    			xs[1] = pos.x;
+    			ys[1] = pos.y;
+    			
+    			pos = transform(edges[2].getP1().x,edges[2].getP1().y);
+    			xs[2] = pos.x;
+    			ys[2] = pos.y;
+    			
+    			pos = transform(edges[0].getP1().x,edges[0].getP1().y);
+    			xs[3] = pos.x;
+    			ys[3] = pos.y;
+    			
+    			gr.fillPolygon(xs, ys, 4);
+    			
+    			gr.setColor(Color.BLACK);
+    		}
+    	}
+    	
     }
 
     protected void drawGeofence(Graphics2D gr, Simulator sim) {

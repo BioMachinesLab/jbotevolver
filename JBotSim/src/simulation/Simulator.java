@@ -68,6 +68,7 @@ public class Simulator implements Serializable {
 				addCallback((Updatable)Factory.getInstance(updatableArgs.getArgumentAsString("classname"), updatableArgs));
 			}
 		}
+		
 	}
 	
 	public Network getNetwork() {

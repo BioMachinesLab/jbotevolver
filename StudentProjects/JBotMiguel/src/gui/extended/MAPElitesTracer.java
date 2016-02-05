@@ -3,6 +3,7 @@ package gui.extended;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
@@ -27,6 +28,46 @@ public class MAPElitesTracer extends Tracer {
 		super(args);
 	}
 	
+	public void drawMapElites(String[] names, Simulator[] sim, MAPElitesPopulation[] pop) {
+		
+		double startxo = -0.35;
+		
+		double xo = startxo;//-sim.length*0.8/2;
+		double yo = -0.7;
+		
+		double xinc = 0.75;
+		double yinc = 0.78;
+
+		setup(sim[0]);
+		
+		width = 1.7;
+		height = (sim.length+1)/2;
+		
+		Graphics2D g = createCanvas(sim[0]);
+		
+		for(int i = 0 ; i < sim.length ; i++) {
+			
+			Simulator s = sim[i];
+			MAPElitesPopulation p = pop[i];
+			
+//			if(i == sim.length/2)
+//				drawMapElites(s, p, g, xo, yo, false, true);
+//			else if(i == 0)
+//				drawMapElites(s, p, g, xo, yo, true, false);
+//			else
+				drawMapElites(s, p, g, xo, yo, false, false, names[i]);
+			xo+=xinc;
+			
+			if(i%2==0) {
+				yo+=yinc;
+				xo=startxo;
+			}
+			
+		}
+		
+		writeGraphics(g,sim[0],"");
+	}
+	
 	public void drawMapElites(Simulator sim, MAPElitesPopulation pop) {
 		
 		setup(sim);
@@ -34,8 +75,13 @@ public class MAPElitesTracer extends Tracer {
 		height = 1;
 		
 		Graphics2D g = createCanvas(sim);
+		drawMapElites(sim, pop, g, 0, 0, true, true,"");
+		writeGraphics(g,sim,"");
+	}
+	
+	public Graphics2D drawMapElites(Simulator sim, MAPElitesPopulation pop, Graphics2D g, double xo, double yo, boolean leftText, boolean bottomText, String name) {
 		
-		drawGrid(g);
+		drawGrid(g,xo,yo,leftText,bottomText,name);
 		
 		for(int x = 0 ; x < pop.getMap().length ; x++) {
 			for(int y = 0 ; y < pop.getMap()[x].length ; y++) {
@@ -66,10 +112,19 @@ public class MAPElitesTracer extends Tracer {
 						pos.x = (y-pop.getMap()[x].length/2)*pop.getMapResolution()+pop.getMapResolution()/2;
 						pos.y = (x-pop.getMap().length/2)*pop.getMapResolution()+pop.getMapResolution()/2;
 						
+						pos.x+=xo;
+						pos.y+=yo;
+						
 						if(supposedLocation[0] != x || supposedLocation[1] != y) {
-							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.BLACK);
+							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.GRAY);
 						} else {
-							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, getColor(fitness));
+							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, /*getColor(fitness)*/Color.GREEN.darker());
+//							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, getColor(fitness));
+							
+							if(fitness < 0.8) {
+								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.RED);
+							}
+							
 						}
 						
 						drawMarker(g,m);
@@ -85,89 +140,113 @@ public class MAPElitesTracer extends Tracer {
 				}
 			}
 		}
-		
-		writeGraphics(g,sim,"");
+		return g;
 	}
 	
-	protected void drawGrid(Graphics2D g) {
-		double inc = 0.05;
-		float lineWidth = 0.5f;
+	protected void drawGrid(Graphics2D g, double xo, double yo, boolean left, boolean bottom, String name) {
+		double inc = 0.1;
+		float lineWidth = 0.2f;
 
 		Stroke original = g.getStroke();
-		BasicStroke dashed = new BasicStroke(lineWidth,
-                BasicStroke.CAP_BUTT,
-                BasicStroke.JOIN_MITER,
-                2.0f, new float[]{1f}, 0.0f);
-        g.setStroke(dashed);
+//		BasicStroke dashed = new BasicStroke(lineWidth,
+//                BasicStroke.CAP_BUTT,
+//                BasicStroke.JOIN_MITER,
+//                2.0f, new float[]{3f}, 0.0f);
+//        g.setStroke(dashed);
         
-        double limit = 0.4;
+        double limit = 0.35;
         
         DecimalFormat df2 = new DecimalFormat( "#,###,###,##0.00" );
         
-        g.setFont(new Font("Arial", Font.PLAIN, 15)); 
+        int axisFontSize = 18;
         
-		for(double y = -limit, count = 0 ; y <= limit ; y+=inc) {
-			IntPos a = transform(-limit, y);
-			IntPos b = transform(limit, y);
-			g.setColor(Color.GRAY);
-			g.drawLine(a.x, a.y, b.x, b.y);
+        IntPos aa = transform(-0.075+xo, limit+yo+0.01);
+        
+        g.setFont(new Font("Arial", Font.PLAIN, 25));
+        g.setColor(Color.BLACK);
+		g.drawString(name, aa.x, aa.y);
+        
+		for(double y = -limit, count = 0 ; y <= limit+inc/2.0 ; y+=inc) {
 			
 			double d = new Double(df2.format(y)).doubleValue();
-
-			if(d == -0) d = 0;
 			
-			if(count++ % 2 != 0 && d != 0 || d < -(limit)+inc/2.0)
-				continue;
-			
-			int xs = -26;
-			int xy = 5;
-			
-			if(d < 0)
-				xs-=2;
-			g.setColor(Color.BLACK);
-			g.drawString(""+d, a.x+xs, a.y+xy);
+			if(Math.abs(d) != limit) {
+				
+				IntPos a = transform(-limit+xo, y+yo);
+				IntPos b = transform(-limit+xo+0.015, y+yo);
+				g.setColor(Color.GRAY);
+				g.drawLine(a.x, a.y, b.x, b.y);
+				
+				a = transform(limit+xo, y+yo);
+				b = transform(limit+xo-0.015, y+yo);
+				g.setColor(Color.GRAY);
+				g.drawLine(a.x, a.y, b.x, b.y);
+				
+			} else {
+				
+				IntPos a = transform(-limit+xo, y+yo);
+				IntPos b = transform(limit+xo, y+yo);
+				g.setColor(Color.GRAY);
+				g.drawLine(a.x, a.y, b.x, b.y);
+			}
 		}
 		
-		for(double x = -limit, count = 0 ; x <= limit ; x+=inc) {
-			IntPos a = transform(x, -limit);
-			IntPos b = transform(x, limit);
-			g.setColor(Color.GRAY);
-			g.drawLine(a.x, a.y, b.x, b.y);
-
+		for(double x = -limit, count = 0 ; x <= limit+inc/2.0 ; x+=inc) {
+			
 			double d = new Double(df2.format(x)).doubleValue();
 			
-			if(d == -0) d = 0;
-			
-			if(count++ % 2 != 0 && d != 0.0 || d < -(limit)+inc/2.0)
-				continue;
-			
-			int xs = -9;
-			int xy = 16;
-			
-			if(d < 0)
-				xs-=2;
-			g.setColor(Color.BLACK);
-			g.drawString(""+d, a.x+xs, a.y+xy);
+			if(Math.abs(d) != limit) {
+				
+				IntPos a = transform(x+xo, -limit+yo);
+				IntPos b = transform(x+xo, -limit+yo+0.015);
+				g.setColor(Color.GRAY);
+				g.drawLine(a.x, a.y, b.x, b.y);
+				
+				a = transform(x+xo, limit+yo);
+				b = transform(x+xo, limit+yo-0.015);
+				g.setColor(Color.GRAY);
+				g.drawLine(a.x, a.y, b.x, b.y);
+				
+			} else {
+				
+				IntPos a = transform(x+xo, -limit+yo);
+				IntPos b = transform(x+xo, limit+yo);
+				g.setColor(Color.GRAY);
+				g.drawLine(a.x, a.y, b.x, b.y);
+	
+			}
 		}
 		
-		IntPos a = transform(-limit, -limit);
-		g.drawString("-"+new Double(df2.format(limit)).doubleValue(), a.x-26, a.y+16);
 		
-		a = transform(0, -limit);
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("Arial", Font.PLAIN, axisFontSize));
+		
+		//bl
+		IntPos a = transform(-limit+xo+0.01, -limit+yo+0.02);
+		g.drawString(""+(-limit), a.x, a.y);
+		
+		//br
+		a = transform(limit+xo-0.085, -limit+yo+0.02);
+		g.drawString(""+(limit), a.x, a.y);
+		//tl
+		a = transform(-limit+xo+0.01, limit+yo-0.04);
+		g.drawString(""+(limit), a.x, a.y);
+		
+		
+		a = transform(0+xo, -limit+yo);
 		
 		g.setFont(new Font("Arial", Font.PLAIN, 22));
-		g.drawString("Lateral displacement (m)", a.x-130, a.y+40);
+		if(left)
+			g.drawString("Lateral displacement (m)", a.x-130, a.y+40);
 		
-		a = transform(0, limit);
+		a = transform(0+xo, limit+yo);
 		
 		AffineTransform orig = g.getTransform();
 		g.rotate(-Math.PI/2);
-		g.drawString("Forward displacement (m)", -a.x-130, a.y-40);
+		if(bottom)
+			g.drawString("Forward displacement (m)", -a.x-130, a.y-40);
 		g.setTransform(orig);
 		
-//		Forward displacement (m)
-//		Lateral displacement (m)
-			
 		g.setStroke(original);
 	}
 	

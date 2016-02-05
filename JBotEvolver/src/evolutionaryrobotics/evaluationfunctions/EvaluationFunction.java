@@ -19,7 +19,7 @@ public abstract class EvaluationFunction implements Serializable, Updatable {
 			throw new RuntimeException("Evaluation 'classname' not defined: "+arguments.toString());
 
 		String evaluationName = arguments.getArgumentAsString("classname");
-
+		
 		try {
 			Constructor<?>[] constructors = Class.forName(evaluationName).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {

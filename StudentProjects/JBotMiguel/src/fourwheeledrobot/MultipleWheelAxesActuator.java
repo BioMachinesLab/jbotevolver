@@ -35,6 +35,7 @@ public abstract class MultipleWheelAxesActuator extends Actuator {
     protected double w;
     protected double l;
     protected Vector2d[] wheelPos;
+    protected double stop = 0;
     
     public MultipleWheelAxesActuator(Simulator simulator, int id, Arguments args, int speeds, int rotations) {
         super(simulator, id, args);
@@ -55,6 +56,12 @@ public abstract class MultipleWheelAxesActuator extends Actuator {
         frictionParam = args.getArgumentAsDoubleOrSetDefault("friction", frictionParam);
         maxSlipAngle = Math.toRadians(args.getArgumentAsDoubleOrSetDefault("slipangle", maxSlipAngle));
         parallelLineAngle = Math.toRadians(args.getArgumentAsDoubleOrSetDefault("parallelangle", parallelLineAngle));
+        
+        if(args.getArgumentIsDefined("anglelimit")) {
+        	double angle = Math.toRadians(args.getArgumentAsDoubleOrSetDefault("anglelimit", 45));
+        	this.angleLimit = angle;
+        }
+        
     }
 
     private static class Line {
@@ -107,6 +114,9 @@ public abstract class MultipleWheelAxesActuator extends Actuator {
     
     @Override
     public void apply(Robot robot, double timeDelta) {
+    	
+    	if(stop-- > 0)
+    		return;
     	
     	double[] speeds = getCompleteSpeeds();
     	double[] rotations = getCompleteRotations();
@@ -304,6 +314,7 @@ public abstract class MultipleWheelAxesActuator extends Actuator {
 		
 		rotation[axisNumber] = val;
 		prevRotation[axisNumber] = rotation[axisNumber];
+		
 	}
 	
 	public void setRotation(double[] vals) {
@@ -334,5 +345,9 @@ public abstract class MultipleWheelAxesActuator extends Actuator {
 	
 	public abstract double[] getCompleteRotations();
 	public abstract double[] getCompleteSpeeds();
+	
+	public void stop(double val) {
+		this.stop = val;
+	}
 
 }
