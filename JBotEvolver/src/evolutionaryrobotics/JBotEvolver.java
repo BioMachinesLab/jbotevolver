@@ -112,10 +112,6 @@ public class JBotEvolver extends JBotSim {
 	
 	public void setupBestCoIndividual(Simulator simulator) {
 		
-		// Obter o numero de presas
-		Arguments numbRobotsPreys= getArguments().get("--robots");
-		int nPreys = numbRobotsPreys.getArgumentAsIntOrSetDefault("numberofrobots", 1);
-		
 		ArrayList<Robot> robots;
 		
 		if(simulator.getRobots().isEmpty()) {
@@ -123,6 +119,10 @@ public class JBotEvolver extends JBotSim {
 			simulator.addRobots(robots);
 		} else
 			robots = simulator.getRobots();
+		
+		// Obter o numero de presas
+		Arguments numbRobotsPreys= getArguments().get("--robots");
+		int nPreys = numbRobotsPreys.getArgumentAsIntOrSetDefault("numberofrobots", 1);
 		
 		ArrayList<Robot> preys = new ArrayList<Robot>();
 		ArrayList<Robot> predators = new ArrayList<Robot>();
@@ -164,7 +164,7 @@ public class JBotEvolver extends JBotSim {
 		else
 			cb = pb.getBestChromosome();
 		
-		System.out.println(ca.getID()+" "+cb.getID());
+//		System.out.println(ca.getID()+" "+cb.getID());
 		
 		for(Robot r : predators) {
 			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
