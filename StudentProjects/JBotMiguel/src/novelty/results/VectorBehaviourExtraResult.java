@@ -7,6 +7,10 @@ import novelty.EvaluationResult;
 
 public class VectorBehaviourExtraResult extends VectorBehaviourResult {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3563909434469833876L;
 	protected double extraValue;
 
     public VectorBehaviourExtraResult(double extra, double... bs) {

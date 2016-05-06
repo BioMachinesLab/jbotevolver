@@ -32,6 +32,7 @@ public class MAPElitesPopulation extends Population{
 	protected boolean randomMutation = false;
 	protected double gaussianStdDev = 1.0;
 	protected double maxAllele = 10;
+	protected double[] possibleValues;
 
 	public MAPElitesPopulation(Arguments arguments) {
 		super(arguments);
@@ -53,6 +54,17 @@ public class MAPElitesPopulation extends Population{
 		map = new MOChromosome[size][size];
 		
 		chromosomes = new ArrayList<MOChromosome>();
+		
+		if(arguments.getArgumentIsDefined("possiblevalues")) {
+			String values = arguments.getArgumentAsString("possiblevalues");
+			String[] split = values.split(",");
+			possibleValues = new double[split.length];
+			int index = 0;
+			for(String s : split) {
+				possibleValues[index++] = Double.parseDouble(s);
+			}
+		}
+		
 	}
 	
 	public ArrayList<MOChromosome> getRandomPopulation() {
@@ -64,7 +76,11 @@ public class MAPElitesPopulation extends Population{
 		for (int i = 0; i < initialBatch; i++) {
 			double[] alleles = new double[genomeLength];
 			for (int j = 0; j < genomeLength; j++) {
-				alleles[j] = randomNumberGenerator.nextDouble()*maxAllele * 2 - maxAllele;
+				
+				if(possibleValues != null) {
+					alleles[j] = possibleValues[randomNumberGenerator.nextInt(possibleValues.length)];
+				} else				
+					alleles[j] = randomNumberGenerator.nextDouble()*maxAllele * 2 - maxAllele;
 			}
 			chromosomes.add(new MOChromosome(alleles, currentChromosomeId++));
 		}
@@ -169,7 +185,12 @@ public class MAPElitesPopulation extends Population{
 				double allele = c.getAlleles()[j];
 				if (randomNumberGenerator.nextDouble() < mutationRate) {
 					mutated = true;
-					if(!randomMutation)
+					if(possibleValues != null) {
+						double currentValue = allele;
+						do {
+							allele = possibleValues[randomNumberGenerator.nextInt(possibleValues.length)];
+						} while(allele == currentValue);
+					} else if(!randomMutation)
 						allele = allele + randomNumberGenerator.nextGaussian()*gaussianStdDev;
 					else
 						allele = randomNumberGenerator.nextDouble()*maxAllele * 2 - maxAllele;

@@ -62,9 +62,9 @@ public class MAPElitesViewer {
 	public static void main(String[] args) throws Exception {
 //		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
 //		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
-//		new MAPElitesViewer("bigdisk/december2015/10samples/intersected_repertoire_all/", true);
+//		new MAPElitesViewer("bigdisk/december2015/10samples/repertoire/", true);
 //		new MAPElitesViewer("bigdisk/december2015/foraging/intersected_repertoire_all/", true);
-		new MAPElitesViewer("repertoire/", true);
+		new MAPElitesViewer("hexamap/", true);
 		
 	}
 	
@@ -147,6 +147,7 @@ public class MAPElitesViewer {
 			refresh();
 			try {Thread.sleep(50);} catch (InterruptedException e) {}
 		}
+		sim.terminate();
 	}
 	
 	public void setGeneration(int i) {
@@ -167,9 +168,9 @@ public class MAPElitesViewer {
 			
 			refresh();
 			
-			System.out.println(((MAPElitesPopulation)pop).getNumberOfChromosomes());
+//			System.out.println(((MAPElitesPopulation)pop).getNumberOfChromosomes());
 			
-			Thread.sleep(10);
+//			Thread.sleep(10);
 		} catch(Exception e) {
 			System.err.println("Can't find population file "+i);
 //			e.printStackTrace();

@@ -267,7 +267,7 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     	}
     }
 
-	private void evaluateAndAdd(ArrayList<MOChromosome> randomChromosomes) {
+	protected void evaluateAndAdd(ArrayList<MOChromosome> randomChromosomes) {
 		
 		int totalEvaluations = 0;
 		

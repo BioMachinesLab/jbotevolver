@@ -4,8 +4,10 @@ import fourwheeledrobot.MultipleWheelAxesActuator;
 import fourwheeledrobot.MultipleWheelRepertoireActuator;
 import gui.renderer.TwoDRendererDebug;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 
 import mathutils.Vector2d;
 import simulation.robot.Robot;
@@ -22,16 +24,19 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		super.drawRobot(graphics, robot);
 		
-		Actuator act = robot.getActuatorWithId(1);
-
-		int spacing = 30;
-		
-		if(act instanceof MultipleWheelAxesActuator) {
-			MultipleWheelAxesActuator mwaa = (MultipleWheelAxesActuator)act;
-			drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
-		} else if(act instanceof MultipleWheelRepertoireActuator) {
-			MultipleWheelRepertoireActuator mwaa = (MultipleWheelRepertoireActuator)act;
-			drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
+		if(robot.getActuators().size() > 1) {
+			
+			Actuator act = robot.getActuatorWithId(1);
+	
+			int spacing = 30;
+			
+	//		if(act instanceof MultipleWheelAxesActuator) {
+	//			MultipleWheelAxesActuator mwaa = (MultipleWheelAxesActuator)act;
+	//			drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
+	//		} else if(act instanceof MultipleWheelRepertoireActuator) {
+	//			MultipleWheelRepertoireActuator mwaa = (MultipleWheelRepertoireActuator)act;
+	//			drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
+	//		}
 		}
 	}
 	
@@ -90,14 +95,17 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 		rot = new Vector2d(len*Math.cos(rO),len*Math.sin(rO));
 		posC.add(rot);
 		
+		Graphics2D gx = (Graphics2D)graphics;
+		
 		//guiding line
-		graphics.setColor(Color.BLACK);
-		graphics.drawLine((int)posA.x, (int)posA.y, (int)posC.x, (int)posC.y);
+		gx.setColor(Color.BLACK);
+		gx.drawLine((int)posA.x, (int)posA.y, (int)posC.x, (int)posC.y);
 		
-		graphics.setColor(Color.RED);
-		graphics.drawOval((int)posA.x-wheelSize,(int)posA.y-wheelSize,wheelSize*2,wheelSize*2);
-		graphics.drawLine((int)posA.x, (int)posA.y, (int)posB.x, (int)posB.y);
-		
+		gx.setStroke(new BasicStroke(2));
+		gx.setColor(Color.RED);
+		gx.drawOval((int)posA.x-wheelSize,(int)posA.y-wheelSize,wheelSize*2,wheelSize*2);
+		gx.drawLine((int)posA.x, (int)posA.y, (int)posB.x, (int)posB.y);
+		gx.setStroke(new BasicStroke());
 	}
 	
 	protected void drawRobotOverlay(Vector2d robotCenter, double rO, int spacing) {
