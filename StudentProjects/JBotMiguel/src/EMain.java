@@ -7,7 +7,8 @@ import gui.evolution.EvolutionGui;
 public class EMain {
 	public static void main(String[] args) throws Exception {
 		
-		String configName = "hexamap.conf";
+//		String configName = "hexamap.conf";
+		String configName = "hexamap/_restartevolution.conf";
 //		String configName = "repertoire_nav.conf";
 //		String configName = "nsga2_novelty.conf";
 //		String configName = "nsga2_fitness.conf";

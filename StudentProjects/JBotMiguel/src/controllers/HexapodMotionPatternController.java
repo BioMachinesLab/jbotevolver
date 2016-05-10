@@ -1,5 +1,6 @@
 package controllers;
 
+import coppelia.CharWA;
 import coppelia.FloatWA;
 import coppelia.IntW;
 import coppelia.remoteApi;
@@ -33,6 +34,8 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 
 	private boolean init = false;
 	
+    private static float[] ori_original = new float[3];
+	
 	public HexapodMotionPatternController(Simulator simulator,Robot robot,Arguments args) {
 		super(simulator, robot, args);
 		genomeLength = 24;
@@ -44,8 +47,6 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 		vrep = new remoteApi();
 		vrep.simxFinish(-1); // just in case, close all opened connections
 		clientId = vrep.simxStart("127.0.0.1",19997,true,false,5000,5);
-		System.out.println("Connected to remote API server");
-		System.out.println(clientId);
 		vrep.simxSynchronous(clientId,true);
 		vrep.simxStartSimulation(clientId,vrep.simx_opmode_oneshot);
 	
@@ -58,7 +59,6 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 					String jointName = ""+joint;
 					String armName = "_"+arm;
 					name+= jointName+armName;
-					System.out.println(name);
 					IntW handle = new IntW(0);
 					vrep.simxGetObjectHandle(clientId, name, handle, remoteApi.simx_opmode_blocking);
 					jointHandles[arm-1][joint-1] = handle.getValue();
@@ -69,11 +69,13 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 			IntW handle = new IntW(0);
 			vrep.simxGetObjectHandle(clientId, ROBOT_NAME, handle, remoteApi.simx_opmode_blocking);
 			robotHandle = handle.getValue();
-			System.out.println(robotHandle);
 			vrep.simxGetObjectHandle(clientId, ROBOT_BODY_NAME, handle, remoteApi.simx_opmode_blocking);
 			robotBodyHandle = handle.getValue();
-			System.out.println(robotBodyHandle);
 			gotHandles = true;
+			
+			FloatWA angles = new FloatWA(3);
+			vrep.simxGetObjectOrientation(clientId,robotBodyHandle,remoteApi.sim_handle_parent,angles,remoteApi.simx_opmode_blocking);
+			ori_original = angles.getArray();
 		}
 		setDefaultJoints(true);
 	}
@@ -85,8 +87,6 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 	
 	@Override
 	public void controlStep(double time) {
-		
-		System.out.println("STEP "+time);
 		
 		if(!init) {
 			init();
@@ -101,7 +101,6 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 		
 		double theta = getOrientation();
 		robot.setOrientation(theta);
-//		System.out.println("TIME: "+time+"X: "+pos[0]+" Y: "+pos[1]+" Z: "+pos[2]+" Or: "+theta);
 		
 		vrep.simxSynchronousTrigger(clientId);
 	}
@@ -168,8 +167,19 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 	
 	private double getOrientation() {
 		FloatWA eulerAngles = new FloatWA(0);
-		vrep.simxGetObjectOrientation(clientId, robotBodyHandle, robotHandle, eulerAngles, remoteApi.simx_opmode_streaming);
-		return eulerAngles.getArray()[0];
+		vrep.simxGetObjectOrientation(clientId, robotBodyHandle, -1, eulerAngles, remoteApi.simx_opmode_streaming);
+		
+		float[] ori = eulerAngles.getArray();
+		
+		float a = ori[0] - ori_original[0];
+        float b = ori[1] - ori_original[1];
+        float g = ori[2] - ori_original[2];
+        
+        double y = -(Math.sin(b)* Math.cos(a)* Math.cos(g) + Math.sin(a) * Math.sin(g));
+        double x = (Math.sin(b)* Math.cos(a)* Math.sin(g) - Math.sin(a) * Math.cos(g));
+        double z = Math.cos(b)*Math.cos(a);
+		
+		return Math.atan2(y,x);
 	}
 
 	public void setJointPosition(int armNumber, int jointNumber, float angleInRads, boolean sendToVrep) {
@@ -207,4 +217,30 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 	public int getNumberOfOutputs() {
 		return getGenomeLength();
 	}
+	
+	protected float[] getDataFromVREP() {
+    	CharWA str=new CharWA(0);
+    	while(vrep.simxGetStringSignal(clientId,"toClient",str,remoteApi.simx_opmode_oneshot_wait) != remoteApi.simx_return_ok) {
+    		try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+    	
+		vrep.simxClearStringSignal(clientId, "toClient", remoteApi.simx_opmode_oneshot);
+		 
+		FloatWA f = new FloatWA(0);
+		f.initArrayFromCharArray(str.getArray());
+		return f.getArray();
+    }
+    
+    protected void sendDataToVREP(float[] arr) {
+    	FloatWA f = new FloatWA(arr.length);
+    	f.setValue(arr);
+    	char[] chars = f.getCharArrayFromArray();
+    	String tempStr = new String(chars);
+		CharWA str = new CharWA(tempStr);
+		vrep.simxWriteStringStream(clientId,"fromClient",str,remoteApi.simx_opmode_oneshot);
+    }
 }

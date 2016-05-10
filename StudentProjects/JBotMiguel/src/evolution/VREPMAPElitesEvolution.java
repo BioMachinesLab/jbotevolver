@@ -1,19 +1,11 @@
 package evolution;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.util.ArrayList;
 
-import coppelia.CharWA;
-import coppelia.FloatWA;
-import coppelia.FloatWAA;
-import coppelia.remoteApi;
 import mathutils.Vector2d;
 import multiobjective.GenericEvaluationFunction;
 import multiobjective.MOChromosome;
 import multiobjective.MOFitnessResult;
-import multiobjective.MOTask;
 import novelty.BehaviourResult;
 import novelty.EvaluationResult;
 import novelty.ExpandedFitness;
@@ -22,12 +14,13 @@ import novelty.evaluators.FinalPositionWithOrientationBehavior;
 import novelty.results.VectorBehaviourExtraResult;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
+import taskexecutor.VREPResult;
+import taskexecutor.VREPTask;
+import taskexecutor.VREPTaskExecutor;
+import coppelia.remoteApi;
 import evaluationfunctions.OrientationEvaluationFunction;
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.evolution.GenerationalEvolution;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
-import evolutionaryrobotics.populations.Population;
 
 /**
  *	MAP-Elites "illumination" algorithm
@@ -36,20 +29,11 @@ import evolutionaryrobotics.populations.Population;
  */
 public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 	
-	private remoteApi vrep;
-	private int clientId;
-	
     public VREPMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
     	super(jBotEvolver, taskExecutor, arg);
     	
     	if(!arg.getArgumentIsDefined("genomelength"))
     		throw new RuntimeException("Missing 'genomelength' arg in VREPMapElitesEvolution");
-    	
-    	vrep = new remoteApi();
-		vrep.simxFinish(-1); // just in case, close all opened connections
-		clientId = vrep.simxStart("127.0.0.1",19997,true,false,5000,5);
-//		System.out.println("Connected to remote API server");
-		vrep.simxStartSimulation(clientId,vrep.simx_opmode_oneshot);
     }
     
     public static double getFitness(MOChromosome moc) {
@@ -64,32 +48,6 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
     }
     
     
-    protected float[] getDataFromVREP() {
-    	CharWA str=new CharWA(0);
-    	while(vrep.simxGetStringSignal(clientId,"toClient",str,remoteApi.simx_opmode_oneshot_wait) != remoteApi.simx_return_ok) {
-    		try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-		}
-    	
-		vrep.simxClearStringSignal(clientId, "toClient", remoteApi.simx_opmode_oneshot);
-		 
-		FloatWA f = new FloatWA(0);
-		f.initArrayFromCharArray(str.getArray());
-		return f.getArray();
-    }
-    
-    protected void sendDataToVREP(float[] arr) {
-    	FloatWA f = new FloatWA(arr.length);
-    	f.setValue(arr);
-    	char[] chars = f.getCharArrayFromArray();
-    	String tempStr = new String(chars);
-		CharWA str = new CharWA(tempStr);
-		vrep.simxWriteStringStream(clientId,"fromClient",str,remoteApi.simx_opmode_oneshot);
-    }
-    
     @Override
 	protected void evaluateAndAdd(ArrayList<MOChromosome> randomChromosomes) {
     	
@@ -98,64 +56,106 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
     	
     	try {
 			
-			float[] arr = new float[randomChromosomes.size()*randomChromosomes.get(0).getAlleles().length];
-			int ind = 0;
-			for(Chromosome c : randomChromosomes) {
-	
-				for(int i = 0 ; i < c.getAlleles().length ; i++) {
-					arr[ind++] = (float)c.getAlleles()[i];
-				}
-				print(".");
-			}
+			VREPTaskExecutor te = (VREPTaskExecutor)taskExecutor;
+			int instances = te.getInstances();
+			int chromosomesPerInstance = randomChromosomes.size()/instances;
 			
-			sendDataToVREP(arr);
-			float[] results = getDataFromVREP();
+			float fixedParameters[] = new float[1+1];
+			fixedParameters[0] = 1; //size
+			fixedParameters[1] = 3; //seconds of evaluation
 			
-			print("\n");
-	
-			int resultIndex = 0;
+			int totalIndex = 0;
 			
-			for(Chromosome c : randomChromosomes) {
+			for(int i = 0 ; i < instances ; i++){
 				
-				float posX = results[resultIndex++];
-				float posY = results[resultIndex++];
-				float posZ = results[resultIndex++];
+				float[] parameters = new float[fixedParameters.length + 1 + (chromosomesPerInstance*(2+randomChromosomes.get(0).getAlleles().length))];
 				
-				currentX = posX;
-				currentY = posY;
-				
-				float alpha = results[resultIndex++];
-				float beta = results[resultIndex++];
-				float gamma = results[resultIndex++];
-				
-				double orientation = beta;
-				
-				Vector2d pos = new Vector2d(posX,posY);
-				
-				double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
-				FitnessResult fr = new FitnessResult(fitness);
-				GenericEvaluationFunction br = new FinalPositionWithOrientationBehavior(new Arguments(""),pos,orientation);
-				
-				ArrayList<EvaluationResult> sampleResults = new ArrayList<EvaluationResult>();
 				int index = 0;
 				
-				sampleResults.add(index++,fr);
-				sampleResults.add(index++,((GenericEvaluationFunction)br).getEvaluationResult());
+				for(int fp = 0 ; fp < fixedParameters.length ; fp++)
+					parameters[index++] = fixedParameters[fp];
 				
-				ExpandedFitness ef = new ExpandedFitness();
-				ef.setEvaluationResults(sampleResults);
+				parameters[index++] = chromosomesPerInstance; //number of individuals
 				
-				MOFitnessResult result = new MOFitnessResult((MOChromosome)c, ef);
-				MOChromosome moc = result.getChromosome();
-				moc.setEvaluationResult(result.getEvaluationResult());
-				((MAPElitesPopulation)population).addToMap(moc);
-				print("!");
+				for(int ci = 0 ; ci < chromosomesPerInstance ; ci++) {
+					Chromosome c = randomChromosomes.get(totalIndex++);
+					
+					parameters[index++] = c.getID(); //id of the chromosome
+					parameters[index++] = c.getAlleles().length; //lenght of chromosome
+					
+					for(int j = 0 ; j < c.getAlleles().length ; j++) {
+						parameters[index++] = (float)c.getAlleles()[j];
+					}
+					print(".");
+				}
+				VREPTask task = new VREPTask(parameters);
+				taskExecutor.addTask(task);
+				print("\n");
 			}
+			
+			for(int i = 0 ; i < instances ; i++){
+				VREPResult res = (VREPResult) taskExecutor.getResult();
+				
+				float[] vals = res.getValues();
+				
+				int index = 0;
+				
+				int nResults = (int)vals[index++];
+				int nVals = (int)vals[index++];
+				
+				for(int r = 0 ; r < nResults ; r++) {
+					int id = (int)vals[index++];
+					
+					Chromosome c = null;
+					
+					for(int ch = 0 ; ch < randomChromosomes.size() ; ch++) {
+						if(randomChromosomes.get(ch).getID() == id) {
+							c = randomChromosomes.get(ch);
+							break;
+						}
+					}
+					
+					float posX = vals[index++];
+					float posY = vals[index++];
+					float posZ = vals[index++];
+					
+					currentX = posX;
+					currentY = posY;
+					
+					float orX = vals[index++];
+					float orY = vals[index++];
+					float orZ = vals[index++];
+					
+					double orientation = Math.atan2(orY,orX);
+					
+					Vector2d pos = new Vector2d(posX,posY);
+					
+					double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
+					FitnessResult fr = new FitnessResult(fitness);
+					GenericEvaluationFunction br = new FinalPositionWithOrientationBehavior(new Arguments(""),pos,orientation);
+					
+					ArrayList<EvaluationResult> sampleResults = new ArrayList<EvaluationResult>();
+					int sampleIndex = 0;
+					
+					sampleResults.add(sampleIndex++,fr);
+					sampleResults.add(sampleIndex++,((GenericEvaluationFunction)br).getEvaluationResult());
+					
+					ExpandedFitness ef = new ExpandedFitness();
+					ef.setEvaluationResults(sampleResults);
+					
+					MOFitnessResult result = new MOFitnessResult((MOChromosome)c, ef);
+					MOChromosome moc = result.getChromosome();
+					moc.setEvaluationResult(result.getEvaluationResult());
+					((MAPElitesPopulation)population).addToMap(moc);
+					print("!");
+				}
+				print("\n");
+			}
+			
     	}catch (Exception e) {
     		System.out.println(currentX+" "+currentY);
     		e.printStackTrace();
     		System.exit(0);
     	}
 	}
-    
 }
