@@ -64,8 +64,8 @@ public class MAPElitesViewer {
 //		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
 //		new MAPElitesViewer("bigdisk/december2015/10samples/repertoire/", true);
 //		new MAPElitesViewer("bigdisk/december2015/foraging/intersected_repertoire_all/", true);
-		new MAPElitesViewer("hexamap/", true);
-		
+		new MAPElitesViewer("hexamap_big/", true);
+//		new MAPElitesViewer("hexamap_debug/", true);
 	}
 	
 	public MAPElitesViewer(String folder, boolean gui) {
@@ -86,6 +86,11 @@ public class MAPElitesViewer {
 		searchFiles(new File(folder));
 		
 		this.folder = baseFolder+files.get(0);
+		
+		if(baseFolder.equals(files.get(0)+"/")) {
+			this.folder = baseFolder;
+		}
+		
 		
 		load();
 	}
@@ -236,7 +241,6 @@ public class MAPElitesViewer {
 				}
 			}
 		}
-		System.out.println("Good ones: "+count);
 	}
 	
 	protected void ellipsePoint(double angle, double percentage, MAPElitesPopulation po) {

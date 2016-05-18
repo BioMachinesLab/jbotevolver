@@ -115,8 +115,8 @@ public class MAPElitesPopulation extends Population{
 	public void addToMap(MOChromosome moc) {
 		int[] mocMapLocation = positionInMap(moc);
 		
-		if(mocMapLocation[0] > map.length || mocMapLocation[0] < 0 ||
-				mocMapLocation[1] > map[mocMapLocation[0]].length || mocMapLocation[1] < 0)
+		if(mocMapLocation[0] >= map.length || mocMapLocation[0] < 0 ||
+				mocMapLocation[1] >= map[mocMapLocation[0]].length || mocMapLocation[1] < 0)
 			return;
 		
  		MOChromosome currentMapIndividual = map[mocMapLocation[0]][mocMapLocation[1]];
@@ -279,6 +279,10 @@ public class MAPElitesPopulation extends Population{
 	@Override
 	public int getNumberOfChromosomesEvaluated() {
 		return this.numberOfChromosomesRequested;
+	}
+	
+	public double getDistanceLimit() {
+		return limit;
 	}
 	
 	@Override

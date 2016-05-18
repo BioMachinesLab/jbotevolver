@@ -1,4 +1,4 @@
-package evolution;
+package vrep;
 
 import java.util.ArrayList;
 
@@ -19,6 +19,8 @@ import taskexecutor.VREPTask;
 import taskexecutor.VREPTaskExecutor;
 import coppelia.remoteApi;
 import evaluationfunctions.OrientationEvaluationFunction;
+import evolution.MAPElitesEvolution;
+import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 
@@ -29,11 +31,20 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
  */
 public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 	
+	protected int controllerType = 0;
+	protected int time = 0;
+	
     public VREPMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
     	super(jBotEvolver, taskExecutor, arg);
     	
     	if(!arg.getArgumentIsDefined("genomelength"))
     		throw new RuntimeException("Missing 'genomelength' arg in VREPMapElitesEvolution");
+    	
+    	if(!arg.getArgumentIsDefined("time"))
+    		throw new RuntimeException("Missing 'time' arg in VREPMapElitesEvolution");
+    	
+    	controllerType = arg.getArgumentAsIntOrSetDefault("controllertype", controllerType);
+    	time = arg.getArgumentAsIntOrSetDefault("time", time);
     }
     
     public static double getFitness(MOChromosome moc) {
@@ -51,57 +62,29 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
     @Override
 	protected void evaluateAndAdd(ArrayList<MOChromosome> randomChromosomes) {
     	
-    	float currentX = 0;
-    	float currentY = 0;
-    	
     	try {
-			
-			VREPTaskExecutor te = (VREPTaskExecutor)taskExecutor;
-			int instances = te.getInstances();
-			int chromosomesPerInstance = randomChromosomes.size()/instances;
-			
-			float fixedParameters[] = new float[1+1];
+    		Chromosome[] chromosomes = new Chromosome[randomChromosomes.size()];
+    		
+    		for(int i = 0 ; i < chromosomes.length ; i++)
+    			chromosomes[i] = randomChromosomes.get(i);
+    		
+    		float fixedParameters[] = new float[1+1];
 			fixedParameters[0] = 1; //size
-			fixedParameters[1] = 3; //seconds of evaluation
+			fixedParameters[1] = time; //seconds of evaluation
+    		
+			int controllerType = 0;
 			
-			int totalIndex = 0;
+    		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)taskExecutor, chromosomes, fixedParameters, controllerType);
+    		
+			float[][] results = VRepUtils.receiveTasks((VREPTaskExecutor)taskExecutor, nTasks);
 			
-			for(int i = 0 ; i < instances ; i++){
+			for(int t = 0 ; t < results.length ; t++) {
 				
-				float[] parameters = new float[fixedParameters.length + 1 + (chromosomesPerInstance*(2+randomChromosomes.get(0).getAlleles().length))];
-				
-				int index = 0;
-				
-				for(int fp = 0 ; fp < fixedParameters.length ; fp++)
-					parameters[index++] = fixedParameters[fp];
-				
-				parameters[index++] = chromosomesPerInstance; //number of individuals
-				
-				for(int ci = 0 ; ci < chromosomesPerInstance ; ci++) {
-					Chromosome c = randomChromosomes.get(totalIndex++);
-					
-					parameters[index++] = c.getID(); //id of the chromosome
-					parameters[index++] = c.getAlleles().length; //lenght of chromosome
-					
-					for(int j = 0 ; j < c.getAlleles().length ; j++) {
-						parameters[index++] = (float)c.getAlleles()[j];
-					}
-					print(".");
-				}
-				VREPTask task = new VREPTask(parameters);
-				taskExecutor.addTask(task);
-				print("\n");
-			}
-			
-			for(int i = 0 ; i < instances ; i++){
-				VREPResult res = (VREPResult) taskExecutor.getResult();
-				
-				float[] vals = res.getValues();
+				float[] vals = results[t];
 				
 				int index = 0;
 				
 				int nResults = (int)vals[index++];
-				int nVals = (int)vals[index++];
 				
 				for(int r = 0 ; r < nResults ; r++) {
 					int id = (int)vals[index++];
@@ -115,22 +98,34 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 						}
 					}
 					
+					int nVals = (int)vals[index++];
+					
+					//positions of robot
 					float posX = vals[index++];
 					float posY = vals[index++];
 					float posZ = vals[index++];
 					
-					currentX = posX;
-					currentY = posY;
+					//euler angles of robot
+					float a = vals[index++];
+					float b = vals[index++];
+					float g = vals[index++];
 					
-					float orX = vals[index++];
-					float orY = vals[index++];
-					float orZ = vals[index++];
+					//distance
+					float distanceTraveled = vals[index++];
+					
+					double orY = (Math.cos(a)*Math.cos(g) - Math.sin(a)*Math.sin(b)*Math.sin(g));
+					double orX = - Math.cos(b)*Math.sin(g);
+					double orZ = (Math.cos(g)*Math.sin(a) - Math.cos(a)*Math.sin(b)*Math.sin(b));
 					
 					double orientation = Math.atan2(orY,orX);
+					double tilt = Math.cos(a)*Math.cos(b);
 					
 					Vector2d pos = new Vector2d(posX,posY);
 					
-					double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
+					double distanceLimit = ((MAPElitesPopulation)population).getDistanceLimit()/2;
+					
+					double fitness = OrientationEvaluationFunction.calculateOrientationDistanceFitness(pos, orientation, distanceTraveled, distanceLimit);
+					
 					FitnessResult fr = new FitnessResult(fitness);
 					GenericEvaluationFunction br = new FinalPositionWithOrientationBehavior(new Arguments(""),pos,orientation);
 					
@@ -145,15 +140,15 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 					
 					MOFitnessResult result = new MOFitnessResult((MOChromosome)c, ef);
 					MOChromosome moc = result.getChromosome();
+					
 					moc.setEvaluationResult(result.getEvaluationResult());
-					((MAPElitesPopulation)population).addToMap(moc);
-					print("!");
+						
+					if(tilt > 0) {
+						((MAPElitesPopulation)population).addToMap(moc);
+					}
 				}
-				print("\n");
 			}
-			
     	}catch (Exception e) {
-    		System.out.println(currentX+" "+currentY);
     		e.printStackTrace();
     		System.exit(0);
     	}

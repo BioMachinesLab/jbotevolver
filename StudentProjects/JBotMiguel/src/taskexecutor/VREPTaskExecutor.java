@@ -28,19 +28,46 @@ public class VREPTaskExecutor extends TaskExecutor{
 	private LinkedList<Future<Result>> list = new LinkedList<Future<Result>>();
 	private boolean setup = false;
 	
+	private String remoteIps[];
+	private int remoteInstances[];
+	
 	public VREPTaskExecutor(JBotEvolver jBotEvolver, Arguments args){
 		super(jBotEvolver, args);
 		this.instances = args.getArgumentAsIntOrSetDefault("instances", 1);
 		this.ip = args.getArgumentAsStringOrSetDefault("ip", "127.0.0.1");
 		this.scene = args.getArgumentAsStringOrSetDefault("scene", "hexa_mapelites2.ttt");
 		this.headless = args.getArgumentAsIntOrSetDefault("headless", 1) == 1;
+		
+		if(args.getArgumentIsDefined("remote")) {
+			
+			String arg = args.getArgumentAsString("remote");
+			String[] split = arg.split(",");
+			
+			remoteIps = new String[split.length/2];
+			remoteInstances = new int[split.length/2];
+			
+			int index = 0;
+			instances = 0;
+			
+			for(int i = 0 ; i < split.length ; ) {
+				remoteIps[index] = split[i++];
+				remoteInstances[index] = Integer.parseInt(split[i++]);
+				instances+=remoteInstances[index];
+				index++;
+			}
+			
+		}
+		
 		executor = Executors.newFixedThreadPool(instances);
-		try {
-			Runtime rt = Runtime.getRuntime();
-			rt.exec("killall vrep");
-			Thread.sleep(1000);//wait to kill
-		} catch(Exception e){
-			e.printStackTrace();
+		
+		if(remoteIps == null){
+			try {
+				Runtime rt = Runtime.getRuntime();
+				rt.exec("killall vrep");
+				Thread.sleep(1000);//wait to kill
+			} catch(Exception e){
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -57,25 +84,26 @@ public class VREPTaskExecutor extends TaskExecutor{
 			
 			clients = new VREPContainer[instances];
 			
-			for(int i = 0 ; i < instances ; i++) {
-				String cmd = "vrep/vrep"+(i+1)+".app/Contents/MacOS/vrep "+(headless? "-h":"")+" ../../../"+scene; 
-				Process pr = rt.exec(cmd);
-			}
-			
-			Thread.sleep(5000);//wait for vrep
-			
-			for(int i = 0 ; i < instances ; i++) {
-				clients[i] = new VREPContainer();
-				clients[i].vrep = new remoteApi();
+			if(remoteInstances != null) {
 				
-				if(i == 0)
-					clients[i].vrep.simxFinish(-1);
+				for(int r = 0 ; r < remoteIps.length ; r++) {
+					for(int i = 0 ; i < remoteInstances[r] ; i++) {
+						clients[i] = initContainer(remoteIps[r],DEFAULT_PORT+i,false);
+					}
+				}
 				
-				clients[i].ip = this.ip;
-				clients[i].port = DEFAULT_PORT+i;
-				clients[i].clientId = clients[i].vrep.simxStart(clients[i].ip,clients[i].port,true,false,5000,5);
-				clients[i].vrep.simxStartSimulation(clients[i].clientId,clients[i].vrep.simx_opmode_oneshot);
-				availableClients.push(clients[i]);
+			} else {
+			
+				for(int i = 0 ; i < instances ; i++) {
+					String cmd = "vrep/vrep"+(i+1)+".app/Contents/MacOS/vrep "+(headless? "-h":"")+" ../../../"+scene; 
+					Process pr = rt.exec(cmd);
+				}
+				
+				Thread.sleep(5000);//wait for vrep
+				
+				for(int i = 0 ; i < instances ; i++) {
+					clients[i] = initContainer(this.ip,DEFAULT_PORT+i, i==0);
+				}
 			}
 			
 			setup = true;
@@ -83,6 +111,22 @@ public class VREPTaskExecutor extends TaskExecutor{
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	protected VREPContainer initContainer(String ip, int port, boolean kill) {
+		VREPContainer c = new VREPContainer();
+		c.vrep = new remoteApi();
+		
+		if(kill)
+			c.vrep.simxFinish(-1);
+		
+		c.ip = ip;
+		c.port = port;
+		c.clientId = c.vrep.simxStart(c.ip,c.port,true,true,5000,5);
+		c.vrep.simxClearStringSignal(c.clientId, "toClient", remoteApi.simx_opmode_oneshot);
+		availableClients.push(c);
+		
+		return c;
 	}
 
 	@Override
@@ -118,14 +162,21 @@ public class VREPTaskExecutor extends TaskExecutor{
 	@Override
 	public Result getResult() {
 		Result obj = null;
-		Future<Result> callable;
 		
-		synchronized(list) {
-			callable = list.pop();
+		while(obj == null) {
+			
+			Future<Result> callable = null;
+		
+			synchronized(list) {
+				while(callable == null) {
+					callable = list.pop();
+				}
+			}
+			try {
+				obj = callable.get();
+			} catch(Exception e) {e.printStackTrace();}
+		
 		}
-		try {
-			obj = callable.get();
-		} catch(Exception e) {e.printStackTrace();}
 		
 		return obj;
 	}
@@ -153,7 +204,6 @@ public class VREPTaskExecutor extends TaskExecutor{
 			synchronized(availableClients) {
 				
 				while(availableClients.size()==0) {
-					System.out.println("Size: "+availableClients.size());
 					availableClients.wait();
 				}
 				
@@ -168,10 +218,20 @@ public class VREPTaskExecutor extends TaskExecutor{
 
 			Result r = t.getResult();
 			
+			VREPResult vrepR = (VREPResult)r;
+			
 			synchronized(availableClients) {	
 				//return the VREP conn
-				availableClients.push(container);
-				availableClients.notify();
+				if(vrepR.getValues() != null) {
+					availableClients.push(container);
+					availableClients.notify();
+				} else {
+					//we lost a worker, resubmit task and notify others
+					addTask(this.t);
+					instances--;
+					availableClients.notify();
+					return null;
+				}
 			}
 			return r;
 		}

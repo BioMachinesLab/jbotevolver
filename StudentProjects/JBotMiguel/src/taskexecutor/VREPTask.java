@@ -32,12 +32,20 @@ public class VREPTask extends Task{
 	
 	protected float[] getDataFromVREP() {
     	CharWA str=new CharWA(0);
-    	while(container.vrep.simxGetStringSignal(container.clientId,"toClient",str,remoteApi.simx_opmode_oneshot_wait) != remoteApi.simx_return_ok) {
+    	
+    	int signalVal = container.vrep.simxGetStringSignal(container.clientId,"toClient",str,remoteApi.simx_opmode_oneshot_wait);
+    	
+    	while(signalVal != remoteApi.simx_return_ok) {
+    		
+    		if(signalVal == 3 || signalVal == remoteApi.simx_return_initialize_error_flag)//error in the connection
+    			return null;
+    		
     		try {
-				Thread.sleep(50);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+    		signalVal = container.vrep.simxGetStringSignal(container.clientId,"toClient",str,remoteApi.simx_opmode_oneshot_wait);
 		}
     	
 		container.vrep.simxClearStringSignal(container.clientId, "toClient", remoteApi.simx_opmode_oneshot);
