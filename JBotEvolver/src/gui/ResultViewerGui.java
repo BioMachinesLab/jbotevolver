@@ -908,13 +908,21 @@ public class ResultViewerGui extends Gui implements Updatable {
 		JFileChooser chooser = new JFileChooser(lastOpenedPath);
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("Configuration file (*.conf)", "conf");
 		chooser.setFileFilter(filter);
-		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		chooser.setMultiSelectionEnabled(false);
 
 		int returnVal = chooser.showOpenDialog(this);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			fileTree.changeDirectory(chooser.getCurrentDirectory().getAbsolutePath());
-			currentFileTextField.setText(chooser.getSelectedFile().getAbsolutePath());
-			loadCurrentFile();
+			if (chooser.getSelectedFile().isFile()) {
+				fileTree.changeDirectory(chooser.getSelectedFile().getParent());
+				lastOpenedPath = chooser.getSelectedFile().getAbsolutePath();
+				currentFileTextField.setText(chooser.getSelectedFile().getAbsolutePath());
+				loadCurrentFile();
+			} else {
+				fileTree.changeDirectory(chooser.getSelectedFile().getAbsolutePath());
+				lastOpenedPath = chooser.getSelectedFile().getAbsolutePath();
+				currentFileTextField.setText(chooser.getSelectedFile().getAbsolutePath());
+			}
 		}
 	}
 
