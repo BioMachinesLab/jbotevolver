@@ -1,69 +1,7 @@
-package gui;
-
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.KeyboardFocusManager;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Random;
-import java.util.Scanner;
-import java.util.Vector;
-
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSlider;
-import javax.swing.JSplitPane;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.event.TreeSelectionEvent;
-import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreePath;
-
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
-import gui.renderer.Renderer;
-import gui.util.Editor;
-import gui.util.GraphPlotter;
-import gui.util.GraphViz;
-import gui.util.PostEvaluationData;
-import simulation.JBotSim;
-import simulation.Simulator;
-import simulation.Updatable;
-import simulation.util.Arguments;
-import updatables.BlenderExport;
-
 public class ResultViewerGui extends Gui implements Updatable {
 
+	private final int LEFTWRAPPERPANEL_INIT_WIDTH = 400;
+	
 	protected JTextField controlStepTextField;
 	protected JTextField fitnessTextField;
 
@@ -118,8 +56,8 @@ public class ResultViewerGui extends Gui implements Updatable {
 	protected JCheckBox neuralNetworkViewerCheckbox;
 	protected JCheckBox exportToBlender;
 
-	private boolean enableDebugOptions = false;
-	private boolean showSleepError = false;
+	protected boolean enableDebugOptions = false;
+	protected boolean showSleepError = false;
 
 	protected EnvironmentKeyDispatcher dispatcher;
 
@@ -144,7 +82,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftWrapperPanel,
 				rightAndCenterWrapperPanel);
 		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(300);
+		splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH);
 
 		// Provide minimum sizes for the two components in the split pane
 		Dimension minimumSize = new Dimension(300, 250);
