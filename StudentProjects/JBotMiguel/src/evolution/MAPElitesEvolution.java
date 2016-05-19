@@ -98,8 +98,10 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 			}
 		}
 		
-		prune((MAPElitesPopulation)population, pruneThreshold);
-		expandToCircle((MAPElitesPopulation)population);
+		if(population.evolutionDone()) {
+			prune((MAPElitesPopulation)population, pruneThreshold);
+			expandToCircle((MAPElitesPopulation)population);
+		}
 		
 		String dir = diskStorage.getOutputDirectory()+"/";
 		String hash = getRepertoireHash((MAPElitesPopulation)population);

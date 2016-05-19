@@ -71,7 +71,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	public synchronized void drawFrame() {
 		if (simulator == null) {
 			graphics.setColor(new Color(0xEE, 0xEE, 0xEE));
-			graphics.fillRect(0, 0, getWidth(), getHeight());
+			graphics.fillRect(0, 0, getWidth(), getHeight()); 
 			return;
 		}
 
@@ -218,7 +218,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		centerX = width / 2.0;
 		centerY = height / 2.0;
 
-		graphics.setColor(Color.GRAY);
+		graphics.setColor(Color.WHITE);
 		graphics.fillRect(0, 0, image.getWidth(), image.getHeight());
 		graphics.setColor(Color.WHITE);
 

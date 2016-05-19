@@ -52,6 +52,14 @@ public class OrientationEvaluationFunction extends EvaluationFunction{
 		return result;
 	}
 	
+	public static double calculateOrientationDistanceFitness(Vector2d pos, double orientation, double distanceTraveled, double maxDistance) {
+		double result = getOrientationFromCircle(pos) - MathUtils.modPI2(orientation);
+		result = MathUtils.modPI(result);
+		result = Math.abs((Math.PI-result)/(Math.PI));
+		result+=(maxDistance - distanceTraveled)/(maxDistance);
+		return result;
+	}
+	
 	public static double getOrientationFromCircle(Vector2d pos) {
 		
 		double b = Math.sqrt((pos.x/2)*(pos.x/2)+(pos.y/2)*(pos.y/2));

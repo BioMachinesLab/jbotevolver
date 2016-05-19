@@ -16,7 +16,8 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 public class NEATPopulation extends Population implements Serializable {
 	
-	private static final long serialVersionUID = 7376995681295593443L;//3149732524276911322L;
+//	private static final long serialVersionUID = 7376995681295593443L;
+	private static final long serialVersionUID = 3149732524276911322L;
 	protected NEATPopulation4J pop;
 	protected int size = 200;
 	protected int generationNumber = 0;
@@ -25,7 +26,7 @@ public class NEATPopulation extends Population implements Serializable {
 	
 	protected double bestFitness;
 	protected double accumulatedFitness;
-	protected double worstFitness;
+	protected double worstFitness = Double.MAX_VALUE;
 	protected int numberOfChromosomesEvaluated;
 
 	public NEATPopulation(Arguments arguments) {

@@ -70,7 +70,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	
 	@Override
 	public void drawWall(Wall w) {
-		super.drawWall(w);
+//		super.drawWall(w);
 		
 		graphics.setColor(Color.RED);
 		PolygonShape s = (PolygonShape)w.shape;

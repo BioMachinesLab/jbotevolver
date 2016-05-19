@@ -8,7 +8,12 @@ public class EMain {
 	public static void main(String[] args) throws Exception {
 		
 //		String configName = "hexamap.conf";
-		String configName = "hexamap/_restartevolution.conf";
+//		String configName = "hexa_neat_big.conf";
+//		String configName = "hexa_neat.conf";
+		String configName = "hexamap_big.conf";
+//		String configName = "hexamap_debug.conf";
+//		String configName = "hexamap_big/_restartevolution.conf";
+//		String configName = "hexamap/_restartevolution.conf";
 //		String configName = "repertoire_nav.conf";
 //		String configName = "nsga2_novelty.conf";
 //		String configName = "nsga2_fitness.conf";
