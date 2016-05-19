@@ -64,6 +64,8 @@ import updatables.BlenderExport;
 
 public class ResultViewerGui extends Gui implements Updatable {
 
+	private final int LEFTWRAPPERPANEL_INIT_WIDTH = 400;
+	
 	protected JTextField controlStepTextField;
 	protected JTextField fitnessTextField;
 
@@ -118,8 +120,8 @@ public class ResultViewerGui extends Gui implements Updatable {
 	protected JCheckBox neuralNetworkViewerCheckbox;
 	protected JCheckBox exportToBlender;
 
-	private boolean enableDebugOptions = false;
-	private boolean showSleepError = false;
+	protected boolean enableDebugOptions = false;
+	protected boolean showSleepError = false;
 
 	protected EnvironmentKeyDispatcher dispatcher;
 
@@ -144,7 +146,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftWrapperPanel,
 				rightAndCenterWrapperPanel);
 		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(300);
+		splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH);
 
 		// Provide minimum sizes for the two components in the split pane
 		Dimension minimumSize = new Dimension(300, 250);
