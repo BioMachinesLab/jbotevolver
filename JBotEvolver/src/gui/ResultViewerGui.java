@@ -405,6 +405,16 @@ public class ResultViewerGui extends Gui implements Updatable {
 				newRandomSeed();
 			}
 		});
+		
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control F"), "control F");
+		this.getActionMap().put("control F", new AbstractAction() {
+			protected static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				plotFitness();
+			}
+		});
 	}
 
 	protected void initListeners() {
