@@ -1,88 +1,67 @@
 package controllers;
 
+import mathutils.Vector2d;
 import coppelia.CharWA;
 import coppelia.FloatWA;
 import coppelia.IntW;
 import coppelia.remoteApi;
+import evaluationfunctions.DummyEvaluationFunction;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class HexapodMotionPatternController extends Controller implements FixedLenghtGenomeEvolvableController{
 
-	private static String ROBOT_NAME = "hexapod";
-	private static String ROBOT_BODY_NAME = "hexa_body";
-	private static String JOINT_NAME = "hexa_joint";
-	private static float initialOrientation[] = new float[]{0,-(float)Math.PI,0};
-	private static float initialPosition[] = new float[]{0,0,0.087999955f};
-	private static int[][] jointHandles = new int[6][3];
-	private static int robotHandle = 0;
-	private static int robotBodyHandle = 0;
-	private static boolean gotHandles = false;
-	
-	private remoteApi vrep;
-	private int clientId;
-	
-	protected final int legs = 6;
-	protected final int jointsPerLeg = 3;
-	
-	protected double[] weights;
 	protected float[] parameters;
+	protected boolean init = false;
+	protected double[] weights;
 	protected int genomeLength;
+//	protected int inputs;
+//	protected int outputs;
+	protected int controllerType = 0;//0=MAPElites,1=RepertoireNEAT, 2=NEAT, 3=Dummy
+	protected Simulator sim;
+	protected String ip = "127.0.0.1";
+	protected int time = 3;
 	
-	private float[][] jointPositions = new float[6][3];
-
-	private boolean init = false;
-	
-    private static float[] ori_original = new float[3];
+	private static remoteApi vrep;
+	private static int clientId;
 	
 	public HexapodMotionPatternController(Simulator simulator,Robot robot,Arguments args) {
 		super(simulator, robot, args);
-		genomeLength = 24;
+		
+//		if(!args.getArgumentIsDefined("inputs") || !args.getArgumentIsDefined("outputs"))
+//			throw new RuntimeException("Argument 'inputs' not defined for class HexapodMotionPatternController!");
+		
+		ip = args.getArgumentAsStringOrSetDefault("ip", ip);
+		
+		controllerType= args.getArgumentAsIntOrSetDefault("controllertype", controllerType);
+		
+//		if(!args.getArgumentIsDefined("time"))
+//			throw new RuntimeException("Argument 'time' not defined for class HexapodShowbestController!");
+		
+		time= args.getArgumentAsIntOrSetDefault("time", time);
+		
+		if(args.getArgumentIsDefined("weights")) {
+			String[] rawArray = args.getArgumentAsString("weights").split(",");
+			double[] weights = new double[rawArray.length];
+			for(int i = 0 ; i < weights.length ; i++)
+				weights[i] = Double.parseDouble(rawArray[i]);
+			setNNWeights(weights);
+		}
+		this.sim = simulator;
 	}
 	
 	public void init() {
-		
-//		System.out.println("INIT");
-		vrep = new remoteApi();
-		vrep.simxFinish(-1); // just in case, close all opened connections
-		clientId = vrep.simxStart("127.0.0.1",19997,true,false,5000,5);
-		vrep.simxSynchronous(clientId,true);
-		vrep.simxStartSimulation(clientId,vrep.simx_opmode_oneshot);
-	
-		if(!gotHandles) {
-	
-			//all 6 arms
-			for(int arm = 1 ; arm <= 6 ; arm++) {
-				for(int joint = 1 ; joint <= 3 ; joint++) {
-					String name = JOINT_NAME;
-					String jointName = ""+joint;
-					String armName = "_"+arm;
-					name+= jointName+armName;
-					IntW handle = new IntW(0);
-					vrep.simxGetObjectHandle(clientId, name, handle, remoteApi.simx_opmode_blocking);
-					jointHandles[arm-1][joint-1] = handle.getValue();
-				}
-			}
-			
-			//the robot
-			IntW handle = new IntW(0);
-			vrep.simxGetObjectHandle(clientId, ROBOT_NAME, handle, remoteApi.simx_opmode_blocking);
-			robotHandle = handle.getValue();
-			vrep.simxGetObjectHandle(clientId, ROBOT_BODY_NAME, handle, remoteApi.simx_opmode_blocking);
-			robotBodyHandle = handle.getValue();
-			gotHandles = true;
-			
-			FloatWA angles = new FloatWA(3);
-			vrep.simxGetObjectOrientation(clientId,robotBodyHandle,remoteApi.sim_handle_parent,angles,remoteApi.simx_opmode_blocking);
-			ori_original = angles.getArray();
+		if(vrep == null) {
+			vrep = new remoteApi();
+			vrep.simxFinish(-1); // just in case, close all opened connections
+			clientId = vrep.simxStart(ip,19997,true,false,5000,5);
 		}
-		setDefaultJoints(true);
 	}
 	
 	@Override
 	public void end() {
-		vrep.simxStopSimulation(clientId,vrep.simx_opmode_blocking);
+//		vrep.simxStopSimulation(clientId,vrep.simx_opmode_blocking);
 	}
 	
 	@Override
@@ -91,111 +70,80 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 		if(!init) {
 			init();
 			init = true;
-		}
-		
-		actuateRobot(parameters, (float)time/20f);
-		sendAllActuations();
-		
-		float[] pos = getPosition();
-		robot.setPosition(pos[0], pos[1]);
-		
-		double theta = getOrientation();
-		robot.setOrientation(theta);
-		
-		vrep.simxSynchronousTrigger(clientId);
-	}
-	
-	public void sendAllActuations() {
-		vrep.simxPauseCommunication(clientId,true);
-		
-		for(int arm = 0 ; arm < 6 ; arm++) {
-			for(int joint = 0 ; joint < 3 ; joint++) {
-				vrep.simxSetJointTargetPosition(clientId, jointHandles[arm][joint], jointPositions[arm][joint], remoteApi.simx_opmode_streaming);
+//			System.out.println("Sent!");
+			sendDataToVREP(parameters);
+			float[] data = getDataFromVREP();
+			double fit = getFitness(data);
+			
+			if(!sim.getCallbacks().isEmpty() && sim.getCallbacks().get(0) instanceof DummyEvaluationFunction) {
+				DummyEvaluationFunction eval = (DummyEvaluationFunction)sim.getCallbacks().get(0);
+				eval.setFitness(fit);
+			}else{
+				System.out.println("Fitness: "+fit);
 			}
+			
+//			System.out.println("Received!");
 		}
+	}
+	
+	protected double getFitness(float[] vals) {
+		int index = 0;
 		
-		vrep.simxPauseCommunication(clientId,false);
-	}
-	
-	private float actuationFunction(float phi, float t) {
-		return (float)(Math.tanh(4f*Math.sin(2f*Math.PI*(t+phi))));
-	}
-	
-	public void actuateRobot(float[] parameters, float t) {
+		int nResults = (int)vals[index++];
+		
+		//id
+		int id = (int)vals[index++];
+		//number of values
+		int nVals = (int)vals[index++];
+		
+		float fitness = 0;
+		
+		if(controllerType == 0) {
+			float x = vals[index++];
+			float y = vals[index++];
+			float z = vals[index++];
+			float a = vals[index++];
+			float b = vals[index++];
+			float g = vals[index++];
+			float distanceTravelled = vals[index++];
+			float minTilt = vals[index++];
+			fitness = minTilt;
+			
+			double orY = (Math.cos(a)*Math.cos(g) - Math.sin(a)*Math.sin(b)*Math.sin(g));
+			double orX = - Math.cos(b)*Math.sin(g);
+			double orZ = (Math.cos(g)*Math.sin(a) - Math.cos(a)*Math.sin(b)*Math.sin(b));
+			
+			double orientation = Math.atan2(orY,orX);
+			
+			robot.setPosition(new Vector2d(x,y));
+			robot.setOrientation(orientation);
+			
+		}else{
+			fitness = vals[index++];
+		}
 
-		int nParamsPerArm = 4;
-		for(int arm = 0 ; arm < 6 ; arm++) {
-			
-			float alpha1 = parameters[arm*nParamsPerArm+0];
-			float phi1 = parameters[arm*nParamsPerArm+1];
-			
-			float alpha2 = parameters[arm*nParamsPerArm+2];
-			float phi2 = parameters[arm*nParamsPerArm+3];
-			
-			float val1 = (float)(alpha1*actuationFunction(phi1,t));
-			float val2 = (float)(alpha2*actuationFunction(phi2,t));
-			float val3 = (float)(-val2+Math.PI/2);
-			
-			setJointPosition(arm, 0, val1, false);
-			setJointPosition(arm, 1, val2, false);
-			setJointPosition(arm, 2, val3, false);
-		}
-	}
-	
-	public void setDefaultJoints(boolean sendToVrep) {
-		actuateRobot(parameters, 0);
-		if(sendToVrep) {
-			sendAllActuations();
-		}
-//		for(int joint = 0 ; joint < 3 ; joint++) {
-//			
-//			float val = (float)Math.toRadians(0);
-//			
-//			if(joint == 1) val = (float)Math.toRadians(-30);
-//			if(joint == 2) val = (float)Math.toRadians(90);
-//			
-//			for(int arm = 0 ; arm < 6 ; arm++)
-//				setJointPosition(arm,joint,val,false);
-//		}
-	}
-	
-	private float[] getPosition() {
-		FloatWA pos = new FloatWA(0);
-		vrep.simxGetObjectPosition(clientId, robotHandle, -1, pos, remoteApi.simx_opmode_streaming);
-		return pos.getArray();
-	}
-	
-	private double getOrientation() {
-		FloatWA eulerAngles = new FloatWA(0);
-		vrep.simxGetObjectOrientation(clientId, robotBodyHandle, -1, eulerAngles, remoteApi.simx_opmode_streaming);
-		
-		float[] ori = eulerAngles.getArray();
-		
-		float a = ori[0] - ori_original[0];
-        float b = ori[1] - ori_original[1];
-        float g = ori[2] - ori_original[2];
-        
-        double y = -(Math.sin(b)* Math.cos(a)* Math.cos(g) + Math.sin(a) * Math.sin(g));
-        double x = (Math.sin(b)* Math.cos(a)* Math.sin(g) - Math.sin(a) * Math.cos(g));
-        double z = Math.cos(b)*Math.cos(a);
-		
-		return Math.atan2(y,x);
-	}
-
-	public void setJointPosition(int armNumber, int jointNumber, float angleInRads, boolean sendToVrep) {
-		jointPositions[armNumber][jointNumber] = angleInRads;
-		
-		if(sendToVrep)
-			vrep.simxSetJointTargetPosition(clientId, jointHandles[armNumber][jointNumber], angleInRads, remoteApi.simx_opmode_streaming);
+		return fitness;
 	}
 	
 	@Override
 	public void setNNWeights(double[] weights) {
 		this.weights = weights;
-		this.parameters = new float[weights.length];
+		this.genomeLength = weights.length;
+		
+		int parametersIndex = 0;
+		
+		this.parameters = new float[6+weights.length];
+		
+		this.parameters[parametersIndex++] = 1;//1 fixed parameters
+		this.parameters[parametersIndex++] = time;//X seconds
+		this.parameters[parametersIndex++] = 1;//1 individual
+		this.parameters[parametersIndex++] = 1;//id
+		this.parameters[parametersIndex++] = genomeLength+1;//size of type+genome
+		this.parameters[parametersIndex++] = controllerType;
 		
 		for(int i = 0 ; i < weights.length ; i++)
-			this.parameters[i] = (float)weights[i];
+			this.parameters[parametersIndex++] = (float)weights[i];
+		
 	}
 
 	@Override
@@ -210,9 +158,9 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 
 	@Override
 	public int getNumberOfInputs() {
-		return 0;
+		return 0;//not sure if needed
 	}
-
+	
 	@Override
 	public int getNumberOfOutputs() {
 		return getGenomeLength();

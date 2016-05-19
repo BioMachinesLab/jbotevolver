@@ -224,20 +224,21 @@ public class Simulator implements Serializable {
 		terminate();
 	}
         
-        public void terminate() {
-            	stopSimulation = true;
+    public void terminate() {
+        stopSimulation = true;
 		if(network != null)
 			network.shutdown();
-                for(Updatable u : callbacks) {
-                    if(u instanceof Stoppable) {
-                        Stoppable s = (Stoppable) u;
-                        s.terminate(this);
-                    }
-                }
+        for(Updatable u : callbacks) {
+            if(u instanceof Stoppable) {
+                Stoppable s = (Stoppable) u;
+                s.terminate(this);
+            }
         }
+        for(Robot r : environment.getRobots()){
+        	r.getController().end();
+        }
+    }
         
-       
-
 	public double getTimeDelta() {
 		return timeDelta;
 	}

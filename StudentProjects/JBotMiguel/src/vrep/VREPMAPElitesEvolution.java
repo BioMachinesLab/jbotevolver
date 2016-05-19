@@ -33,6 +33,7 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 	
 	protected int controllerType = 0;
 	protected int time = 0;
+	public int excluded = 0;
 	
     public VREPMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
     	super(jBotEvolver, taskExecutor, arg);
@@ -113,6 +114,8 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 					//distance
 					float distanceTraveled = vals[index++];
 					
+					float minTilt = vals[index++];
+					
 					double orY = (Math.cos(a)*Math.cos(g) - Math.sin(a)*Math.sin(b)*Math.sin(g));
 					double orX = - Math.cos(b)*Math.sin(g);
 					double orZ = (Math.cos(g)*Math.sin(a) - Math.cos(a)*Math.sin(b)*Math.sin(b));
@@ -142,12 +145,16 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 					MOChromosome moc = result.getChromosome();
 					
 					moc.setEvaluationResult(result.getEvaluationResult());
-						
-					if(tilt > 0) {
+					
+					if(minTilt > 0) {
 						((MAPElitesPopulation)population).addToMap(moc);
+					} else {
+						excluded++;
 					}
 				}
 			}
+			System.out.println("Total excluded so far: "+excluded);
+			
     	}catch (Exception e) {
     		e.printStackTrace();
     		System.exit(0);

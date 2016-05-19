@@ -54,7 +54,7 @@ public class EvolutionGui extends Gui {
 	private JButton stopButton;
 	private Renderer renderer;
 	private JBotEvolver jBotEvolver;
-	private boolean enablePreview = true;
+	private boolean enablePreview = false;
 	private JTextField previewGenerationTextField;
 	private UpdateEvolutionThread updateThread;
 	
@@ -148,7 +148,7 @@ public class EvolutionGui extends Gui {
 		configPanel.add(previewGenerationTextField);
 		
 		JCheckBox enableCheckbox = new JCheckBox();
-		enableCheckbox.setSelected(true);
+		enableCheckbox.setSelected(false);
 		enableCheckbox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				enablePreview = ((JCheckBox)e.getSource()).isSelected();

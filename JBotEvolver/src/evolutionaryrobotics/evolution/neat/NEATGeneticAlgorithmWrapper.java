@@ -14,7 +14,7 @@ import evolutionaryrobotics.populations.NEATPopulation;
 
 public class NEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithm {
 	
-	private NEATEvolution evo;
+	protected NEATEvolution evo;
 
 	public NEATGeneticAlgorithmWrapper(NEATGADescriptor descriptor, NEATEvolution evo) {
 		super(descriptor);

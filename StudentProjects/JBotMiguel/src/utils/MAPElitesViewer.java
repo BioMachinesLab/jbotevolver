@@ -139,6 +139,8 @@ public class MAPElitesViewer {
 		MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
 		MOChromosome c = pop.getChromosomeFromBehaviorVector(new double[]{pos.x,pos.y});
 		
+		System.out.println("Expected: "+pos.x+" "+pos.y);
+		
 		if(c == null)
 			return;
 		
@@ -147,12 +149,14 @@ public class MAPElitesViewer {
 		sim.addRobots(jbot.createRobots(sim, c));
 		sim.setupEnvironment();
 		placeMarkers((MAPElitesPopulation)pop);
-		for(double i = 0 ; i < sim.getEnvironment().getSteps() ; i++) {
-			sim.performOneSimulationStep(i);
-			refresh();
-			try {Thread.sleep(50);} catch (InterruptedException e) {}
-		}
+		sim.simulate();
+//		for(double i = 0 ; i < sim.getEnvironment().getSteps() ; i++) {
+//			sim.performOneSimulationStep(i);
+//			refresh();
+//			try {Thread.sleep(50);} catch (InterruptedException e) {}
+//		}
 		sim.terminate();
+		renderer.drawFrame();
 	}
 	
 	public void setGeneration(int i) {
@@ -241,46 +245,6 @@ public class MAPElitesViewer {
 				}
 			}
 		}
-	}
-	
-	protected void ellipsePoint(double angle, double percentage, MAPElitesPopulation po) {
-		
-		double resolution = 0.02;
-		double size = 50;
-		
-		double ellipseWidth = 0;
-		double ellipseHeight = 0;
-		
-		for(int y = 0 ; y < size ; y++) {
-			for(int x = 0 ; x < size ; x++) {
-				if(po.getMap()[y][x] != null) {
-					ellipseWidth = Math.max(ellipseWidth,Math.abs((y-size/2)*resolution));
-					ellipseHeight = Math.max(ellipseHeight,Math.abs((x-size/2)*resolution));
-				}
-			}
-		}
-
-		//TODO check this
-		//if the controller wants to move backwards, move in the opposite direction (+PI)
-		if(percentage < 0)
-			angle+=Math.PI;
-		
-		ellipseWidth = ellipseWidth*Math.abs(percentage);
-		ellipseHeight = ellipseHeight*Math.abs(percentage);
-		
-		double x = (ellipseWidth * ellipseHeight) /
-				Math.sqrt(
-						Math.pow(ellipseHeight,2) +
-						Math.pow(ellipseWidth,2) * Math.pow(Math.tan(angle),2));
-		
-		if(angle < -Math.PI/2 || angle > Math.PI/2)
-			x*=-1;
-		
-		double y = Math.sqrt(1-Math.pow(x/ellipseWidth, 2)) * ellipseHeight;
-		
-		LightPole p = new LightPole(sim,"l",x,y,0.05);
-		sim.getEnvironment().addStaticObject(p);
-		
 	}
 	
 	private Color getColor(double fitness) {
@@ -415,7 +379,9 @@ public class MAPElitesViewer {
 					try {
 						Thread.sleep(250);
 					} catch (InterruptedException e) {}
-				} catch(Exception e){}
+				} catch(Exception e){
+					e.printStackTrace();
+				}
 			}
 		}
 	}

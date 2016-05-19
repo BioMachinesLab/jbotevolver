@@ -54,8 +54,6 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
 				
 				fitness+=10;
 				
-				System.out.println(id+" "+fitness);
-				
 				evo.getPopulation().setEvaluationResult(chromosomes[id],fitness);
 	        	genotypes[id].updateFitness(fitness);
 			}

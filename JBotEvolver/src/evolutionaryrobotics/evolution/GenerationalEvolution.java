@@ -93,7 +93,7 @@ public class GenerationalEvolution extends Evolution {
 		diskStorage.close();
 	}
 	
-	private int getGenomeLength() {
+	protected int getGenomeLength() {
 		
 		Simulator sim = jBotEvolver.createSimulator();
 		Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots"));
@@ -115,7 +115,11 @@ public class GenerationalEvolution extends Evolution {
 	
 	protected void setupPopulation() {
 		Arguments populationArguments = jBotEvolver.getArguments().get("--population");
-		populationArguments.setArgument("genomelength", getGenomeLength());
+		Arguments evoArguments = jBotEvolver.getArguments().get("--evolution");
+		if(!evoArguments.getArgumentIsDefined("genomelength"))
+			populationArguments.setArgument("genomelength", getGenomeLength());
+		else
+			populationArguments.setArgument("genomelength", evoArguments.getArgumentAsInt("genomelength"));
 		
 		try {
 			population = Population.getPopulation(jBotEvolver.getArguments().get("--population"));

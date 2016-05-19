@@ -1,5 +1,6 @@
 package controllers;
 
+import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -10,17 +11,20 @@ import evaluationfunctions.DummyEvaluationFunction;
 
 public class HexapodShowbestController extends Controller implements FixedLenghtGenomeEvolvableController{
 
-	private remoteApi vrep;
-	private int clientId;
+	
 	protected float[] parameters;
 	protected boolean init = false;
 	protected double[] weights;
 	protected int genomeLength;
 	protected int inputs;
 	protected int outputs;
-	protected int controllerType = 1;//1=RepertoireNEAT, 2=NEAT, 3=Dummy
+	protected int controllerType = 0;//0=MAPElites,1=RepertoireNEAT, 2=NEAT, 3=Dummy
 	protected Simulator sim;
 	protected String ip = "127.0.0.1";
+	protected int time = 3;
+	
+	private static remoteApi vrep;
+	private static int clientId;
 	
 	public HexapodShowbestController(Simulator simulator,Robot robot,Arguments args) {
 		super(simulator, robot, args);
@@ -31,6 +35,11 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 		ip = args.getArgumentAsStringOrSetDefault("ip", ip);
 		
 		controllerType= args.getArgumentAsIntOrSetDefault("controllertype", controllerType);
+		
+//		if(!args.getArgumentIsDefined("time"))
+//			throw new RuntimeException("Argument 'time' not defined for class HexapodShowbestController!");
+		
+		time= args.getArgumentAsIntOrSetDefault("time", time);
 		
 		if(args.getArgumentIsDefined("weights")) {
 			String[] rawArray = args.getArgumentAsString("weights").split(",");
@@ -43,9 +52,11 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 	}
 	
 	public void init() {
-		vrep = new remoteApi();
-		vrep.simxFinish(-1); // just in case, close all opened connections
-		clientId = vrep.simxStart(ip,19996,true,false,5000,5);
+		if(vrep == null) {
+			vrep = new remoteApi();
+			vrep.simxFinish(-1); // just in case, close all opened connections
+			clientId = vrep.simxStart(ip,19997,true,false,5000,5);
+		}
 	}
 	
 	@Override
@@ -63,8 +74,14 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 			sendDataToVREP(parameters);
 			float[] data = getDataFromVREP();
 			double fit = getFitness(data);
-			DummyEvaluationFunction eval = (DummyEvaluationFunction)sim.getCallbacks().get(0);
-			eval.setFitness(fit);
+			
+			if(!sim.getCallbacks().isEmpty() && sim.getCallbacks().get(0) instanceof DummyEvaluationFunction) {
+				DummyEvaluationFunction eval = (DummyEvaluationFunction)sim.getCallbacks().get(0);
+				eval.setFitness(fit);
+			}else{
+				System.out.println("Fitness: "+fit);
+			}
+			
 			System.out.println("Received!");
 		}
 	}
@@ -78,8 +95,34 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 		int id = (int)vals[index++];
 		//number of values
 		int nVals = (int)vals[index++];
-		//fitness
-		float fitness = vals[index++];
+		
+		float fitness = 0;
+		
+		if(controllerType == 0) {
+			float x = vals[index++];
+			float y = vals[index++];
+			float z = vals[index++];
+			float a = vals[index++];
+			float b = vals[index++];
+			float g = vals[index++];
+			float distanceTravelled = vals[index++];
+			float minTilt = vals[index++];
+			fitness = minTilt;
+			
+			double orY = (Math.cos(a)*Math.cos(g) - Math.sin(a)*Math.sin(b)*Math.sin(g));
+			double orX = - Math.cos(b)*Math.sin(g);
+			double orZ = (Math.cos(g)*Math.sin(a) - Math.cos(a)*Math.sin(b)*Math.sin(b));
+			
+			double orientation = Math.atan2(orY,orX);
+			
+			System.out.println("Position: "+x+","+y);
+			
+			robot.setPosition(new Vector2d(x,y));
+			robot.setOrientation(orientation);
+			
+		}else{
+			fitness = vals[index++];
+		}
 
 		return fitness;
 	}
@@ -94,27 +137,16 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 		this.parameters = new float[6+weights.length];
 		
 		this.parameters[parametersIndex++] = 1;//1 fixed parameters
-		this.parameters[parametersIndex++] = 40;//15 seconds
+		this.parameters[parametersIndex++] = time;//X seconds
 		this.parameters[parametersIndex++] = 1;//1 individual
 		this.parameters[parametersIndex++] = 1;//id
 		this.parameters[parametersIndex++] = genomeLength+1;//size of type+genome
 		this.parameters[parametersIndex++] = controllerType;
+		System.out.println(controllerType);
 		
 		for(int i = 0 ; i < weights.length ; i++)
 			this.parameters[parametersIndex++] = (float)weights[i];
 		
-//		switch (controllerType) {
-//		case 1:
-//			VRepRepertoireController c1 = new VRepRepertoireController(parameters);
-//			inputs = 0;
-//			outputs = c1.getNumberOfParameters();
-//			break;
-//		case 2:
-//			VRepNEATController c2 = new VRepNEATController(parameters);
-//			this.inputs = c2.getNumberOfInputs();
-//			this.inputs = c2.getNumberOfInputs();
-//			break;
-//		}
 	}
 
 	@Override
