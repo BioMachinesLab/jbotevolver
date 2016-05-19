@@ -5,19 +5,18 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 
-import controllers.FixedLenghtGenomeEvolvableController;
-import simulation.robot.Robot;
-import simulation.util.Arguments;
 import evolutionaryrobotics.evolution.neat.NEATSerializer;
 import evolutionaryrobotics.evolution.neat.core.NEATNetDescriptor;
 import evolutionaryrobotics.evolution.neat.core.NEATNeuralNet;
 import evolutionaryrobotics.evolution.neat.core.NEATPopulation4J;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 
 public class NEATPopulation extends Population implements Serializable {
 	
-//	private static final long serialVersionUID = 7376995681295593443L;
-	private static final long serialVersionUID = 3149732524276911322L;
+	private static final long serialVersionUID = 7376995681295593443L;
+//	private static final long serialVersionUID = 3149732524276911322L;
 	protected NEATPopulation4J pop;
 	protected int size = 200;
 	protected int generationNumber = 0;
@@ -156,6 +155,7 @@ public class NEATPopulation extends Population implements Serializable {
 		c.setupRobot(r);
 	}
 	
+	@Override
 	public boolean evolutionDone() {
 		if (generationNumber >= numberOfGenerations ||
 				(generationNumber == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == getPopulationSize()) ||
