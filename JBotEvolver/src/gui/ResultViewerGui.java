@@ -395,6 +395,16 @@ public class ResultViewerGui extends Gui implements Updatable {
 				renderer.drawFrame();
 			}
 		});
+
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "control S");
+		this.getActionMap().put("control S", new AbstractAction() {
+			protected static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				newRandomSeed();
+			}
+		});
 	}
 
 	protected void initListeners() {
@@ -517,30 +527,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		newRandomSeedButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int newRandomSeed = new Random().nextInt(Integer.MAX_VALUE);
-
-				if (extraArguments.getText().isEmpty()) {
-					extraArguments.setText("--random-seed " + newRandomSeed);
-				} else {
-					String finalText = "";
-					boolean findSeedText = false;
-					Scanner scanner = new Scanner(extraArguments.getText());
-					while (scanner.hasNextLine()) {
-						String line = scanner.nextLine();
-						if (line.startsWith("--random-seed")) {
-							finalText += "--random-seed " + newRandomSeed + "\n";
-							findSeedText = true;
-						} else {
-							finalText += line + "\n";
-						}
-					}
-					scanner.close();
-					if (!findSeedText) {
-						finalText += "--random-seed " + newRandomSeed + "\n";
-					}
-					extraArguments.setText(finalText);
-				}
-				loadButton.doClick();
+				newRandomSeed();
 			}
 		});
 
@@ -567,6 +554,33 @@ public class ResultViewerGui extends Gui implements Updatable {
 			 * networkViewer.setVisible(check.isSelected()); } });
 			 */
 		}
+	}
+
+	protected void newRandomSeed() {
+		int newRandomSeed = new Random().nextInt(Integer.MAX_VALUE);
+
+		if (extraArguments.getText().isEmpty()) {
+			extraArguments.setText("--random-seed " + newRandomSeed);
+		} else {
+			String finalText = "";
+			boolean findSeedText = false;
+			Scanner scanner = new Scanner(extraArguments.getText());
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				if (line.startsWith("--random-seed")) {
+					finalText += "--random-seed " + newRandomSeed + "\n";
+					findSeedText = true;
+				} else {
+					finalText += line + "\n";
+				}
+			}
+			scanner.close();
+			if (!findSeedText) {
+				finalText += "--random-seed " + newRandomSeed + "\n";
+			}
+			extraArguments.setText(finalText);
+		}
+		loadButton.doClick();
 	}
 
 	protected void launchGraphPlotter(JBotEvolver jbot, Simulator sim) {
