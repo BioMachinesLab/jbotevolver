@@ -31,6 +31,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -43,6 +44,7 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -65,7 +67,7 @@ import updatables.BlenderExport;
 public class ResultViewerGui extends Gui implements Updatable {
 
 	private final int LEFTWRAPPERPANEL_INIT_WIDTH = 400;
-	
+
 	protected JTextField controlStepTextField;
 	protected JTextField fitnessTextField;
 
@@ -126,6 +128,9 @@ public class ResultViewerGui extends Gui implements Updatable {
 	protected EnvironmentKeyDispatcher dispatcher;
 
 	protected long lastCycleTime = 0;
+
+	protected JButton openButton = new JButton("Open");
+	protected String lastOpenedPath = ".";
 
 	public ResultViewerGui(JBotSim jBotEvolver, Arguments args) {
 		super(jBotEvolver, args);
@@ -189,6 +194,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		topPanel.add(editButton);
 
 		JPanel editLoad = new JPanel();
+		editLoad.add(openButton);
 		editLoad.add(editButton);
 		editLoad.add(loadButton);
 
@@ -538,6 +544,14 @@ public class ResultViewerGui extends Gui implements Updatable {
 			}
 		});
 
+		openButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selectFileToOpen();
+			}
+		});
+
 		if (enableDebugOptions) {
 			neuralNetworkCheckbox.addActionListener(new ActionListener() {
 				@Override
@@ -873,6 +887,20 @@ public class ResultViewerGui extends Gui implements Updatable {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	protected void selectFileToOpen() {
+		JFileChooser chooser = new JFileChooser(lastOpenedPath);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Configuration file (*.conf)", "conf");
+		chooser.setFileFilter(filter);
+		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+		int returnVal = chooser.showOpenDialog(this);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			fileTree.changeDirectory(chooser.getCurrentDirectory().getAbsolutePath());
+			currentFileTextField.setText(chooser.getSelectedFile().getAbsolutePath());
+			loadCurrentFile();
 		}
 	}
 
