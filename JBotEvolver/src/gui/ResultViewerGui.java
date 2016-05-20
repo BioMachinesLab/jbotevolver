@@ -405,7 +405,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 				newRandomSeed();
 			}
 		});
-		
+
 		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control F"), "control F");
 		this.getActionMap().put("control F", new AbstractAction() {
 			protected static final long serialVersionUID = 1L;
@@ -708,7 +708,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		return null;
 	}
 
-	private PostEvaluationData getDataFromPost(File f) throws IOException {
+	protected PostEvaluationData getDataFromPost(File f) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(f));
 		String line = reader.readLine();
 		String[] splitSetupName;
