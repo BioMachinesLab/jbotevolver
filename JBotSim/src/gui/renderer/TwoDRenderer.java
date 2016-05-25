@@ -71,7 +71,7 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	public synchronized void drawFrame() {
 		if (simulator == null) {
 			graphics.setColor(new Color(0xEE, 0xEE, 0xEE));
-			graphics.fillRect(0, 0, getWidth(), getHeight()); 
+			graphics.fillRect(0, 0, getWidth(), getHeight());
 			return;
 		}
 
@@ -136,7 +136,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 		}
 
 		drawArea(graphics, simulator.getEnvironment());
-
+		drawTitle(graphics);
+		
 		repaint();
 	}
 
