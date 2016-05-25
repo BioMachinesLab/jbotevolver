@@ -34,6 +34,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -604,7 +605,14 @@ public class ResultViewerGui extends Gui implements Updatable {
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				new GraphPlotter(getFitnessFiles(mainFolder).split("###"));
+				String files = getFitnessFiles(mainFolder);
+				if (files != null) {
+					if (files.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "No files to compare!", "Error", JOptionPane.ERROR_MESSAGE);
+					} else {
+						new GraphPlotter(files.split("###"));
+					}
+				}
 			}
 		});
 		t.start();
@@ -618,21 +626,26 @@ public class ResultViewerGui extends Gui implements Updatable {
 			if (f.exists()) {
 				return f.getAbsolutePath();
 			} else {
-				String[] directories = (new File(folder)).list(new FilenameFilter() {
-					@Override
-					public boolean accept(File dir, String name) {
-						return (new File(dir, name)).isDirectory();
+				if (folder == null) {
+					JOptionPane.showMessageDialog(this, "No folders selected!", "Error", JOptionPane.ERROR_MESSAGE);
+					return null;
+				} else {
+					String[] directories = (new File(folder)).list(new FilenameFilter() {
+						@Override
+						public boolean accept(File dir, String name) {
+							return (new File(dir, name)).isDirectory();
+						}
+					});
+					String result = "";
+					if (directories != null) {
+						for (String dir : directories) {
+							String dirResult = getFitnessFiles(folder + "/" + dir);
+							if (!dirResult.isEmpty())
+								result += dirResult + "###";
+						}
 					}
-				});
-				String result = "";
-				if (directories != null) {
-					for (String dir : directories) {
-						String dirResult = getFitnessFiles(folder + "/" + dir);
-						if (!dirResult.isEmpty())
-							result += dirResult + "###";
-					}
+					return result;
 				}
-				return result;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -645,37 +658,42 @@ public class ResultViewerGui extends Gui implements Updatable {
 		String parentpath = "";
 		ArrayList<PostEvaluationData> postsInformations = new ArrayList<PostEvaluationData>();
 
-		for (TreePath treePath : selectedFiles) {
-			String path = "";
+		if (selectedFiles == null) {
+			JOptionPane.showMessageDialog(this, "No folders selected!", "Error", JOptionPane.ERROR_MESSAGE);
+		} else {
 
-			if (treePath.getParentPath() == null) {
-				path = treePath.getLastPathComponent().toString();
-			} else {
-				if (parentpath.equals("")) {
-					parentpath = treePath.getParentPath().toString().replace("[", "");
-					parentpath = parentpath.replace("]", "");
+			for (TreePath treePath : selectedFiles) {
+				String path = "";
+
+				if (treePath.getParentPath() == null) {
+					path = treePath.getLastPathComponent().toString();
+				} else {
+					if (parentpath.equals("")) {
+						parentpath = treePath.getParentPath().toString().replace("[", "");
+						parentpath = parentpath.replace("]", "");
+					}
+
+					path = parentpath + "/" + treePath.getLastPathComponent();
 				}
-
-				path = parentpath + "/" + treePath.getLastPathComponent();
+				postsInformations.addAll(getInformationFromPostEvaluation(path));
 			}
-			postsInformations.addAll(getInformationFromPostEvaluation(path));
+
+			JFrame comparisonFrame = new JFrame("Setups Comparison");
+			PostEvaluationTableModel postsModel = new PostEvaluationTableModel(postsInformations);
+			JTable comparisonTable = new JTable(postsModel);
+			JScrollPane comparisonScrollPane = new JScrollPane(comparisonTable);
+			comparisonFrame.add(comparisonScrollPane);
+			comparisonFrame.pack();
+			comparisonFrame.setLocationRelativeTo(this);
+			comparisonFrame.setVisible(true);
+
+			comparisonTable.getColumn("Folder").setPreferredWidth(250);
+			comparisonTable.getColumn("Best").setPreferredWidth(1);
+			comparisonTable.getColumn("Fitness").setPreferredWidth(1);
+			comparisonTable.getColumn("Average").setPreferredWidth(1);
+
+			postsModel.fireTableDataChanged();
 		}
-
-		JFrame comparisonFrame = new JFrame("Setups Comparison");
-		PostEvaluationTableModel postsModel = new PostEvaluationTableModel(postsInformations);
-		JTable comparisonTable = new JTable(postsModel);
-		JScrollPane comparisonScrollPane = new JScrollPane(comparisonTable);
-		comparisonFrame.add(comparisonScrollPane);
-		comparisonFrame.pack();
-		comparisonFrame.setLocationRelativeTo(this);
-		comparisonFrame.setVisible(true);
-
-		comparisonTable.getColumn("Folder").setPreferredWidth(250);
-		comparisonTable.getColumn("Best").setPreferredWidth(1);
-		comparisonTable.getColumn("Fitness").setPreferredWidth(1);
-		comparisonTable.getColumn("Average").setPreferredWidth(1);
-
-		postsModel.fireTableDataChanged();
 	}
 
 	protected ArrayList<PostEvaluationData> getInformationFromPostEvaluation(String folder) {
