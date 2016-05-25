@@ -125,6 +125,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 	protected boolean enableDebugOptions = false;
 	protected boolean showSleepError = false;
+	protected boolean showCurrentFileLabel = false;
 
 	protected EnvironmentKeyDispatcher dispatcher;
 
@@ -142,6 +143,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		}
 
 		enableDebugOptions = args.getArgumentAsIntOrSetDefault("enabledebugoptions", 0) == 1;
+		showCurrentFileLabel = args.getArgumentAsIntOrSetDefault("showCurrentFileLabel", 0) == 1;
 
 		setLayout(new BorderLayout());
 
@@ -697,7 +699,11 @@ public class ResultViewerGui extends Gui implements Updatable {
 						parentpath = parentpath.replace("]", "");
 					}
 
-					path = parentpath + "/" + treePath.getLastPathComponent();
+					if (System.getProperty("os.name").contains("Windows")) {
+						path = parentpath + "\\" + treePath.getLastPathComponent();
+					} else {
+						path = parentpath + "/" + treePath.getLastPathComponent();
+					}
 				}
 				postsInformations.addAll(getInformationFromPostEvaluation(path));
 			}
@@ -947,6 +953,10 @@ public class ResultViewerGui extends Gui implements Updatable {
 				if (simulateUntil == 0)
 					playPosition.setValue(0);
 
+				if (showCurrentFileLabel) {
+					renderer.setText("File: " + filename);
+				}
+
 				launchSimulation();
 
 				lastCycleTime = System.currentTimeMillis();
@@ -1012,19 +1022,32 @@ public class ResultViewerGui extends Gui implements Updatable {
 					TreePath tp = e.getPath();
 
 					String filename = "";
-
+					
 					for (int i = 0; i < tp.getPathCount(); i++) {
 						filename += tp.getPathComponent(i);
 						if (i != tp.getPathCount() - 1)
-							filename += "/";
+							if (System.getProperty("os.name").contains("Windows")) {
+								if (!filename.endsWith("\\")) {
+									filename += "\\";
+								}
+							} else {
+								filename += "/";
+							}
 					}
 
 					File f = new File(filename);
-
 					if (f.exists()) {
-						currentFilename = filename;
-						if (!currentFileTextField.getText().equals(filename))
-							currentFileTextField.setText(filename);
+						String path ="";
+						
+						try{
+							path=f.getCanonicalPath();
+						}catch(IOException ee){
+							path=filename;
+						}
+						
+						currentFilename = path;
+						if (!currentFileTextField.getText().equals(path))
+							currentFileTextField.setText(path);
 					}
 				}
 			});
