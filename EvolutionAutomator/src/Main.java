@@ -17,8 +17,13 @@ public class Main {
 	private boolean testMode = false;
 	
 	public Main(String[] args) {
-		
-		String conf = args[0];
+		String conf ="";
+		if(args.length==0){
+			System.err.println("No configuration file provided!");
+			System.exit(1);
+		}else{
+			conf = args[0];
+		}
 		
 		for(int i = 1 ; i < args.length ; i++) {
 			String[] current = args[i].split("=");
@@ -27,8 +32,8 @@ public class Main {
 		}
 		
 		if(!conf.contains(".conf")) {
-			System.out.println("Configuration file must end in .conf");
-			System.exit(-1);
+			System.err.println("Configuration file must end in .conf");
+			System.exit(1);
 		}
 		
 		try {
@@ -64,9 +69,10 @@ public class Main {
 			if(globalVariables.get("%maxevolutions") != null)
 				maxEvolutions = Integer.parseInt(globalVariables.get("%maxevolutions"));
 			
-			folderName = conf.split("\\.")[0];
-			
+			String[] file = conf.split("/");
+			folderName = file[file.length-1].split("\\.")[0];
 			File folder = new File(folderName);
+			
 			folder.mkdir();
 			
 		} catch (FileNotFoundException e) {

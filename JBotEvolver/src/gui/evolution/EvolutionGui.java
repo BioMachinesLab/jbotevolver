@@ -1,11 +1,5 @@
 package gui.evolution;
 
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evolution.Evolution;
-import evolutionaryrobotics.populations.Population;
-import gui.Gui;
-import gui.renderer.Renderer;
-import gui.util.Graph;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -13,11 +7,11 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -25,6 +19,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evolution.Evolution;
+import evolutionaryrobotics.populations.Population;
+import gui.Gui;
+import gui.renderer.Renderer;
+import gui.util.Graph;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -150,6 +151,7 @@ public class EvolutionGui extends Gui {
 		JCheckBox enableCheckbox = new JCheckBox();
 		enableCheckbox.setSelected(false);
 		enableCheckbox.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				enablePreview = ((JCheckBox)e.getSource()).isSelected();
 				newGeneration();

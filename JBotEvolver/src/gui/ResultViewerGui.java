@@ -1,14 +1,5 @@
 package gui;
 
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
-import gui.renderer.Renderer;
-import gui.util.Editor;
-import gui.util.GraphPlotter;
-import gui.util.GraphViz;
-import gui.util.PostEvaluationData;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -40,8 +31,10 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
@@ -52,11 +45,20 @@ import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
+import gui.renderer.Renderer;
+import gui.util.Editor;
+import gui.util.GraphPlotter;
+import gui.util.GraphViz;
+import gui.util.PostEvaluationData;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -66,7 +68,7 @@ import updatables.BlenderExport;
 public class ResultViewerGui extends Gui implements Updatable {
 
 	private final int LEFTWRAPPERPANEL_INIT_WIDTH = 400;
-	
+
 	protected JTextField controlStepTextField;
 	protected JTextField fitnessTextField;
 
@@ -123,10 +125,14 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 	protected boolean enableDebugOptions = false;
 	protected boolean showSleepError = false;
+	protected boolean showCurrentFileLabel = false;
 
 	protected EnvironmentKeyDispatcher dispatcher;
 
 	protected long lastCycleTime = 0;
+
+	protected JButton openButton = new JButton("Open");
+	protected String lastOpenedPath = ".";
 
 	public ResultViewerGui(JBotSim jBotEvolver, Arguments args) {
 		super(jBotEvolver, args);
@@ -137,6 +143,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		}
 
 		enableDebugOptions = args.getArgumentAsIntOrSetDefault("enabledebugoptions", 0) == 1;
+		showCurrentFileLabel = args.getArgumentAsIntOrSetDefault("showCurrentFileLabel", 0) == 1;
 
 		setLayout(new BorderLayout());
 
@@ -190,6 +197,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		topPanel.add(editButton);
 
 		JPanel editLoad = new JPanel();
+		editLoad.add(openButton);
 		editLoad.add(editButton);
 		editLoad.add(loadButton);
 
@@ -390,6 +398,26 @@ public class ResultViewerGui extends Gui implements Updatable {
 				renderer.drawFrame();
 			}
 		});
+
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control S"), "control S");
+		this.getActionMap().put("control S", new AbstractAction() {
+			protected static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				newRandomSeed();
+			}
+		});
+
+		this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("control F"), "control F");
+		this.getActionMap().put("control F", new AbstractAction() {
+			protected static final long serialVersionUID = 1L;
+
+			@Override
+			public void actionPerformed(ActionEvent evt) {
+				plotFitness();
+			}
+		});
 	}
 
 	protected void initListeners() {
@@ -512,30 +540,15 @@ public class ResultViewerGui extends Gui implements Updatable {
 		newRandomSeedButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				int newRandomSeed = new Random().nextInt(Integer.MAX_VALUE);
+				newRandomSeed();
+			}
+		});
 
-				if (extraArguments.getText().isEmpty()) {
-					extraArguments.setText("--random-seed " + newRandomSeed);
-				} else {
-					String finalText = "";
-					boolean findSeedText = false;
-					Scanner scanner = new Scanner(extraArguments.getText());
-					while (scanner.hasNextLine()) {
-						String line = scanner.nextLine();
-						if (line.startsWith("--random-seed")) {
-							finalText += "--random-seed " + newRandomSeed + "\n";
-							findSeedText = true;
-						} else {
-							finalText += line + "\n";
-						}
-					}
-					scanner.close();
-					if (!findSeedText) {
-						finalText += "--random-seed " + newRandomSeed + "\n";
-					}
-					extraArguments.setText(finalText);
-				}
-				loadButton.doClick();
+		openButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selectFileToOpen();
 			}
 		});
 
@@ -556,18 +569,76 @@ public class ResultViewerGui extends Gui implements Updatable {
 		}
 	}
 
+	protected void newRandomSeed() {
+		int newRandomSeed = new Random().nextInt(Integer.MAX_VALUE);
+
+		if (extraArguments.getText().isEmpty()) {
+			extraArguments.setText("--random-seed " + newRandomSeed);
+		} else {
+			String finalText = "";
+			boolean findSeedText = false;
+			Scanner scanner = new Scanner(extraArguments.getText());
+			while (scanner.hasNextLine()) {
+				String line = scanner.nextLine();
+				if (line.startsWith("--random-seed")) {
+					finalText += "--random-seed " + newRandomSeed + "\n";
+					findSeedText = true;
+				} else {
+					finalText += line + "\n";
+				}
+			}
+			scanner.close();
+			if (!findSeedText) {
+				finalText += "--random-seed " + newRandomSeed + "\n";
+			}
+			extraArguments.setText(finalText);
+		}
+		loadButton.doClick();
+	}
+
 	protected void launchGraphPlotter(JBotEvolver jbot, Simulator sim) {
 		new GraphPlotter(jbot, sim);
 	}
 
 	protected void plotFitness() {
-		File f = new File(currentFileTextField.getText().trim());
-		final String mainFolder = f.isDirectory() ? f.getAbsolutePath() : f.getParent();
+		String[] paths;
+
+		if (fileTree.getSelectedFilesPaths().length >= 1) {
+			paths = new String[fileTree.getSelectedFilesPaths().length];
+			for (int i = 0; i < paths.length; i++) {
+				TreePath p = fileTree.getSelectedFilesPaths()[i];
+				paths[i] = "";
+				for (Object str : p.getPath())
+					paths[i] += str;
+				paths[i].trim();
+			}
+		} else {
+			paths = new String[1];
+			paths[0] = currentFileTextField.getText().trim();
+		}
+
+		File[] files = new File[paths.length];
+		final String[] mainFolders = new String[paths.length];
+		for (int i = 0; i < paths.length; i++) {
+			files[i] = new File(paths[i]);
+			mainFolders[i] = files[i].isDirectory() ? files[i].getAbsolutePath() : files[i].getParent();
+		}
 
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				new GraphPlotter(getFitnessFiles(mainFolder).split("###"));
+				String files = "";
+				for (String folder : mainFolders) {
+					files += getFitnessFiles(folder);
+				}
+
+				if (files != null) {
+					if (files.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "No files to compare!", "Error", JOptionPane.ERROR_MESSAGE);
+					} else {
+						new GraphPlotter(files.split("###"));
+					}
+				}
 			}
 		});
 		t.start();
@@ -581,21 +652,26 @@ public class ResultViewerGui extends Gui implements Updatable {
 			if (f.exists()) {
 				return f.getAbsolutePath();
 			} else {
-				String[] directories = (new File(folder)).list(new FilenameFilter() {
-					@Override
-					public boolean accept(File dir, String name) {
-						return (new File(dir, name)).isDirectory();
+				if (folder == null) {
+					JOptionPane.showMessageDialog(this, "No folders selected!", "Error", JOptionPane.ERROR_MESSAGE);
+					return null;
+				} else {
+					String[] directories = (new File(folder)).list(new FilenameFilter() {
+						@Override
+						public boolean accept(File dir, String name) {
+							return (new File(dir, name)).isDirectory();
+						}
+					});
+					String result = "";
+					if (directories != null) {
+						for (String dir : directories) {
+							String dirResult = getFitnessFiles(folder + "/" + dir);
+							if (!dirResult.isEmpty())
+								result += dirResult + "###";
+						}
 					}
-				});
-				String result = "";
-				if (directories != null) {
-					for (String dir : directories) {
-						String dirResult = getFitnessFiles(folder + "/" + dir);
-						if (!dirResult.isEmpty())
-							result += dirResult + "###";
-					}
+					return result;
 				}
-				return result;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -608,37 +684,46 @@ public class ResultViewerGui extends Gui implements Updatable {
 		String parentpath = "";
 		ArrayList<PostEvaluationData> postsInformations = new ArrayList<PostEvaluationData>();
 
-		for (TreePath treePath : selectedFiles) {
-			String path = "";
+		if (selectedFiles == null) {
+			JOptionPane.showMessageDialog(this, "No folders selected!", "Error", JOptionPane.ERROR_MESSAGE);
+		} else {
 
-			if (treePath.getParentPath() == null) {
-				path = treePath.getLastPathComponent().toString();
-			} else {
-				if (parentpath.equals("")) {
-					parentpath = treePath.getParentPath().toString().replace("[", "");
-					parentpath = parentpath.replace("]", "");
+			for (TreePath treePath : selectedFiles) {
+				String path = "";
+
+				if (treePath.getParentPath() == null) {
+					path = treePath.getLastPathComponent().toString();
+				} else {
+					if (parentpath.equals("")) {
+						parentpath = treePath.getParentPath().toString().replace("[", "");
+						parentpath = parentpath.replace("]", "");
+					}
+
+					if (System.getProperty("os.name").contains("Windows")) {
+						path = parentpath + "\\" + treePath.getLastPathComponent();
+					} else {
+						path = parentpath + "/" + treePath.getLastPathComponent();
+					}
 				}
-
-				path = parentpath + "/" + treePath.getLastPathComponent();
+				postsInformations.addAll(getInformationFromPostEvaluation(path));
 			}
-			postsInformations.addAll(getInformationFromPostEvaluation(path));
+
+			JFrame comparisonFrame = new JFrame("Setups Comparison");
+			PostEvaluationTableModel postsModel = new PostEvaluationTableModel(postsInformations);
+			JTable comparisonTable = new JTable(postsModel);
+			JScrollPane comparisonScrollPane = new JScrollPane(comparisonTable);
+			comparisonFrame.add(comparisonScrollPane);
+			comparisonFrame.pack();
+			comparisonFrame.setLocationRelativeTo(this);
+			comparisonFrame.setVisible(true);
+
+			comparisonTable.getColumn("Folder").setPreferredWidth(250);
+			comparisonTable.getColumn("Best").setPreferredWidth(1);
+			comparisonTable.getColumn("Fitness").setPreferredWidth(1);
+			comparisonTable.getColumn("Average").setPreferredWidth(1);
+
+			postsModel.fireTableDataChanged();
 		}
-
-		JFrame comparisonFrame = new JFrame("Setups Comparison");
-		PostEvaluationTableModel postsModel = new PostEvaluationTableModel(postsInformations);
-		JTable comparisonTable = new JTable(postsModel);
-		JScrollPane comparisonScrollPane = new JScrollPane(comparisonTable);
-		comparisonFrame.add(comparisonScrollPane);
-		comparisonFrame.pack();
-		comparisonFrame.setLocationRelativeTo(this);
-		comparisonFrame.setVisible(true);
-
-		comparisonTable.getColumn("Folder").setPreferredWidth(250);
-		comparisonTable.getColumn("Best").setPreferredWidth(1);
-		comparisonTable.getColumn("Fitness").setPreferredWidth(1);
-		comparisonTable.getColumn("Average").setPreferredWidth(1);
-
-		postsModel.fireTableDataChanged();
 	}
 
 	protected ArrayList<PostEvaluationData> getInformationFromPostEvaluation(String folder) {
@@ -671,7 +756,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		return null;
 	}
 
-	private PostEvaluationData getDataFromPost(File f) throws IOException {
+	protected PostEvaluationData getDataFromPost(File f) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader(f));
 		String line = reader.readLine();
 		String[] splitSetupName;
@@ -868,12 +953,38 @@ public class ResultViewerGui extends Gui implements Updatable {
 				if (simulateUntil == 0)
 					playPosition.setValue(0);
 
+				if (showCurrentFileLabel) {
+					renderer.setText("File: " + filename);
+				}
+
 				launchSimulation();
 
 				lastCycleTime = System.currentTimeMillis();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	protected void selectFileToOpen() {
+		JFileChooser chooser = new JFileChooser(lastOpenedPath);
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("Configuration file (*.conf)", "conf");
+		chooser.setFileFilter(filter);
+		chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+		chooser.setMultiSelectionEnabled(false);
+
+		int returnVal = chooser.showOpenDialog(this);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			if (chooser.getSelectedFile().isFile()) {
+				fileTree.changeDirectory(chooser.getSelectedFile().getParent());
+				lastOpenedPath = chooser.getSelectedFile().getAbsolutePath();
+				currentFileTextField.setText(chooser.getSelectedFile().getAbsolutePath());
+				loadCurrentFile();
+			} else {
+				fileTree.changeDirectory(chooser.getSelectedFile().getAbsolutePath());
+				lastOpenedPath = chooser.getSelectedFile().getAbsolutePath();
+				currentFileTextField.setText(chooser.getSelectedFile().getAbsolutePath());
+			}
 		}
 	}
 
@@ -911,19 +1022,32 @@ public class ResultViewerGui extends Gui implements Updatable {
 					TreePath tp = e.getPath();
 
 					String filename = "";
-
+					
 					for (int i = 0; i < tp.getPathCount(); i++) {
 						filename += tp.getPathComponent(i);
 						if (i != tp.getPathCount() - 1)
-							filename += "/";
+							if (System.getProperty("os.name").contains("Windows")) {
+								if (!filename.endsWith("\\")) {
+									filename += "\\";
+								}
+							} else {
+								filename += "/";
+							}
 					}
 
 					File f = new File(filename);
-
 					if (f.exists()) {
-						currentFilename = filename;
-						if (!currentFileTextField.getText().equals(filename))
-							currentFileTextField.setText(filename);
+						String path ="";
+						
+						try{
+							path=f.getCanonicalPath();
+						}catch(IOException ee){
+							path=filename;
+						}
+						
+						currentFilename = path;
+						if (!currentFileTextField.getText().equals(path))
+							currentFileTextField.setText(path);
 					}
 				}
 			});
