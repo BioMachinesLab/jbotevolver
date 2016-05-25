@@ -599,13 +599,37 @@ public class ResultViewerGui extends Gui implements Updatable {
 	}
 
 	protected void plotFitness() {
-		File f = new File(currentFileTextField.getText().trim());
-		final String mainFolder = f.isDirectory() ? f.getAbsolutePath() : f.getParent();
+		String[] paths;
+
+		if (fileTree.getSelectedFilesPaths().length >= 1) {
+			paths = new String[fileTree.getSelectedFilesPaths().length];
+			for (int i = 0; i < paths.length; i++) {
+				TreePath p = fileTree.getSelectedFilesPaths()[i];
+				paths[i] = "";
+				for (Object str : p.getPath())
+					paths[i] += str;
+				paths[i].trim();
+			}
+		} else {
+			paths = new String[1];
+			paths[0] = currentFileTextField.getText().trim();
+		}
+
+		File[] files = new File[paths.length];
+		final String[] mainFolders = new String[paths.length];
+		for (int i = 0; i < paths.length; i++) {
+			files[i] = new File(paths[i]);
+			mainFolders[i] = files[i].isDirectory() ? files[i].getAbsolutePath() : files[i].getParent();
+		}
 
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				String files = getFitnessFiles(mainFolder);
+				String files = "";
+				for (String folder : mainFolders) {
+					files += getFitnessFiles(folder);
+				}
+
 				if (files != null) {
 					if (files.isEmpty()) {
 						JOptionPane.showMessageDialog(null, "No files to compare!", "Error", JOptionPane.ERROR_MESSAGE);
