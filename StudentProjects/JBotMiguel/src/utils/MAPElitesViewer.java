@@ -63,8 +63,9 @@ public class MAPElitesViewer {
 //		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
 //		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
 //		new MAPElitesViewer("bigdisk/december2015/10samples/repertoire/", true);
-//		new MAPElitesViewer("bigdisk/december2015/foraging/intersected_repertoire_all/", true);
-		new MAPElitesViewer("hexamap_big/", true);
+		new MAPElitesViewer("bigdisk/repertoire/", true);
+//		new MAPElitesViewer("hexamap_big/", true);
+//		new MAPElitesViewer("hexamap_free/", true);
 //		new MAPElitesViewer("hexamap_debug/", true);
 	}
 	
@@ -149,12 +150,15 @@ public class MAPElitesViewer {
 		sim.addRobots(jbot.createRobots(sim, c));
 		sim.setupEnvironment();
 		placeMarkers((MAPElitesPopulation)pop);
-		sim.simulate();
-//		for(double i = 0 ; i < sim.getEnvironment().getSteps() ; i++) {
-//			sim.performOneSimulationStep(i);
-//			refresh();
-//			try {Thread.sleep(50);} catch (InterruptedException e) {}
-//		}
+		if(sim.getArguments().get("--controllers").getCompleteArgumentString().contains("Hexa"))
+			sim.simulate();
+		else {
+			for(double i = 0 ; i < sim.getEnvironment().getSteps() ; i++) {
+				sim.performOneSimulationStep(i);
+				refresh();
+				try {Thread.sleep(50);} catch (InterruptedException e) {}
+			}
+		}
 		sim.terminate();
 		renderer.drawFrame();
 	}
@@ -168,21 +172,16 @@ public class MAPElitesViewer {
 			jbot.setupBestIndividual(sim);
 			sim.setupEnvironment();
 			
-			placeMarkers((MAPElitesPopulation)pop);
-			
-//			circlePoint(-0.5,1.0*0.95,0,0.2,(MAPElitesPopulation)pop);
+			placeMarkers(pop);
 			
 			if(genLabel != null)
 				genLabel.setText("Generation: "+i);
 			
 			refresh();
 			
-//			System.out.println(((MAPElitesPopulation)pop).getNumberOfChromosomes());
-			
-//			Thread.sleep(10);
 		} catch(Exception e) {
 			System.err.println("Can't find population file "+i);
-//			e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 	
@@ -193,7 +192,9 @@ public class MAPElitesViewer {
 		}
 	}
 	
-	public void placeMarkers(MAPElitesPopulation pop) {
+	public void placeMarkers(Population p) {
+		
+		MAPElitesPopulation pop = (MAPElitesPopulation)p;
 		
 		int count = 0;
 		
@@ -247,7 +248,7 @@ public class MAPElitesViewer {
 		}
 	}
 	
-	private Color getColor(double fitness) {
+	protected Color getColor(double fitness) {
 		Color firstCol = Color.GREEN;
 		Color secondCol = Color.RED;
 		int R = (int)Math.abs(firstCol.getRed() * fitness + secondCol.getRed()* (1 - fitness));

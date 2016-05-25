@@ -81,7 +81,7 @@ public class NEATEvolution extends Evolution {
 			population.createRandomPopulation();
 			population.setNEATPopulation4J((NEATPopulation4J) algorithm.population());
 			population.getNEATPopulation4J().setSpecies(algorithm.getSpecies());
-		}
+		} 
 
 		if (!population.evolutionDone())
 			taskExecutor.setTotalNumberOfTasks(

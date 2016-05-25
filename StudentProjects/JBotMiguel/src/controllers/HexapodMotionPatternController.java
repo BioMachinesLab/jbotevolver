@@ -91,6 +91,10 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 		
 		int nResults = (int)vals[index++];
 		
+		System.out.println(vals.length);
+		for(int i = 0 ; i < vals.length ; i++)
+			System.out.print(vals[i]+" ");
+		
 		//id
 		int id = (int)vals[index++];
 		//number of values

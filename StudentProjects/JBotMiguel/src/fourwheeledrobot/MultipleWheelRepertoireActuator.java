@@ -29,6 +29,10 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	protected double circleRadius;
 	protected int type = 0;
 	protected double stop = 0;
+	protected int lock = 0;
+	protected int controlCycle = 0;
+	
+	protected double[] prevBehavior;
 	
 	public MultipleWheelRepertoireActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
@@ -41,6 +45,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
 			nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
 			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
+			lock = (int)(args.getArgumentAsDoubleOrSetDefault("lock", lock) / simulator.getTimeDelta());
 		} else {
 			
 			int fitnessSample = simulator.getArguments().get("--environment").getArgumentAsInt("fitnesssample");
@@ -71,12 +76,19 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		
 		type = args.getArgumentAsIntOrSetDefault("type", type);
 	}
-
+	
 	@Override
 	public void apply(Robot robot, double timeDelta) {
 		
-		//select correct behavior from repertoire
-		double[] behavior = selectBehaviorFromRepertoire();
+		controlCycle++;
+		
+		//select correct behavior from repertoire, or lock for X number of timesteps
+		double[] behavior;
+		if(prevBehavior == null || (lock == 0 || controlCycle % lock == 0)) {
+			behavior = selectBehaviorFromRepertoire();
+		}else{
+			behavior = prevBehavior;
+		}
 		
 		if(behavior == null) {
 			System.err.println("Cannot find the correct behavior in repertoire! "+heading+" "+speed);
@@ -95,6 +107,8 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		if(stop-- <= 0) {
 			wheels.apply(robot, timeDelta);
 		}
+		
+		prevBehavior = behavior;
 	}
 	
 	protected double[] selectBehaviorFromRepertoire() {

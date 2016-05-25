@@ -24,16 +24,16 @@ import simulation.util.Arguments;
 public class TwoDRendererDebug extends TwoDRenderer {
 
 	protected int selectedRobot=-1;
-	private boolean wallRay;
-	private int coneSensorId;
-	private String coneClass = "";
-	private int robotId;
-	private boolean boardSensors;
-	private boolean paperSensors;
+	protected boolean wallRay;
+	protected int coneSensorId;
+	protected String coneClass = "";
+	protected int robotId;
+	protected boolean boardSensors;
+	protected boolean paperSensors;
 
-	private boolean blink = true;
+	protected boolean blink = true;
 	
-	private Vector2d selectedLocation;
+	protected Vector2d selectedLocation;
 	
 	public TwoDRendererDebug(Arguments args) {
 		super(args);

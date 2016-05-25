@@ -11,10 +11,10 @@ public class ExportFitnessPlots {
 		
 //		String f = "bigdisk/december2015/10samples/";String m = "_obstacle/";
 //		String f = "bigdisk/december2015/foraging/";String m = "_foraging/";
-		String f = "";String m = "_obstacle/";
+		String f = "bigdisk/locking/";String m = "";//"_obstacle/";
 		
-		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m+"all_30"+m};
-//		String[] setups = new String[]{f+"repertoire/"};
+//		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m+"all_30"+m};
+		String[] setups = new String[]{f};
 		
 		for(String s : setups)
 			new ExportFitnessPlots(s);

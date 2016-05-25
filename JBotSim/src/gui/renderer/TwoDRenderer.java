@@ -142,14 +142,18 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	protected void drawMarker(Graphics g, Marker m) {
 
-		int markerSize = 2;
+		int markerSize = (int)(scale*m.getRadius());
 		double markerLength = m.getLength();
 
 		int x = transformX(m.getPosition().x);
 		int y = transformY(m.getPosition().y);
 
 		g.setColor(m.getColor());
-		g.drawOval(x - markerSize / 2, y - markerSize / 2, markerSize, markerSize);
+		
+		if(m.isSquare()) {
+			g.drawRect(x - markerSize / 2, y - markerSize / 2, markerSize, markerSize);
+		} else 
+			g.drawOval(x - markerSize / 2, y - markerSize / 2, markerSize, markerSize);
 
 		double orientation = m.getOrientation();
 		Vector2d endPoint = new Vector2d(m.getPosition());

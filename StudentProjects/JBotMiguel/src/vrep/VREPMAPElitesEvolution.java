@@ -34,6 +34,7 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 	protected int controllerType = 0;
 	protected int time = 0;
 	public int excluded = 0;
+	protected double tiltThreshold = 0;
 	
     public VREPMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
     	super(jBotEvolver, taskExecutor, arg);
@@ -46,6 +47,7 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
     	
     	controllerType = arg.getArgumentAsIntOrSetDefault("controllertype", controllerType);
     	time = arg.getArgumentAsIntOrSetDefault("time", time);
+    	tiltThreshold = Math.toRadians(arg.getArgumentAsDoubleOrSetDefault("tiltthreshold", tiltThreshold));
     }
     
     public static double getFitness(MOChromosome moc) {
@@ -146,7 +148,7 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 					
 					moc.setEvaluationResult(result.getEvaluationResult());
 					
-					if(minTilt > 0) {
+					if(minTilt > tiltThreshold) {
 						((MAPElitesPopulation)population).addToMap(moc);
 					} else {
 						excluded++;

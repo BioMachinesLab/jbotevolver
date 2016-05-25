@@ -1,24 +1,20 @@
 package evolution;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
-import multiobjective.MOChromosome;
-import novelty.ExpandedFitness;
-import novelty.evaluators.FinalPositionBehavior;
-import novelty.evaluators.FinalPositionWithOrientationBehavior;
-import simulation.robot.Robot;
-import simulation.util.Arguments;
 import controllers.FixedLenghtGenomeEvolvableController;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
+import novelty.ExpandedFitness;
+import multiobjective.MOChromosome;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 
-public class MAPElitesPopulation extends Population{
+public class NDMAPElitesPopulation extends Population{
 	
 	private static final long serialVersionUID = -4634842347856072534L;
 	
-	protected MOChromosome[][] map;
-	protected double resolution;
-	protected double limit;
 	protected int currentGeneration;
 	protected int generations;
 	protected int initialBatch = 20000;
@@ -36,9 +32,14 @@ public class MAPElitesPopulation extends Population{
 	protected double minAllele = -10;
 	
 	protected double[] possibleValues;
-
-	public MAPElitesPopulation(Arguments arguments) {
+	
+	protected Arguments args;
+	
+	protected NDBehaviorMap map;
+	
+	public NDMAPElitesPopulation(Arguments arguments) {
 		super(arguments);
+		this.args = arguments;
 		
 		initialBatch = arguments.getArgumentAsInt("initialbatch");
 		batchSize = arguments.getArgumentAsInt("batchsize");
@@ -50,13 +51,8 @@ public class MAPElitesPopulation extends Population{
 		
 		gaussianStdDev = arguments.getArgumentAsDoubleOrSetDefault("gaussian", gaussianStdDev);
 
-		limit = arguments.getArgumentAsDouble("limit");
-		resolution = arguments.getArgumentAsDouble("resolution");
-
-		int size = (int)(limit/resolution);
-		map = new MOChromosome[size][size];
-		
 		chromosomes = new ArrayList<MOChromosome>();
+		map = new NDBehaviorMap(arguments);
 		
 		if(arguments.getArgumentIsDefined("maxallele")) {
 			maxAllele = arguments.getArgumentAsInt("maxallele");
@@ -66,6 +62,8 @@ public class MAPElitesPopulation extends Population{
 		if(arguments.getArgumentIsDefined("minallele")) {
 			minAllele = arguments.getArgumentAsInt("minallele");
 		}
+		
+		map.setMinMaxAllele(minAllele,maxAllele);
 		
 		if(arguments.getArgumentIsDefined("possiblevalues")) {
 			String values = arguments.getArgumentAsString("possiblevalues");
@@ -77,6 +75,46 @@ public class MAPElitesPopulation extends Population{
 			}
 		}
 		
+		chromosomes = new ArrayList<MOChromosome>();
+	}
+	
+	public void addToMapForced(MOChromosome moc, double[] vec) {
+		map.addChromosome(moc,vec);
+		chromosomes.add(moc);
+	}
+	
+	public void addToMap(MOChromosome moc) {
+		
+		MOChromosome currentMapIndividual =	map.getChromosome(moc);
+		
+		if(currentMapIndividual == null) {
+			//the cell is empty, add immediately
+			map.addChromosome(moc);
+			chromosomes.add(moc);
+		} else {
+			//check fitness performance to figure out if current chromosome has to be replace
+			if(getFitness(moc) > getFitness(currentMapIndividual)) {
+				map.addChromosome(moc);
+				int index = chromosomes.indexOf(currentMapIndividual);
+				chromosomes.set(index, moc);
+			} 
+		}
+	}
+	
+	public void removeFromMap(MOChromosome moc) {
+		int index = chromosomes.indexOf(moc);
+		chromosomes.remove(index);
+		map.removeChromosome(moc);
+	}
+	
+	protected double getFitness(MOChromosome moc) {
+		
+		double fitness = 0;
+		
+		ExpandedFitness fit = (ExpandedFitness)moc.getEvaluationResult();
+		fitness = (double)fit.getCorrespondingEvaluation(fitnessIndex).value();
+		
+		return fitness;
 	}
 	
 	public ArrayList<MOChromosome> getRandomPopulation() {
@@ -110,130 +148,15 @@ public class MAPElitesPopulation extends Population{
 		return mutate(randomChromosome);
 	}
 	
-	public int getNumberOfChromosomes() {
-		return chromosomes.size();
+
+	public Arguments getArguments() {
+		return args;
 	}
 	
-	public int getBatchSize() {
-		return batchSize;
-	}
-	
-	public double getMapResolution() {
-		return resolution;
-	}
-	
-	public void addToMapForced(MOChromosome moc, int[] pos) {
-		map[pos[0]][pos[1]] = moc;
-		chromosomes.add(moc);
-	}
-	
-	public void addToMap(MOChromosome moc) {
-		int[] mocMapLocation = positionInMap(moc);
-		
-		if(mocMapLocation[0] >= map.length || mocMapLocation[0] < 0 ||
-				mocMapLocation[1] >= map[mocMapLocation[0]].length || mocMapLocation[1] < 0)
-			return;
-		
- 		MOChromosome currentMapIndividual = map[mocMapLocation[0]][mocMapLocation[1]];
-		
-		if(currentMapIndividual == null) {
-			//the cell is empty, add immediately
-			map[mocMapLocation[0]][mocMapLocation[1]] = moc;
-			chromosomes.add(moc);
-		} else {
-			//check fitness performance to figure out if current chromosome has to be replace
-			if(getFitness(moc) > getFitness(currentMapIndividual)) {
-				map[mocMapLocation[0]][mocMapLocation[1]] = moc;
-				int index = chromosomes.indexOf(currentMapIndividual);
-				chromosomes.set(index, moc);
-			} else {
-			}
-		}
-	}
-	
-	public void removeFromMap(MOChromosome moc) {
-		int index = chromosomes.indexOf(moc);
-		chromosomes.remove(index);
-		int[] loc = positionInMap(moc);
-		map[loc[0]][loc[1]] = null;
-	}
-	
-	protected double getFitness(MOChromosome moc) {
-		
-		double fitness = 0;
-		
-		ExpandedFitness fit = (ExpandedFitness)moc.getEvaluationResult();
-		fitness = (double)fit.getCorrespondingEvaluation(fitnessIndex).value();
-		
-		return fitness;
-	}
-	
-	public MOChromosome getChromosomeFromBehaviorVector(double[] vec) {
-		int[] mapLocation = getLocationFromBehaviorVector(vec);
-		return map[mapLocation[0]][mapLocation[1]];
-	}
-	
-	public int[] getLocationFromBehaviorVector(double[] vec) {
-		int[] mapLocation = new int[vec.length];
-		
-		for(int i = 0 ; i < vec.length ; i++) {
-			int pos = (int)(vec[i]/resolution + map.length/2.0);
-			mapLocation[i] = pos;
-		}
-		return mapLocation;
-	}
-	
-	public int[] positionInMap(MOChromosome c) {
-		double[] vec = getBehaviorVector(c);
-		return getLocationFromBehaviorVector(vec);
-	}
-	
-	public double[] getBehaviorVector(MOChromosome c) {
-		ExpandedFitness fit = (ExpandedFitness)c.getEvaluationResult();
-		return (double[])fit.getCorrespondingEvaluation(behaviorIndex).value();
-	}
-	
-	protected MOChromosome mutate(MOChromosome c) {
-		
-		double[] alleles = new double[c.getAlleles().length];
-		
-		boolean mutated = false;
-		
-		do {
-		
-			for (int j = 0; j < c.getAlleles().length; j++) {
-				double allele = c.getAlleles()[j];
-				if (randomNumberGenerator.nextDouble() < mutationRate) {
-					mutated = true;
-					if(possibleValues != null) {
-						double currentValue = allele;
-						do {
-							allele = possibleValues[randomNumberGenerator.nextInt(possibleValues.length)];
-						} while(allele == currentValue);
-					} else if(!randomMutation)
-						allele = allele + randomNumberGenerator.nextGaussian()*gaussianStdDev;
-					else {
-						double interval = maxAllele-minAllele; 
-						double val = randomNumberGenerator.nextDouble()*interval;
-						allele = val+minAllele;
-					}
-					
-					if (allele < -maxAllele)
-						allele = -maxAllele;
-					if (allele > maxAllele)
-						allele = maxAllele;
-				}
-				alleles[j] = allele;
-			}
-		}while(!mutated);
-		
-		return new MOChromosome(alleles, currentChromosomeId++);
-	}
-	
-	public MOChromosome[][] getMap() {
+	public NDBehaviorMap getNDBehaviorMap(){
 		return map;
 	}
-	
+
 	@Override
 	public boolean evolutionDone() {
 		return currentGeneration >= numberOfGenerations ||
@@ -299,8 +222,49 @@ public class MAPElitesPopulation extends Population{
 		return this.numberOfChromosomesRequested;
 	}
 	
-	public double getDistanceLimit() {
-		return limit;
+	public int getBatchSize() {
+		return batchSize;
+	}
+	
+	public int getNumberOfChromosomes() {
+		return chromosomes.size();
+	}
+	
+	protected MOChromosome mutate(MOChromosome c) {
+		
+		double[] alleles = new double[c.getAlleles().length];
+		
+		boolean mutated = false;
+		
+		do {
+		
+			for (int j = 0; j < c.getAlleles().length; j++) {
+				double allele = c.getAlleles()[j];
+				if (randomNumberGenerator.nextDouble() < mutationRate) {
+					mutated = true;
+					if(possibleValues != null) {
+						double currentValue = allele;
+						do {
+							allele = possibleValues[randomNumberGenerator.nextInt(possibleValues.length)];
+						} while(allele == currentValue);
+					} else if(!randomMutation)
+						allele = allele + randomNumberGenerator.nextGaussian()*gaussianStdDev;
+					else {
+						double interval = maxAllele-minAllele; 
+						double val = randomNumberGenerator.nextDouble()*interval;
+						allele = val+minAllele;
+					}
+					
+					if (allele < -maxAllele)
+						allele = -maxAllele;
+					if (allele > maxAllele)
+						allele = maxAllele;
+				}
+				alleles[j] = allele;
+			}
+		}while(!mutated);
+		
+		return new MOChromosome(alleles, currentChromosomeId++);
 	}
 	
 	@Override
@@ -327,4 +291,5 @@ public class MAPElitesPopulation extends Population{
 			}
 		}
 	}
+	
 }

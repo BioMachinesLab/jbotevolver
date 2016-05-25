@@ -55,7 +55,7 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 		if(vrep == null) {
 			vrep = new remoteApi();
 			vrep.simxFinish(-1); // just in case, close all opened connections
-			clientId = vrep.simxStart(ip,19997,true,false,5000,5);
+			clientId = vrep.simxStart(ip,19996,true,false,5000,5);
 		}
 	}
 	

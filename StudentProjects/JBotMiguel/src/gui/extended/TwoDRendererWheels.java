@@ -20,9 +20,70 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 		super(args);
 	}
 	
+	protected void drawRobotBasic(Graphics graphics, Robot robot) {
+		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
+			createImage();
+		int circleDiameter = bigRobots ? (int)Math.max(10,Math.round(robot.getDiameter() * scale)) : (int) Math.round(robot.getDiameter() * scale);
+		int x = transformX(robot.getPosition().getX()) - circleDiameter / 2;
+		int y = transformY(robot.getPosition().getY()) - circleDiameter / 2;
+		
+//		if(robot.getId() == selectedRobot) {
+//			graphics.setColor(Color.yellow);
+//			graphics.fillOval(x-2, y-2, circleDiameter + 4, circleDiameter + 4);
+//			
+//		}
+//		graphics.setColor(robot.getBodyColor());
+		
+		Graphics2D g2d = (Graphics2D)graphics;
+		g2d.setStroke(new BasicStroke(2));
+		
+		graphics.setColor(Color.RED);
+		g2d.drawOval(x, y, circleDiameter, circleDiameter);
+		
+		
+		double orientation  = robot.getOrientation();
+		
+		double x2 = robot.getPosition().getX()+robot.getDiameter()/2.0*Math.cos(orientation);
+		double y2 = robot.getPosition().getY()+robot.getDiameter()/2.0*Math.sin(orientation);
+		
+		graphics.drawLine(transformX(robot.getPosition().getX()), transformY(robot.getPosition().getY()), transformX(x2), transformY(y2));
+
+		g2d.setStroke(new BasicStroke(1));
+		
+		/*
+		Vector2d p0 = new Vector2d();
+		Vector2d p1 = new Vector2d();
+		Vector2d p2 = new Vector2d();
+		p0.set( 0, -robot.getRadius() / 3);
+		p1.set( 0, robot.getRadius() / 3);
+		p2.set( 6 * robot.getRadius() / 7, 0);
+
+		p0.rotate(orientation);
+		p1.rotate(orientation);
+		p2.rotate(orientation);
+
+		int[] xp = new int[3];
+		int[] yp = new int[3];
+
+		xp[0] = transformX(p0.getX() + robot.getPosition().getX());
+		yp[0] = transformY(p0.getY() + robot.getPosition().getY());
+
+		xp[1] = transformX(p1.getX() + robot.getPosition().getX());
+		yp[1] = transformY(p1.getY() + robot.getPosition().getY());
+
+		xp[2] = transformX(p2.getX() + robot.getPosition().getX());
+		yp[2] = transformY(p2.getY() + robot.getPosition().getY());
+
+		graphics.drawPolygon(xp, yp, 3);
+		 */
+		graphics.setColor(Color.BLACK);
+	}
+	
 	@Override
 	protected void drawRobot(Graphics graphics, Robot robot) {
-		super.drawRobot(graphics, robot);
+//		super.drawRobot(graphics, robot);
+		
+		drawRobotBasic(graphics,robot);
 		
 		if(robot.getActuators().size() > 1) {
 			
@@ -121,9 +182,11 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 		Vector2d robotCenterRight = new Vector2d(robotCenter);
 		robotCenterRight.add(new Vector2d(10*Math.cos(rO-Math.PI/2),10*Math.sin(rO-Math.PI/2)));
 		
-		graphics.fillPolygon(
+		graphics.drawPolygon(
 				new int[]{(int)robotCenterLeft.x, (int)robotCenterRight.x, (int)robotFront.x},
 				new int[]{(int)robotCenterLeft.y, (int)robotCenterRight.y, (int)robotFront.y},
 				3);
 	}
+	
+	
 }
