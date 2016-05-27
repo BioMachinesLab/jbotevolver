@@ -95,7 +95,6 @@ public class NDMAPElitesViewer extends MAPElitesViewer{
 		double[] xBuckets = pop.getNDBehaviorMap().getBucketListing(0);
 		double[] yBuckets = pop.getNDBehaviorMap().getBucketListing(1);
 		double[] orBuckets = pop.getNDBehaviorMap().getBucketListing(2);
-		
 		for(int x = 0 ; x < xBuckets.length ; x++) {
 			for(int y = 0 ; y < yBuckets.length ; y++) {
 				for(int z = 0 ; z < orBuckets.length ; z++) {
@@ -108,6 +107,8 @@ public class NDMAPElitesViewer extends MAPElitesViewer{
 						continue;
 					
 					double[] behavior = pop.getNDBehaviorMap().getBehaviorVector(res);
+					
+//					System.out.println(behavior[0]+","+behavior[1]+","+behavior[2]);
 					
 					Vector2d pos = new Vector2d(xBuckets[x],yBuckets[y]);
 					
