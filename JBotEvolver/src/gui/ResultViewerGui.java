@@ -603,13 +603,18 @@ public class ResultViewerGui extends Gui implements Updatable {
 	protected void plotFitness() {
 		String[] paths;
 
-		if (fileTree.getSelectedFilesPaths().length >= 1) {
+		if (fileTree.getSelectedFilesPaths() != null && fileTree.getSelectedFilesPaths().length >= 1) {
 			paths = new String[fileTree.getSelectedFilesPaths().length];
 			for (int i = 0; i < paths.length; i++) {
 				TreePath p = fileTree.getSelectedFilesPaths()[i];
 				paths[i] = "";
-				for (Object str : p.getPath())
-					paths[i] += str;
+
+				Object[] str = p.getPath();
+				for (int j = 0; j < str.length - 1; j++) {
+					paths[i] += str[j];
+				}
+
+				paths[i] += "\\" + str[str.length - 1];
 				paths[i].trim();
 			}
 		} else {
@@ -617,26 +622,29 @@ public class ResultViewerGui extends Gui implements Updatable {
 			paths[0] = currentFileTextField.getText().trim();
 		}
 
-		File[] files = new File[paths.length];
 		final String[] mainFolders = new String[paths.length];
 		for (int i = 0; i < paths.length; i++) {
-			files[i] = new File(paths[i]);
-			mainFolders[i] = files[i].isDirectory() ? files[i].getAbsolutePath() : files[i].getParent();
+
+			File file = new File(paths[i]);
+			mainFolders[i] = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		}
 
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				String files = "";
+				ArrayList<String> files = new ArrayList<String>();
 				for (String folder : mainFolders) {
-					files += getFitnessFiles(folder);
+					String[] fs = getFitnessFiles(folder).split("###");
+
+					for (String str : fs)
+						files.add(str);
 				}
 
 				if (files != null) {
 					if (files.isEmpty()) {
 						JOptionPane.showMessageDialog(null, "No files to compare!", "Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-						new GraphPlotter(files.split("###"));
+						new GraphPlotter(files.toArray(new String[files.size()]));
 					}
 				}
 			}
@@ -1022,7 +1030,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 					TreePath tp = e.getPath();
 
 					String filename = "";
-					
+
 					for (int i = 0; i < tp.getPathCount(); i++) {
 						filename += tp.getPathComponent(i);
 						if (i != tp.getPathCount() - 1)
@@ -1037,14 +1045,14 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 					File f = new File(filename);
 					if (f.exists()) {
-						String path ="";
-						
-						try{
-							path=f.getCanonicalPath();
-						}catch(IOException ee){
-							path=filename;
+						String path = "";
+
+						try {
+							path = f.getCanonicalPath();
+						} catch (IOException ee) {
+							path = filename;
 						}
-						
+
 						currentFilename = path;
 						if (!currentFileTextField.getText().equals(path))
 							currentFileTextField.setText(path);
