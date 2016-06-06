@@ -11,6 +11,7 @@ import java.util.Scanner;
 import javax.swing.JButton;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -31,10 +32,24 @@ public class Editor extends JFrame {
 
 		try {
 			File f = new File(filePath);
-			Scanner scanner = new Scanner(f);
 
-			while(scanner.hasNext())
-				s+=scanner.nextLine()+"\n";
+			if (!f.exists() || f.isDirectory()) {
+				JOptionPane.showMessageDialog(this, "No file selected!", "Error", JOptionPane.ERROR_MESSAGE);
+				return;
+			} else {
+
+				Scanner scanner = null;
+				try {
+					scanner = new Scanner(f);
+
+					while (scanner.hasNext())
+						s += scanner.nextLine() + "\n";
+				} finally {
+					if (scanner != null) {
+						scanner.close();
+					}
+				}
+			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -52,12 +67,12 @@ public class Editor extends JFrame {
 
 		JPanel panel = new JPanel(new BorderLayout());
 
-		panel.add(new JScrollPane(textArea),BorderLayout.CENTER);
-		panel.add(saveButton,BorderLayout.SOUTH);
+		panel.add(new JScrollPane(textArea), BorderLayout.CENTER);
+		panel.add(saveButton, BorderLayout.SOUTH);
 
 		add(panel);
 
-		setSize(600,500);
+		setSize(600, 500);
 		setLocationRelativeTo(null);
 
 		setVisible(true);

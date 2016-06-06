@@ -67,7 +67,8 @@ import updatables.BlenderExport;
 
 public class ResultViewerGui extends Gui implements Updatable {
 
-	private final int LEFTWRAPPERPANEL_INIT_WIDTH = 400;
+	private final int LEFTWRAPPERPANEL_INIT_WIDTH_WINDOWS = 400;
+	private final int LEFTWRAPPERPANEL_INIT_WIDTH_UNIX = 220;
 
 	protected JTextField controlStepTextField;
 	protected JTextField fitnessTextField;
@@ -154,10 +155,22 @@ public class ResultViewerGui extends Gui implements Updatable {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftWrapperPanel,
 				rightAndCenterWrapperPanel);
 		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH);
+		
+		if (System.getProperty("os.name").contains("Windows")) {
+			splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH_WINDOWS);
+		} else {
+			splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH_UNIX);
+		}
+		
 
-		// Provide minimum sizes for the two components in the split pane
-		Dimension minimumSize = new Dimension(300, 250);
+		// Provide minimum sizes for the two components in the split panel
+		Dimension minimumSize = null;
+		if (System.getProperty("os.name").contains("Windows")) {
+			minimumSize = new Dimension(300, 250);
+		} else {
+			minimumSize=new Dimension(200,250);
+		}
+
 		leftWrapperPanel.setMinimumSize(minimumSize);
 		rightAndCenterWrapperPanel.setMinimumSize(minimumSize);
 
@@ -606,6 +619,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 		if (selectedFiles == null) {
 			JOptionPane.showMessageDialog(this, "No folders or files selected!", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
 		} else {
 			String parentpath = "";
 			for (TreePath treePath : selectedFiles) {
@@ -643,7 +657,6 @@ public class ResultViewerGui extends Gui implements Updatable {
 					for (String str : fs) {
 						if (!str.isEmpty()) {
 							files.add(str);
-							System.out.println(str);
 						}
 					}
 				}
