@@ -601,31 +601,35 @@ public class ResultViewerGui extends Gui implements Updatable {
 	}
 
 	protected void plotFitness() {
-		String[] paths;
+		TreePath[] selectedFiles = fileTree.getSelectedFilesPaths();
+		ArrayList<String> paths = new ArrayList<String>();
 
-		if (fileTree.getSelectedFilesPaths() != null && fileTree.getSelectedFilesPaths().length >= 1) {
-			paths = new String[fileTree.getSelectedFilesPaths().length];
-			for (int i = 0; i < paths.length; i++) {
-				TreePath p = fileTree.getSelectedFilesPaths()[i];
-				paths[i] = "";
+		if (selectedFiles == null) {
+			JOptionPane.showMessageDialog(this, "No folders or files selected!", "Error", JOptionPane.ERROR_MESSAGE);
+		} else {
+			String parentpath = "";
+			for (TreePath treePath : selectedFiles) {
+				if (treePath.getParentPath() == null) {
+					paths.add(treePath.getLastPathComponent().toString());
+				} else {
+					if (parentpath.equals("")) {
+						parentpath = treePath.getParentPath().toString().replace("[", "");
+						parentpath = parentpath.replace("]", "");
+					}
 
-				Object[] str = p.getPath();
-				for (int j = 0; j < str.length - 1; j++) {
-					paths[i] += str[j];
+					if (System.getProperty("os.name").contains("Windows")) {
+						paths.add(parentpath + "\\" + treePath.getLastPathComponent());
+					} else {
+						paths.add(parentpath + "/" + treePath.getLastPathComponent());
+					}
 				}
 
-				paths[i] += "\\" + str[str.length - 1];
-				paths[i].trim();
 			}
-		} else {
-			paths = new String[1];
-			paths[0] = currentFileTextField.getText().trim();
 		}
 
-		final String[] mainFolders = new String[paths.length];
-		for (int i = 0; i < paths.length; i++) {
-
-			File file = new File(paths[i]);
+		final String[] mainFolders = new String[paths.size()];
+		for (int i = 0; i < paths.size(); i++) {
+			File file = new File(paths.get(i));
 			mainFolders[i] = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		}
 
@@ -636,8 +640,12 @@ public class ResultViewerGui extends Gui implements Updatable {
 				for (String folder : mainFolders) {
 					String[] fs = getFitnessFiles(folder).split("###");
 
-					for (String str : fs)
-						files.add(str);
+					for (String str : fs) {
+						if (!str.isEmpty()) {
+							files.add(str);
+							System.out.println(str);
+						}
+					}
 				}
 
 				if (files != null) {
