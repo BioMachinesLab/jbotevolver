@@ -67,7 +67,8 @@ import updatables.BlenderExport;
 
 public class ResultViewerGui extends Gui implements Updatable {
 
-	private final int LEFTWRAPPERPANEL_INIT_WIDTH = 400;
+	private final int LEFTWRAPPERPANEL_INIT_WIDTH_WINDOWS = 400;
+	private final int LEFTWRAPPERPANEL_INIT_WIDTH_UNIX = 220;
 
 	protected JTextField controlStepTextField;
 	protected JTextField fitnessTextField;
@@ -154,10 +155,22 @@ public class ResultViewerGui extends Gui implements Updatable {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftWrapperPanel,
 				rightAndCenterWrapperPanel);
 		splitPane.setOneTouchExpandable(true);
-		splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH);
+		
+		if (System.getProperty("os.name").contains("Windows")) {
+			splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH_WINDOWS);
+		} else {
+			splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH_UNIX);
+		}
+		
 
-		// Provide minimum sizes for the two components in the split pane
-		Dimension minimumSize = new Dimension(300, 250);
+		// Provide minimum sizes for the two components in the split panel
+		Dimension minimumSize = null;
+		if (System.getProperty("os.name").contains("Windows")) {
+			minimumSize = new Dimension(300, 250);
+		} else {
+			minimumSize=new Dimension(200,250);
+		}
+
 		leftWrapperPanel.setMinimumSize(minimumSize);
 		rightAndCenterWrapperPanel.setMinimumSize(minimumSize);
 
@@ -601,42 +614,58 @@ public class ResultViewerGui extends Gui implements Updatable {
 	}
 
 	protected void plotFitness() {
-		String[] paths;
+		TreePath[] selectedFiles = fileTree.getSelectedFilesPaths();
+		ArrayList<String> paths = new ArrayList<String>();
 
-		if (fileTree.getSelectedFilesPaths().length >= 1) {
-			paths = new String[fileTree.getSelectedFilesPaths().length];
-			for (int i = 0; i < paths.length; i++) {
-				TreePath p = fileTree.getSelectedFilesPaths()[i];
-				paths[i] = "";
-				for (Object str : p.getPath())
-					paths[i] += str;
-				paths[i].trim();
-			}
+		if (selectedFiles == null) {
+			JOptionPane.showMessageDialog(this, "No folders or files selected!", "Error", JOptionPane.ERROR_MESSAGE);
+			return;
 		} else {
-			paths = new String[1];
-			paths[0] = currentFileTextField.getText().trim();
+			String parentpath = "";
+			for (TreePath treePath : selectedFiles) {
+				if (treePath.getParentPath() == null) {
+					paths.add(treePath.getLastPathComponent().toString());
+				} else {
+					if (parentpath.equals("")) {
+						parentpath = treePath.getParentPath().toString().replace("[", "");
+						parentpath = parentpath.replace("]", "");
+					}
+
+					if (System.getProperty("os.name").contains("Windows")) {
+						paths.add(parentpath + "\\" + treePath.getLastPathComponent());
+					} else {
+						paths.add(parentpath + "/" + treePath.getLastPathComponent());
+					}
+				}
+
+			}
 		}
 
-		File[] files = new File[paths.length];
-		final String[] mainFolders = new String[paths.length];
-		for (int i = 0; i < paths.length; i++) {
-			files[i] = new File(paths[i]);
-			mainFolders[i] = files[i].isDirectory() ? files[i].getAbsolutePath() : files[i].getParent();
+		final String[] mainFolders = new String[paths.size()];
+		for (int i = 0; i < paths.size(); i++) {
+			File file = new File(paths.get(i));
+			mainFolders[i] = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		}
 
 		Thread t = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				String files = "";
+				ArrayList<String> files = new ArrayList<String>();
 				for (String folder : mainFolders) {
-					files += getFitnessFiles(folder);
+					String[] fs = getFitnessFiles(folder).split("###");
+
+					for (String str : fs) {
+						if (!str.isEmpty()) {
+							files.add(str);
+						}
+					}
 				}
 
 				if (files != null) {
 					if (files.isEmpty()) {
 						JOptionPane.showMessageDialog(null, "No files to compare!", "Error", JOptionPane.ERROR_MESSAGE);
 					} else {
-						new GraphPlotter(files.split("###"));
+						new GraphPlotter(files.toArray(new String[files.size()]));
 					}
 				}
 			}
@@ -1022,7 +1051,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 					TreePath tp = e.getPath();
 
 					String filename = "";
-					
+
 					for (int i = 0; i < tp.getPathCount(); i++) {
 						filename += tp.getPathComponent(i);
 						if (i != tp.getPathCount() - 1)
@@ -1037,14 +1066,14 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 					File f = new File(filename);
 					if (f.exists()) {
-						String path ="";
-						
-						try{
-							path=f.getCanonicalPath();
-						}catch(IOException ee){
-							path=filename;
+						String path = "";
+
+						try {
+							path = f.getCanonicalPath();
+						} catch (IOException ee) {
+							path = filename;
 						}
-						
+
 						currentFilename = path;
 						if (!currentFileTextField.getText().equals(path))
 							currentFileTextField.setText(path);

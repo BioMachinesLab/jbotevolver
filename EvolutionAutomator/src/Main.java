@@ -69,10 +69,8 @@ public class Main {
 			if(globalVariables.get("%maxevolutions") != null)
 				maxEvolutions = Integer.parseInt(globalVariables.get("%maxevolutions"));
 			
-			String[] file = conf.split("/");
-			folderName = file[file.length-1].split("\\.")[0];
+			folderName = conf.substring(0, conf.indexOf(".conf"));
 			File folder = new File(folderName);
-			
 			folder.mkdir();
 			
 		} catch (FileNotFoundException e) {
