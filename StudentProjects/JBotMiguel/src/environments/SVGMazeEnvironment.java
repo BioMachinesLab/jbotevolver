@@ -13,15 +13,27 @@ import simulation.util.Arguments;
 
 public class SVGMazeEnvironment extends Environment{
 	
-	private String mazeName = "zigzag";
+	private String[] mazeName = new String[]{"zigzag"};
 	private double randomPosition = 0;
 	private Vector2d shiftMaze;
 	private double shiftX = 0;
 	private double shiftY = 0;
+	private int currentSample = 0;
 	
 	public SVGMazeEnvironment(Simulator simulator, Arguments args) {
 		super(simulator,args);
-		this.mazeName = args.getArgumentAsStringOrSetDefault("mazename", mazeName);
+		
+		if(args.getArgumentIsDefined("mazename")) {
+			String maze = args.getArgumentAsString("mazename");
+			if(!maze.contains(",")) {
+				mazeName = new String[]{maze};
+			} else {
+				mazeName = maze.split(",");
+			}
+		}
+		
+		this.currentSample = args.getArgumentAsInt("fitnesssample");
+		
 		this.randomPosition = args.getArgumentAsDoubleOrSetDefault("randomposition", randomPosition);
 		
 		if(args.getArgumentIsDefined("shiftmaze")){
@@ -40,7 +52,9 @@ public class SVGMazeEnvironment extends Environment{
 		
 		try {
 		
-		    InputStream buffer = new BufferedInputStream(simulator.getFileProvider().getFile("mazes/svg/"+mazeName+".txt"));
+			String chosenMaze = mazeName[currentSample % mazeName.length];
+			
+		    InputStream buffer = new BufferedInputStream(simulator.getFileProvider().getFile("mazes/svg/"+chosenMaze+".txt"));
 		    Scanner s = new Scanner(buffer);
 		    
 //		    System.out.print("MAZE!");

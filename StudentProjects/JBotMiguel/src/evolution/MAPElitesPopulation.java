@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import multiobjective.MOChromosome;
 import novelty.ExpandedFitness;
-import novelty.evaluators.FinalPositionBehavior;
-import novelty.evaluators.FinalPositionWithOrientationBehavior;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import controllers.FixedLenghtGenomeEvolvableController;
@@ -28,6 +26,8 @@ public class MAPElitesPopulation extends Population{
 	protected int behaviorIndex;
 	protected int fitnessIndex;
 	protected int numberOfChromosomesRequested;
+	protected int earlyTerminationGenerations = 0;
+	protected int stagnatedGenerations = 0;
 	protected ArrayList<MOChromosome> chromosomes;
 	protected boolean randomMutation = false;
 	protected double gaussianStdDev = 1.0;
@@ -75,6 +75,10 @@ public class MAPElitesPopulation extends Population{
 			for(String s : split) {
 				possibleValues[index++] = Double.parseDouble(s);
 			}
+		}
+		
+		if(arguments.getArgumentIsDefined("earlyterminationgenerations")) {
+			earlyTerminationGenerations = arguments.getArgumentAsInt("earlyterminationgenerations");
 		}
 		
 	}
@@ -140,12 +144,14 @@ public class MAPElitesPopulation extends Population{
 			//the cell is empty, add immediately
 			map[mocMapLocation[0]][mocMapLocation[1]] = moc;
 			chromosomes.add(moc);
+			stagnatedGenerations = 0;
 		} else {
 			//check fitness performance to figure out if current chromosome has to be replace
 			if(getFitness(moc) > getFitness(currentMapIndividual)) {
 				map[mocMapLocation[0]][mocMapLocation[1]] = moc;
 				int index = chromosomes.indexOf(currentMapIndividual);
 				chromosomes.set(index, moc);
+				stagnatedGenerations = 0;
 			} else {
 			}
 		}
@@ -236,8 +242,9 @@ public class MAPElitesPopulation extends Population{
 	
 	@Override
 	public boolean evolutionDone() {
-		return currentGeneration >= numberOfGenerations ||
-				(currentGeneration == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == batchSize); 
+		return (currentGeneration >= numberOfGenerations) ||
+				(currentGeneration == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == batchSize) ||
+				(earlyTerminationGenerations > 0 && stagnatedGenerations >= earlyTerminationGenerations); 
 	}
 	
 	@Override
@@ -245,6 +252,7 @@ public class MAPElitesPopulation extends Population{
 		currentGeneration++;
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 		numberOfChromosomesRequested = 0;
+		stagnatedGenerations++;
 	}
 	
 	@Override

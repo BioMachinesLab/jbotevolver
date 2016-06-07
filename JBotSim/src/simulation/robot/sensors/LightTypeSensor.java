@@ -1,9 +1,11 @@
 package simulation.robot.sensors;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
+import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowLightChecker;
 import simulation.robot.Robot;
@@ -36,13 +38,12 @@ public class LightTypeSensor extends ConeTypeSensor {
 			readings[j] = Math.max(calculateContributionToSensor(j, source), readings[j]);
 		}
 	}
-
+	
 	@Override
 	public String toString() {
 		for(int i=0;i<numberOfSensors;i++)
 			getSensorReading(i);
 		return "SimPointLightSensor [readings=" + Arrays.toString(readings) + "]";
 	}
-
 
 }

@@ -11,7 +11,8 @@ public class EMain {
 //		String configName = "hexa_neat_big.conf";
 //		String configName = "hexa_neat.conf";
 //		String configName = "hexamap_big.conf";
-		String configName = "repertoire_obstacle.conf";
+//		String configName = "rep_distance.conf";
+		String configName = "rep_radial.conf";
 //		String configName = "hexamap_debug.conf";
 //		String configName = "hexamap_big/_restartevolution.conf";
 //		String configName = "hexamap/_restartevolution.conf";

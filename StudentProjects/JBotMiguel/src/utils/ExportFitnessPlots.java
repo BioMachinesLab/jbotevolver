@@ -9,12 +9,13 @@ public class ExportFitnessPlots {
 		
 		System.out.println("Type\tSetup\tRun\tGeneration\tHighestFitness\tAverageFitness\tLowestFitness");
 		
-//		String f = "bigdisk/december2015/10samples/";String m = "_obstacle/";
+		String f = "bigdisk/june2016/quality/";String m = "_obstacle_type2/";
 //		String f = "bigdisk/december2015/foraging/";String m = "_foraging/";
-		String f = "bigdisk/locking/";String m = "";//"_obstacle/";
+//		String f = "bigdisk/locking/";String m = "";//"_obstacle/";
 		
 //		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m+"all_30"+m};
-		String[] setups = new String[]{f};
+//		String[] setups = new String[]{f};
+		String[] setups = new String[]{f+"repertoire"+m};
 		
 		for(String s : setups)
 			new ExportFitnessPlots(s);

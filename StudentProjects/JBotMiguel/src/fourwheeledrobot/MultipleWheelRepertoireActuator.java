@@ -31,6 +31,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	protected double stop = 0;
 	protected int lock = 0;
 	protected int controlCycle = 0;
+	protected Vector2d lastPoint;
 	
 	protected double[] prevBehavior;
 	
@@ -122,6 +123,8 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 //			int[] pos = getLocationFromBehaviorVector(new double[]{point.x,point.y});
 //			behavior = repertoire[pos[1]][pos[0]];
 			behavior = repertoire[(int)point.y][(int)point.x];
+			lastPoint = new Vector2d(point);
+//			System.out.println((int)point.y+","+(int)point.x);
 			
 			//reduce the size of the circle to find an appropriate point
 			s*=0.95;
@@ -150,17 +153,66 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		
 		} else if(type == 1){
 			
-			speedPercentage = speedPercentage/2.0 + 0.5;
+			speedPercentage = speedPercentage/2.0 + 0.5;// go to [0,1]
 			
 			double h =  percentageAngle * (Math.PI);
 			res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
 			
+		} else if(type == 2){
+			
+			double h =  percentageAngle * (Math.PI/2);
+			
+			if(speedPercentage < 0) {
+				h = -percentageAngle * (Math.PI/2) + Math.PI;
+				speedPercentage*=-1;
+			}
+			res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
 		}
 		
 		res.x+=repertoire.length/2;
 		res.y+=repertoire[0].length/2;
 		
 		return res;
+	}
+	
+	public static void main(String[] args) {
+		
+		double originalSP = 1;
+		double circleRadius = 50;
+		
+		for(double i = -1 ; i < 1; i+=0.15) {
+			
+			double percentageAngle = i;
+			double speedPercentage = originalSP;
+		
+			double h =  percentageAngle * (Math.PI/2);
+			
+			if(speedPercentage < 0) {
+				h = -percentageAngle * (Math.PI/2) + Math.PI;
+				speedPercentage*=-1;
+			}
+			Vector2d res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
+			System.out.println(originalSP+","+i+","+res.x+","+res.y);
+			
+		}
+		
+		originalSP = -1;
+		
+		for(double i = -1 ; i < 1; i+=0.15) {
+			
+			double percentageAngle = i;
+			double speedPercentage = originalSP;
+		
+			double h =  percentageAngle * (Math.PI/2);
+			
+			if(speedPercentage < 0) {
+				h = -percentageAngle * (Math.PI/2) + Math.PI;
+				speedPercentage*=-1;
+			}
+			Vector2d res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
+			System.out.println(originalSP+","+i+","+res.x+","+res.y);
+			
+		}
 	}
 	
 	private int[] getLocationFromBehaviorVector(double[] vec) {
@@ -176,6 +228,12 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	protected double[][][] loadRepertoire(Simulator simulator, String f) {
 		
 		double[][][] r = null;
+		
+		if(simulator.getArguments().get("--simulator") != null)  {
+			Arguments args = simulator.getArguments().get("--simulator");
+			String prefix = args.getArgumentAsStringOrSetDefault("folder","");
+			f= prefix+f;
+		}
 		
 		try {
 		
@@ -203,18 +261,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		
-//		System.out.print("BEHAVIOR! ");
-//		for(int i = 0 ; i < r.length ; i++) {
-//			for(int j = 0 ; j < r[i].length ; j++) {
-//				if(r[i][j] != null) {
-//					for(int z = 0 ; z < r[i][j].length ; z++) {
-//						System.out.print(r[i][j][z]+" ");
-//					}
-//				}
-//			}
-//		}
-//		System.out.println();
+			
 		
 		return r;
 	}
@@ -257,5 +304,9 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	
 	public void stop(double val) {
 		this.stop = val;
+	}
+	
+	public Vector2d getLastPoint() {
+		return lastPoint;
 	}
 }

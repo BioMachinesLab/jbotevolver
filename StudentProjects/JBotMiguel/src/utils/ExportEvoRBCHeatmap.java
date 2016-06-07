@@ -3,33 +3,33 @@ package utils;
 import java.io.File;
 import java.util.Scanner;
 
+import mathutils.Vector2d;
 import simulation.Simulator;
+import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import fourwheeledrobot.MultipleWheelRepertoireActuator;
 
-public class CheckFitness {
+public class ExportEvoRBCHeatmap {
 	
-	int samples = 10;
-	boolean randomizeSeed = true;
+	int samples = 1;
+	boolean randomizeSeed = false;
 	boolean postEvalBest = false;
-	static String prefix = "bigdisk/june2016/distance/";static String m = "_obstacle/";private double subtract = 10;
-//	static String prefix = "bigdisk/december2015/foraging/";static String m = "_foraging/";private double subtract = 0;
-	
-//	static String prefix = "";static String m = "_obstacle/";private double subtract = 10;
+	static String prefix = "bigdisk/june2016/";static String m = "_obstacle_type2/";
 	
 	public static void main(String[] args) throws Exception{
 		
 		String f = "";
-		String[] setups = new String[]{/*f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m*/f+"repertoire"+m};
+		String[] setups = new String[]{/*f+"distance/repertoire"+m,f+"radial/repertoire"+m,*/f+"quality/repertoire"+m};
 		
-		System.out.println("Type\tSetup\tRun\tSample\tRobot\tGeneration\tFitness");
+		System.out.println("Folder\tSetup\tRun\tStep\tX\tY");
 		
 		for(String s : setups)
-			new CheckFitness(prefix+s);
+			new ExportEvoRBCHeatmap(prefix+s);
 	}
 	
-	public CheckFitness(String folder) throws Exception{
+	public ExportEvoRBCHeatmap(String folder) throws Exception{
 		
 		File f = new File(folder);
 		
@@ -103,13 +103,12 @@ public class CheckFitness {
 			generation = getBestGeneration(folder);
 		
 		String filename = postEvalBest ? folder+"/show_best/showbest"+generation+".conf" :  folder+"/_showbest_current.conf";
-		
 		for(int i = 0 ; i < samples ; i++) {
 			
 			String randomizeSeed = this.randomizeSeed ? "\n--random-seed "+i : "";
 			randomizeSeed = randomizeSeed + (this.randomizeSeed ? "\n--simulator +fixedseed=0" : ""); 
 		
-			jbot.loadFile(filename, "--environment +fitnesssample="+i+randomizeSeed+"\n--robots +chosenactuator="+actNumber);
+			jbot.loadFile(filename, "--environment +fitnesssample="+i+randomizeSeed+"\n--robots +chosenactuator="+actNumber+"\n--simulator +folder=("+folder+"/../../../)");
 			
 			if(!postEvalBest && !jbot.getPopulation().evolutionDone())
 				return "";
@@ -119,20 +118,27 @@ public class CheckFitness {
 			jbot.setupBestIndividual(sim);
 			EvaluationFunction eval = jbot.getEvaluationFunction()[0];
 			sim.addCallback(eval);
-			sim.simulate();
+			
+			MultipleWheelRepertoireActuator actuator = (MultipleWheelRepertoireActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireActuator.class);
+			
+			String bigLine = "";
+			sim.setupEnvironment();
+			for(double time = 0 ; time < sim.getEnvironment().getSteps() ; time++){
+				sim.performOneSimulationStep(time);
+				Vector2d point = actuator.getLastPoint();
+				String line= split[split.length-4]+"\t"+split[split.length-2]+"\t"+split[split.length-1]+"\t"+(int)time+"\t"+(int)point.x+"\t"+(int)point.y+"\n";
+				line = line.replaceAll("_20", "");
+				line = line.replaceAll("_obstacle", "");
+				bigLine+= line;
+			}
+			
 			
 			if(generation == 0)
 				generation = jbot.getPopulation().getNumberOfCurrentGeneration();
 			
-			double res = eval.getFitness();
-			res-=subtract;
 			
-			String line= split[split.length-3]+"\t"+split[split.length-2]+"\t"+split[split.length-1]+"\t"+i+"\t"+act+"\t"+generation+"\t"+res+"\n";
-			line = line.replaceAll("_30", "");
-			line = line.replaceAll("_foraging", "");
-			line = line.replaceAll("_obstacle", "");
-			result+=line;
-			System.out.print(line);
+			result+=bigLine;
+			System.out.print(bigLine);
 		}
 		return result;
 	}

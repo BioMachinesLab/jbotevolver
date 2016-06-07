@@ -36,6 +36,7 @@ import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.Marker;
 import simulation.util.Arguments;
 import evaluationfunctions.OrientationEvaluationFunction;
+import evaluationfunctions.RadialOrientationEvaluationFunction;
 import evolution.MAPElitesPopulation;
 import evolution.PostEvaluator;
 import evolutionaryrobotics.JBotEvolver;
@@ -62,8 +63,8 @@ public class MAPElitesViewer {
 	public static void main(String[] args) throws Exception {
 //		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
 //		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
-//		new MAPElitesViewer("bigdisk/december2015/10samples/repertoire/", true);
-		new MAPElitesViewer("bigdisk/repertoire/", true);
+		new MAPElitesViewer("bigdisk/june2016/", true);
+//		new MAPElitesViewer("../JBotMiguel/", true);
 //		new MAPElitesViewer("hexamap_big/", true);
 //		new MAPElitesViewer("hexamap_free/", true);
 //		new MAPElitesViewer("hexamap_debug/", true);
@@ -160,6 +161,8 @@ public class MAPElitesViewer {
 			}
 		}
 		sim.terminate();
+		System.out.println(Math.toDegrees(sim.getRobots().get(0).getOrientation()));
+		System.out.println(Math.toDegrees(RadialOrientationEvaluationFunction.getTargetOrientation(sim.getRobots().get(0).getPosition())));
 		renderer.drawFrame();
 	}
 	
@@ -224,14 +227,14 @@ public class MAPElitesViewer {
 						pos.y = (y-pop.getMap()[x].length/2)*pop.getMapResolution()+pop.getMapResolution()/2;
 						
 						if(supposedLocation[0] != x || supposedLocation[1] != y) {
-							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.BLACK);
+							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.001, 0.02, Color.BLACK);
 						} else {
-							if(fitness < 0.8)
-								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.RED);
-							else{
-								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, getColor(fitness));
+//							if(fitness < 0.8)
+//								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.RED);
+//							else{
+								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.001, 0.02, getColor(fitness));
 								count++;
-							}
+//							}
 						}
 						sim.getEnvironment().addStaticObject(m);
 					} else {
@@ -239,7 +242,7 @@ public class MAPElitesViewer {
 							double[] behavior = (double[])br.value();
 							Vector2d pos = new Vector2d(behavior[0],behavior[1]);
 							
-							Marker m = new Marker(sim, "m", pos.x, pos.y, Math.PI, 0.01, 0, Color.RED);
+							Marker m = new Marker(sim, "m", pos.x, pos.y, Math.PI, 0.001, 0.02, Color.RED);
 							sim.getEnvironment().addStaticObject(m);
 						}
 					}
