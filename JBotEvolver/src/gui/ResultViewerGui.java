@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -43,6 +44,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SpringLayout;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -51,14 +53,18 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
+import controllers.Controller;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
+import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import gui.renderer.Renderer;
 import gui.util.Editor;
 import gui.util.GraphPlotter;
 import gui.util.GraphViz;
 import gui.util.PostEvaluationData;
+import gui.util.SpringUtilities;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -76,11 +82,18 @@ public class ResultViewerGui extends Gui implements Updatable {
 	protected JTextField controlStepTimeTextField;
 	protected JTextField rendererTimeTextField;
 
+	protected JTextField inputNeuronsTextField;
+	protected JTextField outputNeuronsTextField;
+	protected JTextField synapsesTextField;
+	protected JTextField totalNeuronsTextField;
+
 	protected int sleepBetweenControlSteps = 10;
 
 	protected JPanel leftWrapperPanel;
 	protected JPanel rightAndCenterWrapperPanel;
 	protected JPanel treeWrapper;
+	protected JPanel debugOptions;
+	protected JPanel extraOptionsPanel;
 
 	protected JButton pauseButton;
 	protected JButton plotButton;
@@ -155,20 +168,19 @@ public class ResultViewerGui extends Gui implements Updatable {
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftWrapperPanel,
 				rightAndCenterWrapperPanel);
 		splitPane.setOneTouchExpandable(true);
-		
+
 		if (System.getProperty("os.name").contains("Windows")) {
 			splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH_WINDOWS);
 		} else {
 			splitPane.setDividerLocation(LEFTWRAPPERPANEL_INIT_WIDTH_UNIX);
 		}
-		
 
 		// Provide minimum sizes for the two components in the split panel
 		Dimension minimumSize = null;
 		if (System.getProperty("os.name").contains("Windows")) {
 			minimumSize = new Dimension(300, 250);
 		} else {
-			minimumSize=new Dimension(200,250);
+			minimumSize = new Dimension(200, 250);
 		}
 
 		leftWrapperPanel.setMinimumSize(minimumSize);
@@ -233,7 +245,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 	protected JPanel initRightWrapperPanel() {
 
-		int panelWidth = 150;
+		int panelWidth = 300;
 
 		JPanel sideTopPanel = new JPanel();
 		sideTopPanel.setLayout(new BoxLayout(sideTopPanel, BoxLayout.Y_AXIS));
@@ -272,24 +284,6 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 		sideTopPanel.add(new JLabel(" "));
 
-		if (enableDebugOptions) {
-
-			neuralNetworkCheckbox = new JCheckBox("Show Neural Network");
-			neuralNetworkCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
-			sideTopPanel.add(neuralNetworkCheckbox);
-			/*
-			 * neuralNetworkViewerCheckbox = new JCheckBox(
-			 * "Show Neural Network #2");
-			 * neuralNetworkViewerCheckbox.setAlignmentX(Component.
-			 * CENTER_ALIGNMENT); sideTopPanel.add(neuralNetworkViewerCheckbox);
-			 */
-			exportToBlender = new JCheckBox("Export to Blender");
-			exportToBlender.setAlignmentX(Component.CENTER_ALIGNMENT);
-			sideTopPanel.add(exportToBlender);
-
-			sideTopPanel.add(new JLabel(" "));
-		}
-
 		// Status panel
 		JPanel statusPanel = new JPanel(new GridLayout(3, 2));
 		statusPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -297,11 +291,13 @@ public class ResultViewerGui extends Gui implements Updatable {
 		statusPanel.add(new JLabel("Control step: "));
 		controlStepTextField = new JTextField("N/A");
 		controlStepTextField.setHorizontalAlignment(JTextField.CENTER);
+		controlStepTextField.setEditable(false);
 		statusPanel.add(controlStepTextField);
 
 		statusPanel.add(new JLabel("Fitness: "));
 		fitnessTextField = new JTextField("N/A");
 		fitnessTextField.setHorizontalAlignment(JTextField.CENTER);
+		fitnessTextField.setEditable(false);
 		statusPanel.add(fitnessTextField);
 
 		sideTopPanel.add(statusPanel);
@@ -310,6 +306,60 @@ public class ResultViewerGui extends Gui implements Updatable {
 		JPanel sideWrapperPanel = new JPanel(new BorderLayout());
 		sideWrapperPanel.add(sideTopPanel, BorderLayout.NORTH);
 		sideWrapperPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
+
+		if (enableDebugOptions) {
+			debugOptions = new JPanel();
+			SpringLayout layout = new SpringLayout();
+			debugOptions.setLayout(layout);
+
+			extraOptionsPanel = new JPanel(new GridLayout(2, 1));
+			extraOptionsPanel.setLayout(new GridLayout(2, 1));
+			extraOptionsPanel.setBorder(BorderFactory.createTitledBorder("Extra Options"));
+
+			neuralNetworkCheckbox = new JCheckBox("Show Neural Network");
+			neuralNetworkCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
+			extraOptionsPanel.add(neuralNetworkCheckbox);
+
+			exportToBlender = new JCheckBox("Export to Blender");
+			exportToBlender.setAlignmentX(Component.CENTER_ALIGNMENT);
+			extraOptionsPanel.add(exportToBlender);
+			debugOptions.add(extraOptionsPanel);
+
+			// ANN Informations panel
+			JPanel annPanel = new JPanel(new GridLayout(4, 2));
+			annPanel.setBorder(BorderFactory.createTitledBorder("ANN Informations"));
+
+			annPanel.add(new JLabel("Inputs:"));
+			inputNeuronsTextField = new JTextField("N/A");
+			inputNeuronsTextField.setHorizontalAlignment(JTextField.CENTER);
+			inputNeuronsTextField.setEditable(false);
+			annPanel.add(inputNeuronsTextField);
+
+			annPanel.add(new JLabel("Outputs:"));
+			outputNeuronsTextField = new JTextField("N/A");
+			outputNeuronsTextField.setHorizontalAlignment(JTextField.CENTER);
+			outputNeuronsTextField.setEditable(false);
+			annPanel.add(outputNeuronsTextField);
+
+			annPanel.add(new JLabel("Synapses:"));
+			synapsesTextField = new JTextField("N/A");
+			synapsesTextField.setHorizontalAlignment(JTextField.CENTER);
+			synapsesTextField.setEditable(false);
+			annPanel.add(synapsesTextField);
+
+			annPanel.add(new JLabel("Total Neurons:"));
+			totalNeuronsTextField = new JTextField("N/A");
+			totalNeuronsTextField.setHorizontalAlignment(JTextField.CENTER);
+			totalNeuronsTextField.setEditable(false);
+			annPanel.add(totalNeuronsTextField);
+			debugOptions.add(annPanel);
+
+			SpringUtilities.makeGrid(debugOptions, 2, 1, // rows, cols
+					0, 0, // initialX, initialY
+					10, 10);
+			sideTopPanel.add(debugOptions, BorderLayout.SOUTH);
+
+		}
 
 		pauseButton.setPreferredSize(new Dimension(panelWidth, 50));
 		plotButton.setPreferredSize(new Dimension(panelWidth, 50));
@@ -756,30 +806,68 @@ public class ResultViewerGui extends Gui implements Updatable {
 	}
 
 	protected ArrayList<PostEvaluationData> getInformationFromPostEvaluation(String folder) {
-		File f = new File(folder + "/post.txt");
-		ArrayList<PostEvaluationData> postDataList = new ArrayList<PostEvaluationData>();
+		File fol = new File(folder);
+		FileFilter filter = new FileFilter() {
 
-		if (f.exists()) {
-			try {
-				postDataList.add(getDataFromPost(f));
+			@Override
+			public boolean accept(File pathname) {
+				return pathname.getAbsolutePath().endsWith("post.txt");
+			}
+		};
+
+		// In case there is post evaluation information
+		if (fol.isDirectory() && fol.listFiles(filter).length != 0) {
+			File f = new File(folder + "/post.txt");
+			ArrayList<PostEvaluationData> postDataList = new ArrayList<PostEvaluationData>();
+
+			if (f.exists()) {
+				try {
+					postDataList.add(getDataFromPost(f));
+					return postDataList;
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				String[] directories = (new File(folder)).list(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return (new File(dir, name)).isDirectory();
+					}
+				});
+
+				if (directories != null) {
+					for (String dir : directories) {
+						postDataList.addAll(getInformationFromPostEvaluation(folder + "/" + dir));
+					}
+				}
 				return postDataList;
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		} else {
-			String[] directories = (new File(folder)).list(new FilenameFilter() {
-				@Override
-				public boolean accept(File dir, String name) {
-					return (new File(dir, name)).isDirectory();
-				}
-			});
+			File f = new File(folder + "/_fitness.log");
+			ArrayList<PostEvaluationData> postDataList = new ArrayList<PostEvaluationData>();
 
-			if (directories != null) {
-				for (String dir : directories) {
-					postDataList.addAll(getInformationFromPostEvaluation(folder + "/" + dir));
+			if (f.exists()) {
+				try {
+					postDataList.add(getDataFromFitnessLog(f));
+					return postDataList;
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
+			} else {
+				String[] directories = (new File(folder)).list(new FilenameFilter() {
+					@Override
+					public boolean accept(File dir, String name) {
+						return (new File(dir, name)).isDirectory();
+					}
+				});
+
+				if (directories != null) {
+					for (String dir : directories) {
+						postDataList.addAll(getInformationFromPostEvaluation(folder + "/" + dir));
+					}
+				}
+				return postDataList;
 			}
-			return postDataList;
 		}
 
 		return null;
@@ -819,6 +907,37 @@ public class ResultViewerGui extends Gui implements Updatable {
 		reader.close();
 
 		return new PostEvaluationData(setupName, Integer.valueOf(number), chromosomeFitness, overall);
+	}
+
+	protected PostEvaluationData getDataFromFitnessLog(File f) throws IOException {
+		BufferedReader reader = new BufferedReader(new FileReader(f));
+		String line = reader.readLine();
+		String[] splitSetupName;
+
+		if (System.getProperty("os.name").contains("Windows")) {
+			splitSetupName = f.getAbsolutePath().replace("\\", "/").split("/");
+		} else {
+			splitSetupName = f.getAbsolutePath().split("/");
+		}
+
+		String setupName = splitSetupName[splitSetupName.length - 2];
+		String number = "", bestFitness = "", averageFitness = "";
+		while (line != null) {
+			if (!line.contains("#")) {
+				String[] strs = line.trim().split("\t");
+
+				number = strs[0].trim();
+				bestFitness = strs[2].trim();
+				averageFitness = strs[3].trim();
+			}
+
+			line = reader.readLine();
+		}
+
+		reader.close();
+
+		return new PostEvaluationData(setupName, Integer.valueOf(number), Double.valueOf(bestFitness),
+				Double.valueOf(averageFitness));
 	}
 
 	@Override
@@ -1280,6 +1399,22 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 		KeyboardFocusManager.getCurrentKeyboardFocusManager()
 				.addKeyEventDispatcher(new EnvironmentKeyDispatcher(simulator));
+
+		Controller controller = simulator.getEnvironment().getRobots().get(0).getController();
+		if (controller instanceof NeuralNetworkController) {
+			NeuralNetwork network = ((NeuralNetworkController) controller).getNeuralNetwork();
+			inputNeuronsTextField.setText(Integer.toString(network.getNumberOfInputNeurons()));
+			outputNeuronsTextField.setText(Integer.toString(network.getNumberOfOutputNeurons()));
+
+			if (network instanceof CTRNNMultilayer) {
+				CTRNNMultilayer net = (CTRNNMultilayer) network;
+				totalNeuronsTextField.setText(Integer.toString(net.getNumberOfHiddenNodes()));
+			} else {
+				totalNeuronsTextField.setText(
+						Integer.toString(network.getNumberOfInputNeurons() + network.getNumberOfOutputNeurons()));
+			}
+			synapsesTextField.setText(Integer.toString(network.getWeights().length));
+		}
 
 		return simulator;
 	}
