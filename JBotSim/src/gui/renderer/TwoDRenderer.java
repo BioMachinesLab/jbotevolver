@@ -95,6 +95,8 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				case MARKER:
 					drawMarker(graphics, (Marker) m);
 					break;
+				default:
+					break;
 				}
 
 				if (m instanceof GroundBand) {
@@ -121,39 +123,43 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 				case LINE:
 					drawLine((Line) m);
 					break;
+				default:
+					break;
 				}
 			}
 
 			for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
 				switch (m.getType()) {
 				case ROBOT:
+					drawEntities(graphics, (Robot) m);
 					drawRobot(graphics, (Robot) m);
 					if (numberOfRobots > 1 && darIds)
 						drawRobotId(graphics, (Robot) m);
-					drawEntities(graphics, (Robot) m);
+				default:
+					break;
 				}
 			}
 		}
 
 		drawArea(graphics, simulator.getEnvironment());
 		drawTitle(graphics);
-		
+
 		repaint();
 	}
 
 	protected void drawMarker(Graphics g, Marker m) {
 
-		int markerSize = (int)(scale*m.getRadius());
+		int markerSize = (int) (scale * m.getRadius());
 		double markerLength = m.getLength();
 
 		int x = transformX(m.getPosition().x);
 		int y = transformY(m.getPosition().y);
 
 		g.setColor(m.getColor());
-		
-		if(m.isSquare()) {
+
+		if (m.isSquare()) {
 			g.drawRect(x - markerSize / 2, y - markerSize / 2, markerSize, markerSize);
-		} else 
+		} else
 			g.drawOval(x - markerSize / 2, y - markerSize / 2, markerSize, markerSize);
 
 		double orientation = m.getOrientation();
