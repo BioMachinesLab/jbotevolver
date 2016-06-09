@@ -7,6 +7,11 @@ import java.awt.Graphics2D;
 import java.awt.RadialGradientPaint;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
@@ -25,7 +30,8 @@ import simulation.physicalobjects.Wall.Edge;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class TwoDRenderer extends Renderer implements ComponentListener {
+public class TwoDRenderer extends Renderer
+		implements ComponentListener, MouseListener, MouseMotionListener, MouseWheelListener {
 
 	protected static final long serialVersionUID = -1376516458026928095L;
 	protected BufferedImage image;
@@ -44,6 +50,10 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 
 	protected double drawFrames = 1;
 	protected boolean darIds;
+
+	private int px;
+	private int py;
+	private boolean clicked = false;
 
 	public TwoDRenderer(Arguments args) {
 		super(args);
@@ -525,6 +535,72 @@ public class TwoDRenderer extends Renderer implements ComponentListener {
 	@Override
 	public void moveDown() {
 		verticalMovement -= 0.1 / scale * 100;
+		componentResized(null);
+	}
+
+	/*
+	 * Interfaces implementation
+	 */
+	@Override
+	public void mouseClicked(MouseEvent e) {
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			clicked = true;
+			px = e.getX();
+			py = e.getY();
+		}
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		if (e.getButton() == MouseEvent.BUTTON3) {
+			// int dx = e.getX() - px;
+			// int dy = e.getY() - py;
+			// verticalMovement += dy / scale;
+			// horizontalMovement -= dx / scale;
+			// componentResized(null);
+			clicked = false;
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
+		if (clicked) {
+			int dx = e.getX() - px;
+			int dy = e.getY() - py;
+			px = e.getX();
+			py = e.getY();
+			verticalMovement += dy / scale * 1.5;
+			horizontalMovement -= dx / scale * 1.5;
+			componentResized(null);
+		}
+	}
+
+	@Override
+	public void mouseMoved(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseWheelMoved(MouseWheelEvent e) {
+		for (int i = 0; i < Math.abs(e.getWheelRotation()); i++) {
+			if (e.getWheelRotation() < 0) {
+				zoomIn();
+			} else {
+				zoomOut();
+			}
+		}
 		componentResized(null);
 	}
 }
