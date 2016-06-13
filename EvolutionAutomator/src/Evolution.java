@@ -15,12 +15,12 @@ import taskexecutor.TaskExecutor;
 
 public class Evolution extends Thread {
 
-	private Controller controller;
-	private HashMap<String, Arguments> args;
-	private String defaultArgs;
-	private Main main;
-	private String outputFolder;
-	private int nTries = 3;
+	protected Controller controller;
+	protected HashMap<String, Arguments> args;
+	protected String defaultArgs;
+	protected Main main;
+	protected String outputFolder;
+	protected int nTries = 3;
 
 	public Evolution(Main main, Controller controller, String arguments) {
 		this.controller = controller;
@@ -269,7 +269,7 @@ public class Evolution extends Thread {
 		bw.close();
 	}
 
-	private double getAverage(double[] values) {
+	protected double getAverage(double[] values) {
 
 		double avg = 0;
 
@@ -279,7 +279,7 @@ public class Evolution extends Thread {
 		return avg / values.length;
 	}
 
-	private double getStdDeviation(double[] values, double avg) {
+	protected double getStdDeviation(double[] values, double avg) {
 
 		double stdDeviation = 0;
 
@@ -289,7 +289,7 @@ public class Evolution extends Thread {
 		return Math.sqrt(stdDeviation / values.length);
 	}
 
-	private double getOverallAverage(double[][] values, int runs) {
+	protected double getOverallAverage(double[][] values, int runs) {
 		double[] avgs = new double[runs];
 
 		for (int i = 0; i < avgs.length; i++)
