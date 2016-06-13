@@ -7,15 +7,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Scanner;
 
-import evolutionaryrobotics.evolution.neat.ga.core.Chromosome;
-import evolutionaryrobotics.populations.NEATPopulation;
 import evolutionaryrobotics.populations.Population;
 import simulation.util.Arguments;
-import taskexecutor.ConillonTaskExecutor;
 import taskexecutor.TaskExecutor;
 import taskexecutor.results.NEATPostEvaluationResult;
 import taskexecutor.tasks.NEATMultipleSamplePostEvaluationTask;
-import taskexecutor.tasks.NEATSingleSamplePostEvaluationTask;
 
 public class NEATPostEvaluation {
 	
@@ -176,7 +172,7 @@ public class NEATPostEvaluation {
 						for(int sample = 0 ; sample < samples ; sample+=sampleIncrement) {
 							
 							NEATPostEvaluationResult sfr = (NEATPostEvaluationResult)taskExecutor.getResult();
-							result[sfr.getRun()-1][sfr.getGeneration()][sfr.getFitnesssample()]+= sfr.getFitness()*(double)sampleIncrement/(double)samples;
+							result[sfr.getRun()-1][sfr.getGeneration()][sfr.getFitnesssample()]+= sfr.getFitness()*sampleIncrement/samples;
 							String line = sfr.getRun()+" "+sfr.getGeneration()+" "+sfr.getFitnesssample()+" "+sfr.getSample()+" "+sfr.getFitness()+"\n";
 							data.append(line);
 							
