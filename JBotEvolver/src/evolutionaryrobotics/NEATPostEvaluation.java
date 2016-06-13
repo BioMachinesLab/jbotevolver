@@ -15,23 +15,23 @@ import taskexecutor.tasks.NEATMultipleSamplePostEvaluationTask;
 
 public class NEATPostEvaluation {
 	
-	private int startTrial = 0;
-	private int maxTrial = 0;
-	private int samples = 100;
-	private int sampleIncrement = 100;
-	private int fitnesssamples = 1;
-	private int steps = 0;
-	private double targetfitness = 0;
-	private String dir = "";
+	protected int startTrial = 0;
+	protected int maxTrial = 0;
+	protected int samples = 100;
+	protected int sampleIncrement = 100;
+	protected int fitnesssamples = 1;
+	protected int steps = 0;
+	protected double targetfitness = 0;
+	protected String dir = "";
 	
-	private boolean singleEvaluation = false;
-	private boolean localEvaluation = false;
+	protected boolean singleEvaluation = false;
+	protected boolean localEvaluation = false;
 	
-	private TaskExecutor taskExecutor;
-	private String[] args;
+	protected TaskExecutor taskExecutor;
+	protected String[] args;
 	
-	private boolean showOutput = false;
-	private boolean saveOutput = true;
+	protected boolean showOutput = false;
+	protected boolean saveOutput = true;
 	
 	public NEATPostEvaluation(String[] args, String[] extraArgs) {
 		this(args);
@@ -250,7 +250,7 @@ public class NEATPostEvaluation {
 
 	    }
 	
-	private int getGenerationNumberFromFile(String file) {
+	protected int getGenerationNumberFromFile(String file) {
 		Scanner s = null;
 		try {
 			 s = new Scanner(new File(file));
