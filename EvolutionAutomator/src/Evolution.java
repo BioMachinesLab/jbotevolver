@@ -84,7 +84,7 @@ public class Evolution extends Thread {
 		return weights;
 	}
 
-	private int runPostEvaluation() throws Exception {
+	protected int runPostEvaluation() throws Exception {
 
 		Thread.sleep(2000); // wait to make sure that all files have been
 							// written to the disk
@@ -116,7 +116,7 @@ public class Evolution extends Thread {
 			return runGenerationalPostEvaluation(nRuns, stringArguments);
 	}
 
-	private int runGenerationalPostEvaluation(int nRuns, String stringArguments) throws Exception {
+	protected int runGenerationalPostEvaluation(int nRuns, String stringArguments) throws Exception {
 		PostEvaluation postEval = new PostEvaluation(stringArguments.split(" "));
 		double[][] values = postEval.runPostEval();
 
@@ -165,7 +165,7 @@ public class Evolution extends Thread {
 		return best;
 	}
 
-	private int runNeatPostEvaluation(int nRuns, int fitnessSamples, String stringArguments) throws Exception {
+	protected int runNeatPostEvaluation(int nRuns, int fitnessSamples, String stringArguments) throws Exception {
 		NEATPostEvaluation p = new NEATPostEvaluation(stringArguments.split(" "));
 		double[][][] values = p.runPostEval();
 
@@ -255,7 +255,7 @@ public class Evolution extends Thread {
 		createFile(folderName, configName, Arguments.beautifyString(controller.getCompleteConfiguration()));
 	}
 
-	private void createFile(String folderName, String fileName, String contents) throws Exception {
+	protected void createFile(String folderName, String fileName, String contents) throws Exception {
 		File f = new File(folderName);
 
 		if (!f.exists())
@@ -298,7 +298,7 @@ public class Evolution extends Thread {
 		return getAverage(avgs);
 	}
 
-	private double getOverallStdDeviation(double[][] values, int runs) {
+	protected double getOverallStdDeviation(double[][] values, int runs) {
 		double[] avgs = new double[runs];
 		double[] stds = new double[runs];
 
