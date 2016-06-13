@@ -8,13 +8,13 @@ import java.util.Scanner;
 
 public class Main {
 	
-	private LinkedList<Controller> controllers = new LinkedList<Controller>();
-	private String defaultArgs = "";
-	private HashMap<String,String> globalVariables = new HashMap<String, String>();
+	protected LinkedList<Controller> controllers = new LinkedList<Controller>();
+	protected String defaultArgs = "";
+	protected HashMap<String,String> globalVariables = new HashMap<String, String>();
 	private String folderName = null;
-	private int currentEvolutions = 0;
-	private int maxEvolutions = 10;
-	private boolean testMode = false;
+	protected int currentEvolutions = 0;
+	protected int maxEvolutions = 10;
+	protected boolean testMode = false;
 	
 	public Main(String[] args) {
 		String conf ="";
