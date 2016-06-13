@@ -5,10 +5,8 @@ import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.Map;
 
-import evolutionaryrobotics.neuralnetworks.inputs.SysoutNNInput;
-
 public class Factory implements Serializable{
-
+	private static final long serialVersionUID = -5792645805164851756L;
 	public final static Map<Class<?>, Class<?>> map = initializeMap();
 
 	private static Map<Class<?>, Class<?>> initializeMap() {
@@ -27,7 +25,7 @@ public class Factory implements Serializable{
 
 	public static Object getInstance(String className, Object... objects) {
 //		System.out.println("Build by reflection class "+ className); 
-		String s = "";
+//		String s = "";
 		try {
 			Constructor<?>[] constructors = Class.forName(className).getDeclaredConstructors();
 			for (Constructor<?> constructor : constructors) {
@@ -36,19 +34,20 @@ public class Factory implements Serializable{
 				if(params.length == objects.length) {
 					found = true;
 					for(int i = 0 ; i < objects.length; i++) {
+						@SuppressWarnings("rawtypes")
 						Class c = objects[i].getClass();
 						if(params[i].isPrimitive())
 							c = map.get(objects[i].getClass());
 						
-						s+=params[i].getName()+"=="+c.getName()+"\n";
+//						s+=params[i].getName()+"=="+c.getName()+"\n";
 						
 						if(!params[i].isAssignableFrom(c)) {
 							found = false;
-//							System.out.println(className +" not assignable with "+params[i].getCanonicalName());
+							System.out.println(className +" not assignable with "+params[i].getCanonicalName());
 							break;
 						}
 					}
-					s+="\n_____\n";
+//					s+="\n_____\n";
 					if(found) {
 //						System.out.println("found: "+s);
 						return constructor.newInstance(objects);

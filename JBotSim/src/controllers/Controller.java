@@ -1,6 +1,5 @@
 package controllers;
 
-import java.io.Serializable;
 import simulation.Simulator;
 import simulation.SimulatorObject;
 import simulation.robot.Robot;
@@ -8,14 +7,19 @@ import simulation.util.Arguments;
 import simulation.util.Factory;
 
 /**
- * Superclass for all the robot control logic. Subclasses should override at least the method {@link #controlStep(int)}
+ * Superclass for all the robot control logic. Subclasses should override at least the method {@link #controlStep(double)}
  * which is called at each control step. Subclasses can also override {@link #begin()} (called before a simulation is started), 
  * and {@link #end()} which is called after the simulation has ended.
  * 
  * @author alc
  */
 
-public abstract class Controller extends SimulatorObject implements Serializable {
+public abstract class Controller extends SimulatorObject {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2343440609493728136L;
+
 	/**
 	 *  Robot controlled by this controller
 	 */
