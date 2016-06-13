@@ -491,7 +491,8 @@ public class TwoDRenderer extends Renderer
 	// @Override
 	@Override
 	public void componentMoved(ComponentEvent arg0) {
-		// TODO Auto-generated method stub
+		createImage();
+		drawFrame();
 	}
 
 	// @Override
