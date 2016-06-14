@@ -1,4 +1,4 @@
-package utils;
+package utils.evorbc;
 
 import java.io.File;
 import java.util.Scanner;
@@ -16,12 +16,11 @@ public class ExportEvoRBCHeatmap {
 	int samples = 1;
 	boolean randomizeSeed = false;
 	boolean postEvalBest = false;
-	static String prefix = "bigdisk/june2016/";static String m = "_obstacle_type2/";
+	static String prefix = "bigdisk/evorbc2/qualitymetrics/";
 	
 	public static void main(String[] args) throws Exception{
 		
-		String f = "";
-		String[] setups = new String[]{/*f+"distance/repertoire"+m,f+"radial/repertoire"+m,*/f+"quality/repertoire"+m};
+		String[] setups = new String[]{"maze_radial/","maze_distance/"};
 		
 		System.out.println("Folder\tSetup\tRun\tStep\tX\tY");
 		
@@ -107,8 +106,12 @@ public class ExportEvoRBCHeatmap {
 			
 			String randomizeSeed = this.randomizeSeed ? "\n--random-seed "+i : "";
 			randomizeSeed = randomizeSeed + (this.randomizeSeed ? "\n--simulator +fixedseed=0" : ""); 
+			
+			String options = "--environment +fitnesssample="+i+randomizeSeed+"\n";
+			options+="--robots +chosenactuator="+actNumber+"\n";
+			options+="--simulator +folder=("+prefix+")\n";
 		
-			jbot.loadFile(filename, "--environment +fitnesssample="+i+randomizeSeed+"\n--robots +chosenactuator="+actNumber+"\n--simulator +folder=("+folder+"/../../../)");
+			jbot.loadFile(filename, options);
 			
 			if(!postEvalBest && !jbot.getPopulation().evolutionDone())
 				return "";

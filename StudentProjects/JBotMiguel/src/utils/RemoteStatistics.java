@@ -1,5 +1,8 @@
 package utils;
 
+import utils.evorbc.ExportFitnessPlots;
+import utils.evorbc.IntersectionTest;
+
 public class RemoteStatistics {
 	
 	public static void main(String[] args) throws Exception{
