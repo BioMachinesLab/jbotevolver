@@ -7,6 +7,7 @@ import java.awt.Polygon;
 import java.awt.RadialGradientPaint;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 
 import mathutils.Vector2d;
@@ -37,7 +38,9 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	
 	public TwoDRendererDebug(Arguments args) {
 		super(args);
-		this.addMouseListener(new MouseListenerSentinel());
+		MouseListenerSentinel listener = new MouseListenerSentinel(this);
+		this.addMouseListener(listener);
+		this.addMouseMotionListener(listener);
 		wallRay = args.getArgumentAsIntOrSetDefault("wallray", 0)==1;
 		coneSensorId = args.getArgumentAsIntOrSetDefault("conesensorid",-1);
 		coneClass = args.getArgumentAsStringOrSetDefault("coneclass","");
@@ -306,7 +309,13 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		return -1*((y - centerY)/scale - verticalMovement);
 	}
 
-	public class MouseListenerSentinel implements MouseListener {
+	public class MouseListenerSentinel implements MouseListener,MouseMotionListener {
+		
+		private TwoDRenderer renderer;
+		
+		public MouseListenerSentinel(TwoDRenderer renderer) {
+			this.renderer = renderer;
+		}
 
 		//		@Override
 		@Override
@@ -329,24 +338,34 @@ public class TwoDRendererDebug extends TwoDRenderer {
 			selectedRobot = -1;
 		}
 
-		//		@Override
 		@Override
 		public void mouseEntered(MouseEvent e) {
+			renderer.mouseEntered(e);
 		}
 
-		//		@Override
 		@Override
 		public void mouseExited(MouseEvent e) {
+			renderer.mouseExited(e);
 		}
 
-		//		@Override
 		@Override
 		public void mousePressed(MouseEvent e) {
+			renderer.mousePressed(e);
 		}
 
-		//		@Override
 		@Override
 		public void mouseReleased(MouseEvent e) {
+			renderer.mouseReleased(e);
+		}
+		
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			renderer.mouseDragged(e);
+		}
+		
+		@Override
+		public void mouseMoved(MouseEvent e) {
+			renderer.mouseMoved(e);
 		}
 	}
 	

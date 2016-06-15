@@ -1,4 +1,4 @@
-package utils;
+package utils.evorbc;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -7,6 +7,7 @@ import java.util.Scanner;
 import simulation.Simulator;
 import simulation.util.Arguments;
 import taskexecutor.ParallelTaskExecutor;
+import utils.CheckFitness;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 

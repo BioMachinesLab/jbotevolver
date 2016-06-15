@@ -74,7 +74,7 @@ import updatables.BlenderExport;
 public class ResultViewerGui extends Gui implements Updatable {
 
 	private final int LEFTWRAPPERPANEL_INIT_WIDTH_WINDOWS = 400;
-	private final int LEFTWRAPPERPANEL_INIT_WIDTH_UNIX = 220;
+	private final int LEFTWRAPPERPANEL_INIT_WIDTH_UNIX = 300;
 
 	protected JTextField controlStepTextField;
 	protected JTextField fitnessTextField;
@@ -180,7 +180,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		if (System.getProperty("os.name").contains("Windows")) {
 			minimumSize = new Dimension(300, 250);
 		} else {
-			minimumSize = new Dimension(200, 250);
+			minimumSize = new Dimension(300, 250);
 		}
 
 		leftWrapperPanel.setMinimumSize(minimumSize);
@@ -1413,7 +1413,8 @@ public class ResultViewerGui extends Gui implements Updatable {
 				totalNeuronsTextField.setText(
 						Integer.toString(network.getNumberOfInputNeurons() + network.getNumberOfOutputNeurons()));
 			}
-			synapsesTextField.setText(Integer.toString(network.getWeights().length));
+			if(network.getWeights() != null)
+				synapsesTextField.setText(Integer.toString(network.getWeights().length));
 		}
 
 		return simulator;

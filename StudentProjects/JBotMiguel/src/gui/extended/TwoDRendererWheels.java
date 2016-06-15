@@ -27,13 +27,6 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 		int x = transformX(robot.getPosition().getX()) - circleDiameter / 2;
 		int y = transformY(robot.getPosition().getY()) - circleDiameter / 2;
 		
-//		if(robot.getId() == selectedRobot) {
-//			graphics.setColor(Color.yellow);
-//			graphics.fillOval(x-2, y-2, circleDiameter + 4, circleDiameter + 4);
-//			
-//		}
-//		graphics.setColor(robot.getBodyColor());
-		
 		Graphics2D g2d = (Graphics2D)graphics;
 		g2d.setStroke(new BasicStroke(2));
 		
@@ -50,32 +43,6 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 
 		g2d.setStroke(new BasicStroke(1));
 		
-		/*
-		Vector2d p0 = new Vector2d();
-		Vector2d p1 = new Vector2d();
-		Vector2d p2 = new Vector2d();
-		p0.set( 0, -robot.getRadius() / 3);
-		p1.set( 0, robot.getRadius() / 3);
-		p2.set( 6 * robot.getRadius() / 7, 0);
-
-		p0.rotate(orientation);
-		p1.rotate(orientation);
-		p2.rotate(orientation);
-
-		int[] xp = new int[3];
-		int[] yp = new int[3];
-
-		xp[0] = transformX(p0.getX() + robot.getPosition().getX());
-		yp[0] = transformY(p0.getY() + robot.getPosition().getY());
-
-		xp[1] = transformX(p1.getX() + robot.getPosition().getX());
-		yp[1] = transformY(p1.getY() + robot.getPosition().getY());
-
-		xp[2] = transformX(p2.getX() + robot.getPosition().getX());
-		yp[2] = transformY(p2.getY() + robot.getPosition().getY());
-
-		graphics.drawPolygon(xp, yp, 3);
-		 */
 		graphics.setColor(Color.BLACK);
 	}
 	
@@ -85,33 +52,25 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 		
 		drawRobotBasic(graphics,robot);
 		
-		if(robot.getActuators().size() > 1) {
+		if(robot.getActuators().size() >= 1) {
 			
 			Actuator act = robot.getActuatorWithId(1);
 	
 			int spacing = 30;
 			
-	//		if(act instanceof MultipleWheelAxesActuator) {
-	//			MultipleWheelAxesActuator mwaa = (MultipleWheelAxesActuator)act;
-	//			drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
-	//		} else if(act instanceof MultipleWheelRepertoireActuator) {
-	//			MultipleWheelRepertoireActuator mwaa = (MultipleWheelRepertoireActuator)act;
-	//			drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
-	//		}
+			if(act instanceof MultipleWheelAxesActuator) {
+				MultipleWheelAxesActuator mwaa = (MultipleWheelAxesActuator)act;
+				drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
+			} else if(act instanceof MultipleWheelRepertoireActuator) {
+				MultipleWheelRepertoireActuator mwaa = (MultipleWheelRepertoireActuator)act;
+				drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
+			}
 		}
 	}
 	
 	public void drawSpeedRotation(double[] speeds, double[] rotations, Robot r, int spacing, double maxSpeed) {
 		
-		double rO = -r.getOrientation();
-		
-//		for(double s : speeds)
-//			System.out.print(s+" ");
-//		System.out.println();
-//		for(double s : rotations)
-//			System.out.print(s+" ");
-//		System.out.println();
-//		System.out.println();
+		double robotOrientation = -r.getOrientation();
 		
 		Vector2d robotCenter = new Vector2d(spacing*2.5,spacing*2.5);
 		
@@ -119,15 +78,15 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 			
 			int len = (int)(spacing*speeds[i]/maxSpeed);
 			
-			double rotAngle = -rotations[i] + rO;
+			double wheelAngle = -rotations[i] + robotOrientation;
 			
 			int row = getWheelRow(i);
 			int column = getWheelColumn(i);
 			
-			drawRobotWheels(column, row, spacing, rO, robotCenter, rotAngle, len);
+			drawRobotWheels(column, row, spacing, robotOrientation, robotCenter, wheelAngle, len);
 		}
 		
-		drawRobotOverlay(robotCenter, rO, spacing);
+		drawRobotOverlay(robotCenter, robotOrientation, spacing);
 	}
 	
 	protected int getWheelRow(int i) {
@@ -140,32 +99,44 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 		return -1;
 	}
 	
-	protected void drawRobotWheels(int column, int row, int spacing, double rO, Vector2d robotCenter, double rotAngle, int len) {
+	protected void drawRobotWheels(int column, int row, int spacing, double robotOrientation, Vector2d robotCenter, double wheelAngle, int len) {
 		
 		int wheelSize = spacing/5;
-		Vector2d posA = new Vector2d(column*spacing,row*spacing);
-		posA.rotate(rO);
-		posA.add(robotCenter);
+		Vector2d wheelCenter = new Vector2d(column*spacing,row*spacing);
+		wheelCenter.rotate(robotOrientation);
+		wheelCenter.add(robotCenter);
 		
-		Vector2d posB = new Vector2d(posA);
+		Vector2d posB = new Vector2d(wheelCenter);
 		
-		Vector2d rot = new Vector2d(len*Math.cos(rotAngle),len*Math.sin(rotAngle));
+		Vector2d rot = new Vector2d(len*Math.cos(wheelAngle),len*Math.sin(wheelAngle));
 		posB.add(rot);
 		
-		Vector2d posC = new Vector2d(posA);
-		rot = new Vector2d(len*Math.cos(rO),len*Math.sin(rO));
-		posC.add(rot);
+		Vector2d guidingLineCenter = new Vector2d(wheelCenter);
+		rot = new Vector2d(len*Math.cos(robotOrientation),len*Math.sin(robotOrientation));
+		guidingLineCenter.add(rot);
+		
+		Vector2d guidingLineLeft = new Vector2d(wheelCenter);
+		rot = new Vector2d(len*Math.cos(robotOrientation+Math.PI/4),len*Math.sin(robotOrientation+Math.PI/4));
+		guidingLineLeft.add(rot);
+		
+		Vector2d guidingLineRight = new Vector2d(wheelCenter);
+		rot = new Vector2d(len*Math.cos(robotOrientation-Math.PI/4),len*Math.sin(robotOrientation-Math.PI/4));
+		guidingLineRight.add(rot);
 		
 		Graphics2D gx = (Graphics2D)graphics;
 		
-		//guiding line
-		gx.setColor(Color.BLACK);
-		gx.drawLine((int)posA.x, (int)posA.y, (int)posC.x, (int)posC.y);
+		//guiding lines
+		gx.setColor(Color.LIGHT_GRAY);
+		gx.drawLine((int)wheelCenter.x, (int)wheelCenter.y, (int)guidingLineLeft.x, (int)guidingLineLeft.y);
+		gx.drawLine((int)wheelCenter.x, (int)wheelCenter.y, (int)guidingLineRight.x, (int)guidingLineRight.y);
+		gx.drawLine((int)wheelCenter.x, (int)wheelCenter.y, (int)guidingLineCenter.x, (int)guidingLineCenter.y);
 		
+		
+		//actual line
 		gx.setStroke(new BasicStroke(2));
 		gx.setColor(Color.RED);
-		gx.drawOval((int)posA.x-wheelSize,(int)posA.y-wheelSize,wheelSize*2,wheelSize*2);
-		gx.drawLine((int)posA.x, (int)posA.y, (int)posB.x, (int)posB.y);
+		gx.drawOval((int)wheelCenter.x-wheelSize,(int)wheelCenter.y-wheelSize,wheelSize*2,wheelSize*2);
+		gx.drawLine((int)wheelCenter.x, (int)wheelCenter.y, (int)posB.x, (int)posB.y);
 		gx.setStroke(new BasicStroke());
 	}
 	

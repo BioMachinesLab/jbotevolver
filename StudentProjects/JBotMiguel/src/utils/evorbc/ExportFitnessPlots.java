@@ -1,4 +1,4 @@
-package utils;
+package utils.evorbc;
 
 import java.io.File;
 import java.util.Scanner;
@@ -7,15 +7,15 @@ public class ExportFitnessPlots {
 	
 	public static void main(String[] args) throws Exception{
 		
-		System.out.println("Type\tSetup\tRun\tGeneration\tHighestFitness\tAverageFitness\tLowestFitness");
+		System.out.println("Setup\tRun\tGeneration\tHighestFitness\tAverageFitness\tLowestFitness");
 		
-		String f = "bigdisk/june2016/quality/";String m = "_obstacle_type2/";
+		String f = "bigdisk/evorbc2/qualitymetrics/maze_";
 //		String f = "bigdisk/december2015/foraging/";String m = "_foraging/";
 //		String f = "bigdisk/locking/";String m = "";//"_obstacle/";
 		
 //		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m+"all_30"+m};
 //		String[] setups = new String[]{f};
-		String[] setups = new String[]{f+"repertoire"+m};
+		String[] setups = new String[]{f+"radial/",f+"distance/",f+"quality/"};
 		
 		for(String s : setups)
 			new ExportFitnessPlots(s);
@@ -31,7 +31,7 @@ public class ExportFitnessPlots {
 			result+=checkSubFolders(new File(folder+s));
 		}
 		
-		System.out.println(result);
+		System.out.print(result);
 	}
 	
 	private String checkSubFolders(File folder) throws Exception {
@@ -68,19 +68,19 @@ public class ExportFitnessPlots {
 		String prevLine = "";
 		
 		String[] split = folder.split("/");
-		String prefix = split[split.length-3]+"\t"+split[split.length-2]+"\t"+split[split.length-1];
+		String prefix = split[split.length-3]+"_"+split[split.length-2]+"\t"+split[split.length-1];
 		
 		while(s.hasNextLine()) {
 			String line = s.nextLine().trim().replaceAll("\\s+", "\t");
-			line = line.replaceAll("_30_", "_");
-			line = line.replaceAll("_foraging", "");
-			line = line.replaceAll("_obstacle", "");
+			
+			String newLine = prefix+"\t"+line;
+			newLine = newLine.replaceAll("Actuator", "");
+			newLine = newLine.replaceAll("_maze", "");
+			
 			if(!line.startsWith("#") && !line.equals(prevLine) && !line.isEmpty()) {
-				prevLine = line;
-				result.append(prefix);
-				result.append("\t");
-				result.append(line.replaceAll("_30", "").replaceAll("_foraging", "").replaceAll("_obstacle", ""));
+				result.append(newLine);
 				result.append("\n");
+				prevLine = line;
 			}
 		}
 		
