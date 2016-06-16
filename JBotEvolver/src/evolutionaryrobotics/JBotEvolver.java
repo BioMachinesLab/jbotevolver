@@ -85,12 +85,16 @@ public class JBotEvolver extends JBotSim {
 		super.loadArguments(args);
 
 		String absolutePath = "";
-		if (arguments.get("--bestcontrollerweights") != null
-				&& arguments.get("--bestcontrollerweights").getCompleteArgumentString().equals("enable")
-				&& System.getProperty("os.name").toLowerCase().contains("win")) {
-			absolutePath = arguments.get("--output").getCompleteArgumentString().replace("\\", "/");
-		} else {
-			absolutePath = (new File("./" + arguments.get("--output").getCompleteArgumentString())).getCanonicalPath();
+		if (arguments.get("--output") != null) {
+			if (arguments.get("--bestcontrollerweights") != null
+					&& arguments.get("--bestcontrollerweights").getCompleteArgumentString().equals("enable")
+					&& System.getProperty("os.name").toLowerCase().contains("win")) {
+				absolutePath = arguments.get("--output").getCompleteArgumentString().replace("\\", "/");
+			} else {
+				System.out.println(arguments);
+				absolutePath = (new File("./" + arguments.get("--output").getCompleteArgumentString()))
+						.getCanonicalPath();
+			}
 		}
 
 		if (arguments.get("--population") != null) {
