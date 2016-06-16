@@ -207,8 +207,8 @@ public class BlenderRenderer extends Renderer {
 				e.printStackTrace();
 				throw new RuntimeException("Cannot open '" + currentFrameFilename + "' for writing: " + e);
 			}
-			masterFile.printf("if f > %d and f <= %d:\n", currentFrame, currentFrame + framesPerFile);
-			masterFile.printf("  exec file(\"" + frameFilename + currentFrame + ".py\")\n\n");
+			masterFile.printf("if f > %d and f <= %d:%n", currentFrame, currentFrame + framesPerFile);
+			masterFile.printf("  exec file(\"" + frameFilename + currentFrame + ".py\")%n%n");
 
 			framesBeforeFileChange = framesPerFile;
 
@@ -217,7 +217,7 @@ public class BlenderRenderer extends Renderer {
 		} 
 		framesBeforeFileChange--;
 
-		currentFrameFile.printf("if f == %d:\n", currentFrame + 1);
+		currentFrameFile.printf("if f == %d:%n", currentFrame + 1);
 
 		if(simulator.getEnvironment().getMovableObjects().size() > 0) {
 			Vector2d position;
@@ -236,7 +236,7 @@ public class BlenderRenderer extends Renderer {
 						preyNames.put((Prey) m, preyName);
 					}
 
-					currentFrameFile.printf("  SetPreyState(\"%s\", %f, %f, %f, %f)\n", 
+					currentFrameFile.printf("  SetPreyState(\"%s\", %f, %f, %f, %f)%n", 
 							preyName,
 							position.getX(),
 							position.getY(),
@@ -250,7 +250,7 @@ public class BlenderRenderer extends Renderer {
 						robotName = "robot" + (nextRobotNumber++);
 						robotNames.put((Robot) m, robotName);
 					}
-					currentFrameFile.printf("  SetRobotState(\"%s\", %f, %f, %f, %f, %f, %f, %f)\n",
+					currentFrameFile.printf("  SetRobotState(\"%s\", %f, %f, %f, %f, %f, %f, %f)%n",
 							robotName,
 							position.getX(),
 							position.getY(),

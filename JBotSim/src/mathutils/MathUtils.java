@@ -2,7 +2,6 @@ package mathutils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
@@ -70,7 +69,7 @@ public class MathUtils implements Serializable {
 			double fCCNumElemFirst = vec_first[j];
 			double fCCNumElemSecond = vec_second[j];
 
-			// printf( "%d %f %f\n", j, fCCNumElemFirst, fCCNumElemSecond );
+			// printf( "%d %f %f%n", j, fCCNumElemFirst, fCCNumElemSecond );
 
 			fCCNumeratorSum += fCCNumElemFirst * fCCNumElemSecond;
 			fCCDenominatorSumFirst += fCCNumElemFirst * fCCNumElemFirst;
@@ -80,7 +79,7 @@ public class MathUtils implements Serializable {
 				* fCCDenominatorSumSecond);
 		double fCrossCorrelation = fCCNumeratorSum / fCCDenominator;
 
-		// printf( "Cross Correlation: %f\n", fCrossCorrelation );
+		// printf( "Cross Correlation: %f%n", fCrossCorrelation );
 		return fCrossCorrelation;
 	}
 
@@ -141,6 +140,7 @@ public class MathUtils implements Serializable {
 		java.util.List <Object> keys = new ArrayList<Object>();
 		keys.addAll(m.keySet());
 		Collections.sort(keys, new Comparator<Object>() {
+			@Override
 			public int compare(Object key1, Object key2) {
 				Object v1 = m.get(key1);
 				Object v2 = m.get(key2);

@@ -47,8 +47,8 @@ public class AxisAlignedBoundingBox implements Serializable {
 	}
 
 	public boolean overlaps(AxisAlignedBoundingBox aabb){
-		//	    printf("me: x1:%f x2:%f y1:%f y2:%f\n", this.m_fX1, this.m_fX2, this.m_fY1, this.m_fY2); 
-		//	    printf("ot: x1:%f x2:%f y1:%f y2:%f\n", pcAABB.m_fX1, pcAABB.m_fX2, pcAABB.m_fY1, pcAABB.m_fY2); 
+		//	    printf("me: x1:%f x2:%f y1:%f y2:%f%n", this.m_fX1, this.m_fX2, this.m_fY1, this.m_fY2); 
+		//	    printf("ot: x1:%f x2:%f y1:%f y2:%f%n", pcAABB.m_fX1, pcAABB.m_fX2, pcAABB.m_fY1, pcAABB.m_fY2); 
 
 		if (this.x1 <= aabb.x2)
 			if (this.x2 >= aabb.x1)
