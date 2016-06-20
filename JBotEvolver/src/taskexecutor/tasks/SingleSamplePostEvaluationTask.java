@@ -1,14 +1,14 @@
 package taskexecutor.tasks;
 
 import java.util.ArrayList;
-import java.util.Random;
+
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.Chromosome;
 import result.Result;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import taskexecutor.results.PostEvaluationResult;
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 	
@@ -32,7 +32,7 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 	public void run() {
 		jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
 		
-		Simulator simulator = jBotEvolver.createSimulator(new Random(sample));
+		Simulator simulator = jBotEvolver.createSimulator(sample);
 		simulator.setFileProvider(getFileProvider());
 		//TODO comment this line
 //		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator); 
@@ -48,6 +48,7 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 		else
 			fitness= eval.getFitness();
 	}
+	@Override
 	public Result getResult() {
 		PostEvaluationResult fr = new PostEvaluationResult(run,fitnesssample,fitness,sample);
 		return fr;

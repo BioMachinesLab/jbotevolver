@@ -1,7 +1,6 @@
 package taskexecutor.tasks;
 
 import java.util.ArrayList;
-import java.util.Random;
 
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
@@ -41,7 +40,7 @@ public class NEATMultipleSamplePostEvaluationTask extends JBotEvolverTask {
 
 			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
 
-			Simulator simulator = jBotEvolver.createSimulator(new Random(i));
+			Simulator simulator = jBotEvolver.createSimulator(i);
 			simulator.setFileProvider(getFileProvider());
 			// ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 			// jBotEvolver.setChromosome(robots, chromosome);
