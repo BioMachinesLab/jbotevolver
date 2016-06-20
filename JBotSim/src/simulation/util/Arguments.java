@@ -1,7 +1,5 @@
 package simulation.util;
 
-import gui.StartupGui;
-
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -18,6 +16,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gui.StartupGui;
 import mathutils.Vector2d;
 
 /**
@@ -840,6 +839,7 @@ public class Arguments implements Serializable {
 		}
 	}
 
+	@Override
 	public String toString() {
 		return getCompleteArgumentString();
 	}
@@ -855,7 +855,7 @@ public class Arguments implements Serializable {
 	public static String beautifyString(String s) {
 		
 		int nParenthesis = 0;
-		String newString = "\t";
+		String newString = "";
 		
 		for(int i = 0 ; i < s.length(); i++) {
 			char c = s.charAt(i);
