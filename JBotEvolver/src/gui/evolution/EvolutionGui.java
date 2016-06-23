@@ -405,7 +405,7 @@ public class EvolutionGui extends Gui {
 						if(enablePreview && evoPopulation > 0 && evoPopulation != currentGenerationNumber){
 							currentGenerationNumber = evoPopulation;
 							if(evo.getPopulation().getBestChromosome() != null) {
-								Simulator sim = jBotEvolver.createSimulator(new Random());
+								Simulator sim = jBotEvolver.createSimulator(new Random().nextLong());
 								sim.addCallback(jBotEvolver.getEvaluationFunction()[0]);
 								sim.addCallback(this);
 //								ArrayList<Robot> robots = jBotEvolver.createRobots(sim);

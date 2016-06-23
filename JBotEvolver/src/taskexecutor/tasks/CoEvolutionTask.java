@@ -3,14 +3,13 @@ package taskexecutor.tasks;
 import java.util.ArrayList;
 import java.util.Random;
 
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.Chromosome;
 import result.Result;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import taskexecutor.results.SimpleCoEvolutionFitnessResult;
-import taskexecutor.results.SimpleFitnessResult;
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 public class CoEvolutionTask extends JBotEvolverTask {
 
@@ -44,7 +43,7 @@ public class CoEvolutionTask extends JBotEvolverTask {
 			long seed = random
 					.nextLong();
 			
-			Simulator simulator = jBotEvolver.createSimulator(new Random(seed));
+			Simulator simulator = jBotEvolver.createSimulator(seed);
 			simulator.setFileProvider(getFileProvider());
 
 			ArrayList<Robot> robots = jBotEvolver.createCoEvolutionRobots(simulator);
@@ -72,6 +71,7 @@ public class CoEvolutionTask extends JBotEvolverTask {
 		}
 	}
 
+	@Override
 	public Result getResult() {
 		SimpleCoEvolutionFitnessResult fr = new SimpleCoEvolutionFitnessResult(chromosome.getID(),opponentChromosome.getID(),
 				fitness / samples);

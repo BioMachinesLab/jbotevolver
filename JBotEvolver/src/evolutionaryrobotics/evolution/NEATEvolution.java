@@ -121,7 +121,7 @@ public class NEATEvolution extends Evolution {
 		}
 
 		InnovationDatabase db = algorithm.innovationDatabase();
-		System.err.println("Innovation Database Stats - Hits: " + db.hits + " - misses: " + db.misses);
+		System.out.println("Innovation Database Stats - Hits: " + db.hits + " - misses: " + db.misses);
 
 	}
 

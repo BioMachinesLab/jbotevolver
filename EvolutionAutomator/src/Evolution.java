@@ -43,7 +43,7 @@ public class Evolution extends Thread {
 				runEvolutions();
 				Arguments postArguments = controller.getArguments("--postevaluation");
 				if (postArguments != null) {
-					System.out.println("Evolution finished, running Post Eval on " + controller.getName());
+					System.out.println("\nEvolution finished, running Post Eval on " + controller.getName());
 					int run = runPostEvaluation();
 					System.out.println("Post-evaluation on " + controller.getName() + ": " + run);
 					String weights = getWeights(run);

@@ -1,8 +1,5 @@
 package gui;
 
-import gui.renderer.Renderer;
-import gui.renderer.TwoDRenderer;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -10,7 +7,6 @@ import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
-import java.util.Random;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -21,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
+import gui.renderer.Renderer;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -78,6 +75,7 @@ public class WithControlsGui extends Gui implements Updatable{
 			 */
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void actionPerformed(ActionEvent evt) {  
 				if(renderer != null)
 					WithControlsGui.this.renderer.zoomIn();  
@@ -91,6 +89,7 @@ public class WithControlsGui extends Gui implements Updatable{
 			 */
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void actionPerformed(ActionEvent evt) { 
 				if(renderer != null)
 					WithControlsGui.this.renderer.zoomOut();  
@@ -104,6 +103,7 @@ public class WithControlsGui extends Gui implements Updatable{
 			 */
 			private static final long serialVersionUID = 1L;
 
+			@Override
 			public void actionPerformed(ActionEvent evt) {  
 				if(renderer != null)
 					WithControlsGui.this.renderer.resetZoom();  
@@ -153,6 +153,7 @@ public class WithControlsGui extends Gui implements Updatable{
 
 		startButton.addActionListener(new ActionListener() {
 			//			@Override
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				simulationState = RUN;
 				if(simulator != null || simulator.simulationFinished()) {
@@ -164,6 +165,7 @@ public class WithControlsGui extends Gui implements Updatable{
 
 		quitButton.addActionListener(new ActionListener() {
 			//			@Override
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				System.exit(0);
 			} 		
@@ -171,6 +173,7 @@ public class WithControlsGui extends Gui implements Updatable{
 
 		pauseButton.addActionListener(new ActionListener() {
 			//			@Override
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				if (simulationState == RUN) {
 					simulationState = PAUSED;
@@ -190,6 +193,7 @@ public class WithControlsGui extends Gui implements Updatable{
 		framesPanel.add(increaseMaxFramesPerSecond);
 		decreaseMaxFramesPerSecond.addActionListener(new ActionListener() {
 			//			@Override
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				maxFramesPerSecond *= 0.9;
 			}
@@ -198,6 +202,7 @@ public class WithControlsGui extends Gui implements Updatable{
 
 		increaseMaxFramesPerSecond.addActionListener(new ActionListener() {
 			//			@Override
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				maxFramesPerSecond /=  0.9;
 			}
@@ -214,6 +219,7 @@ public class WithControlsGui extends Gui implements Updatable{
 		sleepPanel.add(increasesleepBetweenControlSteps);
 		decreaseSleepBetweenControlSteps.addActionListener(new ActionListener() {
 			//			@Override
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				sleepBetweenControlSteps -= 5;
 				if (sleepBetweenControlSteps < 0)
@@ -223,6 +229,7 @@ public class WithControlsGui extends Gui implements Updatable{
 
 		increasesleepBetweenControlSteps.addActionListener(new ActionListener() {
 			//			@Override
+			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				sleepBetweenControlSteps += 5;
 			}
@@ -240,6 +247,7 @@ public class WithControlsGui extends Gui implements Updatable{
 	}
 
 	//	@Override
+	@Override
 	public void dispose() {
 		frame.setVisible(false);
 	}
@@ -258,7 +266,7 @@ public class WithControlsGui extends Gui implements Updatable{
 		if(args.get("--gui").getArgumentIsDefined("renderer"))
 			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
 		
-		Simulator simulator = jBotSim.createSimulator(new Random(jBotSim.getRandomSeed()));
+		Simulator simulator = jBotSim.createSimulator(jBotSim.getRandomSeed());
 		simulator.addRobots(jBotSim.createRobots(simulator));
 		simulator.addCallback(this);
 		simulator.setupEnvironment();
