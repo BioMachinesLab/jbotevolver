@@ -2,6 +2,7 @@ package gui.extended;
 
 import fourwheeledrobot.MultipleWheelAxesActuator;
 import fourwheeledrobot.MultipleWheelRepertoireActuator;
+import fourwheeledrobot.MultipleWheelRepertoireNDActuator;
 import gui.renderer.TwoDRendererDebug;
 
 import java.awt.BasicStroke;
@@ -63,6 +64,9 @@ public class TwoDRendererWheels extends TwoDRendererDebug{
 				drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
 			} else if(act instanceof MultipleWheelRepertoireActuator) {
 				MultipleWheelRepertoireActuator mwaa = (MultipleWheelRepertoireActuator)act;
+				drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
+			} else if(act instanceof MultipleWheelRepertoireNDActuator) {
+				MultipleWheelRepertoireNDActuator mwaa = (MultipleWheelRepertoireNDActuator)act;
 				drawSpeedRotation(mwaa.getCompleteSpeeds(),mwaa.getCompleteRotations(), robot, spacing, mwaa.getMaxSpeed());
 			}
 		}

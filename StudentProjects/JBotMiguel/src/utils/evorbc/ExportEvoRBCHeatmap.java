@@ -16,16 +16,18 @@ public class ExportEvoRBCHeatmap {
 	int samples = 1;
 	boolean randomizeSeed = false;
 	boolean postEvalBest = false;
-	static String prefix = "bigdisk/evorbc2/qualitymetrics/";
+	static String f = "bigdisk/evorbc2/qualitymetrics/";
 	
 	public static void main(String[] args) throws Exception{
 		
-		String[] setups = new String[]{"maze_radial/","maze_distance/"};
+//		f = "bigdisk/evorbc2/multimaze/"; String[] setups = new String[]{f+"repertoire_obstacle/"};
+//		f = "bigdisk/evorbc2/qualitymetrics/"; String[] setups = new String[]{f+"maze_radial/",f+"maze_distance/",f+"maze_quality/"};
+		f = "bigdisk/evorbc2/repertoiresize/"; String[] setups = new String[]{f+"maze_quality_5/",f+"maze_quality_10/",f+"maze_quality_20/",f+"maze_quality_30/",f+"maze_quality_50/",f+"maze_quality_100/"};
 		
 		System.out.println("Folder\tSetup\tRun\tStep\tX\tY");
 		
 		for(String s : setups)
-			new ExportEvoRBCHeatmap(prefix+s);
+			new ExportEvoRBCHeatmap(s);
 	}
 	
 	public ExportEvoRBCHeatmap(String folder) throws Exception{
@@ -109,7 +111,7 @@ public class ExportEvoRBCHeatmap {
 			
 			String options = "--environment +fitnesssample="+i+randomizeSeed+"\n";
 			options+="--robots +chosenactuator="+actNumber+"\n";
-			options+="--simulator +folder=("+prefix+")\n";
+			options+="--simulator +folder=("+f+")\n";
 		
 			jbot.loadFile(filename, options);
 			
@@ -130,7 +132,6 @@ public class ExportEvoRBCHeatmap {
 				sim.performOneSimulationStep(time);
 				Vector2d point = actuator.getLastPoint();
 				String line= split[split.length-4]+"\t"+split[split.length-2]+"\t"+split[split.length-1]+"\t"+(int)time+"\t"+(int)point.x+"\t"+(int)point.y+"\n";
-				line = line.replaceAll("_20", "");
 				line = line.replaceAll("_obstacle", "");
 				bigLine+= line;
 			}

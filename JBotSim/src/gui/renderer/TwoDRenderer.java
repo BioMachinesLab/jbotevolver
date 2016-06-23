@@ -84,7 +84,7 @@ public class TwoDRenderer extends Renderer
 			graphics.fillRect(0, 0, getWidth(), getHeight());
 			return;
 		}
-
+		
 		if (simulator.getTime() % drawFrames != 0) {
 			// repaint();
 			return;

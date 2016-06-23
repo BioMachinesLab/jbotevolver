@@ -4,12 +4,16 @@ import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 import java.util.Scanner;
 
+import javax.management.RuntimeErrorException;
+
+import mathutils.MathUtils;
 import mathutils.Vector2d;
 import multiobjective.MOChromosome;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
+import evaluationfunctions.RadialOrientationEvaluationFunction;
 import evolution.NDBehaviorMap;
 
 /**
@@ -26,7 +30,7 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 	protected int lock = 0;
 	protected int controlCycle = 0;
 	protected double stop = 0;
-	protected int type = 0;//0=cartesian,1=spherical
+	protected int type = 0;//0=spherical
 	
 	public MultipleWheelRepertoireNDActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
@@ -65,19 +69,7 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 		int[] buckets = new int[map.getNDimensions()];
 
 		if(type == 0) {
-			//cartesian
-			for(int dim = 0 ; dim < map.getNDimensions() ; dim++) {
-				
-				double limit = map.getLimits()[dim];
-				
-				if(!map.getCircularDimension(dim))//if not circular, we have to check the filling radius
-					limit = map.getCircleRadius()*map.getResolutions()[dim];
-				
-				double val =  limit*2*actuations[dim] - limit;//limit*2 * [0,1] - limit
-				buckets[dim] = map.valueToBucket(dim, val);
-			}
-		} if(type == 1) {
-			//n-sphere: https://en.wikipedia.org/wiki/N-sphere#Spherical_coordinates
+			//same as EvoRBC GECCO paper: Alpha [-90,90], speed [-1,1]
 			
 			int nSphere = 0;
 			
@@ -87,53 +79,39 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 				nSphere++;
 			}
 			
-			int actuationIndex = 0;
+			double speedPercentage = actuations[0];
+			double headingPercentage = actuations[1];
+			double h =  headingPercentage * (Math.PI/2);
 			
-			double r = actuations[actuationIndex++];
-			double[] phi = new double[nSphere-1];
+			double circleRadius = map.getCircleRadius()-1;//circle radius in buckets
 			
-			for(int i = 0 ; i < phi.length ; i++) {
-				if(i == phi.length-1)
-					phi[i] = actuations[actuationIndex++]*2*Math.PI;
-				else
-					phi[i] = actuations[actuationIndex++]*Math.PI;
+			if(nSphere != 2 && actuations.length != 3)
+				throw new RuntimeException("MultipleWheelRepertoireNDActuator unimplemented for this type of map!");
+			
+			if(speedPercentage < 0) {
+				h+=Math.PI;
+				speedPercentage*=-1;
 			}
 			
-			double[] vals = new double[map.getNDimensions()];
+			//multiply by the circle radius in cartesian coordinates
+			double x = speedPercentage*Math.cos(h)* (circleRadius*map.getResolutions()[0]);
+			double y = speedPercentage*Math.sin(h)* (circleRadius*map.getResolutions()[1]);
 			
-			for(int i = 0 ; i < nSphere ; i++) {
-				double val = r;
-				
-				if(i != vals.length-1) {
-					for(int j = 0 ; j <= i ; j++) {
-						if(j == i) {
-							val*=Math.cos(phi[j]);
-						} else {
-							val*=Math.sin(phi[j]);
-						}
-					}	
-				} else {
-					for(int j = 0 ; j < i ; j++) {
-						val*=Math.sin(phi[j]);
-					}
-				}
-				vals[i] = val;
-				double circleRadius =map.getCircleRadius();//circle radius in buckets
-				circleRadius*= map.getResolutions()[i];//circle radius in cartesian coordinates
-				vals[i]*= circleRadius*vals[i];
-				buckets[i] = map.valueToBucket(i, val);
-			}
+			buckets[0] = map.valueToBucket(0, x);
+			buckets[1] = map.valueToBucket(1, y);
 			
-			//regular cartesian conversion for non-circular dimensions
-			for(int dim = nSphere ; dim < vals.length ; dim++) {
-				double limit = map.getLimits()[dim];
-				
-				if(!map.getCircularDimension(dim))//if not circular, we have to check the filling radius
-					limit = map.getCircleRadius()*map.getResolutions()[dim];
-				
-				double val =  limit*2*actuations[dim] - limit;//limit*2 * [0,1] - limit
-				buckets[dim] = map.valueToBucket(dim, val);
-			}
+			//regular cartesian conversion for non-circular dimensions (ie, orientation)
+			double limit = map.getLimits()[2];
+			
+			if(!map.getCircularDimension(2))//if not circular, we have to check the filling radius
+				limit = map.getCircleRadius()*map.getResolutions()[2];
+
+			double orientation =  limit*actuations[2];//limit*2 * [0,1] - limit
+			
+			orientation+= RadialOrientationEvaluationFunction.getTargetOrientation(new Vector2d(x,y));
+			orientation = MathUtils.modPI2(orientation);
+			
+			buckets[2] = map.valueToBucket(2, orientation);
 			
 		}
 		return buckets;
@@ -153,33 +131,14 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 		}
 		
 		double[] vec = map.getValuesFromBucketVector(bucket);
+		
 		MOChromosome c = map.getChromosome(vec);
 		
 		if(c == null) {
-//			System.out.println();
-//			for(int i = 0 ; i < vec.length ; i++) {
-//				System.out.print(bucket[i]+" ");
-//			}
-//			System.out.println();
-//			for(int i = 0 ; i < vec.length ; i++) {
-//				System.out.print(vec[i]+" ");
-//			}
-//			System.out.println();
-			
 			System.err.println("Cannot find the correct behavior in repertoire!");
-//			System.exit(0);
 		} else {
 			
 			double[] behavior = c.getAlleles();
-			
-			//			System.out.println();
-//			System.out.println("Circle radius: "+map.getCircleRadius()+" "+map.getResolutions()[0]);
-//			for(int i = 0 ; i < vec.length ; i++)
-//				System.out.print(vec[i]+" ");
-//			System.out.println();
-//			for(int i = 0 ; i < bucket.length ; i++)
-//				System.out.print(bucket[i]+" ");
-//			System.out.println();
 			
 			int behaviorIndex = 0;
 			
@@ -214,7 +173,7 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 	}
 	
 	public void setActuation(double actuation, int dimension) {
-		this.actuations[dimension] = actuation;
+		this.actuations[dimension] = (actuation - 0.5) *2.0;
 	}
 	
 	public void stop(double val) {
@@ -223,5 +182,17 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 
 	public int getNDimensions() {
 		return map.getNDimensions();
+	}
+	
+	public double[] getCompleteRotations() {
+		return wheels.getCompleteRotations();
+	}
+	
+	public double[] getCompleteSpeeds() {
+		return wheels.getCompleteSpeeds();
+	}
+	
+	public double getMaxSpeed() {
+		return wheels.getMaxSpeed();
 	}
 }

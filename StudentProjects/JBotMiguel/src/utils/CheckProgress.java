@@ -8,7 +8,8 @@ public class CheckProgress {
 //	static String prefix = "bigdisk/december2015/10samples/";static String m = "_obstacle/";static double maxGens = 500;
 //	static String prefix = "bigdisk/december2015/foraging/";static String m = "_foraging/";static double maxGens = 300;
 	
-	static String prefix = "";static String m = "_obstacle/";static double maxGens = 500;
+	static String prefix = "bigdisk/evorbc2/";static String m = "";static double maxGens = 1000;
+	static String[] setups = new String[]{"repertoiresize/"};
 	
 	static int maxRuns = 30;
 	static int expected = 0;
@@ -16,7 +17,6 @@ public class CheckProgress {
 	
 	public static void main(String[] args) throws Exception{
 		String f = "";
-		String[] setups = new String[]{/*f+"multiple_intersection_repertoire"+m,f+"single_intersection_repertoire"+m,*/f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m};
 //		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m};
 		
 		for(String s : setups)

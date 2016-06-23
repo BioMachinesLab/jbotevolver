@@ -20,7 +20,8 @@ import evolutionaryrobotics.populations.Population;
 public class NDMAPElitesViewer extends MAPElitesViewer{
 	
 	public static void main(String[] args) throws Exception {
-		new NDMAPElitesViewer("rep_test/", true);
+//		new NDMAPElitesViewer("rep_test/", true);
+		new NDMAPElitesViewer("repertoire/", true);
 	}
 	
 	public NDMAPElitesViewer(String folder, boolean gui) {
@@ -31,6 +32,7 @@ public class NDMAPElitesViewer extends MAPElitesViewer{
 		super(folder);
 	}
 	
+	@Override
 	public void play(Vector2d pos) {
 		NDMAPElitesPopulation pop = (NDMAPElitesPopulation)jbot.getPopulation();
 		
@@ -43,15 +45,20 @@ public class NDMAPElitesViewer extends MAPElitesViewer{
 			c = pop.getNDBehaviorMap().getChromosomeFromBehaviorVector(new double[]{pos.x,pos.y,angle});
 			angle+=Math.toRadians(45);
 		}
-		
+
 		if(c == null) {
 			System.out.println("Cant find behavior at pos "+pos.x+","+pos.y);
 			return;
 		}
 		
-//		System.out.println(pos.x+" "+pos.y+" "+pop.getNDBehaviorMap().getLocationHash(c));
 		
-		double[] vec = pop.getNDBehaviorMap().getBehaviorVector(c);
+		int[] buckets = pop.getNDBehaviorMap().getBucketsFromBehaviorVector(pop.getNDBehaviorMap().getBehaviorVector(c));
+		for(int i = 0 ; i < buckets.length ; i++) {
+			System.out.print(buckets[i]+" ");
+		}
+		System.out.println();
+		
+//		System.out.println(pos.x+" "+pos.y+" "+pop.getNDBehaviorMap().getLocationHash(c));
 		
 		sim = jbot.createSimulator();
 		renderer.setSimulator(sim);
@@ -109,6 +116,7 @@ public class NDMAPElitesViewer extends MAPElitesViewer{
 					double[] behavior = pop.getNDBehaviorMap().getBehaviorVector(res);
 					
 //					System.out.println(behavior[0]+","+behavior[1]+","+behavior[2]);
+//					System.out.println(xBuckets[x]+","+yBuckets[y]+","+orBuckets[z]);
 					
 					Vector2d pos = new Vector2d(xBuckets[x],yBuckets[y]);
 					

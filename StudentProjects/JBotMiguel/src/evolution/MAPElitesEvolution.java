@@ -27,10 +27,12 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 public class MAPElitesEvolution extends GenerationalEvolution{
 	
 	protected double pruneThreshold = 0.0;
+	protected boolean circle = true;
 	
     public MAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
     	super(jBotEvolver, taskExecutor, arg);
     	pruneThreshold = arg.getArgumentAsDoubleOrSetDefault("prune", pruneThreshold);
+    	circle = arg.getArgumentAsIntOrSetDefault("circle", 1) == 1;
     }
     
     /*	procedure MAP-ELITES ALGORITHM (SIMPLE, DEFAULT VERSION)
@@ -100,7 +102,10 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		
 		if(population.evolutionDone()) {
 			prune((MAPElitesPopulation)population, pruneThreshold);
-			expandToCircle((MAPElitesPopulation)population);
+			if(circle)
+				expandToCircle((MAPElitesPopulation)population);
+			else
+				expandToSquare((MAPElitesPopulation)population);
 		}
 		
 		String dir = diskStorage.getOutputDirectory()+"/";
@@ -137,7 +142,7 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		}
     }
     
-    public static void expandToCircle(MAPElitesPopulation p, double prune) {
+    public static void expandToCircle(MAPElitesPopulation p, double prune, boolean circle) {
     	MOChromosome[][] map = p.getMap();
     	double maxDist = 0;
 //    	double resolution = p.getMapResolution();
@@ -149,7 +154,10 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 	    			int posY = y;
 	    			posX-= map.length/2;
 	        		posY-= map[0].length/2;
-	        		maxDist = Math.max(maxDist,new Vector2d(posX,posY).length());
+	        		if(circle)
+	        			maxDist = Math.max(maxDist,new Vector2d(posX,posY).length());
+	        		else
+	        			maxDist = Math.max(maxDist, Math.max(Math.abs(posX),Math.abs(posY)));
     			}
     		}
     	}
@@ -161,7 +169,13 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     	for(int x = 0 ; x < map.length ; x++) {
     		for(int y = 0 ; y < map[x].length ; y++) {
     			
-    			double len = new Vector2d(x-map.length/2,y-map[x].length/2).length();
+    			double len = 0;
+    			
+    			if(circle)
+	    			len = new Vector2d(x-map.length/2,y-map[x].length/2).length();
+    			else
+    				len = Math.max(Math.abs(x-map.length/2),Math.abs(y-map[x].length/2));
+    			
     			if(len <= maxDist) {
 //    				int[] pos = p.getLocationFromBehaviorVector(new double[]{x,y});
     				if(map[x][y] == null) {
@@ -182,7 +196,11 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     }
     
     public static void expandToCircle(MAPElitesPopulation p) {
-    	expandToCircle(p,0.0);
+    	expandToCircle(p,0.0,true);
+    }
+    
+    public static void expandToSquare(MAPElitesPopulation p) {
+    	expandToCircle(p,0.0,false);
     }
     
     private static MOChromosome findNearest(int x, int y, MOChromosome[][] map, double prune) {

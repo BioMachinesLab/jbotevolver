@@ -63,7 +63,8 @@ public class MAPElitesViewer {
 	public static void main(String[] args) throws Exception {
 //		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
 //		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
-		new MAPElitesViewer("bigdisk/evorbc2/repertoiresize/", true);
+//		new MAPElitesViewer("bigdisk/evorbc2/repertoiresize/", true);
+		new MAPElitesViewer("rep_square/", true);
 //		new MAPElitesViewer("../JBotMiguel/", true);
 //		new MAPElitesViewer("hexamap_big/", true);
 //		new MAPElitesViewer("hexamap_free/", true);

@@ -9,13 +9,10 @@ public class ExportFitnessPlots {
 		
 		System.out.println("Setup\tRun\tGeneration\tHighestFitness\tAverageFitness\tLowestFitness");
 		
-		String f = "bigdisk/evorbc2/qualitymetrics/maze_";
-//		String f = "bigdisk/december2015/foraging/";String m = "_foraging/";
-//		String f = "bigdisk/locking/";String m = "";//"_obstacle/";
+//		String f = "bigdisk/evorbc2/multimaze/"; String[] setups = new String[]{f+"repertoire_obstacle/"};
+//		String f = "bigdisk/evorbc2/qualitymetrics/maze_"; String[] setups = new String[]{f+"radial/",f+"distance/",f+"quality/"};
+		String f = "bigdisk/evorbc2/repertoiresize/maze_quality_"; String[] setups = new String[]{f+"5/",f+"10/",f+"20/",f+"30/",f+"50/",f+"100/"};
 		
-//		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m+"all_30"+m};
-//		String[] setups = new String[]{f};
-		String[] setups = new String[]{f+"radial/",f+"distance/",f+"quality/"};
 		
 		for(String s : setups)
 			new ExportFitnessPlots(s);

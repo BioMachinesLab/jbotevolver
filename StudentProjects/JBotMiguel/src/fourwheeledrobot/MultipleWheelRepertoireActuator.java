@@ -26,12 +26,13 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	protected double[][][] repertoire;
 	protected int nParams;
 	protected double resolution;
-	protected double circleRadius;
+	protected double repertoireRadius;
 	protected int type = 0;
 	protected double stop = 0;
 	protected int lock = 0;
 	protected int controlCycle = 0;
 	protected Vector2d lastPoint;
+	protected double maxSide = 0;
 	
 	protected double[] prevBehavior;
 	
@@ -65,15 +66,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
 			nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
 			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
-//			System.out.println(actuatorChosen+" "+numArgs+" "+wheelArgs.getArgumentAsString("repertoire"));
 		}
-		
-//		for(int i = 0 ; i < repertoire.length ; i++) {
-//			for(int j = 0 ; j < repertoire[i].length ; j++) {
-//				System.out.print(repertoire[i][j] == null ? " " : "X");
-//			}
-//			System.out.println();
-//		}
 		
 		type = args.getArgumentAsIntOrSetDefault("type", type);
 	}
@@ -120,13 +113,11 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		
 		do{
 			Vector2d point = circlePoint(this.heading,s);
-//			int[] pos = getLocationFromBehaviorVector(new double[]{point.x,point.y});
-//			behavior = repertoire[pos[1]][pos[0]];
 			behavior = repertoire[(int)point.y][(int)point.x];
 			lastPoint = new Vector2d(point);
-//			System.out.println((int)point.y+","+(int)point.x);
 			
 			//reduce the size of the circle to find an appropriate point
+			//in case there is no filling
 			s*=0.95;
 			if(Math.abs(s) < 0.1)
 				break;
@@ -142,77 +133,43 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 //		speedPercentage = 0.5;
 		
 		if(type == 0) {
-			
+			//same as EvoRBC GECCO paper: Alpha [-90,90], speed [-1,1]
 			double h =  percentageAngle * (Math.PI/2);
 			
 			if(speedPercentage < 0) {
 				h+=Math.PI;
 				speedPercentage*=-1;
 			}
-			res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
+			res = new Vector2d(speedPercentage*repertoireRadius*Math.cos(h),speedPercentage*repertoireRadius*Math.sin(h));
 		
 		} else if(type == 1){
-			
+			//Alpha [-180,180], speed [0,1]
 			speedPercentage = speedPercentage/2.0 + 0.5;// go to [0,1]
 			
 			double h =  percentageAngle * (Math.PI);
-			res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
+			res = new Vector2d(speedPercentage*repertoireRadius*Math.cos(h),speedPercentage*repertoireRadius*Math.sin(h));
 			
 		} else if(type == 2){
-			
+			//similar to type=0, but doesn't invert the direction when going backwards
 			double h =  percentageAngle * (Math.PI/2);
 			
 			if(speedPercentage < 0) {
 				h = -percentageAngle * (Math.PI/2) + Math.PI;
 				speedPercentage*=-1;
 			}
-			res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
+			res = new Vector2d(speedPercentage*repertoireRadius*Math.cos(h),speedPercentage*repertoireRadius*Math.sin(h));
+		} else if(type == 3){
+			//Cartesian: x,y coordinates (square-shaped repertoire)
+			double x = percentageAngle*maxSide;
+			double y = speedPercentage*maxSide;
+			
+			res = new Vector2d(x,y);
 		}
 		
 		res.x+=repertoire.length/2;
 		res.y+=repertoire[0].length/2;
 		
 		return res;
-	}
-	
-	public static void main(String[] args) {
-		
-		double originalSP = 1;
-		double circleRadius = 50;
-		
-		for(double i = -1 ; i < 1; i+=0.15) {
-			
-			double percentageAngle = i;
-			double speedPercentage = originalSP;
-		
-			double h =  percentageAngle * (Math.PI/2);
-			
-			if(speedPercentage < 0) {
-				h = -percentageAngle * (Math.PI/2) + Math.PI;
-				speedPercentage*=-1;
-			}
-			Vector2d res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
-			System.out.println(originalSP+","+i+","+res.x+","+res.y);
-			
-		}
-		
-		originalSP = -1;
-		
-		for(double i = -1 ; i < 1; i+=0.15) {
-			
-			double percentageAngle = i;
-			double speedPercentage = originalSP;
-		
-			double h =  percentageAngle * (Math.PI/2);
-			
-			if(speedPercentage < 0) {
-				h = -percentageAngle * (Math.PI/2) + Math.PI;
-				speedPercentage*=-1;
-			}
-			Vector2d res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
-			System.out.println(originalSP+","+i+","+res.x+","+res.y);
-			
-		}
 	}
 	
 	private int[] getLocationFromBehaviorVector(double[] vec) {
@@ -248,7 +205,8 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 				int x = s.nextInt();
 				int y = s.nextInt();
 				
-				circleRadius = Math.max(circleRadius,new Vector2d(x - size/2.0, y - size/2.0).length());
+				repertoireRadius = Math.max(repertoireRadius,new Vector2d(x - size/2.0, y - size/2.0).length());
+				maxSide = Math.max(maxSide, Math.max(Math.abs(x-size/2.0), Math.abs(y-size/2.0)));
 				
 				r[x][y] = new double[nParams];
 				for(int d = 0 ; d < nParams ; d++) {

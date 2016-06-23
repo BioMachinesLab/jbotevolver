@@ -8,6 +8,8 @@ import java.awt.RadialGradientPaint;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
 
 import mathutils.Vector2d;
@@ -309,7 +311,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		return -1*((y - centerY)/scale - verticalMovement);
 	}
 
-	public class MouseListenerSentinel implements MouseListener,MouseMotionListener {
+	public class MouseListenerSentinel implements MouseListener,MouseMotionListener,MouseWheelListener {
 		
 		private TwoDRenderer renderer;
 		
@@ -366,6 +368,11 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		@Override
 		public void mouseMoved(MouseEvent e) {
 			renderer.mouseMoved(e);
+		}
+
+		@Override
+		public void mouseWheelMoved(MouseWheelEvent e) {
+			renderer.mouseWheelMoved(e);
 		}
 	}
 	
