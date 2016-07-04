@@ -73,10 +73,10 @@ public abstract class Renderer extends Component {
 		if (titleText != null && !titleText.isEmpty()) {
 			Font f = g.getFont();
 			
-			if (System.getProperty("os.name").contains("Windows")) {
-				Font font = new Font(f.getName(), f.getStyle(), f.getSize() * 2);
-				g.setFont(font);
-			}			
+//			if (System.getProperty("os.name").contains("Windows")) {
+//				Font font = new Font(f.getName(), f.getStyle(), f.getSize() * 2);
+//				g.setFont(font);
+//			}			
 
 			int x = getWidth() / 2 - g.getFontMetrics().stringWidth(titleText) / 2;
 			int y = (int) (g.getFontMetrics().getHeight() * 1.5);
