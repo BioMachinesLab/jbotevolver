@@ -11,8 +11,13 @@ public class ExportFitnessPlots {
 		
 //		String f = "bigdisk/evorbc2/multimaze/"; String[] setups = new String[]{f+"repertoire_obstacle/"};
 //		String f = "bigdisk/evorbc2/qualitymetrics/maze_"; String[] setups = new String[]{f+"radial/",f+"distance/",f+"quality/"};
-		String f = "bigdisk/evorbc2/repertoiresize/maze_quality_"; String[] setups = new String[]{f+"5/",f+"10/",f+"20/",f+"30/",f+"50/",f+"100/"};
+//		String f = "bigdisk/evorbc2/repertoiresize/maze_quality_"; String[] setups = new String[]{f+"5/",f+"10/",f+"20/",f+"30/",f+"50/",f+"100/"};
 		
+//		String f = "bigdisk/repertoireresolution/maze_quality_"; String[] setups = new String[]{f+"5/",f+"10/",f+"20/",f+"50/",f+"100/",f+"200/"};
+		String f = "bigdisk/repertoireresolution/repertoire_quality_"; String[] setups = new String[]{f+"5/",f+"10/",f+"20/",f+"50/",f+"100/",f+"200/"};
+		
+//		String f = "bigdisk/behaviormapping/maze_type"; String[] setups = new String[]{/*f+"0_20/",f+"1_20/",*/f+"3_20/"};
+//		String f = "bigdisk/orientation/"; String[] setups = new String[]{f+"maze_orientation/"};
 		
 		for(String s : setups)
 			new ExportFitnessPlots(s);

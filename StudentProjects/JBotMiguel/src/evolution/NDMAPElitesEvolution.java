@@ -113,9 +113,9 @@ public class NDMAPElitesEvolution extends GenerationalEvolution{
 		
 		String dir = diskStorage.getOutputDirectory()+"/";
 		String hash = getRepertoireHash(((NDMAPElitesPopulation)population));
-    	String file = "repertoire_"+hash+".obj";
+    	String file = "repertoire_"+hash+".txt";
 		
-		serializeRepertoire(dir,file,((NDMAPElitesPopulation)population).getNDBehaviorMap());
+    	saveRepertoireTxt(dir,file,((NDMAPElitesPopulation)population).getNDBehaviorMap());
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(dir+"repertoire_name.txt")));
 			bw.write(hash);
@@ -560,16 +560,18 @@ public class NDMAPElitesEvolution extends GenerationalEvolution{
     	}
     	return ""+sb.toString().hashCode();
     }
-    
-    public static void serializeRepertoire(String dir, String file, NDBehaviorMap map) {
+
+    public static void saveRepertoireTxt(String dir, String file, NDBehaviorMap map) {
+    	String s = map.serialize();
     	try {
-    		FileOutputStream fout = new FileOutputStream(dir+file);
-        	ObjectOutputStream oos = new ObjectOutputStream(fout);
-        	oos.writeObject(map);
-        	fout.close();
+    	
+    		FileWriter fw = new FileWriter(new File(dir+file));
+    		
+    		fw.write(s.trim());
+    		
+    		fw.close();
     	} catch(Exception e){
     		e.printStackTrace();
     	}
     }
-
 }

@@ -1,54 +1,61 @@
 package utils.evorbc;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.Scanner;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import fourwheeledrobot.MultipleWheelRepertoireActuator;
+import fourwheeledrobot.MultipleWheelRepertoireNDActuator;
 
 public class ExportEvoRBCHeatmap {
 	
-	int samples = 1;
+	int samples = 50;
+	int fitnessSamples = 5;
 	boolean randomizeSeed = false;
 	boolean postEvalBest = false;
 	static String f = "bigdisk/evorbc2/qualitymetrics/";
+	static FileWriter fw;
 	
 	public static void main(String[] args) throws Exception{
 		
 //		f = "bigdisk/evorbc2/multimaze/"; String[] setups = new String[]{f+"repertoire_obstacle/"};
 //		f = "bigdisk/evorbc2/qualitymetrics/"; String[] setups = new String[]{f+"maze_radial/",f+"maze_distance/",f+"maze_quality/"};
-		f = "bigdisk/evorbc2/repertoiresize/"; String[] setups = new String[]{f+"maze_quality_5/",f+"maze_quality_10/",f+"maze_quality_20/",f+"maze_quality_30/",f+"maze_quality_50/",f+"maze_quality_100/"};
+//		f = "bigdisk/evorbc2/repertoiresize/"; String[] setups = new String[]{f+"maze_quality_5/",f+"maze_quality_10/",f+"maze_quality_20/",f+"maze_quality_30/",f+"maze_quality_50/",f+"maze_quality_100/"};
+		f = "bigdisk/repertoireresolution/"; String[] setups = new String[]{f+"maze_quality_5/",f+"maze_quality_10/",f+"maze_quality_20/",f+"maze_quality_50/",f+"maze_quality_100/",f+"maze_quality_200/"};
+//		f = "bigdisk/behaviormapping/"; String[] setups = new String[]{f+"maze_type0_20/",f+"maze_type1_20/",f+"maze_type3_20/"};
+//		f = "bigdisk/orientation/"; String[] setups = new String[]{f+"maze_orientation/"};
+
+		fw = new FileWriter(new File("out.txt"));
 		
-		System.out.println("Folder\tSetup\tRun\tStep\tX\tY");
+		fw.append("Folder\tSetup\tRun\tSample\tMaze\tStep\tX\tY\n");
+//		fw.append("Folder\tSetup\tRun\tSample\tMaze\tStep\tX\tY\tZ\n");
 		
 		for(String s : setups)
 			new ExportEvoRBCHeatmap(s);
+		
+		fw.close();
 	}
 	
 	public ExportEvoRBCHeatmap(String folder) throws Exception{
 		
 		File f = new File(folder);
 		
-		String result = "";
-		
 		for(String s : f.list()) {
-			result=checkSubFolders(new File(folder+s));
+			checkSubFolders(new File(folder+s));
 		}
 		
 //		System.out.println(result);
 	}
 	
-	private String checkSubFolders(File folder) throws Exception {
-		
-		String result = "";
+	private void checkSubFolders(File folder) throws Exception {
 		
 		if(folder.list() == null) {
-			return result;
+			return;
 		}
 		
 		for(String f : folder.list()) {
@@ -56,20 +63,17 @@ public class ExportEvoRBCHeatmap {
 			String fn = folder.getPath()+"/"+f;
 			
 			if(f.equals("_fitness.log")) {
-				result=checkFitness(folder.getPath());
+				checkFitness(folder.getPath());
 			} else if(new File(fn).isDirectory()) {
 				checkSubFolders(new File(fn));
 			}
 		}
-		return result;
 	}
 	
-	private String checkFitness(String folder) throws Exception {
-		
-		String result = "";
+	private void checkFitness(String folder) throws Exception {
 		
 		if(!new File(folder+"/_showbest_current.conf").exists())
-			return result;
+			return;
 		
 		JBotEvolver jbot = new JBotEvolver(new String[]{folder+"/_showbest_current.conf"});
 		
@@ -83,19 +87,25 @@ public class ExportEvoRBCHeatmap {
 		
 		if(nActs == 0) {
 			String actName = actArgs.getArgumentAt(0).split("=")[0];
-			result+=runEvaluation(folder,jbot,actName,0);
+			try {
+				runEvaluation(folder,jbot,actName,0);
+			} catch(Exception e){
+				e.printStackTrace();
+			}
 		} else {
 			for(int a = 0 ; a < nActs ; a++) {
 				String actName = wheel.getArgumentAt(a).split("=")[0];
-				result+=runEvaluation(folder,jbot,actName,a);
+				try {
+					runEvaluation(folder,jbot,actName,a);
+				} catch(Exception e){
+					e.printStackTrace();
+				}
 			}
 		}
-		
-		return result;
 	}
 	
-	private String runEvaluation(String folder, JBotEvolver jbot, String act, int actNumber) throws Exception{
-		String result = "";
+	private void runEvaluation(String folder, JBotEvolver jbot, String act, int actNumber) throws Exception{
+		StringBuffer result = new StringBuffer();
 		String[] split = folder.split("/");
 		
 		int generation = 0;
@@ -104,19 +114,19 @@ public class ExportEvoRBCHeatmap {
 			generation = getBestGeneration(folder);
 		
 		String filename = postEvalBest ? folder+"/show_best/showbest"+generation+".conf" :  folder+"/_showbest_current.conf";
-		for(int i = 0 ; i < samples ; i++) {
+		for(int sample = 0 ; sample < samples ; sample++) {
 			
-			String randomizeSeed = this.randomizeSeed ? "\n--random-seed "+i : "";
+			String randomizeSeed = this.randomizeSeed ? "\n--random-seed "+sample : "";
 			randomizeSeed = randomizeSeed + (this.randomizeSeed ? "\n--simulator +fixedseed=0" : ""); 
 			
-			String options = "--environment +fitnesssample="+i+randomizeSeed+"\n";
+			String options = "--environment +fitnesssample="+sample+randomizeSeed+"\n";
 			options+="--robots +chosenactuator="+actNumber+"\n";
 			options+="--simulator +folder=("+f+")\n";
 		
 			jbot.loadFile(filename, options);
 			
 			if(!postEvalBest && !jbot.getPopulation().evolutionDone())
-				return "";
+				return;
 			
 			Simulator sim = jbot.createSimulator();
 			jbot.createRobots(sim);
@@ -125,14 +135,25 @@ public class ExportEvoRBCHeatmap {
 			sim.addCallback(eval);
 			
 			MultipleWheelRepertoireActuator actuator = (MultipleWheelRepertoireActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireActuator.class);
+//			MultipleWheelRepertoireNDActuator actuator = (MultipleWheelRepertoireNDActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireNDActuator.class);
 			
 			String bigLine = "";
 			sim.setupEnvironment();
+			
+			String folderName = split[split.length-4];
+			String setupName = split[split.length-2]+"_"+split[split.length-3];
+			String runName = split[split.length-1];
+			
 			for(double time = 0 ; time < sim.getEnvironment().getSteps() ; time++){
 				sim.performOneSimulationStep(time);
 				Vector2d point = actuator.getLastPoint();
-				String line= split[split.length-4]+"\t"+split[split.length-2]+"\t"+split[split.length-1]+"\t"+(int)time+"\t"+(int)point.x+"\t"+(int)point.y+"\n";
+				String line= folderName+"\t"+setupName+"\t"+runName+"\t"+sample+"\t"+(sample % fitnessSamples)+"\t"+(int)time+"\t"+(int)point.x+"\t"+(int)point.y+"\n";
+//				int[] point = actuator.getPrevBehavior();
+//				int[] point = actuator.getRealPrevBehavior();
+//				String line= folderName+"\t"+setupName+"\t"+runName+"\t"+sample+"\t"+(sample % fitnessSamples)+"\t"+(int)time+"\t"+(int)point[0]+"\t"+(int)point[1]+"\t"+(int)point[2]+"\n";
 				line = line.replaceAll("_obstacle", "");
+				line = line.replaceAll("_maze", "");
+				line = line.replaceAll("_20", "");
 				bigLine+= line;
 			}
 			
@@ -140,11 +161,9 @@ public class ExportEvoRBCHeatmap {
 			if(generation == 0)
 				generation = jbot.getPopulation().getNumberOfCurrentGeneration();
 			
-			
-			result+=bigLine;
-			System.out.print(bigLine);
+			result.append(bigLine);
 		}
-		return result;
+		fw.append(result.toString());
 	}
 	
 	public static int getBestGeneration(String folder) throws Exception{

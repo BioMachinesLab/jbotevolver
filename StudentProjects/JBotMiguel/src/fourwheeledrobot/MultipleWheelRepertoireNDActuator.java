@@ -2,6 +2,7 @@ package fourwheeledrobot;
 
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
+import java.util.Locale;
 import java.util.Scanner;
 
 import javax.management.RuntimeErrorException;
@@ -67,7 +68,7 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 	private int[] selectBehaviorFromRepertoire() {
 		
 		int[] buckets = new int[map.getNDimensions()];
-
+		
 		if(type == 0) {
 			//same as EvoRBC GECCO paper: Alpha [-90,90], speed [-1,1]
 			
@@ -81,6 +82,7 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 			
 			double speedPercentage = actuations[0];
 			double headingPercentage = actuations[1];
+			
 			double h =  headingPercentage * (Math.PI/2);
 			
 			double circleRadius = map.getCircleRadius()-1;//circle radius in buckets
@@ -119,7 +121,7 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 	
 	@Override
 	public void apply(Robot robot, double timeDelta) {
-		
+
 		controlCycle++;
 		
 		//select correct behavior from repertoire, or lock for X number of timesteps
@@ -161,15 +163,34 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 	}
 	
 	protected NDBehaviorMap loadNDBehaviorMap(Simulator simulator, String f) {
+		
+		if(simulator.getArguments().get("--simulator") != null)  {
+			Arguments args = simulator.getArguments().get("--simulator");
+			String prefix = args.getArgumentAsStringOrSetDefault("folder","");
+			f= prefix+f;
+		}
+		
+		NDBehaviorMap map = null;
+		
 		try {
-			ObjectInputStream ois = new ObjectInputStream(simulator.getFileProvider().getFile(f));
-			NDBehaviorMap map = (NDBehaviorMap)ois.readObject();
-			ois.close();
-			return map;
+			Scanner s = new Scanner(simulator.getFileProvider().getFile(f));
+			
+			StringBuffer b = new StringBuffer();
+			
+			while(s.hasNextLine()) {
+				String line = s.nextLine();
+				b.append(line+"\n");
+			}
+			
+			map = NDBehaviorMap.deserialize(b.toString());
+			
+			s.close();
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-		return null;
+		
+		return map;
 	}
 	
 	public void setActuation(double actuation, int dimension) {
@@ -194,5 +215,14 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 	
 	public double getMaxSpeed() {
 		return wheels.getMaxSpeed();
+	}
+	
+	public int[] getPrevBehavior() {
+		return prevBehavior;
+	}
+	
+	public int[] getRealPrevBehavior() {
+		double[] vec = map.getValuesFromBucketVector(prevBehavior);
+		return map.getBucketsFromBehaviorVector(vec);
 	}
 }

@@ -13,6 +13,7 @@ import novelty.results.VectorBehaviourResult;
 import simulation.physicalobjects.Marker;
 import taskexecutor.results.SimpleFitnessResult;
 import evolution.MAPElitesPopulation;
+import evolution.NDBehaviorMap;
 import evolution.NDMAPElitesEvolution;
 import evolution.NDMAPElitesPopulation;
 import evolutionaryrobotics.populations.Population;
@@ -20,8 +21,8 @@ import evolutionaryrobotics.populations.Population;
 public class NDMAPElitesViewer extends MAPElitesViewer{
 	
 	public static void main(String[] args) throws Exception {
-//		new NDMAPElitesViewer("rep_test/", true);
-		new NDMAPElitesViewer("repertoire/", true);
+		new NDMAPElitesViewer("rep_test/", true);
+//		new NDMAPElitesViewer("repertoire/", true);
 	}
 	
 	public NDMAPElitesViewer(String folder, boolean gui) {
@@ -97,23 +98,27 @@ public class NDMAPElitesViewer extends MAPElitesViewer{
 		
 		handlePopulation(pop);
 		
-		double[][] vals = new double[pop.getNDBehaviorMap().getSizes()[0]][pop.getNDBehaviorMap().getSizes()[1]];
+		NDBehaviorMap map = pop.getNDBehaviorMap();
 		
-		double[] xBuckets = pop.getNDBehaviorMap().getBucketListing(0);
-		double[] yBuckets = pop.getNDBehaviorMap().getBucketListing(1);
-		double[] orBuckets = pop.getNDBehaviorMap().getBucketListing(2);
+		map = NDBehaviorMap.deserialize(map.serialize());
+		
+		double[][] vals = new double[map.getSizes()[0]][map.getSizes()[1]];
+		
+		double[] xBuckets = map.getBucketListing(0);
+		double[] yBuckets = map.getBucketListing(1);
+		double[] orBuckets = map.getBucketListing(2);
 		for(int x = 0 ; x < xBuckets.length ; x++) {
 			for(int y = 0 ; y < yBuckets.length ; y++) {
 				for(int z = 0 ; z < orBuckets.length ; z++) {
 					
 					double[] vec = new double[]{xBuckets[x],yBuckets[y],orBuckets[z]};
 		
-					MOChromosome res = pop.getNDBehaviorMap().getChromosomeFromBehaviorVector(vec);
+					MOChromosome res = map.getChromosomeFromBehaviorVector(vec);
 					
 					if(res == null)
 						continue;
 					
-					double[] behavior = pop.getNDBehaviorMap().getBehaviorVector(res);
+					double[] behavior = map.getBehaviorVector(res);
 					
 //					System.out.println(behavior[0]+","+behavior[1]+","+behavior[2]);
 //					System.out.println(xBuckets[x]+","+yBuckets[y]+","+orBuckets[z]);

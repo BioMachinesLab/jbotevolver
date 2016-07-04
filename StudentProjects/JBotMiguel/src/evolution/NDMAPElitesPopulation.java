@@ -55,12 +55,12 @@ public class NDMAPElitesPopulation extends Population{
 		map = new NDBehaviorMap(arguments);
 		
 		if(arguments.getArgumentIsDefined("maxallele")) {
-			maxAllele = arguments.getArgumentAsInt("maxallele");
+			maxAllele = arguments.getArgumentAsDouble("maxallele");
 			minAllele = -maxAllele;
 		}
 		
 		if(arguments.getArgumentIsDefined("minallele")) {
-			minAllele = arguments.getArgumentAsInt("minallele");
+			minAllele = arguments.getArgumentAsDouble("minallele");
 		}
 		
 		map.setMinMaxAllele(minAllele,maxAllele);
