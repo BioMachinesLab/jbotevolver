@@ -4,8 +4,8 @@ public class Cronometer {
 	
 	private static long startingTime;
 	private static long lapTime;
-	private static long[] times = new long[10];
-	private static long[] timesStamp = new long[10];
+	private static long[] times = new long[15];
+	private static long[] timesStamp = new long[15];
 	
 	public static void start() {
 		startingTime = System.currentTimeMillis();

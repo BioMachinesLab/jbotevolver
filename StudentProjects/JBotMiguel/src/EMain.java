@@ -14,7 +14,7 @@ public class EMain {
 		
 //		String configName = "maze_square.conf";
 
-		String configName = "repertoire_obstacle.conf";
+		String configName = "benchmark.conf";
 //		String configName = "rep_test/_restartevolution.conf";
 		
 //		String configName = "hexamap_debug.conf";

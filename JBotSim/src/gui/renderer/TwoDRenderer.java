@@ -286,7 +286,7 @@ public class TwoDRenderer extends Renderer
 	}
 
 	public void drawWall(Wall w) {
-
+		
 		graphics.setColor(w.color);
 
 		Edge[] edges = w.getEdges();
@@ -321,6 +321,7 @@ public class TwoDRenderer extends Renderer
 		// int y = (int) transformY(m.getTopLeftY());
 		//
 		// graphics.fillRect(x, y, wallWidth, wallHeight);
+		
 		graphics.setColor(Color.BLACK);
 
 	}

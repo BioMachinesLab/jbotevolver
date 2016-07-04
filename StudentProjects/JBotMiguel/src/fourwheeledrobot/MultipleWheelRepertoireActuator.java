@@ -7,6 +7,7 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
+import tests.Cronometer;
 
 /**
  * This actuator uses a behavior repertoire to choose the
@@ -69,6 +70,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		}
 		
 		type = args.getArgumentAsIntOrSetDefault("type", type);
+		
 	}
 	
 	@Override

@@ -11,6 +11,7 @@ import simulation.util.Factory;
 import taskexecutor.results.SimpleFitnessResult;
 import taskexecutor.tasks.GenerationalTask;
 import tasks.Task;
+import tests.Cronometer;
 
 public class NEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithm {
 
@@ -38,6 +39,7 @@ public class NEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithm {
 			convertedGenotypes[i] = jBotChromosome;
 
 			String taskClass = GenerationalTask.class.getName();
+			
 			if (evo.getJBotEvolver().getArgumentsCopy().get("--evolution").getArgumentIsDefined("task")) {
 				Arguments evolutionArguments = new Arguments(
 						evo.getJBotEvolver().getArgumentsCopy().get("--evolution").getArgumentAsString("task"));
@@ -45,7 +47,7 @@ public class NEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithm {
 					taskClass = evolutionArguments.getArgumentAsString("classname");
 				}
 			}
-
+			
 			Task task = (Task) Factory.getInstance(taskClass,
 					new JBotEvolver(evo.getJBotEvolver().getArgumentsCopy(), evo.getJBotEvolver().getRandomSeed()),
 					samples, jBotChromosome, evo.getPopulation().getGenerationRandomSeed());

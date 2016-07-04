@@ -16,6 +16,7 @@ import mathutils.Vector2d;
 import net.jafama.FastMath;
 import simulation.physicalobjects.Nest;
 import simulation.physicalobjects.Wall;
+import simulation.physicalobjects.Wall.Edge;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.PolygonShape;
 import simulation.robot.LedState;
 import simulation.robot.Robot;
@@ -106,6 +107,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 	protected void drawRobot(Graphics graphics, Robot robot) {
 		if (image.getWidth() != getWidth() || image.getHeight() != getHeight())
 			createImage();
+		
 		int circleDiameter = bigRobots ? (int)Math.max(10,Math.round(robot.getDiameter() * scale)) : (int) Math.round(robot.getDiameter() * scale);
 		int x = transformX(robot.getPosition().getX()) - circleDiameter / 2;
 		int y = transformY(robot.getPosition().getY()) - circleDiameter / 2;

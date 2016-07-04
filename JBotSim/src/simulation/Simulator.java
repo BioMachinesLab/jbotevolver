@@ -1,5 +1,7 @@
 package simulation;
 
+import gui.Gui;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,6 +43,7 @@ public class Simulator implements Serializable {
 	private HashMap<String, Arguments> arguments = new HashMap<String, Arguments>();
 
 	public Simulator(long randomSeed, HashMap<String, Arguments> arguments) {
+		
 		this.random = new Random(randomSeed);
 		this.randomSeed = randomSeed;
 		this.arguments = arguments;
@@ -73,7 +76,7 @@ public class Simulator implements Serializable {
 						(Updatable) Factory.getInstance(updatableArgs.getArgumentAsString("classname"), updatableArgs));
 			}
 		}
-
+		
 	}
 
 	public Network getNetwork() {
@@ -160,9 +163,10 @@ public class Simulator implements Serializable {
 		updatePositions(time);
 
 		for (Updatable r : callbacks) {
+//			if(r instanceof Gui)
+//				continue;
 			r.update(this);
 		}
-
 	}
 
 	protected void updateAllControllers(Double time) {
@@ -215,10 +219,10 @@ public class Simulator implements Serializable {
 			performOneSimulationStep(time);
 		}
 		terminate();
-
 	}
 
 	public void simulate(long sleepTime) {
+		
 		setup();
 		for (time = Double.valueOf(0); time < environment.getSteps() && !stopSimulation; time++) {
 			performOneSimulationStep(time);

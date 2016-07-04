@@ -5,6 +5,7 @@ import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import tests.Cronometer;
 
 public class PhototaxisEvaluationFunction extends EvaluationFunction {
 
