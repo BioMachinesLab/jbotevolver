@@ -34,7 +34,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	protected int controlCycle = 0;
 	protected Vector2d lastPoint;
 	protected double maxSide = 0;
-	
+	protected String repertoireLocation;
 	protected double[] prevBehavior;
 	
 	public MultipleWheelRepertoireActuator(Simulator simulator, int id, Arguments args) {
@@ -47,6 +47,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			Arguments wheelArgs = new Arguments(a.getArgumentAsString(a.getArgumentAt(0)));
 			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
 			nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
+			this.repertoireLocation = wheelArgs.getArgumentAsString("repertoire");
 			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
 			lock = (int)(args.getArgumentAsDoubleOrSetDefault("lock", lock) / simulator.getTimeDelta());
 		} else {
@@ -269,4 +270,13 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	public Vector2d getLastPoint() {
 		return lastPoint;
 	}
+
+	public String getRepertoireLocation() {
+		return repertoireLocation;
+	}
+	
+	public double[] getLastBehavior() {
+		return repertoire[(int)lastPoint.y][(int)lastPoint.x];
+	}
+	
 }

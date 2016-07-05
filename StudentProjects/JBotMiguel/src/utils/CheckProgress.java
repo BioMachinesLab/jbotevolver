@@ -3,99 +3,66 @@ package utils;
 import java.io.File;
 import java.util.Scanner;
 
-public class CheckProgress {
+public class CheckProgress extends TraverseFolders {
 	
-//	static String prefix = "bigdisk/december2015/10samples/";static String m = "_obstacle/";static double maxGens = 500;
-//	static String prefix = "bigdisk/december2015/foraging/";static String m = "_foraging/";static double maxGens = 300;
-	
-	static String prefix = "bigdisk/evorbc2/";static String m = "";static double maxGens = 1000;
-	static String[] setups = new String[]{"repertoiresize/"};
-	
-	static int maxRuns = 30;
-	static int expected = 0;
-	static int found = 0;
+	private double maxGens = 1000;
+	private int maxRuns = 30;
+	private int expected = 0;
+	private int found = 0;
 	
 	public static void main(String[] args) throws Exception{
-		String f = "";
-//		String[] setups = new String[]{f+"wheels"+m,f+"repertoire"+m,f+"all_repertoire"+m};
-		
-		for(String s : setups)
-			new CheckProgress(prefix+s);
-
+		new CheckProgress("bigdisk/evorbc2/",new String[]{});
+	}
+	
+	public CheckProgress(String baseFolder, String[] setups, int generations, int runs) {
+		super(baseFolder, setups);
+		this.maxGens = generations;
+		this.maxRuns = runs;
+		traverse();
 		System.out.println("Total: "+(found/(double)expected*100.0)+"% ("+(expected-found)/maxGens+" runs left)");
 	}
 	
-	public CheckProgress(String folder) throws Exception{
-		
-		File f = new File(folder);
-		
-		String result = "";
-		
-		for(String s : f.list()) {
-			result=checkSubFolders(new File(folder+s));
-			System.out.println(result);
-		}
-		
+	public CheckProgress(String baseFolder, String[] setups) {
+		this(baseFolder, setups, 1000, 30);
 	}
 	
-	private String checkSubFolders(File folder) throws Exception {
+	protected void act(File folder) {
 		
-		String result = "";
+		try {
 		
-		if(folder.list() == null) {
-			return result;
-		}
-		
-		if(new File(folder.getPath()+"/"+folder.getName()+".conf").exists()) {
-			for(int i = 1 ; i <= maxRuns ; i++) {
-				String fn = folder.getPath()+"/"+i;
-				int gens = checkGeneration(fn);
-				found+=gens;
-				expected+=(maxGens-1);
-				result+=fn+"\t"+gens+"\n";
-			}
-		} else {
-			for(String f : folder.list()) {
-				String fn = folder+"/"+f;
-				if(new File(fn).isDirectory()) {
-					result+= checkSubFolders(new File(fn));
+			String result = "";
+			
+			if(new File(folder.getPath()+"/"+folder.getName()+".conf").exists()) {
+				for(int i = 1 ; i <= maxRuns ; i++) {
+					String fn = folder.getPath()+"/"+i;
+					int gens = checkGeneration(new File(fn));
+					found+=gens;
+					expected+=(maxGens-1);
+					result+=fn+"\t"+gens+"\n";
 				}
-			}
-		}
+			} 
+			
+			System.out.println(result);
 		
-//		for(String f : folder.list()) {
-//			
-//			String fn = folder.getPath()+"/"+f;
-//			
-//			if(f.equals("_fitness.log")) {
-//				result+=folder.getPath()+"\t"+checkGeneration(folder.getPath())+"\n";
-//			} else if(new File(fn).isDirectory()) {
-//				result+= checkSubFolders(new File(fn));
-//			}
-//		}
-		return result;
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
-	private int checkGeneration(String folder) throws Exception {
+	private int checkGeneration(File folder) throws Exception {
 		
-		if(!new File(folder+"/_generationnumber").exists())
+		if(!new File(folder.getPath()+"/_generationnumber").exists())
 			return 0;
 		
 		return getHighestGeneration(folder);
 	}
 	
 	
-	public static int getHighestGeneration(String folder) throws Exception{
-		File f = new File(folder);
-		
-		File post = new File(f.getPath()+"/_generationnumber");
-		
+	public static int getHighestGeneration(File folder) throws Exception{
+		File post = new File(folder.getPath()+"/_generationnumber");
 		Scanner s = new Scanner(post);
-		
 		int gen = s.nextInt();
-		
 		s.close();
-		
 		return gen;
 	}
 }

@@ -131,6 +131,10 @@ public class MAPElitesPopulation extends Population{
 		chromosomes.add(moc);
 	}
 	
+	public MOChromosome getChromosomoeFromLocation(int[] pos) {
+		return map[pos[0]][pos[1]];
+	}
+	
 	public void addToMap(MOChromosome moc) {
 		int[] mocMapLocation = positionInMap(moc);
 		
