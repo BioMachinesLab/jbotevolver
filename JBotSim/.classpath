@@ -6,6 +6,6 @@
 	<classpathentry kind="lib" path="lib/jafama.jar"/>
 	<classpathentry kind="lib" path="lib/javassist.jar"/>
 	<classpathentry kind="lib" path="lib/jfreesvg-3.0.jar"/>
-	<classpathentry kind="lib" path="BaseClient.jar"/>
+	<classpathentry kind="lib" path="lib/BaseClient.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
