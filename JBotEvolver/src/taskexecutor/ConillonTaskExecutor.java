@@ -43,23 +43,28 @@ public class ConillonTaskExecutor extends TaskExecutor {
 		//Make sure that Jafama has been initialized
 		//so that it is not initialized every time in each worker
 		FastMath.sinQuick(1);
+		
+		serverPort = args.getArgumentAsIntOrSetDefault("serverport", 0);
+		codePort = args.getArgumentAsIntOrSetDefault("codeport", 0);
+		serverName = args.getArgumentAsStringOrSetDefault("server",
+				"evolve.dcti.iscte.pt");
+		
 	}
 
-	private void connect() {
-		connected = false;
+	private synchronized void connect() {
 		
 		while(!connected){
 			ClientPriority priority = getPriority(args
 					.getArgumentAsIntOrSetDefault("priority", 10));
 	
-			serverPort = args.getArgumentAsIntOrSetDefault("serverport", 0);
-			codePort = args.getArgumentAsIntOrSetDefault("codeport", 0);
-			serverName = args.getArgumentAsStringOrSetDefault("server",
-					"evolve.dcti.iscte.pt");
-			
 			String desc = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
 			
 			int totalTasks = args.getArgumentAsIntOrSetDefault("totaltasks",0);
+			
+			if(client != null) {
+				client.disconnect();
+			}
+			
 			if(totalTasks > 0)
 				client = new Client(desc,priority, serverName, serverPort, serverName, codePort, totalTasks);
 			else
@@ -88,7 +93,7 @@ public class ConillonTaskExecutor extends TaskExecutor {
 		//the task should be added to the buffer before it is prepared
 		//since the ClientId will be different if we need to reconnect to conillon
 		Task copiedTask = copy(t);
-		taskBuffer.add(copiedTask);//TODO we should add a COPY of the task, because the buffer is getting filled with tasks that are already prepared 
+		taskBuffer.add(copiedTask); 
 		
 		try {
 			if(!connected)
