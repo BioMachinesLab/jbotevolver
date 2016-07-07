@@ -73,7 +73,7 @@ public class CoEvolutionTask extends JBotEvolverTask {
 
 	@Override
 	public Result getResult() {
-		SimpleCoEvolutionFitnessResult fr = new SimpleCoEvolutionFitnessResult(chromosome.getID(),opponentChromosome.getID(),
+		SimpleCoEvolutionFitnessResult fr = new SimpleCoEvolutionFitnessResult(getId(),chromosome.getID(),opponentChromosome.getID(),
 				fitness / samples);
 		return fr;
 	}

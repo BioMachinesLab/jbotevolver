@@ -9,16 +9,16 @@ public class NEATPostEvaluationResult extends Result {
 	private int sample = 0;
 	private double fitness = 0;
 
-	public NEATPostEvaluationResult(int run, int generation, int fitnesssample, double fitness) {
-		super();
+	public NEATPostEvaluationResult(int taskId, int run, int generation, int fitnesssample, double fitness) {
+		super(taskId);
 		this.generation = generation;
 		this.fitness = fitness;
 		this.run = run;
 		this.fitnesssample = fitnesssample;
 	}
 	
-	public NEATPostEvaluationResult(int run, int generation, int fitnesssample, double fitness, int sample) {
-		this(run,generation,fitnesssample,fitness);
+	public NEATPostEvaluationResult(int taskId, int run, int generation, int fitnesssample, double fitness, int sample) {
+		this(taskId, run,generation,fitnesssample,fitness);
 		this.sample = sample;
 	}
 

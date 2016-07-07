@@ -27,7 +27,7 @@ public class VREPTask extends Task{
 
 	@Override
 	public Result getResult() {
-		return new VREPResult(getDataFromVREP());
+		return new VREPResult(getId(),getDataFromVREP());
 	}
 	
 	protected float[] getDataFromVREP() {

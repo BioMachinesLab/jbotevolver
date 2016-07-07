@@ -52,7 +52,7 @@ public class GenerationalTask extends JBotEvolverTask {
 	}
 	@Override
 	public Result getResult() {
-		SimpleFitnessResult fr = new SimpleFitnessResult(chromosome.getID(),fitness/samples);
+		SimpleFitnessResult fr = new SimpleFitnessResult(getId(),chromosome.getID(),fitness/samples);
 		return fr;
 	}
 }

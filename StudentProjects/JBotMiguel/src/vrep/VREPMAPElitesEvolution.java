@@ -143,7 +143,7 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 					ExpandedFitness ef = new ExpandedFitness();
 					ef.setEvaluationResults(sampleResults);
 					
-					MOFitnessResult result = new MOFitnessResult((MOChromosome)c, ef);
+					MOFitnessResult result = new MOFitnessResult(r,(MOChromosome)c, ef);
 					MOChromosome moc = result.getChromosome();
 					
 					moc.setEvaluationResult(result.getEvaluationResult());

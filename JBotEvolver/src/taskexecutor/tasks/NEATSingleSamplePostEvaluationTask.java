@@ -50,7 +50,7 @@ public class NEATSingleSamplePostEvaluationTask extends JBotEvolverTask {
 	}
 	@Override
 	public Result getResult() {
-		NEATPostEvaluationResult fr = new NEATPostEvaluationResult(run,generation,fitnesssample,fitness,sample);
+		NEATPostEvaluationResult fr = new NEATPostEvaluationResult(getId(),run,generation,fitnesssample,fitness,sample);
 		return fr;
 	}
 	

@@ -8,8 +8,8 @@ public class SimpleCoEvolutionFitnessResult extends Result {
 	private double fitness = 0;
 	
 	
-	public SimpleCoEvolutionFitnessResult(int chromosomeIdA, int chromosomeIdB, double fitness) {
-		super();
+	public SimpleCoEvolutionFitnessResult(int taskId, int chromosomeIdA, int chromosomeIdB, double fitness) {
+		super(taskId);
 		this.chromosomeIdA = chromosomeIdA;
 		this.chromosomeIdB = chromosomeIdB;
 		this.fitness = fitness;

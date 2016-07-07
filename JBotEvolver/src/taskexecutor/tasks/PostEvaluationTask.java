@@ -58,7 +58,7 @@ public class PostEvaluationTask extends JBotEvolverTask {
 		
 		double val = threshold > 0 ? fitness : fitness/nSamples;
 		
-		PostEvaluationResult fr = new PostEvaluationResult(run,fitnesssample,val);
+		PostEvaluationResult fr = new PostEvaluationResult(getId(),run,fitnesssample,val);
 		return fr;
 	}
 }

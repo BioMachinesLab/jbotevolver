@@ -5,25 +5,51 @@ import java.util.Scanner;
 
 public class CheckProgress extends TraverseFolders {
 	
-	private double maxGens = 1000;
+	private static boolean VERBOSE = false;
+	
+	private int maxGens = 1000;
 	private int maxRuns = 30;
 	private int expected = 0;
 	private int found = 0;
 	
 	public static void main(String[] args) throws Exception{
-		new CheckProgress("bigdisk/evorbc2/",new String[]{});
+		
+		int g = 1000;
+		int r = 30;
+		
+//		new CheckProgress("bigdisk/ann/",new String[]{},r,g).traverse();//done
+//		new CheckProgress("bigdisk/behaviormapping/",new String[]{},r,g).traverse();//done
+		new CheckProgress("bigdisk/multimaze/",new String[]{},r,g).traverse();
+		new CheckProgress("bigdisk/qualitymetrics/",new String[]{},r,g).traverse();
+		new CheckProgress("bigdisk/repertoireresolution/",new String[]{},r,g).traverse();
+		new CheckProgress("bigdisk/repertoiresize/",new String[]{},r,g).traverse();
 	}
 	
-	public CheckProgress(String baseFolder, String[] setups, int generations, int runs) {
+	public CheckProgress(String baseFolder, String[] setups, int runs, int generations) {
 		super(baseFolder, setups);
 		this.maxGens = generations;
 		this.maxRuns = runs;
-		traverse();
-		System.out.println("Total: "+(found/(double)expected*100.0)+"% ("+(expected-found)/maxGens+" runs left)");
 	}
 	
-	public CheckProgress(String baseFolder, String[] setups) {
-		this(baseFolder, setups, 1000, 30);
+	@Override
+	public void traverseEnded() {
+		System.out.println("Total: "+(found/(double)expected*100.0)+"% ("+(expected-found)/maxGens+" runs left) -- "+baseFolder);
+	}
+	
+	@Override
+	protected boolean actFilter(File folder) {
+		
+		if(new File(folder.getPath()+"/repertoire_name.txt").exists())
+			return false;
+		
+		if(new File(folder.getPath()+"/"+folder.getName()+".conf").exists()) {
+			if(new File(folder.getPath()+"/1/repertoire_name.txt").exists())
+				return false;
+			
+			return true;
+		}
+		
+		return false;
 	}
 	
 	protected void act(File folder) {
@@ -32,17 +58,16 @@ public class CheckProgress extends TraverseFolders {
 		
 			String result = "";
 			
-			if(new File(folder.getPath()+"/"+folder.getName()+".conf").exists()) {
-				for(int i = 1 ; i <= maxRuns ; i++) {
-					String fn = folder.getPath()+"/"+i;
-					int gens = checkGeneration(new File(fn));
-					found+=gens;
-					expected+=(maxGens-1);
-					result+=fn+"\t"+gens+"\n";
-				}
-			} 
+			for(int i = 1 ; i <= maxRuns ; i++) {
+				String fn = folder.getPath()+"/"+i;
+				int gens = checkGeneration(new File(fn));
+				found+=gens;
+				expected+=(maxGens-1);
+				result+=fn+"\t"+gens+"\n";
+			}
 			
-			System.out.println(result);
+			if(VERBOSE)
+				System.out.println(result);
 		
 		} catch(Exception e) {
 			e.printStackTrace();

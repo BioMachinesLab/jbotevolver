@@ -50,7 +50,7 @@ public class SingleSamplePostEvaluationTask extends JBotEvolverTask {
 	}
 	@Override
 	public Result getResult() {
-		PostEvaluationResult fr = new PostEvaluationResult(run,fitnesssample,fitness,sample);
+		PostEvaluationResult fr = new PostEvaluationResult(getId(),run,fitnesssample,fitness,sample);
 		return fr;
 	}
 }

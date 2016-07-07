@@ -1,7 +1,13 @@
 package taskexecutor;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import net.jafama.FastMath;
 import result.Result;
@@ -19,6 +25,9 @@ public class ConillonTaskExecutor extends TaskExecutor {
 	private JBotEvolver jBotEvolver;
 	private Arguments args;
 	private boolean connected = false;
+	private boolean submitting = false;
+	
+	private ArrayList<Task> taskBuffer = new ArrayList<Task>();
 
 	@ArgumentsAnnotation(name="serverport", defaultValue="0")
 	private int serverPort;
@@ -31,36 +40,74 @@ public class ConillonTaskExecutor extends TaskExecutor {
 		super(jBotEvolver, args);
 		this.jBotEvolver = jBotEvolver;
 		this.args = args;
-		FastMath.sinQuick(1);//Make sure that Jafama has been initialized
+		//Make sure that Jafama has been initialized
+		//so that it is not initialized every time in each worker
+		FastMath.sinQuick(1);
 	}
 
 	private void connect() {
-		ClientPriority priority = getPriority(args
-				.getArgumentAsIntOrSetDefault("priority", 10));
-
-		serverPort = args.getArgumentAsIntOrSetDefault("serverport", 0);
-		codePort = args.getArgumentAsIntOrSetDefault("codeport", 0);
-		serverName = args.getArgumentAsStringOrSetDefault("server",
-				"evolve.dcti.iscte.pt");
+		connected = false;
 		
-		String desc = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
-		
-		int totalTasks = args.getArgumentAsIntOrSetDefault("totaltasks",0);
-		if(totalTasks > 0)
-			client = new Client(desc,priority, serverName, serverPort, serverName, codePort, totalTasks);
-		else
-			client = new Client(desc,priority, serverName, serverPort, serverName, codePort);
-		connected = true;
+		while(!connected){
+			ClientPriority priority = getPriority(args
+					.getArgumentAsIntOrSetDefault("priority", 10));
+	
+			serverPort = args.getArgumentAsIntOrSetDefault("serverport", 0);
+			codePort = args.getArgumentAsIntOrSetDefault("codeport", 0);
+			serverName = args.getArgumentAsStringOrSetDefault("server",
+					"evolve.dcti.iscte.pt");
+			
+			String desc = jBotEvolver.getArguments().get("--output").getCompleteArgumentString();
+			
+			int totalTasks = args.getArgumentAsIntOrSetDefault("totaltasks",0);
+			if(totalTasks > 0)
+				client = new Client(desc,priority, serverName, serverPort, serverName, codePort, totalTasks);
+			else
+				client = new Client(desc,priority, serverName, serverPort, serverName, codePort);
+			
+			connected = true;
+			
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
 	public void addTask(Task t) {
-		if(!connected)
-			connect();
 		
-		prepareTask(t);
+		if(!submitting) {
+			//when we get here, the mode changed from "getting results" to "submitting", so it's
+			//a brand new batch of tasks. we can clear the buffer of tasks and start adding new tasks
+			submitting = true;
+			taskBuffer.clear();
+		}
+
+		//the task should be added to the buffer before it is prepared
+		//since the ClientId will be different if we need to reconnect to conillon
+		Task copiedTask = copy(t);
+		taskBuffer.add(copiedTask);//TODO we should add a COPY of the task, because the buffer is getting filled with tasks that are already prepared 
 		
-		client.commit(t);
+		try {
+			if(!connected)
+				connect();
+			
+			//an error might have occured before we submit a task
+			checkForConillonError();
+			
+			prepareTask(t);
+			client.commit(t);
+			
+			//an error might have occured during the submission, and the exception
+			//might have been contained in the Client code, so we need to make sure
+			//everything went ok
+			checkForConillonError();
+		
+		} catch(Exception e) {
+			checkForConillonError();
+		}
 	}
 	
 	/*
@@ -118,8 +165,29 @@ public class ConillonTaskExecutor extends TaskExecutor {
 
 	@Override
 	public Result getResult() {
-		if(connected)
-			return client.getNextResult();
+		
+		submitting = false;
+		
+		if(connected) {
+			if(client.getReturnedException() != null) {
+				checkForConillonError();
+				return getResult();
+			}
+			
+			Result r = client.getNextResult();
+			
+			if(r == null && client.getReturnedException() != null) {
+				checkForConillonError();
+				//try again to get the result after the connection has been established 
+				return getResult();
+			}
+			
+			//we got a good result, so we should remove this task from the buffer
+			//to prevent it from getting resubmitted
+			removeTaskFromBuffer(r.getTaskId());
+			
+			return r;
+		}
 		return null;
 	}
 	
@@ -129,4 +197,62 @@ public class ConillonTaskExecutor extends TaskExecutor {
 						: (priority < 7) ? ClientPriority.NORMAL
 								: ClientPriority.LOW;
 	}
+	
+	//As we receive results from Conillon, we won't have to
+	//resubmit those tasks in order to recover from an error
+	private void removeTaskFromBuffer(int taskId) {
+		
+		Iterator<Task> i = taskBuffer.iterator();
+		
+		while(i.hasNext()) {
+			Task t = i.next();
+			if(t.getId() == taskId) {
+				i.remove();
+				return;
+			}
+		}
+		
+	}
+	
+	private Task copy(Task t) {
+		try {
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ObjectOutputStream oos = new ObjectOutputStream(baos);
+			oos.writeObject(t);
+	
+			ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+			ObjectInputStream ois = new ObjectInputStream(bais);
+			return (Task) ois.readObject();
+		}catch(IOException | ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	private void checkForConillonError() {
+		
+		if(client.getReturnedException() != null) {
+		
+			connected = false;
+			connect();
+			submitting = true;
+			
+			Iterator<Task> i = taskBuffer.iterator();
+			
+			//we remove the tasks from the buffer to a temporary array
+			//since they will be added again in the "addTask" method
+			ArrayList<Task> tempArray = new ArrayList<Task>();
+			
+			while(i.hasNext()) {
+				Task t = i.next();
+				i.remove();
+				tempArray.add(t);
+			}
+			
+			//resubmit tasks that were lost when Conillon went down
+			for(Task t : tempArray)
+				addTask(t);
+		}
+	}
+	
 }

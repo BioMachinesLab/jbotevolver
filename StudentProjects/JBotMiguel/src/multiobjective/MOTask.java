@@ -68,7 +68,7 @@ public class MOTask extends JBotEvolverTask {
 		}
 	}
 	public Result getResult() {
-		MOFitnessResult fr = new MOFitnessResult(chromosome, ExpandedFitness.setToMeanOf(results));
+		MOFitnessResult fr = new MOFitnessResult(getId(),chromosome, ExpandedFitness.setToMeanOf(results));
 		return fr;
 	}
 }

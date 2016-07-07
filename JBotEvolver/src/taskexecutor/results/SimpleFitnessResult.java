@@ -7,8 +7,8 @@ public class SimpleFitnessResult extends Result {
 	private double fitness = 0;
 	
 
-	public SimpleFitnessResult(int chromosomeId, double fitness) {
-		super();
+	public SimpleFitnessResult(int taskId, int chromosomeId, double fitness) {
+		super(taskId);
 		this.chromosomeId = chromosomeId;
 		this.fitness = fitness;
 	}

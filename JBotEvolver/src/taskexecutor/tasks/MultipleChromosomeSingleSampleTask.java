@@ -51,7 +51,7 @@ public class MultipleChromosomeSingleSampleTask extends JBotEvolverTask{
 	}
 	@Override
 	public Result getResult() {
-		PostEvaluationResult fr = new PostEvaluationResult(chromosome.getID(),fitnesssample,fitness);
+		PostEvaluationResult fr = new PostEvaluationResult(getId(),chromosome.getID(),fitnesssample,fitness);
 		return fr;
 	}
 
