@@ -14,10 +14,10 @@ public class EMain {
 		
 //		String configName = "maze_square.conf";
 
-		String configName = "benchmark.conf";
+//		String configName = "benchmark.conf";
 //		String configName = "rep_test/_restartevolution.conf";
 		
-//		String configName = "hexamap_debug.conf";
+		String configName = "hexamap_free.conf";
 //		String configName = "hexamap_big/_restartevolution.conf";
 //		String configName = "hexamap/_restartevolution.conf";
 //		String configName = "repertoire_nav.conf";

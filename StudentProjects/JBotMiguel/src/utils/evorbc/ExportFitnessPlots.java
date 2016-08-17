@@ -19,13 +19,15 @@ public class ExportFitnessPlots extends TraverseFolders{
 	}
 	
 	public static void main(String[] args) throws Exception{
-//		new ExportFitnessPlots("bigdisk/multimaze/", new String[]{"repertoire_obstacle/"}, "multimaze.txt").traverse();
-//		new ExportFitnessPlots("bigdisk/qualitymetrics/", new String[]{"maze_radial/","maze_distance/","maze_quality/"}, "qualitymetrics.txt").traverse();
-//		new ExportFitnessPlots("bigdisk/repertoiresize/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_30/","maze_quality_50/","maze_quality_100/"}, "repertoiresize.txt").traverse();
-//		new ExportFitnessPlots("bigdisk/repertoireresolution/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_50/","maze_quality_100/","maze_quality_200/"} , "repertoireresolution.txt").traverse();
-//		new ExportFitnessPlots("bigdisk/behaviormapping/", new String[]{"maze_type0_20/","maze_type1_20/","maze_type3_20/"}, "behaviormapping.txt").traverse();
-//		new ExportFitnessPlots("bigdisk/orientation/", new String[]{"maze_orientation/"}, "orientation.txt").traverse();
-		new ExportFitnessPlots("bigdisk/ann/", new String[]{"maze_ann/"}, "ann.txt").traverse();
+		/*new ExportFitnessPlots("bigdisk/multimaze/", new String[]{"repertoire_obstacle/"}, "multimaze.txt").traverse();
+		new ExportFitnessPlots("bigdisk/qualitymetrics/", new String[]{"maze_radial/","maze_distance/","maze_quality/"}, "qualitymetrics.txt").traverse();
+		new ExportFitnessPlots("bigdisk/repertoiresize/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_30/","maze_quality_50/","maze_quality_100/"}, "repertoiresize.txt").traverse();
+		new ExportFitnessPlots("bigdisk/repertoireresolution/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_50/","maze_quality_100/","maze_quality_200/"} , "repertoireresolution.txt").traverse();
+		new ExportFitnessPlots("bigdisk/behaviormapping/", new String[]{"maze_type0_20/","maze_type1_20/","maze_type3_20/"}, "behaviormapping.txt").traverse();
+		new ExportFitnessPlots("bigdisk/orientation/", new String[]{"maze_orientation/"}, "orientation.txt").traverse();
+		new ExportFitnessPlots("bigdisk/ann/", new String[]{"maze_ann/"}, "ann.txt").traverse();*/
+		
+		new ExportFitnessPlots("/Volumes/Orico/ec/miguel/orientation/", new String[]{"maze_orientation/"}, "orientation.txt").traverse();
 	}
 	
 	@Override

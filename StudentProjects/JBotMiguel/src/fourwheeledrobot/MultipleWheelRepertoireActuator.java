@@ -275,6 +275,10 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		return repertoireLocation;
 	}
 	
+	public double[][][] getRepertoire() {
+		return repertoire;
+	}
+	
 	public double[] getLastBehavior() {
 		return repertoire[(int)lastPoint.y][(int)lastPoint.x];
 	}

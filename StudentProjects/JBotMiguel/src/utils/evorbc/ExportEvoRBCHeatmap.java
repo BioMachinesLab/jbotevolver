@@ -20,8 +20,8 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 	
 	private static String FOLDER_NAME = "export";
 	
-	private int samples = 50;
-	private int maxRuns = 10;
+	private int samples = 25;//50
+	private int maxRuns = 30;//30
 	private int fitnessSamples = 5;
 	private boolean realPoint = false;
 	private boolean evorbcND = false;
@@ -40,37 +40,66 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 	public static void main(String[] args) throws Exception{
 		
 		ExportEvoRBCHeatmap heatmap = null;
-		boolean realPoint = false;
-		
-//		heatmap = new ExportEvoRBCHeatmap("bigdisk/multimaze/", new String[]{"repertoire_obstacle/"}, "multimaze.txt");
-//		heatmap.realPoint = realPoint;
-//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
-//		
-//		heatmap = new ExportEvoRBCHeatmap("bigdisk/qualitymetrics/", new String[]{"maze_radial/","maze_distance/","maze_quality/"}, "qualitymetrics.txt");
-//		heatmap.realPoint = realPoint;
-//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
-//		
-//		heatmap = new ExportEvoRBCHeatmap("bigdisk/repertoiresize/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_30/","maze_quality_50/","maze_quality_100/"}, "repertoiresize.txt");
-//		heatmap.realPoint = realPoint;
-//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
-//		
-//		heatmap = new ExportEvoRBCHeatmap("bigdisk/repertoireresolution/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_50/","maze_quality_100/","maze_quality_200/"}, "repertoireresolution.txt");
-//		heatmap.realPoint = realPoint;
-//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
-//		
-//		heatmap = new ExportEvoRBCHeatmap("bigdisk/behaviormapping/", new String[]{"maze_type0_20/","maze_type1_20/","maze_type3_20/"}, "behaviormapping.txt");
-//		heatmap.realPoint = realPoint;
-//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
-		
-		heatmap = new ExportEvoRBCHeatmap("bigdisk/orientation/", new String[]{"maze_orientation/"}, "orientation-real.txt");
-		heatmap.realPoint = true;
-		heatmap.evorbcND = true;
+		/*
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/multimaze/", new String[]{"repertoire_obstacle/"}, "multimaze.txt");
+		heatmap.realPoint = false;
 		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
 		
-		heatmap = new ExportEvoRBCHeatmap("bigdisk/orientation/", new String[]{"maze_orientation/"}, "orientation.txt");
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/multimaze/", new String[]{"repertoire_obstacle/"}, "multimaze-real.txt");
+		heatmap.realPoint = true;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+		
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/qualitymetrics/", new String[]{"maze_radial/","maze_distance/","maze_quality/"}, "qualitymetrics.txt");
+		heatmap.realPoint = false;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/qualitymetrics/", new String[]{"maze_radial/","maze_distance/","maze_quality/"}, "qualitymetrics-real.txt");
+		heatmap.realPoint = true;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+		
+		
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/repertoiresize/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_30/","maze_quality_50/","maze_quality_100/"}, "repertoiresize.txt");
+		heatmap.realPoint = false;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/repertoiresize/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_30/","maze_quality_50/","maze_quality_100/"}, "repertoiresize-real.txt");
+		heatmap.realPoint = true;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+		
+		
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/repertoireresolution/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_50/","maze_quality_100/","maze_quality_200/"}, "repertoireresolution.txt");
+		heatmap.realPoint = false;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/repertoireresolution/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_50/","maze_quality_100/","maze_quality_200/"}, "repertoireresolution-real.txt");
+		heatmap.realPoint = true;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+		
+		
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/behaviormapping/", new String[]{"maze_type0_20/","maze_type1_20/","maze_type3_20/"}, "behaviormapping.txt");
+		heatmap.realPoint = false;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/behaviormapping/", new String[]{"maze_type0_20/","maze_type1_20/","maze_type3_20/"}, "behaviormapping-real.txt");
+		heatmap.realPoint = true;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+
+		*/
+		heatmap = new ExportEvoRBCHeatmap("/Volumes/Orico/ec/miguel/orientation/", new String[]{"maze_orientation/"}, "orientation.txt");
 		heatmap.realPoint = false;
 		heatmap.evorbcND = true;
 		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+		
+//		heatmap = new ExportEvoRBCHeatmap("/Volumes/Orico/ec/miguel/orientation/", new String[]{"maze_orientation/"}, "orientation-real.txt");
+//		heatmap.realPoint = true;
+//		heatmap.evorbcND = true;
+//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
 	}
 	
 	@Override
@@ -83,9 +112,9 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 			fw = new FileWriter(new File(FOLDER_NAME+"/heatmap-"+this.fileName));
 			
 			if(evorbcND)
-				fw.append("Folder\tSetup\tRun\tSample\tMaze\tStep\tX\tY\tZ\n");
+				fw.append("Folder Setup Run X Y Z Count\n");
 			else
-				fw.append("Folder\tSetup\tRun\tSample\tMaze\tStep\tX\tY\n");
+				fw.append("Folder Setup Run X Y Count\n");
 		
 		}catch(Exception e){
 			e.printStackTrace();
@@ -129,6 +158,8 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 //		if(!jbot.getPopulation().evolutionDone())
 //			return result;
 		
+		System.out.println(folder);
+		
 		Arguments actArgs = new Arguments(jbot.getArguments().get("--robots").getArgumentAsString("actuators"));
 		Arguments mWheel = new Arguments(actArgs.getArgumentAsString(actArgs.getArgumentAt(0)));
 		Arguments wheel = new Arguments(mWheel.getArgumentAsString("wheels"));
@@ -156,7 +187,7 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 	private MAPElitesPopulation getMapPop(JBotEvolver jbot, String folder) throws Exception {
 		
 		String filename = folder+"/_showbest_current.conf";
-		jbot.loadFile(filename, "");
+		jbot.loadFile(filename, "--simulator +folder="+baseFolder);
 		
 		Simulator sim = jbot.createSimulator();
 		jbot.createRobots(sim);
@@ -165,14 +196,13 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 		String string = baseFolder+actuator.getRepertoireLocation();
 		
 		File f = new File(string);
-		jbot.loadFile(f.getParent()+"/_showbest_current.conf", "");
+		jbot.loadFile(f.getParent()+"/_showbest_current.conf", "--simulator +folder="+baseFolder);
 		
 		return (MAPElitesPopulation)jbot.getPopulation();
 	}
 	
 	private void runEvaluation(String folder, JBotEvolver jbot, String act, int actNumber) throws Exception{
 		
-		StringBuffer result = new StringBuffer();
 		String[] split = folder.split("/");
 		
 		String folderName = split[split.length-4];
@@ -193,7 +223,13 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 			mapPop = getMapPop(jbot,folder);
 		
 		String filename = postEvalBest ? folder+"/show_best/showbest"+generation+".conf" :  folder+"/_showbest_current.conf";
+		
+		int[][] count = null;
+		int[][][] countND = null;
+		
 		for(int sample = 0 ; sample < samples ; sample++) {
+			
+			System.out.print(".");
 			
 			String randomizeSeed = this.randomizeSeed ? "\n--random-seed "+sample : "";
 			randomizeSeed = randomizeSeed + (this.randomizeSeed ? "\n--simulator +fixedseed=0" : ""); 
@@ -213,25 +249,36 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 			EvaluationFunction eval = jbot.getEvaluationFunction()[0];
 			sim.addCallback(eval);
 			
-			String bigLine = "";
 			sim.setupEnvironment();
+			
+			MultipleWheelRepertoireNDActuator actuatorND = null;
+			MultipleWheelRepertoireActuator actuator = null;
+			
+			if(evorbcND)
+				actuatorND = (MultipleWheelRepertoireNDActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireNDActuator.class);
+			else
+				actuator = (MultipleWheelRepertoireActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireActuator.class);
+			
+			if(evorbcND && countND == null) {
+				countND = new int[actuatorND.getMap().getBucketListing(0).length][actuatorND.getMap().getBucketListing(1).length][actuatorND.getMap().getBucketListing(2).length];
+			} else if(!evorbcND && count == null) {
+				count = new int[actuator.getRepertoire().length][actuator.getRepertoire()[0].length];
+			}
 			
 			for(double time = 0 ; time < sim.getEnvironment().getSteps() ; time++){
 				sim.performOneSimulationStep(time);
 				
-				String line = "";
-				
 				if(evorbcND) {
-					MultipleWheelRepertoireNDActuator actuatorND = (MultipleWheelRepertoireNDActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireNDActuator.class);
+					
 					int[] points = actuatorND.getPrevBehavior();
 					
 					if(realPoint)
 						points = actuatorND.getRealPrevBehavior();
 					
-					line= folderName+"\t"+setupName+"\t"+runName+"\t"+sample+"\t"+(sample % fitnessSamples)+"\t"+(int)time+"\t"+(int)points[0]+"\t"+(int)points[1]+"\t"+(int)points[2]+"\n";
+					countND[(int)points[0]][(int)points[1]][(int)points[2]]++;
 					
 				} else {
-					MultipleWheelRepertoireActuator actuator = (MultipleWheelRepertoireActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireActuator.class);
+					
 					
 					Vector2d point = actuator.getLastPoint();
 					
@@ -240,21 +287,49 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 						int[] loc = mapPop.getLocationFromBehaviorVector(mapPop.getBehaviorVector(c));
 						point = new Vector2d(loc[0],loc[1]);
 					}
-					line= folderName+"\t"+setupName+"\t"+runName+"\t"+sample+"\t"+(sample % fitnessSamples)+"\t"+(int)time+"\t"+(int)point.x+"\t"+(int)point.y+"\n";
+					count[(int)point.x][(int)point.y]++;
 				}
 
-				line = line.replaceAll("_obstacle", "");
-				line = line.replaceAll("_maze", "");
-				line = line.replaceAll("_20", "");
-				bigLine+= line;
 			}
 			
 			if(generation == 0)
 				generation = jbot.getPopulation().getNumberOfCurrentGeneration();
 			
-			result.append(bigLine);
+//			result.append(bigLine);
 		}
-		fw.append(result.toString());
+		
+		
+		StringBuffer result = new StringBuffer();
+		String info = folderName+" "+setupName+" "+runName;
+		
+		info = info.replaceAll("_obstacle", "");
+		info = info.replaceAll("_maze", "");
+		info = info.replaceAll("_20", "");
+		
+		if(evorbcND) {
+			for(int x = 0 ; x < countND.length ; x++) {
+				for(int y = 0 ; y < countND[0].length ; y++) {
+					for(int z = 0 ; z < countND[0][0].length ; z++) {
+						if(countND[x][y][z] != 0) {
+							result.append(info);
+							result.append(" "+x+" "+y+" "+z+" "+countND[x][y][z]+"\n");
+						}
+					}
+				}
+			}
+		} else {
+			for(int x = 0 ; x < count.length ; x++) {
+				for(int y = 0 ; y < count[0].length ; y++) {
+					if(count[x][y] != 0) {
+						result.append(info);
+						result.append(" "+x+" "+y+" "+count[x][y]+"\n");
+					}
+				}
+			}
+		}
+		
+		System.out.println();
+		fw.append(result);
 	}
 	
 	public static int getBestGeneration(String folder) throws Exception{

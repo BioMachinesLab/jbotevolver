@@ -1,12 +1,6 @@
 package fourwheeledrobot;
 
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
-import java.util.Locale;
 import java.util.Scanner;
-
-import javax.management.RuntimeErrorException;
-
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import multiobjective.MOChromosome;
@@ -221,8 +215,16 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 		return prevBehavior;
 	}
 	
+	public NDBehaviorMap getMap() {
+		return map;
+	}
+	
 	public int[] getRealPrevBehavior() {
 		double[] vec = map.getValuesFromBucketVector(prevBehavior);
-		return map.getBucketsFromBehaviorVector(vec);
+		MOChromosome moc = map.getChromosomeFromBehaviorVector(vec);
+		vec = map.getBehaviorVector(moc);
+		int[] realVec = map.getBucketsFromBehaviorVector(vec);
+		
+		return realVec;
 	}
 }
