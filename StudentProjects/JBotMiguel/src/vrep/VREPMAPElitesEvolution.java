@@ -108,22 +108,14 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 					float posY = vals[index++];
 					float posZ = vals[index++];
 					
-					//euler angles of robot
-					float a = vals[index++];
-					float b = vals[index++];
-					float g = vals[index++];
-					
+					//orientation of robot
+					double orientation = vals[index++]; // [-PI,PI]
+
 					//distance
 					float distanceTraveled = vals[index++];
 					
+                                        // feasibility
 					float feasibility = vals[index++];
-					
-					double orY = (Math.cos(a)*Math.cos(g) - Math.sin(a)*Math.sin(b)*Math.sin(g));
-					double orX = - Math.cos(b)*Math.sin(g);
-					double orZ = (Math.cos(g)*Math.sin(a) - Math.cos(a)*Math.sin(b)*Math.sin(b));
-					
-					double orientation = Math.atan2(orY,orX);
-					double tilt = Math.cos(a)*Math.cos(b);
 					
 					Vector2d pos = new Vector2d(posX,posY);
 					
