@@ -57,7 +57,9 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 		double[] behavior = (double[])br.value();
 		Vector2d pos = new Vector2d(behavior[0],behavior[1]);
 		double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
+		
 		double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
+		
 		return fitness;
     }
     
