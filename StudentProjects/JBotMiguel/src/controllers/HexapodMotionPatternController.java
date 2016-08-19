@@ -44,8 +44,11 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 		if(args.getArgumentIsDefined("weights")) {
 			String[] rawArray = args.getArgumentAsString("weights").split(",");
 			double[] weights = new double[rawArray.length];
-			for(int i = 0 ; i < weights.length ; i++)
+			for(int i = 0 ; i < weights.length ; i++) {
 				weights[i] = Double.parseDouble(rawArray[i]);
+                            
+                        }
+                        System.out.println();
 			setNNWeights(weights);
 		}
 		this.sim = simulator;
@@ -55,7 +58,7 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 		if(vrep == null) {
 			vrep = new remoteApi();
 			vrep.simxFinish(-1); // just in case, close all opened connections
-			clientId = vrep.simxStart(ip,19997,true,false,5000,5);
+			clientId = vrep.simxStart(ip,19996,true,false,5000,5);
 		}
 	}
 	
@@ -106,18 +109,10 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 			float x = vals[index++];
 			float y = vals[index++];
 			float z = vals[index++];
-			float a = vals[index++];
-			float b = vals[index++];
-			float g = vals[index++];
+			float orientation = vals[index++];
 			float distanceTravelled = vals[index++];
 			float minTilt = vals[index++];
 			fitness = minTilt;
-			
-			double orY = (Math.cos(a)*Math.cos(g) - Math.sin(a)*Math.sin(b)*Math.sin(g));
-			double orX = - Math.cos(b)*Math.sin(g);
-			double orZ = (Math.cos(g)*Math.sin(a) - Math.cos(a)*Math.sin(b)*Math.sin(b));
-			
-			double orientation = Math.atan2(orY,orX);
 			
 			robot.setPosition(new Vector2d(x,y));
 			robot.setOrientation(orientation);

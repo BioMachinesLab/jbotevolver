@@ -32,9 +32,10 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 	
 	protected int controllerType = 0;
-	protected int time = 0;
+	protected int time = 0; // s
 	public int excluded = 0;
 	protected double feasibilityThreshold = 0.0;
+        protected double maxSpeed = 0; // m/s
 	
     public VREPMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
     	super(jBotEvolver, taskExecutor, arg);
@@ -48,6 +49,11 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
     	controllerType = arg.getArgumentAsIntOrSetDefault("controllertype", controllerType);
     	time = arg.getArgumentAsIntOrSetDefault("time", time);
     	feasibilityThreshold = arg.getArgumentAsDoubleOrSetDefault("feasibility", feasibilityThreshold);
+
+    	if(!arg.getArgumentIsDefined("maxspeed"))
+    		throw new RuntimeException("Missing 'maxspeed' arg in VREPMapElitesEvolution");
+        maxSpeed = arg.getArgumentAsDouble("maxspeed");
+    	        
     }
     
     public static double getFitness(MOChromosome moc) {
@@ -110,26 +116,18 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 					float posY = vals[index++];
 					float posZ = vals[index++];
 					
-					//euler angles of robot
-					float a = vals[index++];
-					float b = vals[index++];
-					float g = vals[index++];
-					
+					//orientation of robot
+					double orientation = vals[index++]; // [-PI,PI]
+
 					//distance
 					float distanceTraveled = vals[index++];
 					
+                                        // feasibility
 					float feasibility = vals[index++];
-					
-					double orY = (Math.cos(a)*Math.cos(g) - Math.sin(a)*Math.sin(b)*Math.sin(g));
-					double orX = - Math.cos(b)*Math.sin(g);
-					double orZ = (Math.cos(g)*Math.sin(a) - Math.cos(a)*Math.sin(b)*Math.sin(b));
-					
-					double orientation = Math.atan2(orY,orX);
-					double tilt = Math.cos(a)*Math.cos(b);
 					
 					Vector2d pos = new Vector2d(posX,posY);
 					
-					double distanceLimit = ((MAPElitesPopulation)population).getDistanceLimit()/2;
+					double distanceLimit = maxSpeed * time;
 					
 					double fitness = OrientationEvaluationFunction.calculateOrientationDistanceFitness(pos, orientation, distanceTraveled, distanceLimit);
 					
