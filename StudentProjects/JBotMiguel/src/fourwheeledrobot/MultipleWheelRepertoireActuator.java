@@ -129,7 +129,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		return behavior;
 	}
 	
-	private Vector2d circlePoint(double percentageAngle, double speedPercentage) {
+	private Vector2d circlePoint(double anglePercentage, double speedPercentage) {
 		Vector2d res = null;
 		
 //		percentageAngle = 1;
@@ -137,7 +137,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		
 		if(type == 0) {
 			//same as EvoRBC GECCO paper: Alpha [-90,90], speed [-1,1]
-			double h =  percentageAngle * (Math.PI/2);
+			double h =  anglePercentage * (Math.PI/2);
 			
 			if(speedPercentage < 0) {
 				h+=Math.PI;
@@ -149,21 +149,21 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			//Alpha [-180,180], speed [0,1]
 			speedPercentage = speedPercentage/2.0 + 0.5;// go to [0,1]
 			
-			double h =  percentageAngle * (Math.PI);
+			double h =  anglePercentage * (Math.PI);
 			res = new Vector2d(speedPercentage*repertoireRadius*Math.cos(h),speedPercentage*repertoireRadius*Math.sin(h));
 			
 		} else if(type == 2){
 			//similar to type=0, but doesn't invert the direction when going backwards
-			double h =  percentageAngle * (Math.PI/2);
+			double h =  anglePercentage * (Math.PI/2);
 			
 			if(speedPercentage < 0) {
-				h = -percentageAngle * (Math.PI/2) + Math.PI;
+				h = -anglePercentage * (Math.PI/2) + Math.PI;
 				speedPercentage*=-1;
 			}
 			res = new Vector2d(speedPercentage*repertoireRadius*Math.cos(h),speedPercentage*repertoireRadius*Math.sin(h));
 		} else if(type == 3){
 			//Cartesian: x,y coordinates (square-shaped repertoire)
-			double x = percentageAngle*maxSide;
+			double x = anglePercentage*maxSide;
 			double y = speedPercentage*maxSide;
 			
 			res = new Vector2d(x,y);
