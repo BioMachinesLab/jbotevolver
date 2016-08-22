@@ -17,7 +17,7 @@ public class EMain {
 //		String configName = "benchmark.conf";
 //		String configName = "rep_test/_restartevolution.conf";
 		
-		String configName = "hexamap_free.conf";
+		String configName = "repertoire_square/AWS_5Actuator_20/1/_restartevolution.conf";
 //		String configName = "hexamap_big/_restartevolution.conf";
 //		String configName = "hexamap/_restartevolution.conf";
 //		String configName = "repertoire_nav.conf";

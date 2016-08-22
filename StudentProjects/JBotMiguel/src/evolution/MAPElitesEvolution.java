@@ -3,7 +3,9 @@ package evolution;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import mathutils.Vector2d;
 import multiobjective.MOChromosome;
@@ -101,7 +103,9 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		}
 		
 		if(population.evolutionDone()) {
+			System.out.println("Pruning [threshold="+pruneThreshold+"]");
 			prune((MAPElitesPopulation)population, pruneThreshold);
+			System.out.println("Expanding [circle="+circle+"]");
 			if(circle)
 				expandToCircle((MAPElitesPopulation)population);
 			else
@@ -128,6 +132,7 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		
 		evolutionFinished = true;
 		diskStorage.close();
+		System.out.println("Finished evolution!");
 	}
     
     public static void printRepertoire(MAPElitesPopulation p) {
@@ -147,6 +152,8 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     	double maxDist = 0;
 //    	double resolution = p.getMapResolution();
     	
+    	double[] minMax = new double[]{Double.MAX_VALUE, Double.MAX_VALUE, -Double.MAX_VALUE, -Double.MAX_VALUE};
+    	
     	for(int x = 0 ; x < map.length ; x++) {
     		for(int y = 0 ; y < map[x].length ; y++) {
     			if(map[x][y] != null) {
@@ -156,8 +163,13 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 	        		posY-= map[0].length/2;
 	        		if(circle)
 	        			maxDist = Math.max(maxDist,new Vector2d(posX,posY).length());
-	        		else
-	        			maxDist = Math.max(maxDist, Math.max(Math.abs(posX),Math.abs(posY)));
+	        		else {
+	        			minMax[0] = Math.min(minMax[0],x);//min x
+	        			minMax[1] = Math.min(minMax[1],y);//min Y
+	        			minMax[2] = Math.max(minMax[2],x);//max x
+	        			minMax[3] = Math.max(minMax[3],y);//max Y
+	        		}
+	        			
     			}
     		}
     	}
@@ -171,17 +183,22 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     			
     			double len = 0;
     			
-    			if(circle)
+    			if(circle) {
 	    			len = new Vector2d(x-map.length/2,y-map[x].length/2).length();
-    			else
-    				len = Math.max(Math.abs(x-map.length/2),Math.abs(y-map[x].length/2));
-    			
-    			if(len <= maxDist) {
-//    				int[] pos = p.getLocationFromBehaviorVector(new double[]{x,y});
-    				if(map[x][y] == null) {
+	    			if(len <= maxDist) {
+	//    				int[] pos = p.getLocationFromBehaviorVector(new double[]{x,y});
+	    				if(map[x][y] == null) {
+	    					mapNew[x][y] = findNearest(x,y,map,prune);
+	    				}
+	    			}
+    			}else {
+    				//square
+    				if(map[x][y] == null && x >= minMax[0] && x <= minMax[2] && y >= minMax[1] && y<= minMax[3]) {
     					mapNew[x][y] = findNearest(x,y,map,prune);
     				}
     			}
+    			
+    			
     		}
     	}
     	

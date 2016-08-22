@@ -2,6 +2,10 @@ package fourwheeledrobot;
 
 import java.util.Scanner;
 
+import evorbc.mappingfunctions.CartesianMappingFunction;
+import evorbc.mappingfunctions.MappingFunction;
+import evorbc.mappingfunctions.Polar180MappingFunction;
+import evorbc.mappingfunctions.Polar360MappingFunction;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -26,16 +30,13 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	//locomotion parameters (a double[]) for a total of 3 dimensions
 	protected double[][][] repertoire;
 	protected int nParams;
-	protected double resolution;
-	protected double repertoireRadius;
-	protected int type = 0;
 	protected double stop = 0;
 	protected int lock = 0;
 	protected int controlCycle = 0;
 	protected Vector2d lastPoint;
-	protected double maxSide = 0;
 	protected String repertoireLocation;
 	protected double[] prevBehavior;
+	protected MappingFunction mappingFunction;
 	
 	public MultipleWheelRepertoireActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
@@ -53,9 +54,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		} else {
 			
 			int fitnessSample = simulator.getArguments().get("--environment").getArgumentAsInt("fitnesssample");
-			
 			int actuatorChosen = fitnessSample % numArgs;
-			
 			boolean randomize = simulator.getArguments().get("--robots").getFlagIsTrue("randomizeactuator");
 			
 			if(randomize)
@@ -70,8 +69,22 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
 		}
 		
-		type = args.getArgumentAsIntOrSetDefault("type", type);
+		int type = args.getArgumentAsIntOrSetDefault("type", 0);
 		
+		switch(type) {
+		case 0:
+			mappingFunction = new Polar180MappingFunction(repertoire);
+			break;
+		case 1:
+			mappingFunction = new Polar360MappingFunction(repertoire);
+			break;
+		case 2:
+			//unimplemented
+			break;
+		case 3:
+			mappingFunction = new CartesianMappingFunction(repertoire);
+			break;
+		}
 	}
 	
 	@Override
@@ -115,7 +128,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		double s = this.speed;
 		
 		do{
-			Vector2d point = circlePoint(this.heading,s);
+			Vector2d point = mappingFunction.map(this.heading,s);
 			behavior = repertoire[(int)point.y][(int)point.x];
 			lastPoint = new Vector2d(point);
 			
@@ -127,62 +140,6 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		} while(behavior == null);
 		
 		return behavior;
-	}
-	
-	private Vector2d circlePoint(double anglePercentage, double speedPercentage) {
-		Vector2d res = null;
-		
-//		percentageAngle = 1;
-//		speedPercentage = 0.5;
-		
-		if(type == 0) {
-			//same as EvoRBC GECCO paper: Alpha [-90,90], speed [-1,1]
-			double h =  anglePercentage * (Math.PI/2);
-			
-			if(speedPercentage < 0) {
-				h+=Math.PI;
-				speedPercentage*=-1;
-			}
-			res = new Vector2d(speedPercentage*repertoireRadius*Math.cos(h),speedPercentage*repertoireRadius*Math.sin(h));
-		
-		} else if(type == 1){
-			//Alpha [-180,180], speed [0,1]
-			speedPercentage = speedPercentage/2.0 + 0.5;// go to [0,1]
-			
-			double h =  anglePercentage * (Math.PI);
-			res = new Vector2d(speedPercentage*repertoireRadius*Math.cos(h),speedPercentage*repertoireRadius*Math.sin(h));
-			
-		} else if(type == 2){
-			//similar to type=0, but doesn't invert the direction when going backwards
-			double h =  anglePercentage * (Math.PI/2);
-			
-			if(speedPercentage < 0) {
-				h = -anglePercentage * (Math.PI/2) + Math.PI;
-				speedPercentage*=-1;
-			}
-			res = new Vector2d(speedPercentage*repertoireRadius*Math.cos(h),speedPercentage*repertoireRadius*Math.sin(h));
-		} else if(type == 3){
-			//Cartesian: x,y coordinates (square-shaped repertoire)
-			double x = anglePercentage*maxSide;
-			double y = speedPercentage*maxSide;
-			
-			res = new Vector2d(x,y);
-		}
-		
-		res.x+=repertoire.length/2;
-		res.y+=repertoire[0].length/2;
-		
-		return res;
-	}
-	
-	private int[] getLocationFromBehaviorVector(double[] vec) {
-		int[] mapLocation = new int[vec.length];
-		
-		for(int i = 0 ; i < vec.length ; i++) {
-			int pos = (int)(vec[i]/resolution + repertoire.length/2.0);
-			mapLocation[i] = pos;
-		}
-		return mapLocation;
 	}
 	
 	protected double[][][] loadRepertoire(Simulator simulator, String f) {
@@ -202,14 +159,11 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			int size = s.nextInt();
 			r = new double[size][size][];
 			
-			resolution = readDouble(s);
+			double resolution = readDouble(s);
 			
 			while(s.hasNext()) {
 				int x = s.nextInt();
 				int y = s.nextInt();
-				
-				repertoireRadius = Math.max(repertoireRadius,new Vector2d(x - size/2.0, y - size/2.0).length());
-				maxSide = Math.max(maxSide, Math.max(Math.abs(x-size/2.0), Math.abs(y-size/2.0)));
 				
 				r[x][y] = new double[nParams];
 				for(int d = 0 ; d < nParams ; d++) {
@@ -223,19 +177,18 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			e.printStackTrace();
 		}
 			
-		
 		return r;
 	}
 	
-	//receives heading [0,1] and saves as angle [-1,1]
+	//receives heading [0,1]
 	public void setHeading(double heading) {
-		this.heading = (heading - 0.5) * 2;
+		this.heading = heading;
 //		System.out.print("h: "+heading+" -> "+Math.toDegrees(this.heading));
 	}
 
-	//receives speed [0,1] and saves as percentage [-1,1]
+	//receives speed [0,1]
 	public void setWheelSpeed(double speed) {
-		this.speed = (speed - 0.5) * 2;
+		this.speed = speed;
 //		System.out.println("\t\ts: "+speed+" -> "+this.speed);
 	}
 	

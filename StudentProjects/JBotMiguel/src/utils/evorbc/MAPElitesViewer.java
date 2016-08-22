@@ -10,6 +10,7 @@ import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import javax.swing.JButton;
@@ -42,6 +43,7 @@ import evolution.PostEvaluator;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
+import evorbc.mappingfunctions.CartesianMappingFunction;
 import gui.extended.TwoDRendererWheels;
 import gui.renderer.TwoDRendererDebug;
 
@@ -64,8 +66,8 @@ public class MAPElitesViewer {
 //		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
 //		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
 //		new MAPElitesViewer("bigdisk/repertoiresize/", true);
-		new MAPElitesViewer("bigdisk/repertoireresolution/", true);
-//		new MAPElitesViewer("../JBotMiguel/", true);
+		new MAPElitesViewer("bigdisk/behaviormapping/", true);
+//		new MAPElitesViewer("repertoire_square/", true);
 //		new MAPElitesViewer("hexamap_big/", true);
 //		new MAPElitesViewer("hexamap_free/", true);
 //		new MAPElitesViewer("hexamap_debug/", true);
@@ -140,9 +142,11 @@ public class MAPElitesViewer {
 	
 	public void play(Vector2d pos) {
 		MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
+		
 		MOChromosome c = pop.getChromosomeFromBehaviorVector(new double[]{pos.x,pos.y});
 		
 		System.out.println("Expected: "+pos.x+" "+pos.y);
+		System.out.println("Map location:"+Arrays.toString(pop.getLocationFromBehaviorVector(new double[]{pos.x,pos.y})));
 		
 		if(c == null)
 			return;
