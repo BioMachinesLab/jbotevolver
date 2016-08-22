@@ -6,6 +6,8 @@ import coppelia.FloatWA;
 import coppelia.IntW;
 import coppelia.remoteApi;
 import evaluationfunctions.DummyEvaluationFunction;
+import evaluationfunctions.OrientationEvaluationFunction;
+import java.util.Arrays;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
@@ -21,7 +23,9 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 	protected int controllerType = 0;//0=MAPElites,1=RepertoireNEAT, 2=NEAT, 3=Dummy
 	protected Simulator sim;
 	protected String ip = "127.0.0.1";
+        //protected String ip = "10.40.50.136";
 	protected int time = 3;
+        protected double maxSpeed = 0.5;
 	
 	private static remoteApi vrep;
 	private static int clientId;
@@ -40,6 +44,7 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 //			throw new RuntimeException("Argument 'time' not defined for class HexapodShowbestController!");
 		
 		time= args.getArgumentAsIntOrSetDefault("time", time);
+                maxSpeed = args.getArgumentAsDoubleOrSetDefault("maxspeed", maxSpeed);
 		
 		if(args.getArgumentIsDefined("weights")) {
 			String[] rawArray = args.getArgumentAsString("weights").split(",");
@@ -90,14 +95,10 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 	}
 	
 	protected double getFitness(float[] vals) {
-		int index = 0;
-		
+		System.out.println("Received from VRep: " + Arrays.toString(vals));
+
+                int index = 0;
 		int nResults = (int)vals[index++];
-		
-		System.out.println(vals.length);
-		for(int i = 0 ; i < vals.length ; i++)
-			System.out.print(vals[i]+" ");
-		
 		//id
 		int id = (int)vals[index++];
 		//number of values
@@ -111,12 +112,11 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 			float z = vals[index++];
 			float orientation = vals[index++];
 			float distanceTravelled = vals[index++];
-			float minTilt = vals[index++];
-			fitness = minTilt;
+			float feasibility = vals[index++];
+			fitness = (float) OrientationEvaluationFunction.calculateOrientationDistanceFitness(new Vector2d(x,y), orientation, distanceTravelled, maxSpeed * time);
 			
 			robot.setPosition(new Vector2d(x,y));
 			robot.setOrientation(orientation);
-			
 		}else{
 			fitness = vals[index++];
 		}

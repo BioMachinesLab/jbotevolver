@@ -46,6 +46,7 @@ import evolutionaryrobotics.populations.Population;
 import evorbc.mappingfunctions.CartesianMappingFunction;
 import gui.extended.TwoDRendererWheels;
 import gui.renderer.TwoDRendererDebug;
+import java.util.Arrays;
 
 public class MAPElitesViewer {
 	
@@ -66,8 +67,9 @@ public class MAPElitesViewer {
 //		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
 //		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
 //		new MAPElitesViewer("bigdisk/repertoiresize/", true);
-		new MAPElitesViewer("bigdisk/behaviormapping/", true);
-//		new MAPElitesViewer("repertoire_square/", true);
+		new MAPElitesViewer("../../../../vrepexps/nao_map/", true);
+//                new MAPElitesViewer("nao_map/", true);
+//		new MAPElitesViewer("../JBotMiguel/", true);
 //		new MAPElitesViewer("hexamap_big/", true);
 //		new MAPElitesViewer("hexamap_free/", true);
 //		new MAPElitesViewer("hexamap_debug/", true);
@@ -141,15 +143,19 @@ public class MAPElitesViewer {
 	}
 	
 	public void play(Vector2d pos) {
-		MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
-		
+		System.out.println("------------");
+                MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
 		MOChromosome c = pop.getChromosomeFromBehaviorVector(new double[]{pos.x,pos.y});
-		
-		System.out.println("Expected: "+pos.x+" "+pos.y);
-		System.out.println("Map location:"+Arrays.toString(pop.getLocationFromBehaviorVector(new double[]{pos.x,pos.y})));
-		
-		if(c == null)
+                System.out.println("Click: (" + pos.x+", "+pos.y +")");
+                if(c == null)
 			return;
+                System.out.println("Chromosome: " + Arrays.toString(c.getAlleles()));
+            
+		ExpandedFitness fit = (ExpandedFitness)c.getEvaluationResult();
+		BehaviourResult br = (BehaviourResult)fit.getCorrespondingEvaluation(1);
+		double[] behavior = (double[])br.value();
+		double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();                
+		System.out.println("Expected X: " + behavior[0] + " Y: " + behavior[1] + " Ori: " + orientation);
 		
 		sim = jbot.createSimulator();
 		renderer.setSimulator(sim);
@@ -166,8 +172,6 @@ public class MAPElitesViewer {
 			}
 		}
 		sim.terminate();
-		System.out.println(Math.toDegrees(sim.getRobots().get(0).getOrientation()));
-		System.out.println(Math.toDegrees(RadialOrientationEvaluationFunction.getTargetOrientation(sim.getRobots().get(0).getPosition())));
 		renderer.drawFrame();
 	}
 	
