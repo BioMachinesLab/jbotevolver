@@ -29,6 +29,7 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 	
 	private static remoteApi vrep;
 	private static int clientId;
+	protected boolean waitForResult = true;
 	
 	public HexapodMotionPatternController(Simulator simulator,Robot robot,Arguments args) {
 		super(simulator, robot, args);
@@ -44,7 +45,9 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 //			throw new RuntimeException("Argument 'time' not defined for class HexapodShowbestController!");
 		
 		time= args.getArgumentAsIntOrSetDefault("time", time);
-                maxSpeed = args.getArgumentAsDoubleOrSetDefault("maxspeed", maxSpeed);
+		maxSpeed = args.getArgumentAsDoubleOrSetDefault("maxspeed", maxSpeed);
+                
+        waitForResult = args.getArgumentAsIntOrSetDefault("waitforresult",1) == 1; 
 		
 		if(args.getArgumentIsDefined("weights")) {
 			String[] rawArray = args.getArgumentAsString("weights").split(",");
@@ -80,14 +83,19 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 			init = true;
 //			System.out.println("Sent!");
 			sendDataToVREP(parameters);
-			float[] data = getDataFromVREP();
-			double fit = getFitness(data);
 			
-			if(!sim.getCallbacks().isEmpty() && sim.getCallbacks().get(0) instanceof DummyEvaluationFunction) {
-				DummyEvaluationFunction eval = (DummyEvaluationFunction)sim.getCallbacks().get(0);
-				eval.setFitness(fit);
-			}else{
-				System.out.println("Fitness: "+fit);
+			if(waitForResult) {
+			
+				float[] data = getDataFromVREP();
+				double fit = getFitness(data);
+				
+				if(!sim.getCallbacks().isEmpty() && sim.getCallbacks().get(0) instanceof DummyEvaluationFunction) {
+					DummyEvaluationFunction eval = (DummyEvaluationFunction)sim.getCallbacks().get(0);
+					eval.setFitness(fit);
+				}else{
+					System.out.println("Fitness: "+fit);
+				}
+			
 			}
 			
 //			System.out.println("Received!");
