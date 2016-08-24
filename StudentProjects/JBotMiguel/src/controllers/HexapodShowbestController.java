@@ -8,6 +8,8 @@ import coppelia.CharWA;
 import coppelia.FloatWA;
 import coppelia.remoteApi;
 import evaluationfunctions.DummyEvaluationFunction;
+import evaluationfunctions.OrientationEvaluationFunction;
+import java.util.Arrays;
 
 public class HexapodShowbestController extends Controller implements FixedLenghtGenomeEvolvableController{
 
@@ -22,9 +24,14 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 	protected Simulator sim;
 	protected String ip = "127.0.0.1";
 	protected int time = 3;
+        
+        protected double maxSpeed = 0.5;
+	
 	
 	private static remoteApi vrep;
 	private static int clientId;
+        protected boolean waitForResult = true;
+	
 	
 	public HexapodShowbestController(Simulator simulator,Robot robot,Arguments args) {
 		super(simulator, robot, args);
@@ -38,7 +45,7 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 		
 //		if(!args.getArgumentIsDefined("time"))
 //			throw new RuntimeException("Argument 'time' not defined for class HexapodShowbestController!");
-		
+		waitForResult = args.getArgumentAsIntOrSetDefault("waitforresult",1) == 1; 
 		time= args.getArgumentAsIntOrSetDefault("time", time);
 		
 		if(args.getArgumentIsDefined("weights")) {
@@ -70,27 +77,32 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 		if(!init) {
 			init();
 			init = true;
-			System.out.println("Sent!");
+//			System.out.println("Sent!");
 			sendDataToVREP(parameters);
-			float[] data = getDataFromVREP();
-			double fit = getFitness(data);
 			
-			if(!sim.getCallbacks().isEmpty() && sim.getCallbacks().get(0) instanceof DummyEvaluationFunction) {
-				DummyEvaluationFunction eval = (DummyEvaluationFunction)sim.getCallbacks().get(0);
-				eval.setFitness(fit);
-			}else{
-				System.out.println("Fitness: "+fit);
+			if(waitForResult) {
+			
+				float[] data = getDataFromVREP();
+				double fit = getFitness(data);
+				
+				if(!sim.getCallbacks().isEmpty() && sim.getCallbacks().get(0) instanceof DummyEvaluationFunction) {
+					DummyEvaluationFunction eval = (DummyEvaluationFunction)sim.getCallbacks().get(0);
+					eval.setFitness(fit);
+				}else{
+					System.out.println("Fitness: "+fit);
+				}
+			
 			}
 			
-			System.out.println("Received!");
+//			System.out.println("Received!");
 		}
 	}
 	
 	protected double getFitness(float[] vals) {
-		int index = 0;
-		
+		System.out.println("Received from VRep: " + Arrays.toString(vals));
+
+                int index = 0;
 		int nResults = (int)vals[index++];
-		
 		//id
 		int id = (int)vals[index++];
 		//number of values
@@ -102,24 +114,13 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 			float x = vals[index++];
 			float y = vals[index++];
 			float z = vals[index++];
-			float a = vals[index++];
-			float b = vals[index++];
-			float g = vals[index++];
+			float orientation = vals[index++];
 			float distanceTravelled = vals[index++];
-			float minTilt = vals[index++];
-			fitness = minTilt;
-			
-			double orY = (Math.cos(a)*Math.cos(g) - Math.sin(a)*Math.sin(b)*Math.sin(g));
-			double orX = - Math.cos(b)*Math.sin(g);
-			double orZ = (Math.cos(g)*Math.sin(a) - Math.cos(a)*Math.sin(b)*Math.sin(b));
-			
-			double orientation = Math.atan2(orY,orX);
-			
-			System.out.println("Position: "+x+","+y);
+			float feasibility = vals[index++];
+			fitness = (float) OrientationEvaluationFunction.calculateOrientationDistanceFitness(new Vector2d(x,y), orientation, distanceTravelled, maxSpeed * time);
 			
 			robot.setPosition(new Vector2d(x,y));
 			robot.setOrientation(orientation);
-			
 		}else{
 			fitness = vals[index++];
 		}
@@ -134,7 +135,7 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 		
 		int parametersIndex = 0;
 		
-		this.parameters = new float[6+weights.length];
+		this.parameters = new float[9+weights.length];
 		
 		this.parameters[parametersIndex++] = 1;//1 fixed parameters
 		this.parameters[parametersIndex++] = time;//X seconds
@@ -142,6 +143,10 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 		this.parameters[parametersIndex++] = 1;//id
 		this.parameters[parametersIndex++] = genomeLength+1;//size of type+genome
 		this.parameters[parametersIndex++] = controllerType;
+                this.parameters[parametersIndex++] = 38;//repertoire params
+                this.parameters[parametersIndex++] = 6;//inputs
+                this.parameters[parametersIndex++] = 2;//outputs
+                
 		System.out.println(controllerType);
 		
 		for(int i = 0 ; i < weights.length ; i++)
@@ -187,6 +192,7 @@ public class HexapodShowbestController extends Controller implements FixedLenght
     }
     
     protected void sendDataToVREP(float[] arr) {
+        System.out.println("Sending data to VREP");
     	FloatWA f = new FloatWA(arr.length);
     	f.setValue(arr);
     	char[] chars = f.getCharArrayFromArray();

@@ -47,7 +47,7 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 		time= args.getArgumentAsIntOrSetDefault("time", time);
 		maxSpeed = args.getArgumentAsDoubleOrSetDefault("maxspeed", maxSpeed);
                 
-        waitForResult = args.getArgumentAsIntOrSetDefault("waitforresult",1) == 1; 
+                waitForResult = args.getArgumentAsIntOrSetDefault("waitforresult",1) == 1; 
 		
 		if(args.getArgumentIsDefined("weights")) {
 			String[] rawArray = args.getArgumentAsString("weights").split(",");
