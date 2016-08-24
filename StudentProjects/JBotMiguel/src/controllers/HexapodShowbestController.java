@@ -24,14 +24,12 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 	protected Simulator sim;
 	protected String ip = "127.0.0.1";
 	protected int time = 3;
-        
-        protected double maxSpeed = 0.5;
-	
+    protected double maxSpeed = 0.5;
 	
 	private static remoteApi vrep;
 	private static int clientId;
-        protected boolean waitForResult = true;
-	
+    protected boolean waitForResult = true;
+    protected Arguments evolutionArgs;
 	
 	public HexapodShowbestController(Simulator simulator,Robot robot,Arguments args) {
 		super(simulator, robot, args);
@@ -56,6 +54,7 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 			setNNWeights(weights);
 		}
 		this.sim = simulator;
+		this.evolutionArgs = sim.getArguments().get("--evolution");
 	}
 	
 	public void init() {
@@ -101,7 +100,7 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 	protected double getFitness(float[] vals) {
 		System.out.println("Received from VRep: " + Arrays.toString(vals));
 
-                int index = 0;
+        int index = 0;
 		int nResults = (int)vals[index++];
 		//id
 		int id = (int)vals[index++];
@@ -141,13 +140,14 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 		this.parameters[parametersIndex++] = time;//X seconds
 		this.parameters[parametersIndex++] = 1;//1 individual
 		this.parameters[parametersIndex++] = 1;//id
-		this.parameters[parametersIndex++] = genomeLength+1;//size of type+genome
+		this.parameters[parametersIndex++] = genomeLength+4;//size of type+genome
 		this.parameters[parametersIndex++] = controllerType;
-                this.parameters[parametersIndex++] = 38;//repertoire params
-                this.parameters[parametersIndex++] = 6;//inputs
-                this.parameters[parametersIndex++] = 2;//outputs
+		
+        this.parameters[parametersIndex++] = evolutionArgs.getArgumentAsInt("nparams");//repertoire params
+        this.parameters[parametersIndex++] = evolutionArgs.getArgumentAsInt("inputs");//inputs
+        this.parameters[parametersIndex++] = evolutionArgs.getArgumentAsInt("outputs");//outputs
                 
-		System.out.println(controllerType);
+		System.out.println(weights.length+" ANN params");
 		
 		for(int i = 0 ; i < weights.length ; i++)
 			this.parameters[parametersIndex++] = (float)weights[i];
@@ -176,12 +176,13 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 	
 	protected float[] getDataFromVREP() {
     	CharWA str=new CharWA(0);
-    	while(vrep.simxGetStringSignal(clientId,"toClient",str,remoteApi.simx_opmode_oneshot_wait) != remoteApi.simx_return_ok) {
-    		try {
+    	try {
+	    	while(vrep.simxGetStringSignal(clientId,"toClient",str,remoteApi.simx_opmode_oneshot_wait) != remoteApi.simx_return_ok) {
 				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
 			}
+    	} catch (InterruptedException e) {
+			e.printStackTrace();
+			return new float[]{0,0,0,0};
 		}
     	
 		vrep.simxClearStringSignal(clientId, "toClient", remoteApi.simx_opmode_oneshot);
@@ -199,5 +200,6 @@ public class HexapodShowbestController extends Controller implements FixedLenght
     	String tempStr = new String(chars);
 		CharWA str = new CharWA(tempStr);
 		vrep.simxWriteStringStream(clientId,"fromClient",str,remoteApi.simx_opmode_oneshot);
+		System.out.println("Sent data!");
     }
 }
