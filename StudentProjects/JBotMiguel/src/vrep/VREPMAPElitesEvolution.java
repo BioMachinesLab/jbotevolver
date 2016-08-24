@@ -14,10 +14,7 @@ import novelty.evaluators.FinalPositionWithOrientationBehavior;
 import novelty.results.VectorBehaviourExtraResult;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
-import taskexecutor.VREPResult;
-import taskexecutor.VREPTask;
 import taskexecutor.VREPTaskExecutor;
-import coppelia.remoteApi;
 import evaluationfunctions.OrientationEvaluationFunction;
 import evolution.MAPElitesEvolution;
 import evolution.MAPElitesPopulation;
@@ -35,13 +32,16 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 	protected int time = 0; // s
 	public int excluded = 0;
 	protected double feasibilityThreshold = 0.0;
-        protected double maxSpeed = 0; // m/s
+    protected double maxSpeed = 0; // m/s
+    protected int genomeLength = 0;
 	
     public VREPMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
     	super(jBotEvolver, taskExecutor, arg);
     	
     	if(!arg.getArgumentIsDefined("genomelength"))
     		throw new RuntimeException("Missing 'genomelength' arg in VREPMapElitesEvolution");
+    	
+    	this.genomeLength = arg.getArgumentAsInt("genomelength");
     	
     	if(!arg.getArgumentIsDefined("time"))
     		throw new RuntimeException("Missing 'time' arg in VREPMapElitesEvolution");
@@ -85,7 +85,7 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
     		
 			int controllerType = 0;
 			
-    		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)taskExecutor, chromosomes, fixedParameters, controllerType);
+    		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)taskExecutor, chromosomes, fixedParameters, controllerType, genomeLength, 0, 0);
     		
 			float[][] results = VRepUtils.receiveTasks((VREPTaskExecutor)taskExecutor, nTasks);
 			

@@ -3,6 +3,7 @@ package utils.evorbc;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import mathutils.Vector2d;
@@ -11,10 +12,15 @@ import novelty.BehaviourResult;
 import novelty.ExpandedFitness;
 import novelty.results.VectorBehaviourExtraResult;
 import simulation.Simulator;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
 import utils.TraverseFolders;
+import evaluationfunctions.DistanceTravelledEvaluationFunction;
 import evaluationfunctions.OrientationEvaluationFunction;
+import evaluationfunctions.RadialOrientationEvaluationFunction;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import fourwheeledrobot.MultipleWheelRepertoireActuator;
 
 public class EvoRBCOrientationFitness extends TraverseFolders{
@@ -23,6 +29,7 @@ public class EvoRBCOrientationFitness extends TraverseFolders{
 	
 	private String fileName;
 	private FileWriter fw;
+	private boolean distance = false;
 	private LinkedList<String> setupNames = new LinkedList<String>();
 	
 	public EvoRBCOrientationFitness(String baseFolder, String[] setups, String fileName) throws IOException {
@@ -33,7 +40,9 @@ public class EvoRBCOrientationFitness extends TraverseFolders{
 	public static void main(String[] args) throws Exception{
 		
 		EvoRBCOrientationFitness orientationError = null;
-		orientationError = new EvoRBCOrientationFitness("orico/repertoireresolution/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_50/","maze_quality_100/","maze_quality_200/"}, "repertoireresolution.txt");
+//		orientationError = new EvoRBCOrientationFitness("bigdisk/repertoireresolution/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_50/","maze_quality_100/","maze_quality_200/"}, "repertoireresolution.txt");
+		orientationError = new EvoRBCOrientationFitness("bigdisk/qualitymetrics/", new String[]{"maze_radial/","maze_distance/","maze_quality/"}, "distance-qualitymetrics.txt");
+		orientationError.distance = true;
 		orientationError.traverse(); System.out.println("Done "+orientationError.fileName);
 	}
 	
@@ -46,7 +55,10 @@ public class EvoRBCOrientationFitness extends TraverseFolders{
 			new File(FOLDER_NAME+"/orientation-fitness-"+this.fileName).delete();
 			fw = new FileWriter(new File(FOLDER_NAME+"/orientation-fitness-"+this.fileName));
 			
-			fw.append("Folder Setup Fitness\n");
+			if(distance)
+				fw.append("Folder Setup Distance Orientation\n");
+			else
+				fw.append("Folder Setup Orientation\n");
 		
 		}catch(Exception e){
 			e.printStackTrace();
@@ -88,42 +100,75 @@ public class EvoRBCOrientationFitness extends TraverseFolders{
 		String[] split = folder.split("/");
 		
 		String folderName = split[split.length-4];
-		String setupName = split[split.length-2];
+		String setupName = split[split.length-2]+"_"+split[split.length-3];
 		
-		if(!setupNames.contains(setupName+"_"+split[split.length-3])) {
-			setupNames.add(setupName+"_"+split[split.length-3]);
+		if(!setupNames.contains(setupName)) {
+			setupNames.add(setupName);
 		}else{
 			return;
 		}
 		
 		JBotEvolver jbot = new JBotEvolver(new String[]{folder+"/_showbest_current.conf"});
-		MAPElitesPopulation pop = getMapPop(jbot,folder);
-		System.out.println(folder);
+		String popFolder = getMapPop(jbot, folder);
+		System.out.println(popFolder);
+		jbot = new JBotEvolver(new String[]{popFolder});
+		MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
 		
 		for(int x = 0 ; x < pop.getMap().length ; x++) {
 			for(int y = 0 ; y < pop.getMap()[x].length ; y++) {
 				
 				MOChromosome res = pop.getMap()[x][y];
 				
-				if(res != null) {
+				if(res == null)
+					continue;
+				
+				Simulator sim = jbot.createSimulator();
+				sim.addRobots(jbot.createRobots(sim, res));
+				sim.addCallback(jbot.getEvaluationFunction()[0]);
+				sim.setupEnvironment();
+				
+				sim.simulate();
+				
+				EvaluationFunction ff = (EvaluationFunction)sim.getCallbacks().get(0);
+				
+				if(ff instanceof DistanceTravelledEvaluationFunction) {
 					
-					ExpandedFitness fit = (ExpandedFitness)res.getEvaluationResult();
-					BehaviourResult br = (BehaviourResult)fit.getCorrespondingEvaluation(1);
+					DistanceTravelledEvaluationFunction ff1 = (DistanceTravelledEvaluationFunction)ff;
+					fw.append(folderName+" "+setupName+" "+ff1.getFitness()+" "+0+"\n");
 					
-					if(br instanceof VectorBehaviourExtraResult) {
-						double[] behavior = (double[])br.value();
-						Vector2d pos = new Vector2d(behavior[0],behavior[1]);
-						
-						double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
-						double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
-						fw.append(folderName+" "+setupName+" "+fitness+"\n");
-					}
+				} else if (ff instanceof RadialOrientationEvaluationFunction) {
+					
+					RadialOrientationEvaluationFunction ff1 = (RadialOrientationEvaluationFunction)ff;
+					fw.append(folderName+" "+setupName+" "+ff1.getDistanceFitness()+" "+ff1.getOrientationFitness()+"\n");
+					
+				} else if (ff instanceof OrientationEvaluationFunction) {
+					
+					OrientationEvaluationFunction ff1 = (OrientationEvaluationFunction)ff;
+					fw.append(folderName+" "+setupName+" "+ff1.getDistanceFitness()+" "+ff1.getOrientationFitness()+"\n");
+					
+				} else {
+					throw new RuntimeException("Found an unexpected Evaluation Function!");
 				}
+				
+//				if(res != null) {
+//					
+//					ExpandedFitness fit = (ExpandedFitness)res.getEvaluationResult();
+//					BehaviourResult br = (BehaviourResult)fit.getCorrespondingEvaluation(1);
+//					double distanceFitness = distEval.getFitness();
+//					
+//					if(br instanceof VectorBehaviourExtraResult) {
+//						double[] behavior = (double[])br.value();
+//						Vector2d pos = new Vector2d(behavior[0],behavior[1]);
+//						double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
+//						double orientationFitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
+//						fw.append(folderName+" "+setupName+" "+distanceFitness+" "+orientationFitness+"\n");
+//					}
+//				}
 			}
 		}
 	}
 	
-	private MAPElitesPopulation getMapPop(JBotEvolver jbot, String folder) throws Exception {
+	private String getMapPop(JBotEvolver jbot, String folder) throws Exception {
 		
 		String filename = folder+"/_showbest_current.conf";
 		jbot.loadFile(filename, "--simulator +folder="+baseFolder);
@@ -134,9 +179,11 @@ public class EvoRBCOrientationFitness extends TraverseFolders{
 		MultipleWheelRepertoireActuator actuator = (MultipleWheelRepertoireActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireActuator.class);
 		String string = baseFolder+actuator.getRepertoireLocation();
 		
-		File f = new File(string);
-		jbot.loadFile(f.getParent()+"/_showbest_current.conf", "--simulator +folder="+baseFolder);
+		return new File(string).getParent().concat("/_showbest_current.conf");
 		
-		return (MAPElitesPopulation)jbot.getPopulation();
+//		File f = new File(string);
+//		jbot.loadFile(f.getParent()+"/_showbest_current.conf", "--simulator +folder="+baseFolder);
+//		
+//		return (MAPElitesPopulation)jbot.getPopulation();
 	}
 }

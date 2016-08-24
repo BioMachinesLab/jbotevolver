@@ -40,9 +40,17 @@ public class OrientationEvaluationFunction extends EvaluationFunction{
 	
 	@Override
 	public double getFitness() {
-		double resultDistance = ignoreDistance ? 0 : (maxDistance - distanceTraveled)/(maxDistance);
-		double resultOrientation = ignoreOrientation ? 0 : calculateOrientationFitness(position, orientation);
+		double resultDistance = getDistanceFitness();
+		double resultOrientation = getOrientationFitness();
 		return resultOrientation + resultDistance;
+	}
+	
+	public double getDistanceFitness() {
+		return ignoreDistance ? 0 : (maxDistance - distanceTraveled)/(maxDistance);
+	}
+	
+	public double getOrientationFitness() {
+		return ignoreOrientation ? 0 : calculateOrientationFitness(position, orientation);
 	}
 	
 	public static double calculateOrientationFitness(Vector2d pos, double orientation) {

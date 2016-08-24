@@ -7,7 +7,7 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 public class VRepUtils {
 	
-	public static int sendTasks(VREPTaskExecutor te, Chromosome[] chromosomes, float[] fixedParameters, float type) {
+	public static int sendTasks(VREPTaskExecutor te, Chromosome[] chromosomes, float[] fixedParameters, float type, float nParams, float inputs, float outputs) {
 		
 		int instances = te.getInstances();
 		int chromosomesPerInstance = chromosomes.length/instances;
@@ -42,11 +42,14 @@ public class VRepUtils {
 				index = 0;
 				Chromosome c = chromosomes[totalIndex++];
 				
-				float[] params = new float[3 + c.getAlleles().length];
+				float[] params = new float[6 + c.getAlleles().length];
 				
 				params[index++] = c.getID(); //id of the chromosome
-				params[index++] = c.getAlleles().length + 1; //length of chromosome + type
+				params[index++] = c.getAlleles().length + 4; //length of chromosome + type
 				params[index++] = type; //type
+				params[index++] = nParams;//the number of locomotion parameters of the controller
+				params[index++] = inputs; //inputs
+				params[index++] = outputs; //outputs
 				
 				for(int j = 0 ; j < c.getAlleles().length ; j++) {
 					params[index++] = (float)c.getAlleles()[j];

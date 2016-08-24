@@ -26,6 +26,8 @@ public class VRepRepertoireController extends VRepController {
 			ann = new VRepNEATController(parameters);
 		}
 		
+		nParams = (int)parameters[1];//locomotion parameters
+		
 		loadRepertoire(REPERTOIRE_FILENAME);
 	}
 

@@ -9,15 +9,24 @@ import evolutionaryrobotics.populations.NEATPopulation;
 
 public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper {
 	
+	protected int controllerType;
 	protected int time;
+	protected int nParams;
+	protected int inputs;
+	protected int outputs;
 	
 	public VRepNEATGeneticAlgorithmWrapper(NEATGADescriptor descriptor, NEATEvolution evo) {
 		super(descriptor,evo);
 	}
 	
-	public void setEvaluationTime(int time) {
+	public void setParameters(int controllerType, int time, int nParams, int inputs, int outputs) {
+		this.controllerType = controllerType;
 		this.time = time;
+		this.nParams = nParams;
+		this.inputs = inputs;
+		this.outputs = outputs;
 	}
+	
 	
 	protected void evaluatePopulation(Chromosome[] genotypes) {
 		
@@ -31,7 +40,7 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
 		fixedParameters[1] = time; //seconds of evaluation
 		
 		//controller type is hardcoded
-		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)evo.getTaskExecutor(), chromosomes, fixedParameters, 1);
+		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)evo.getTaskExecutor(), chromosomes, fixedParameters, controllerType, nParams, inputs, outputs);
 		
 		float[][] results = VRepUtils.receiveTasks((VREPTaskExecutor)evo.getTaskExecutor(), nTasks);
 		

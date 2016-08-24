@@ -25,7 +25,7 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 	protected String ip = "127.0.0.1";
         //protected String ip = "10.40.50.136";
 	protected int time = 3;
-        protected double maxSpeed = 0.5;
+       protected double maxSpeed = 0.5;
 	
 	private static remoteApi vrep;
 	private static int clientId;

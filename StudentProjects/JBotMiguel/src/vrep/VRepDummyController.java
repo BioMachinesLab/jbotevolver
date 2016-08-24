@@ -10,10 +10,13 @@ public class VRepDummyController extends VRepController {
 	
 	public VRepDummyController(float[] parameters) {
 		super(parameters);
-		locomotionParameters = new float[parameters.length-1];
+		
+		int ignoreValues = 4;//type, nParams, inputs, outputs
+		
+		locomotionParameters = new float[parameters.length-ignoreValues];
 		
 		for(int i = 0 ; i < locomotionParameters.length ; i++)
-			locomotionParameters[i] = parameters[i+1];
+			locomotionParameters[i] = parameters[i+ignoreValues];
 	}
 
 	@Override

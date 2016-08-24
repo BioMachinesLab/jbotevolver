@@ -47,6 +47,9 @@ public class MAPElitesTracer extends Tracer {
 		
 		for(int i = 0 ; i < sim.length ; i++) {
 			
+			if(sim[i] == null)
+				continue;
+			
 			Simulator s = sim[i];
 			MAPElitesPopulation p = pop[i];
 			
@@ -121,9 +124,15 @@ public class MAPElitesTracer extends Tracer {
 							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, /*getColor(fitness)*/Color.GREEN.darker());
 //							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, getColor(fitness));
 							
-							if(fitness < 0.8) {
-								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.RED);
-							}
+							//TODO test
+							double h = ((double)(orientation+Math.PI)/(Math.PI*2)); 
+							float hf = (float)h; 
+							Color hsb = Color.getHSBColor(hf, 1f, 1f);
+							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, hsb);
+							
+//							if(fitness < 0.8) {
+//								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.RED);
+//							}
 							
 						}
 						

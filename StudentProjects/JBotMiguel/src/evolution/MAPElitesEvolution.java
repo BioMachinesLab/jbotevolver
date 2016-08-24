@@ -104,7 +104,7 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		
 		if(population.evolutionDone()) {
 			System.out.println("Pruning [threshold="+pruneThreshold+"]");
-			prune((MAPElitesPopulation)population, pruneThreshold);
+			prune((MAPElitesPopulation)population, pruneThreshold);;
 			System.out.println("Expanding [circle="+circle+"]");
 			if(circle)
 				expandToCircle((MAPElitesPopulation)population);
@@ -116,7 +116,9 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		String hash = getRepertoireHash((MAPElitesPopulation)population);
     	String file = "repertoire_"+hash+".txt";
 		
+    	System.out.println("Saving repertoire to file...");
 		saveRepertoireTxt(dir,file,(MAPElitesPopulation)population);
+		System.out.println("Saved!");
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(dir+"repertoire_name.txt")));
 			bw.write(hash);
@@ -157,13 +159,13 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     	for(int x = 0 ; x < map.length ; x++) {
     		for(int y = 0 ; y < map[x].length ; y++) {
     			if(map[x][y] != null) {
-	    			int posX = x;
-	    			int posY = y;
+    				int posY = y;
+    				int posX = x; 
 	    			posX-= map.length/2;
 	        		posY-= map[0].length/2;
-	        		if(circle)
+	        		if(circle) {
 	        			maxDist = Math.max(maxDist,new Vector2d(posX,posY).length());
-	        		else {
+	        		}else {
 	        			minMax[0] = Math.min(minMax[0],x);//min x
 	        			minMax[1] = Math.min(minMax[1],y);//min Y
 	        			minMax[2] = Math.max(minMax[2],x);//max x

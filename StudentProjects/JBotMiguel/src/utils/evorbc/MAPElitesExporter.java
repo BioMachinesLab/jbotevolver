@@ -8,29 +8,29 @@ import simulation.util.Arguments;
 
 public class MAPElitesExporter extends MAPElitesViewer{
 	
+	protected String imageName;
 	
 	public static void main(String[] args) throws Exception {
-//		new MAPElitesViewer("../../EvolutionAutomator/");
-		new MAPElitesExporter("repertoire/");
-//		new MAPElitesViewer("intersected_repertoires");
-		
+//		new MAPElitesExporter("bigdisk/qualitymetrics/repertoire_distance/","distance");
+//		new MAPElitesExporter("bigdisk/qualitymetrics/repertoire_radial/","radial");
+		new MAPElitesExporter("bigdisk/qualitymetrics/repertoire/","quality");
 	}
 	
-	public MAPElitesExporter(String folder) {
+	public MAPElitesExporter(String folder, String imageName) {
 		super(folder);
-//		export();
+		this.imageName = imageName;
 		exportAll();
 	}
 	
 	private void exportAll() {
 		
 		MAPElitesPopulation[] pops = new MAPElitesPopulation[files.size()];
-		Simulator[] sims = new Simulator[files.size()];
+		String[] setups = new String[]{"4WS-5","2WS-3"};
+		Simulator[] sims = new Simulator[setups.length];
 		
 		int i = 0;
 		
-		String[] files = new String[]{"AWS_8Actuator_30/1","AWS_3Actuator_30/1","AWS_5Actuator_30/1","FWS_2Actuator_30/1","FWS_3Actuator_30/1"};
-//		String[] files = new String[]{"FWS_2Actuator_30/1","FWS_3Actuator_30/1","AWS_3Actuator_30/1","AWS_5Actuator_30/1","AWS_8Actuator_30/1"};
+		String[] files = new String[]{"AWS_5Actuator_20/1","FWS_3Actuator_20/1"};
 		
 		for(String f : files) {
 			
@@ -42,17 +42,17 @@ public class MAPElitesExporter extends MAPElitesViewer{
 			f = f.replaceAll("/", "_");
 			
 			MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
-//			MAPElitesEvolution.expandToCircle(pop,0.8);
 			sims[i] = sim;
 			pops[i] = pop;
 			i++;
 			
 		}
 		
-		MAPElitesTracer t = new MAPElitesTracer(new Arguments("scale=500,folder=map_elites_img,name=repertoire_all"));
-		t.drawMapElites(new String[]{"4WS-8","4WS-3","4WS-5","2WS-2","2WS-3",},sims, pops);
+		MAPElitesTracer t = new MAPElitesTracer(new Arguments("scale=500,folder=map_elites_img,name="+imageName));
+		t.drawMapElites(setups,sims, pops);
 	}
 	
+	/*
 	private void export() {
 		
 		String[] imgNames = new String[]{"1_original","2_pruned","3_filled"};
@@ -80,5 +80,5 @@ public class MAPElitesExporter extends MAPElitesViewer{
 				
 			}
 		}
-	}
+	}*/
 }

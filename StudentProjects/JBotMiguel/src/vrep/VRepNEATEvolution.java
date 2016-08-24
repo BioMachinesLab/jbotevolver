@@ -20,6 +20,8 @@ public class VRepNEATEvolution extends NEATEvolution {
 	protected int inputNeurons;
 	protected int outputNeurons;
 	protected int time;
+	protected int controllerType;
+	protected int nParams = 0;//repertoire params
 
 	public VRepNEATEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
@@ -33,6 +35,8 @@ public class VRepNEATEvolution extends NEATEvolution {
 		inputNeurons = args.getArgumentAsInt("inputs");
 		outputNeurons = args.getArgumentAsInt("outputs");
 		time = args.getArgumentAsInt("time");
+		nParams = args.getArgumentAsIntOrSetDefault("nparams", nParams);
+		controllerType = jBotEvolver.getArguments().get("--controllers").getArgumentAsIntOrSetDefault("controllertype", controllerType);
 		
 		descriptor.setInputNodes(inputNeurons);
 		descriptor.setOutputNodes(outputNeurons);
@@ -52,7 +56,7 @@ public class VRepNEATEvolution extends NEATEvolution {
 			algorithm.loadPopulation(population.getNEATPopulation4J());
 		}
 		
-		algorithm.setEvaluationTime(time);
+		algorithm.setParameters(controllerType, time, nParams, inputNeurons, outputNeurons);
 
 		algorithm.pluginFitnessFunction(new PreEvaluatedFitnessFunction(Collections.<Chromosome, Float> emptyMap()));
 		algorithm.pluginCrossOver(new NEATCrossover());

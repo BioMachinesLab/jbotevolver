@@ -21,12 +21,14 @@ public class VRepNEATController extends VRepController {
 		
 		//read parameters, ignore first values
 		int type = (int)parameters[index++];
-//		int inputNumber = (int)parameters[index++];
-//		int outputNumber = (int)parameters[index++];
+		int nParams = (int)parameters[index++];//locomotion parameters
+		
+		int inputNumber = (int)parameters[index++];
+		int outputNumber = (int)parameters[index++];
 		
 		//TODO hardcoded...
-		int inputNumber = 6;
-		int outputNumber = 2;
+//		int inputNumber = 6;
+//		int outputNumber = 2;
 		
 		inputs = new Vector<NNInput>();
 		Vector<NNOutput> outputs = new Vector<NNOutput>();
