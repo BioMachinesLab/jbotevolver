@@ -1,9 +1,7 @@
 package gui.extended;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
@@ -19,8 +17,8 @@ import simulation.Simulator;
 import simulation.physicalobjects.Marker;
 import simulation.util.Arguments;
 import updatables.Tracer;
-import evaluationfunctions.OrientationEvaluationFunction;
 import evolution.MAPElitesPopulation;
+import evorbc.qualitymetrics.CircularQualityMetric;
 
 public class MAPElitesTracer extends Tracer {
 	
@@ -103,7 +101,7 @@ public class MAPElitesTracer extends Tracer {
 						
 						double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
 						
-						double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
+						double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);
 						
 						int[] supposedLocation = pop.getLocationFromBehaviorVector(behavior);
 						

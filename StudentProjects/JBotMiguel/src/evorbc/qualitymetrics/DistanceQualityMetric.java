@@ -31,14 +31,7 @@ public class DistanceQualityMetric extends EvaluationFunction{
 	
 	@Override
 	public double getFitness() {
-		//minDistance is the distance in a straight line
-		double minDistance = length(position);
-		
-		//the edge case where the best thing is to stay put
-		if(distanceTraveled == 0)
-			return 1;
-		
-		return minDistance/distanceTraveled;
+		return getFitness(position,distanceTraveled);
 	}
 
 	//Here we redefine functions that are in the Vector2d class because
@@ -49,9 +42,19 @@ public class DistanceQualityMetric extends EvaluationFunction{
 		return FastMath.sqrt(x*x+y*y);
 	}
 	
-	public final double length(Vector2d a)
-	{
+	public static final double length(Vector2d a) {
 		return FastMath.sqrt(a.x*a.x + a.y*a.y);
+	}
+	
+	public static double getFitness(Vector2d position, double distanceTraveled){
+		//minDistance is the distance in a straight line
+		double minDistance = length(position);
+		
+		//the edge case where the robots stays put
+		if(distanceTraveled == 0)
+			return 1;
+		
+		return  minDistance/distanceTraveled;
 	}
 
 }

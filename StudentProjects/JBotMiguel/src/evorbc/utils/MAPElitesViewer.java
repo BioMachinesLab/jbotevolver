@@ -33,23 +33,15 @@ import novelty.ExpandedFitness;
 import novelty.results.VectorBehaviourExtraResult;
 import novelty.results.VectorBehaviourResult;
 import simulation.Simulator;
-import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.Marker;
 import simulation.util.Arguments;
-import evaluationfunctions.OrientationEvaluationFunction;
-import evaluationfunctions.RadialOrientationEvaluationFunction;
-import evolution.MAPElitesEvolution;
 import evolution.MAPElitesPopulation;
 import evolution.PostEvaluator;
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
-import evorbc.mappingfunctions.CartesianMappingFunction;
-import evorbc.qualitymetrics.DistanceQualityMetric;
+import evorbc.qualitymetrics.CircularQualityMetric;
 import gui.extended.TwoDRendererWheels;
 import gui.renderer.TwoDRendererDebug;
-
-import java.util.Arrays;
 
 public class MAPElitesViewer {
 	
@@ -239,7 +231,7 @@ public class MAPElitesViewer {
 						
 						double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
 						
-						double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
+						double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);
 						
 						int[] supposedLocation = pop.getLocationFromBehaviorVector(behavior);
 						

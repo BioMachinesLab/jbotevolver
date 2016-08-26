@@ -15,11 +15,12 @@ import novelty.results.VectorBehaviourExtraResult;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import taskexecutor.VREPTaskExecutor;
-import evaluationfunctions.OrientationEvaluationFunction;
 import evolution.MAPElitesEvolution;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import evorbc.qualitymetrics.CircularQualityMetric;
+import evorbc.qualitymetrics.DistanceQualityMetric;
 
 /**
  *	MAP-Elites "illumination" algorithm
@@ -32,7 +33,6 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 	protected int time = 0; // s
 	public int excluded = 0;
 	protected double feasibilityThreshold = 0.0;
-    protected double maxSpeed = 0; // m/s
     protected int genomeLength = 0;
 	
     public VREPMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
@@ -49,11 +49,6 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
     	controllerType = arg.getArgumentAsIntOrSetDefault("controllertype", controllerType);
     	time = arg.getArgumentAsIntOrSetDefault("time", time);
     	feasibilityThreshold = arg.getArgumentAsDoubleOrSetDefault("feasibility", feasibilityThreshold);
-
-    	if(!arg.getArgumentIsDefined("maxspeed"))
-    		throw new RuntimeException("Missing 'maxspeed' arg in VREPMapElitesEvolution");
-        maxSpeed = arg.getArgumentAsDouble("maxspeed");
-    	        
     }
     
     public static double getFitness(MOChromosome moc) {
@@ -64,7 +59,7 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 		Vector2d pos = new Vector2d(behavior[0],behavior[1]);
 		double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
 		
-		double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
+		double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);
 		
 		return fitness;
     }
@@ -122,14 +117,12 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 					//distance
 					float distanceTraveled = vals[index++];
 					
-                                        // feasibility
+                    //feasibility
 					float feasibility = vals[index++];
 					
 					Vector2d pos = new Vector2d(posX,posY);
 					
-					double distanceLimit = maxSpeed * time;
-					
-					double fitness = OrientationEvaluationFunction.calculateOrientationDistanceFitness(pos, orientation, distanceTraveled, distanceLimit);
+					double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation) + DistanceQualityMetric.getFitness(pos, distanceTraveled);
 					
 					FitnessResult fr = new FitnessResult(fitness);
 					GenericEvaluationFunction br = new FinalPositionWithOrientationBehavior(new Arguments(""),pos,orientation);

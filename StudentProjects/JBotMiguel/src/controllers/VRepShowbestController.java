@@ -8,10 +8,12 @@ import coppelia.CharWA;
 import coppelia.FloatWA;
 import coppelia.remoteApi;
 import evaluationfunctions.DummyEvaluationFunction;
-import evaluationfunctions.OrientationEvaluationFunction;
+import evorbc.qualitymetrics.CircularQualityMetric;
+import evorbc.qualitymetrics.DistanceQualityMetric;
+
 import java.util.Arrays;
 
-public class HexapodShowbestController extends Controller implements FixedLenghtGenomeEvolvableController{
+public class VRepShowbestController extends Controller implements FixedLenghtGenomeEvolvableController{
 
 	
 	protected float[] parameters;
@@ -24,14 +26,13 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 	protected Simulator sim;
 	protected String ip = "127.0.0.1";
 	protected int time = 3;
-    protected double maxSpeed = 0.5;
 	
 	private static remoteApi vrep;
 	private static int clientId;
     protected boolean waitForResult = true;
     protected Arguments evolutionArgs;
 	
-	public HexapodShowbestController(Simulator simulator,Robot robot,Arguments args) {
+	public VRepShowbestController(Simulator simulator,Robot robot,Arguments args) {
 		super(simulator, robot, args);
 		
 		if(!args.getArgumentIsDefined("inputs") || !args.getArgumentIsDefined("outputs"))
@@ -44,7 +45,6 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 //		if(!args.getArgumentIsDefined("time"))
 //			throw new RuntimeException("Argument 'time' not defined for class HexapodShowbestController!");
 		waitForResult = args.getArgumentAsIntOrSetDefault("waitforresult",1) == 1; 
-		time= args.getArgumentAsIntOrSetDefault("time", time);
 		
 		if(args.getArgumentIsDefined("weights")) {
 			String[] rawArray = args.getArgumentAsString("weights").split(",");
@@ -116,7 +116,7 @@ public class HexapodShowbestController extends Controller implements FixedLenght
 			float orientation = vals[index++];
 			float distanceTravelled = vals[index++];
 			float feasibility = vals[index++];
-			fitness = (float) OrientationEvaluationFunction.calculateOrientationDistanceFitness(new Vector2d(x,y), orientation, distanceTravelled, maxSpeed * time);
+			fitness = (float) (CircularQualityMetric.calculateOrientationFitness(new Vector2d(x,y), orientation) + DistanceQualityMetric.getFitness(new Vector2d(x,y), distanceTravelled));
 			
 			robot.setPosition(new Vector2d(x,y));
 			robot.setOrientation(orientation);

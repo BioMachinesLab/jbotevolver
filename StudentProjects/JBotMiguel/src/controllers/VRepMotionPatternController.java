@@ -3,16 +3,16 @@ package controllers;
 import mathutils.Vector2d;
 import coppelia.CharWA;
 import coppelia.FloatWA;
-import coppelia.IntW;
 import coppelia.remoteApi;
 import evaluationfunctions.DummyEvaluationFunction;
-import evaluationfunctions.OrientationEvaluationFunction;
+import evorbc.qualitymetrics.CircularQualityMetric;
+import evorbc.qualitymetrics.DistanceQualityMetric;
 import java.util.Arrays;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class HexapodMotionPatternController extends Controller implements FixedLenghtGenomeEvolvableController{
+public class VRepMotionPatternController extends Controller implements FixedLenghtGenomeEvolvableController{
 
 	protected float[] parameters;
 	protected boolean init = false;
@@ -31,7 +31,7 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 	private static int clientId;
 	protected boolean waitForResult = true;
 	
-	public HexapodMotionPatternController(Simulator simulator,Robot robot,Arguments args) {
+	public VRepMotionPatternController(Simulator simulator,Robot robot,Arguments args) {
 		super(simulator, robot, args);
 		
 //		if(!args.getArgumentIsDefined("inputs") || !args.getArgumentIsDefined("outputs"))
@@ -121,7 +121,9 @@ public class HexapodMotionPatternController extends Controller implements FixedL
 			float orientation = vals[index++];
 			float distanceTravelled = vals[index++];
 			float feasibility = vals[index++];
-			fitness = (float) OrientationEvaluationFunction.calculateOrientationDistanceFitness(new Vector2d(x,y), orientation, distanceTravelled, maxSpeed * time);
+			
+			fitness = (float) (CircularQualityMetric.calculateOrientationFitness(new Vector2d(x,y), orientation) + DistanceQualityMetric.getFitness(new Vector2d(x,y), distanceTravelled));
+//			.calculateOrientationDistanceFitness(, distanceTravelled, maxSpeed * time);
 			
 			robot.setPosition(new Vector2d(x,y));
 			robot.setOrientation(orientation);

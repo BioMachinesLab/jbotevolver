@@ -2,9 +2,7 @@ package evolution;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import mathutils.Vector2d;
@@ -16,10 +14,10 @@ import novelty.ExpandedFitness;
 import novelty.results.VectorBehaviourExtraResult;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
-import evaluationfunctions.OrientationEvaluationFunction;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evolution.GenerationalEvolution;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import evorbc.qualitymetrics.CircularQualityMetric;
 
 /**
  *	MAP-Elites "illumination" algorithm
@@ -548,7 +546,7 @@ public class NDMAPElitesEvolution extends GenerationalEvolution{
 		double[] behavior = (double[])br.value();
 		Vector2d pos = new Vector2d(behavior[0],behavior[1]);
 		double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
-		double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
+		double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);
 		return fitness;
     }
     

@@ -45,7 +45,16 @@ public class RadialQualityMetric extends EvaluationFunction{
 			fitness+=dqm.getFitness();
 		
 		return fitness;
-		
+	}
+	
+	public double getDistanceFitness() {
+		if(distance)
+			return dqm.getFitness();
+		return 0;
+	}
+	
+	public double getOrientationFitness() {
+		return calculateOrientationFitness(position, orientation);
 	}
 	
 	public static double calculateOrientationFitness(Vector2d pos, double orientation) {

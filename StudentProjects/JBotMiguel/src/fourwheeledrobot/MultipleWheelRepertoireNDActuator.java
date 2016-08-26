@@ -1,6 +1,7 @@
 package fourwheeledrobot;
 
 import java.util.Scanner;
+
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import multiobjective.MOChromosome;
@@ -8,8 +9,8 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
-import evaluationfunctions.RadialOrientationEvaluationFunction;
 import evolution.NDBehaviorMap;
+import evorbc.qualitymetrics.RadialQualityMetric;
 
 /**
  * @author miguelduarte
@@ -104,7 +105,7 @@ public class MultipleWheelRepertoireNDActuator extends Actuator{
 
 			double orientation =  limit*actuations[2];//limit*2 * [0,1] - limit
 			
-			orientation+= RadialOrientationEvaluationFunction.getTargetOrientation(new Vector2d(x,y));
+			orientation+= RadialQualityMetric.getTargetOrientation(new Vector2d(x,y));
 			orientation = MathUtils.modPI2(orientation);
 			
 			buckets[2] = map.valueToBucket(2, orientation);

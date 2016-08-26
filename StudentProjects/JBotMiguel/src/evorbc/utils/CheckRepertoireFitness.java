@@ -2,21 +2,16 @@ package evorbc.utils;
 
 import java.io.File;
 import java.util.Scanner;
-
 import novelty.BehaviourResult;
-import novelty.EvaluationResult;
 import novelty.ExpandedFitness;
 import novelty.FitnessResult;
 import novelty.results.VectorBehaviourExtraResult;
 import mathutils.Vector2d;
 import multiobjective.MOChromosome;
-import simulation.Simulator;
-import simulation.util.Arguments;
-import evaluationfunctions.OrientationEvaluationFunction;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import evorbc.qualitymetrics.CircularQualityMetric;
 
 public class CheckRepertoireFitness {
 	
@@ -101,7 +96,7 @@ public class CheckRepertoireFitness {
 				double[] behavior = (double[])br.value();
 				Vector2d pos = new Vector2d(behavior[0],behavior[1]);
 				double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
-				double currentOrientationFitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation); 
+				double currentOrientationFitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation); 
 				orientationFitness+=currentOrientationFitness;
 				distanceFitness+=(fitRes.getFitness()-currentOrientationFitness);
 				

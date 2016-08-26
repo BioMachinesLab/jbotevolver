@@ -3,24 +3,17 @@ package evorbc.utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 
-import mathutils.Vector2d;
 import multiobjective.MOChromosome;
-import novelty.BehaviourResult;
-import novelty.ExpandedFitness;
-import novelty.results.VectorBehaviourExtraResult;
 import simulation.Simulator;
-import simulation.robot.Robot;
-import simulation.util.Arguments;
 import utils.TraverseFolders;
-import evaluationfunctions.DistanceTravelledEvaluationFunction;
-import evaluationfunctions.OrientationEvaluationFunction;
-import evaluationfunctions.RadialOrientationEvaluationFunction;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evorbc.qualitymetrics.CircularQualityMetric;
+import evorbc.qualitymetrics.DistanceQualityMetric;
+import evorbc.qualitymetrics.RadialQualityMetric;
 import fourwheeledrobot.MultipleWheelRepertoireActuator;
 
 public class EvoRBCOrientationFitness extends TraverseFolders{
@@ -131,19 +124,19 @@ public class EvoRBCOrientationFitness extends TraverseFolders{
 				
 				EvaluationFunction ff = (EvaluationFunction)sim.getCallbacks().get(0);
 				
-				if(ff instanceof DistanceTravelledEvaluationFunction) {
+				if(ff instanceof DistanceQualityMetric) {
 					
-					DistanceTravelledEvaluationFunction ff1 = (DistanceTravelledEvaluationFunction)ff;
+					DistanceQualityMetric ff1 = (DistanceQualityMetric)ff;
 					fw.append(folderName+" "+setupName+" "+ff1.getFitness()+" "+0+"\n");
 					
-				} else if (ff instanceof RadialOrientationEvaluationFunction) {
+				} else if (ff instanceof RadialQualityMetric) {
 					
-					RadialOrientationEvaluationFunction ff1 = (RadialOrientationEvaluationFunction)ff;
+					RadialQualityMetric ff1 = (RadialQualityMetric)ff;
 					fw.append(folderName+" "+setupName+" "+ff1.getDistanceFitness()+" "+ff1.getOrientationFitness()+"\n");
 					
-				} else if (ff instanceof OrientationEvaluationFunction) {
+				} else if (ff instanceof CircularQualityMetric) {
 					
-					OrientationEvaluationFunction ff1 = (OrientationEvaluationFunction)ff;
+					CircularQualityMetric ff1 = (CircularQualityMetric)ff;
 					fw.append(folderName+" "+setupName+" "+ff1.getDistanceFitness()+" "+ff1.getOrientationFitness()+"\n");
 					
 				} else {

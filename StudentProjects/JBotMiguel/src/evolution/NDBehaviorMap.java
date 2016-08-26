@@ -7,18 +7,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Scanner;
 
-import evaluationfunctions.DistanceTravelledEvaluationFunction;
-import evolutionaryrobotics.JBotEvolver;
 import multiobjective.MOChromosome;
-import multiobjective.MOTask;
 import novelty.EvaluationResult;
 import novelty.ExpandedFitness;
 import novelty.FitnessResult;
-import novelty.evaluators.FinalPositionWithOrientation3Behavior;
 import novelty.results.VectorBehaviourResult;
-import simulation.Simulator;
 import simulation.util.Arguments;
-import taskexecutor.results.SimpleFitnessResult;
 
 public class NDBehaviorMap implements Serializable{
 	

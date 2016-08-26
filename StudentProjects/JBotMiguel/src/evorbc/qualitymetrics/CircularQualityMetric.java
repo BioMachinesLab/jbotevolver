@@ -44,6 +44,16 @@ public class CircularQualityMetric extends EvaluationFunction{
 		return fitness;
 	}
 	
+	public double getDistanceFitness() {
+		if(distance)
+			return dqm.getFitness();
+		return 0;
+	}
+	
+	public double getOrientationFitness() {
+		return calculateOrientationFitness(position, orientation);
+	}
+	
 	public static double calculateOrientationFitness(Vector2d pos, double orientation) {
 		double result = getTargetOrientation(pos) - MathUtils.modPI2(orientation);
 		result = MathUtils.modPI(result);
