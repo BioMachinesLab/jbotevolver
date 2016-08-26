@@ -1,42 +1,32 @@
-package utils.evorbc;
+package evorbc.utils;
 
 import java.io.File;
 import java.util.Scanner;
 
-import novelty.BehaviourResult;
-import novelty.EvaluationResult;
-import novelty.ExpandedFitness;
-import novelty.FitnessResult;
-import novelty.results.VectorBehaviourExtraResult;
-import mathutils.Vector2d;
-import multiobjective.MOChromosome;
 import simulation.Simulator;
 import simulation.util.Arguments;
-import evaluationfunctions.OrientationEvaluationFunction;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 
-public class CheckRepertoireFitness {
+public class CheckRepertoireOrientation {
 	
 	public static void main(String[] args) throws Exception{
 		
-//		String f = "repertoire/";
-		String f = "bigdisk/december2015/foraging/repertoire/";
+		String f = "repertoire/";
 		
-		System.out.println("Setup\tGeneration\tOrientationFitness\tDistanceFitness\tChromosomes");
+		System.out.println("Setup\tGeneration\tAverageFitness\tChromosomes");
 		
 		for(String s : new File(f).list()) {
 			if(new File(f+s).isDirectory()) {
-				new CheckRepertoireFitness(f+s);
+				new CheckRepertoireOrientation(f+s);
 			}
 		}
 	}
 	
 	private int count = 0;
 	
-	public CheckRepertoireFitness(String folder) throws Exception{
+	public CheckRepertoireOrientation(String folder) throws Exception{
 		
 		File f = new File(folder);
 		
@@ -62,7 +52,7 @@ public class CheckRepertoireFitness {
 			String fn = folder.getPath()+"/"+f;
 			
 			if(f.equals("_fitness.log")) {
-				result+=checkFitness(folder.getPath()+"/");
+				result+=checkOrientation(folder.getPath()+"/");
 			} else if(new File(fn).isDirectory()) {
 				result+= checkSubFolders(new File(fn));
 			}
@@ -70,7 +60,7 @@ public class CheckRepertoireFitness {
 		return result;
 	}
 	
-	private String checkFitness(String folder) throws Exception {
+	private String checkOrientation(String folder) throws Exception {
 		
 		StringBuffer result = new StringBuffer();
 		
@@ -88,35 +78,11 @@ public class CheckRepertoireFitness {
 		for(int i = 0 ; i <= gens ; i++) {
 			JBotEvolver jbot = new JBotEvolver(new String[]{folder+"show_best/showbest"+i+".conf"});
 			MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
-			
-			double distanceFitness = 0;
-			double orientationFitness = 0;
-			
-			for(Chromosome c : pop.getChromosomes()) {
-				MOChromosome moc = (MOChromosome)c;
-				ExpandedFitness fit = (ExpandedFitness)moc.getEvaluationResult();
-				FitnessResult fitRes = (FitnessResult)fit.getCorrespondingEvaluation(0);
-				BehaviourResult br = (BehaviourResult)fit.getCorrespondingEvaluation(1);
-				
-				double[] behavior = (double[])br.value();
-				Vector2d pos = new Vector2d(behavior[0],behavior[1]);
-				double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
-				double currentOrientationFitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation); 
-				orientationFitness+=currentOrientationFitness;
-				distanceFitness+=(fitRes.getFitness()-currentOrientationFitness);
-				
-			}
-			
-			distanceFitness/=pop.getChromosomes().length;
-			orientationFitness/=pop.getChromosomes().length;
-			
 			result.append(split[split.length-2]);
 			result.append("\t");
 			result.append(i);
 			result.append("\t");
-			result.append(orientationFitness);
-			result.append("\t");
-			result.append(distanceFitness);
+			result.append(pop.getAverageFitness());
 			result.append("\t");
 			result.append(pop.getChromosomes().length+"\n");
 		}

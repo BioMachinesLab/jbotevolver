@@ -1,5 +1,6 @@
 package evorbc.qualitymetrics;
 
+import net.jafama.FastMath;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
@@ -20,7 +21,9 @@ public class DistanceQualityMetric extends EvaluationFunction{
 		Robot r = simulator.getRobots().get(0);
 		
 		if(position != null) {
-			distanceTraveled+=position.distanceTo(r.getPosition());
+			distanceTraveled+=distanceTo(position, r.getPosition());
+		} else {
+			distanceTraveled = length(r.getPosition());
 		}
 		
 		position = new Vector2d(r.getPosition());
@@ -29,13 +32,26 @@ public class DistanceQualityMetric extends EvaluationFunction{
 	@Override
 	public double getFitness() {
 		//minDistance is the distance in a straight line
-		double minDistance = position.length();
+		double minDistance = length(position);
 		
 		//the edge case where the best thing is to stay put
 		if(distanceTraveled == 0)
 			return 1;
 		
 		return minDistance/distanceTraveled;
+	}
+
+	//Here we redefine functions that are in the Vector2d class because
+	//they are slightly imprecise due to the use of Jafama 
+	public double distanceTo(Vector2d a, Vector2d b) {
+		double x = a.x - b.x;
+		double y = a.y - b.y;		
+		return FastMath.sqrt(x*x+y*y);
+	}
+	
+	public final double length(Vector2d a)
+	{
+		return FastMath.sqrt(a.x*a.x + a.y*a.y);
 	}
 
 }

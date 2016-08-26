@@ -33,7 +33,7 @@ public class MAPElitesTracer extends Tracer {
 		double startxo = -0.35;
 		
 		double xo = startxo;//-sim.length*0.8/2;
-		double yo = -0.7;
+		double yo = 0;
 		
 		double xinc = 0.75;
 		double yinc = 0.78;
@@ -47,8 +47,9 @@ public class MAPElitesTracer extends Tracer {
 		
 		for(int i = 0 ; i < sim.length ; i++) {
 			
-			if(sim[i] == null)
+			if(sim[i] == null) {
 				continue;
+			}
 			
 			Simulator s = sim[i];
 			MAPElitesPopulation p = pop[i];
@@ -61,7 +62,7 @@ public class MAPElitesTracer extends Tracer {
 				drawMapElites(s, p, g, xo, yo, false, false, names[i]);
 			xo+=xinc;
 			
-			if(i%2==0) {
+			if(i%2==0 && i != 0) {
 				yo+=yinc;
 				xo=startxo;
 			}
@@ -125,10 +126,10 @@ public class MAPElitesTracer extends Tracer {
 //							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, getColor(fitness));
 							
 							//TODO test
-							double h = ((double)(orientation+Math.PI)/(Math.PI*2)); 
-							float hf = (float)h; 
-							Color hsb = Color.getHSBColor(hf, 1f, 1f);
-							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, hsb);
+//							double h = ((double)(orientation+Math.PI)/(Math.PI*2)); 
+//							float hf = (float)h; 
+//							Color hsb = Color.getHSBColor(hf, 1f, 1f);
+//							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, hsb);
 							
 //							if(fitness < 0.8) {
 //								m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.RED);

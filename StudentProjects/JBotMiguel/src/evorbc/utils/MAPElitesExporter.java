@@ -1,4 +1,4 @@
-package utils.evorbc;
+package evorbc.utils;
 
 import evolution.MAPElitesEvolution;
 import evolution.MAPElitesPopulation;
@@ -11,9 +11,14 @@ public class MAPElitesExporter extends MAPElitesViewer{
 	protected String imageName;
 	
 	public static void main(String[] args) throws Exception {
-//		new MAPElitesExporter("bigdisk/qualitymetrics/repertoire_distance/","distance");
-//		new MAPElitesExporter("bigdisk/qualitymetrics/repertoire_radial/","radial");
-		new MAPElitesExporter("bigdisk/qualitymetrics/repertoire/","quality");
+		new MAPElitesExporter("bigdisk/qualitymetrics/repertoire_distance/","distance_old");
+		new MAPElitesExporter("bigdisk/qualitymetrics/repertoire_radial/","radial_old");
+		new MAPElitesExporter("bigdisk/qualitymetrics/repertoire/","circular_old");
+		new MAPElitesExporter("qualitymetric_test/repertoire_distance/","distance_new");
+		new MAPElitesExporter("qualitymetric_test/repertoire_circular/","circular_new");
+		new MAPElitesExporter("qualitymetric_test/repertoire_radial/","radial_new");
+		new MAPElitesExporter("qualitymetric_test/repertoire_radial_dist/","radial_dist_new");
+		new MAPElitesExporter("qualitymetric_test/repertoire_circular_dist/","circular_dist_new");
 	}
 	
 	public MAPElitesExporter(String folder, String imageName) {

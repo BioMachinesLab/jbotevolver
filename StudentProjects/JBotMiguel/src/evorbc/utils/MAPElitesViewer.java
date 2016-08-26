@@ -1,4 +1,4 @@
-package utils.evorbc;
+package evorbc.utils;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -38,14 +38,17 @@ import simulation.physicalobjects.Marker;
 import simulation.util.Arguments;
 import evaluationfunctions.OrientationEvaluationFunction;
 import evaluationfunctions.RadialOrientationEvaluationFunction;
+import evolution.MAPElitesEvolution;
 import evolution.MAPElitesPopulation;
 import evolution.PostEvaluator;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
 import evorbc.mappingfunctions.CartesianMappingFunction;
+import evorbc.qualitymetrics.DistanceQualityMetric;
 import gui.extended.TwoDRendererWheels;
 import gui.renderer.TwoDRendererDebug;
+
 import java.util.Arrays;
 
 public class MAPElitesViewer {
@@ -67,7 +70,7 @@ public class MAPElitesViewer {
 //		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
 //		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
 //		new MAPElitesViewer("bigdisk/repertoiresize/", true);
-		new MAPElitesViewer("../../../../Dropbox/Robot/V-REP/Results/nao_map/", true);
+		new MAPElitesViewer("qualitymetric_test/", true);
 //                new MAPElitesViewer("nao_map/", true);
 //		new MAPElitesViewer("../JBotMiguel/", true);
 //		new MAPElitesViewer("hexamap_big/", true);
@@ -143,8 +146,14 @@ public class MAPElitesViewer {
 	}
 	
 	public void play(Vector2d pos) {
+		
 		System.out.println("------------");
-                MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
+        MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
+                
+        int[] loc = pop.getLocationFromBehaviorVector(new double[]{pos.x,pos.y});
+        
+        System.out.println("LOC "+loc[0]+" "+loc[1]);
+                
 		MOChromosome c = pop.getChromosomeFromBehaviorVector(new double[]{pos.x,pos.y});
                 System.out.println("Click: (" + pos.x+", "+pos.y +")");
                 if(c == null)
@@ -159,6 +168,7 @@ public class MAPElitesViewer {
 		
 		sim = jbot.createSimulator();
 		renderer.setSimulator(sim);
+		
 		sim.addRobots(jbot.createRobots(sim, c));
 		sim.setupEnvironment();
 		placeMarkers((MAPElitesPopulation)pop);
@@ -172,6 +182,7 @@ public class MAPElitesViewer {
 			}
 		}
 		sim.terminate();
+		
 		renderer.drawFrame();
 	}
 	
@@ -210,6 +221,8 @@ public class MAPElitesViewer {
 		
 		int count = 0;
 		
+//		MAPElitesEvolution.printRepertoire(pop);
+		
 		for(int x = 0 ; x < pop.getMap().length ; x++) {
 			for(int y = 0 ; y < pop.getMap()[x].length ; y++) {
 				
@@ -232,8 +245,8 @@ public class MAPElitesViewer {
 						
 						Marker m;
 						
-						pos.x = (x-pop.getMap().length/2)*pop.getMapResolution()+pop.getMapResolution()/2;
-						pos.y = (y-pop.getMap()[x].length/2)*pop.getMapResolution()+pop.getMapResolution()/2;
+						pos.x = (x - pop.getMap().length/2.0) * pop.getMapResolution();
+						pos.y = (y - pop.getMap().length/2.0) * pop.getMapResolution();
 						
 						if(supposedLocation[0] != x || supposedLocation[1] != y) {
 							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.001, 0.02, Color.BLACK);

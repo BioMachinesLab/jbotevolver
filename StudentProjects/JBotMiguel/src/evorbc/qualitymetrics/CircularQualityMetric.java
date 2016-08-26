@@ -4,24 +4,22 @@ import net.jafama.FastMath;
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.physicalobjects.GeometricCalculator;
-import simulation.physicalobjects.GeometricInfo;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
-public class RadialQualityMetric extends EvaluationFunction{
+public class CircularQualityMetric extends EvaluationFunction{
 
 	protected double orientation = 0;
 	protected boolean useDistance = false;
 	protected DistanceQualityMetric dqm;
 	protected Vector2d position;
 	
-	public RadialQualityMetric(Arguments args) {
+	public CircularQualityMetric(Arguments args) {
 		super(args);
 		
 		useDistance = args.getFlagIsTrue("usedistance");
-
+		
 		if(useDistance)
 			dqm = new DistanceQualityMetric(args);
 	}
@@ -45,28 +43,30 @@ public class RadialQualityMetric extends EvaluationFunction{
 			fitness+=dqm.getFitness();
 		
 		return fitness;
-		
 	}
 	
 	public static double calculateOrientationFitness(Vector2d pos, double orientation) {
-		double target = getTargetOrientation(pos);
-		
-		//forward
-		double result = target - MathUtils.modPI2(orientation);
+		double result = getTargetOrientation(pos) - MathUtils.modPI2(orientation);
 		result = MathUtils.modPI(result);
-		result = FastMath.abs((Math.PI-result)/(Math.PI));
-		
-		//backward
-		double result2 = MathUtils.modPI2(target + Math.PI) - MathUtils.modPI2(orientation);
-		result2 = MathUtils.modPI(result2);
-		result2 = FastMath.abs((Math.PI-result2)/(Math.PI));
-		
-		return FastMath.max(result, result2);
+		result = Math.abs((Math.PI-result)/(Math.PI));
+		return result;
 	}
 	
 	public static double getTargetOrientation(Vector2d pos) {
-		GeometricInfo sensorInfo = new GeometricCalculator().getGeometricInfoBetweenPoints(new Vector2d(0,0), 0, pos, 1);
-		return -sensorInfo.getAngle();
+		double b = Math.sqrt((pos.x/2.0)*(pos.x/2.0)+(pos.y/2.0)*(pos.y/2.0));
+		double alpha = Math.atan2(pos.y,pos.x);
+		double a = b/Math.cos(alpha);
+		double beta = Math.atan2(pos.y,pos.x-a);
+		double orientation = 0;
+		
+		if(pos.x < 0)
+			orientation = beta-Math.PI;
+		else
+			orientation = beta;
+		
+		orientation = MathUtils.modPI(orientation);
+		
+		return orientation;
 	}
 
 }

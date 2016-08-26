@@ -187,10 +187,21 @@ public class MAPElitesPopulation extends Population{
 		int[] mapLocation = new int[vec.length];
 		
 		for(int i = 0 ; i < vec.length ; i++) {
-			int pos = (int)(vec[i]/resolution + map.length/2.0);
+			int pos = (int)Math.floor((vec[i]+resolution/2.0)/resolution + map.length/2.0);
 			mapLocation[i] = pos;
 		}
 		return mapLocation;
+	}
+	
+	public static void main(String[] args) {
+		double resolution = 0.02;
+		double veci = 0.017;
+		double val = Math.floor((veci+resolution/2.0)/(resolution));
+		int pos = (int)(val);
+		System.out.println(val+" "+pos);
+		
+//		pos = (int)((veci+resolution/2.0)/resolution);
+//		System.out.println(pos);
 	}
 	
 	public int[] positionInMap(MOChromosome c) {

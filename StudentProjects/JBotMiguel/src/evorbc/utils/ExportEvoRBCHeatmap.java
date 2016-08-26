@@ -1,4 +1,4 @@
-package utils.evorbc;
+package evorbc.utils;
 
 import java.io.File;
 import java.io.FileWriter;
