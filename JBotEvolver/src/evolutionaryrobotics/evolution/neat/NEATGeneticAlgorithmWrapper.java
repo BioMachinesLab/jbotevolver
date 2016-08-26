@@ -1,17 +1,15 @@
 package evolutionaryrobotics.evolution.neat;
 
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evolution.NEATEvolution;
-import evolutionaryrobotics.evolution.neat.core.NEATGADescriptor;
-import evolutionaryrobotics.evolution.neat.core.NEATGeneticAlgorithm;
-import evolutionaryrobotics.evolution.neat.ga.core.Chromosome;
-import evolutionaryrobotics.populations.NEATPopulation;
 import simulation.util.Arguments;
 import simulation.util.Factory;
 import taskexecutor.results.SimpleFitnessResult;
 import taskexecutor.tasks.GenerationalTask;
 import tasks.Task;
-import tests.Cronometer;
+import evolutionaryrobotics.evolution.NEATEvolution;
+import evolutionaryrobotics.evolution.neat.core.NEATGADescriptor;
+import evolutionaryrobotics.evolution.neat.core.NEATGeneticAlgorithm;
+import evolutionaryrobotics.evolution.neat.ga.core.Chromosome;
+import evolutionaryrobotics.populations.NEATPopulation;
 
 public class NEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithm {
 
@@ -48,8 +46,7 @@ public class NEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithm {
 				}
 			}
 			
-			Task task = (Task) Factory.getInstance(taskClass,
-					new JBotEvolver(evo.getJBotEvolver().getArgumentsCopy(), evo.getJBotEvolver().getRandomSeed()),
+			Task task = (Task) Factory.getInstance(taskClass,evo.getJBotEvolver().getCopy(),
 					samples, jBotChromosome, evo.getPopulation().getGenerationRandomSeed());
 
 			// GenerationalTask neatTask = new GenerationalTask(

@@ -1,6 +1,7 @@
 package evorbc.mappingfunctions;
 
 import mathutils.Vector2d;
+import multiobjective.MOChromosome;
 
 public class Polar180MappingFunction extends PolarMappingFunction{
 	

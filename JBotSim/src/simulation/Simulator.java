@@ -41,6 +41,7 @@ public class Simulator implements Serializable {
 	private Network network;
 
 	private HashMap<String, Arguments> arguments = new HashMap<String, Arguments>();
+	protected HashMap<String,Serializable> serializableObjects;
 
 	public Simulator(long randomSeed, HashMap<String, Arguments> arguments) {
 		
@@ -77,6 +78,14 @@ public class Simulator implements Serializable {
 			}
 		}
 		
+	}
+	
+	public void setSerializableObjects(HashMap<String, Serializable> serializableObjects) {
+		this.serializableObjects = serializableObjects;
+	}
+	
+	public HashMap<String, Serializable> getSerializableObjects() {
+		return serializableObjects;
 	}
 
 	public Network getNetwork() {

@@ -70,7 +70,7 @@ public class MAPElitesViewer {
 //		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
 //		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
 //		new MAPElitesViewer("bigdisk/repertoiresize/", true);
-		new MAPElitesViewer("qualitymetric_test/", true);
+		new MAPElitesViewer("repertoire_circular/", true);
 //                new MAPElitesViewer("nao_map/", true);
 //		new MAPElitesViewer("../JBotMiguel/", true);
 //		new MAPElitesViewer("hexamap_big/", true);

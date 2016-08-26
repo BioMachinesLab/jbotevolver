@@ -23,6 +23,10 @@ public class JBotEvolver extends JBotSim {
 	public JBotEvolver(String[] args) throws Exception {
 		super(args);
 	}
+	
+	protected JBotEvolver(HashMap<String, Arguments> arguments, long randomSeed, boolean runInit) {
+		super(arguments, randomSeed, runInit);
+	}
 
 	public EvaluationFunction[] getEvaluationFunction() {
 		EvaluationFunction[] evals = new EvaluationFunction[1];
@@ -197,6 +201,12 @@ public class JBotEvolver extends JBotSim {
 				}
 			}
 		}
-
 	}
+	
+	public JBotEvolver getCopy() {
+		JBotEvolver jbot = new JBotEvolver(getArgumentsCopy(), getRandomSeed(),false);
+		jbot.serializableObjects = this.serializableObjects;
+		return jbot;
+	}
+	
 }

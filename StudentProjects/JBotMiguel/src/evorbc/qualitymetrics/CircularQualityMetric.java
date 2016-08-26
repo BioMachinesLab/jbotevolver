@@ -1,6 +1,5 @@
 package evorbc.qualitymetrics;
 
-import net.jafama.FastMath;
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -11,16 +10,16 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 public class CircularQualityMetric extends EvaluationFunction{
 
 	protected double orientation = 0;
-	protected boolean useDistance = false;
+	protected boolean distance = false;
 	protected DistanceQualityMetric dqm;
 	protected Vector2d position;
 	
 	public CircularQualityMetric(Arguments args) {
 		super(args);
 		
-		useDistance = args.getFlagIsTrue("usedistance");
+		distance = args.getFlagIsTrue("distance");
 		
-		if(useDistance)
+		if(distance)
 			dqm = new DistanceQualityMetric(args);
 	}
 
@@ -31,7 +30,7 @@ public class CircularQualityMetric extends EvaluationFunction{
 		position = new Vector2d(r.getPosition());
 		orientation = r.getOrientation();
 		
-		if(useDistance)
+		if(distance)
 			dqm.update(simulator);
 	}
 	
@@ -39,7 +38,7 @@ public class CircularQualityMetric extends EvaluationFunction{
 	public double getFitness() {
 		double fitness = calculateOrientationFitness(position, orientation);
 		
-		if(useDistance)
+		if(distance)
 			fitness+=dqm.getFitness();
 		
 		return fitness;

@@ -1,8 +1,7 @@
 package evorbc.mappingfunctions;
 
-import java.util.Arrays;
-
 import mathutils.Vector2d;
+import multiobjective.MOChromosome;
 
 public class CartesianMappingFunction extends MappingFunction{
 	
@@ -38,5 +37,31 @@ public class CartesianMappingFunction extends MappingFunction{
 		
 		return new Vector2d(y,x);
 	}
+	
+	@Override
+	public void fill() {
+    	
+    	//create a copy of the map so that we only expand the map
+    	//with some of the original behaviors
+    	double[][][] mapNew = new double[repertoire.length][repertoire[0].length][];
+    	
+    	for(int x = 0 ; x < repertoire.length ; x++) {
+    		for(int y = 0 ; y < repertoire[x].length ; y++) {
+    			
+				if(repertoire[x][y] == null && x >= minMax[0] && x <= minMax[2] && y >= minMax[1] && y<= minMax[3]) {
+					mapNew[x][y] = findNearest(x,y,repertoire);
+				}
+    		}
+    	}
+    	
+    	//merge the two maps
+    	for(int i = 0 ; i < mapNew.length ; i++) {
+    		for(int j = 0 ; j < mapNew[i].length ; j++) {
+    			if(mapNew[i][j] != null) {
+    				repertoire[i][j] = mapNew[i][j];
+    			}
+    		}
+    	}
+    }
 
 }

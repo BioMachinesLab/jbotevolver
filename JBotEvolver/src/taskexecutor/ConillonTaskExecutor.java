@@ -126,8 +126,8 @@ public class ConillonTaskExecutor extends TaskExecutor {
 	 * locally (for instance, to preview the current generation in the GUI). 
 	 */
 	private void prepareTask(Task t) {
-		JBotEvolverTask jt = (JBotEvolverTask)t;
-		HashMap<String, Arguments> arguments = jt.getJBotEvolver().getArguments();
+		
+		HashMap<String, Arguments> arguments = ((JBotEvolverTask)t).getJBotEvolver().getArguments();
 		
 		for (String name : arguments.keySet()) {
 			Arguments args = arguments.get(name);

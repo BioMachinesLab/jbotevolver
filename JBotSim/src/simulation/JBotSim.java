@@ -5,32 +5,61 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Locale;
 
 import controllers.Controller;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.Factory;
 
 public class JBotSim implements Serializable {
+	
 	private static final long serialVersionUID = -3428397257087885544L;
 	protected HashMap<String, Arguments> arguments;
 	protected String parentFolder = "";
 	protected long randomSeed;
+	protected HashMap<String,Serializable> serializableObjects = new HashMap<String, Serializable>();
 
 	public JBotSim(HashMap<String, Arguments> arguments, long randomSeed) {
 		Locale.setDefault(new Locale("en", "US"));
 		this.arguments = arguments;
 		this.randomSeed = randomSeed;
+		runInit();
 	}
 
 	public JBotSim(String[] commandLineArgs) throws IOException, ClassNotFoundException {
 		Locale.setDefault(new Locale("en", "US"));
 		if (commandLineArgs != null)
 			loadArguments(commandLineArgs);
+		runInit();
+	}
+	
+	protected JBotSim(HashMap<String, Arguments> arguments, long randomSeed, boolean runInit) {
+		Locale.setDefault(new Locale("en", "US"));
+		this.arguments = arguments;
+		this.randomSeed = randomSeed;
+		if(runInit)
+			runInit();
+	}
+	
+	private void runInit() {
+		if(arguments.get("--init") != null) {
+			Arguments initArguments = arguments.get("--init");
+			
+			for(int i = 0 ; i < initArguments.getNumberOfArguments() ; i++){
+				String argName = initArguments.getArgumentAt(i);
+				String argVals = initArguments.getArgumentAsString(argName);
+				Arguments executableArgs = new Arguments(argVals);
+				Executable exec = (Executable)Factory.getInstance(executableArgs.getArgumentAsString("classname"));
+				exec.execute(this, executableArgs);
+			}
+		}
 	}
 
 	public Simulator createSimulator(long randomSeed) {
 		Simulator simulator = new Simulator(randomSeed, arguments);
+		simulator.setSerializableObjects(serializableObjects);
 		return simulator;
 	}
 
@@ -88,6 +117,7 @@ public class JBotSim implements Serializable {
 
 	protected void loadFile(String fileName) throws Exception {
 		loadArguments(Arguments.readOptionsFromFile(fileName));
+		runInit();
 	}
 
 	protected void loadArguments(String[] args) throws IOException, ClassNotFoundException {
@@ -110,6 +140,7 @@ public class JBotSim implements Serializable {
 		String[] args = Arguments.readOptionsFromString(fileContents);
 
 		loadArguments(args);
+		runInit();
 	}
 
 	public synchronized HashMap<String, Arguments> getArgumentsCopy() {
@@ -121,8 +152,13 @@ public class JBotSim implements Serializable {
 
 		return newArgs;
 	}
+	
+	public HashMap<String, Serializable> getSerializableObjectHashMap() {
+		return this.serializableObjects;
+	}
 
 	public long getRandomSeed() {
 		return randomSeed;
 	}
+	
 }

@@ -1,10 +1,11 @@
 package evorbc.mappingfunctions;
 
 import mathutils.Vector2d;
+import multiobjective.MOChromosome;
 
 public class Polar360MappingFunction extends PolarMappingFunction{
 	
-	public Polar360MappingFunction(double[][][] repertoire) {
+	public Polar360MappingFunction(double[][][]repertoire) {
 		super(repertoire);
 	}
 

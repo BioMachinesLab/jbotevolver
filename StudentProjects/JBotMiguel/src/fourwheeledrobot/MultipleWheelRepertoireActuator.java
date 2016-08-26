@@ -1,17 +1,13 @@
 package fourwheeledrobot;
 
-import java.util.Scanner;
-
-import evorbc.mappingfunctions.CartesianMappingFunction;
 import evorbc.mappingfunctions.MappingFunction;
-import evorbc.mappingfunctions.Polar180MappingFunction;
-import evorbc.mappingfunctions.Polar360MappingFunction;
 import mathutils.Vector2d;
+import multiobjective.MOChromosome;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
-import tests.Cronometer;
+import simulation.util.Factory;
 
 /**
  * This actuator uses a behavior repertoire to choose the
@@ -49,7 +45,7 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
 			nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
 			this.repertoireLocation = wheelArgs.getArgumentAsString("repertoire");
-			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
+			repertoire = (double[][][])simulator.getSerializableObjects().get("repertoire");
 			lock = (int)(args.getArgumentAsDoubleOrSetDefault("lock", lock) / simulator.getTimeDelta());
 		} else {
 			
@@ -66,25 +62,14 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			Arguments wheelArgs = new Arguments(a.getArgumentAsString(a.getArgumentAt(actuatorChosen)));
 			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
 			nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
-			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
+			repertoire = (double[][][])simulator.getSerializableObjects().get("repertoire");
 		}
 		
-		int type = args.getArgumentAsIntOrSetDefault("type", 0);
-		
-		switch(type) {
-		case 0:
-			mappingFunction = new Polar180MappingFunction(repertoire);
-			break;
-		case 1:
-			mappingFunction = new Polar360MappingFunction(repertoire);
-			break;
-		case 2:
-			//unimplemented
-			break;
-		case 3:
-			mappingFunction = new CartesianMappingFunction(repertoire);
-			break;
+		if(args.getArgumentIsDefined("mapping")) {
+			Arguments fillArguments = new Arguments(args.getArgumentAsString("mapping"));
+			mappingFunction = (MappingFunction)Factory.getInstance(fillArguments.getArgumentAsString("classname"),(Object)repertoire);
 		}
+		
 	}
 	
 	@Override
@@ -122,62 +107,33 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	}
 	
 	protected double[] selectBehaviorFromRepertoire() {
-		
+
 		double[] behavior = null;
 		
 		double s = this.speed;
 		
+		Vector2d point = null;
+		
 		do{
-			Vector2d point = mappingFunction.map(this.heading,s);
-			behavior = repertoire[(int)point.y][(int)point.x];
+			point = mappingFunction.map(this.heading,s);
+			behavior = repertoire[(int)point.x][(int)point.y];
 			lastPoint = new Vector2d(point);
 			
-			//reduce the size of the circle to find an appropriate point
-			//in case there is no filling
-			s*=0.95;
-			if(Math.abs(s) < 0.1)
-				break;
+			if(behavior == null) {
+				//reduce the size of the circle to find an appropriate point
+				//in case there is no filling. this is to deal with edge cases
+				s=s*2.0-1.0;
+				s*=0.95;
+//				MAPElitesEvolution.printRepertoire(repertoire, (int)point.x, (int)point.y);
+				if(Math.abs(s) < 0.1)
+					break;
+				
+				s=s/2.0 + 0.5;
+			}
+			
 		} while(behavior == null);
 		
 		return behavior;
-	}
-	
-	protected double[][][] loadRepertoire(Simulator simulator, String f) {
-		
-		double[][][] r = null;
-		
-		if(simulator.getArguments().get("--simulator") != null)  {
-			Arguments args = simulator.getArguments().get("--simulator");
-			String prefix = args.getArgumentAsStringOrSetDefault("folder","");
-			f= prefix+f;
-		}
-		
-		try {
-		
-			Scanner s = new Scanner(simulator.getFileProvider().getFile(f));
-			
-			int size = s.nextInt();
-			r = new double[size][size][];
-			
-			double resolution = readDouble(s);
-			
-			while(s.hasNext()) {
-				int x = s.nextInt();
-				int y = s.nextInt();
-				
-				r[x][y] = new double[nParams];
-				for(int d = 0 ; d < nParams ; d++) {
-					r[x][y][d] = readDouble(s);
-				}
-			}
-			
-			s.close();
-		
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-			
-		return r;
 	}
 	
 	//receives heading [0,1]
@@ -198,10 +154,6 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	
 	public double getWheelSpeed() {
 		return speed;
-	}
-	
-	private double readDouble(Scanner s) {
-		return Double.parseDouble(s.next().trim().replace(',','.'));
 	}
 	
 	public double[] getCompleteRotations() {

@@ -3,6 +3,7 @@ package src;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -334,16 +335,37 @@ public class Evolution extends Thread {
 
 				int generations = controller.getArguments("--population").getArgumentAsInt("generations");
 
-				String runEvolution = outputFolder + "/" + controller.getName() + ".conf --output " + outputFolder + "/"
-						+ run + " --random-seed " + seed;
+				String runEvolution = outputFolder + "/" + controller.getName() + ".conf";
 				String resumeEvolution = outputFolder + "/" + run + "/_restartevolution.conf --population +generations="
 						+ generations;
+				
+				
+				JBotEvolver jBotEvolver;
 
-				String execute = f.exists() ? resumeEvolution : runEvolution;
-				System.out.println(execute);
+				if(f.exists()) {
+					//evolution was already started before, we need to resume it
+					jBotEvolver = new JBotEvolver(resumeEvolution.split(" "));
+				} else {
+					
+					String[] originalArgs = Arguments.readOptionsFromFile(runEvolution);
+					for(int i = 0 ; i < originalArgs.length ; i++) {
+						originalArgs[i] = originalArgs[i].replaceAll("\\%run", this.run+"");
+					}
+					
+					String[] extraArgs = ("--output " + outputFolder + "/" + run + " --random-seed " + seed).split(" ");
+					
+					String[] fullArgs = new String[originalArgs.length+extraArgs.length];
+					
+					int index;
+					for(index = 0; index < originalArgs.length ; index++)
+						fullArgs[index] = originalArgs[index];
+					
+					for(int i = 0; i < extraArgs.length ; i++)
+						fullArgs[index++] = extraArgs[i];
 
-				JBotEvolver jBotEvolver = new JBotEvolver(execute.split(" "));
-
+					jBotEvolver = new JBotEvolver(fullArgs);
+				}
+				
 				TaskExecutor taskExecutor;
 
 				if (controller.getArguments("--executor") != null) {
