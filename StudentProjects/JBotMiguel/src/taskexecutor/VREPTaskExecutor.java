@@ -30,6 +30,7 @@ public class VREPTaskExecutor extends TaskExecutor{
 	
 	private String remoteIps[];
 	private int remoteInstances[];
+	private static int ALLOWED_FAULTS = 5;
 	
 	public VREPTaskExecutor(JBotEvolver jBotEvolver, Arguments args){
 		super(jBotEvolver, args);
@@ -122,13 +123,13 @@ public class VREPTaskExecutor extends TaskExecutor{
 		
 		c.ip = ip;
 		c.port = port;
-		c.clientId = c.vrep.simxStart(c.ip,c.port,true,true,5000,5);
+		c.clientId = c.vrep.simxStart(c.ip,c.port,true,false,5000,5);
 		c.vrep.simxClearStringSignal(c.clientId, "toClient", remoteApi.simx_opmode_oneshot);
 		availableClients.push(c);
 		
 		return c;
 	}
-
+	
 	@Override
 	public void stopTasks() {
 		for(VREPContainer c : clients) {
@@ -186,6 +187,7 @@ public class VREPTaskExecutor extends TaskExecutor{
 		int clientId;
 		String ip;
 		int port;
+		int faults  = 0;
 	}
 	
 	private class VREPJBotCallable implements Callable<Result> {
@@ -227,9 +229,16 @@ public class VREPTaskExecutor extends TaskExecutor{
 					availableClients.notify();
 				} else {
 					//we lost a worker, resubmit task and notify others
+					container.faults++;
 					addTask(this.t);
-					instances--;
+					
+					if(container.faults < ALLOWED_FAULTS) {
+						initContainer(container.ip, container.port, true);
+					} else {
+						instances--;
+					}
 					availableClients.notify();
+					
 					return null;
 				}
 			}
