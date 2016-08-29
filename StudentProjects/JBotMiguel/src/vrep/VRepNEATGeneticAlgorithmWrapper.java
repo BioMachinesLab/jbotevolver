@@ -27,7 +27,6 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
 		this.outputs = outputs;
 	}
 	
-	
 	protected void evaluatePopulation(Chromosome[] genotypes) {
 		
 		evolutionaryrobotics.neuralnetworks.Chromosome[] chromosomes = new evolutionaryrobotics.neuralnetworks.Chromosome[genotypes.length];
@@ -35,12 +34,14 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
 		for(int i = 0 ; i < chromosomes.length ; i++)
 			chromosomes[i] = ((NEATPopulation)evo.getPopulation()).convertChromosome(genotypes[i], i);
 		
+		float[][] packet = createDataPacket(chromosomes);
+		
 		float fixedParameters[] = new float[1+1];
 		fixedParameters[0] = 1; //size
 		fixedParameters[1] = time; //seconds of evaluation
 		
 		//controller type is hardcoded
-		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)evo.getTaskExecutor(), chromosomes, fixedParameters, controllerType, nParams, inputs, outputs);
+		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)evo.getTaskExecutor(), fixedParameters, packet);
 		
 		float[][] results = VRepUtils.receiveTasks((VREPTaskExecutor)evo.getTaskExecutor(), nTasks);
 		
@@ -56,11 +57,8 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
 			
 				//id
 				int id = (int)vals[index++];
-				
 				int nVals = (int)vals[index++];
-				
 				float fitness = vals[index++];
-				
 				fitness+=10;
 				
 				evo.getPopulation().setEvaluationResult(chromosomes[id],fitness);
@@ -68,4 +66,33 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
 			}
 		}
     }
+	
+	private float[][] createDataPacket(evolutionaryrobotics.neuralnetworks.Chromosome[] chromosomes) {
+		
+		int index = 0;
+		
+		float[][] totalPackets = new float[chromosomes.length][];
+		
+		for(int i = 0 ; i < totalPackets.length ; i++) {
+		
+			evolutionaryrobotics.neuralnetworks.Chromosome c = chromosomes[i];
+			
+			float[] params = new float[6 + c.getAlleles().length];
+			
+			params[index++] = c.getID(); //id of the chromosome
+			params[index++] = c.getAlleles().length + 4; //length of chromosome + type
+			params[index++] = controllerType; //type
+			params[index++] = nParams;//the number of locomotion parameters of the controller
+			params[index++] = inputs; //inputs
+			params[index++] = outputs; //outputs
+			
+			for(int j = 0 ; j < c.getAlleles().length ; j++) {
+				params[index++] = (float)c.getAlleles()[j];
+			}
+			
+			totalPackets[i] = params;
+		}
+		
+		return totalPackets;
+	}
 }

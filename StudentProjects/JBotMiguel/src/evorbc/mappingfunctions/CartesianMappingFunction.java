@@ -1,5 +1,8 @@
 package evorbc.mappingfunctions;
 
+import java.util.Arrays;
+
+import evolution.MAPElitesEvolution;
 import mathutils.Vector2d;
 import multiobjective.MOChromosome;
 
@@ -35,12 +38,14 @@ public class CartesianMappingFunction extends MappingFunction{
 		double x = a * (minMax[2] - minMax[0]) + minMax[0]; //a * (xMax - xMin) + xMin
 		double y = b * (minMax[3] - minMax[1]) + minMax[1]; //b * (yMax - yMin) + yMin
 		
-		return new Vector2d(y,x);
+//		printRepertoire(repertoire, (int)x, (int)y);
+		
+		return new Vector2d(x,y);
 	}
 	
 	@Override
 	public void fill() {
-    	
+		
     	//create a copy of the map so that we only expand the map
     	//with some of the original behaviors
     	double[][][] mapNew = new double[repertoire.length][repertoire[0].length][];
@@ -54,14 +59,18 @@ public class CartesianMappingFunction extends MappingFunction{
     		}
     	}
     	
+    	int count = 0;
+    	
     	//merge the two maps
     	for(int i = 0 ; i < mapNew.length ; i++) {
     		for(int j = 0 ; j < mapNew[i].length ; j++) {
     			if(mapNew[i][j] != null) {
+    				count++;
     				repertoire[i][j] = mapNew[i][j];
     			}
     		}
     	}
+    	System.out.println("[CartesianMappingFunction] Fill function added "+count+" behaviors");
     }
 
 }

@@ -77,10 +77,10 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
     		float fixedParameters[] = new float[1+1];
 			fixedParameters[0] = 1; //size
 			fixedParameters[1] = time; //seconds of evaluation
-    		
-			int controllerType = 0;
 			
-    		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)taskExecutor, chromosomes, fixedParameters, controllerType, genomeLength, 0, 0);
+			float[][] packet = createDataPacket(chromosomes);
+    		
+    		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)taskExecutor, fixedParameters, packet);
     		
 			float[][] results = VRepUtils.receiveTasks((VREPTaskExecutor)taskExecutor, nTasks);
 			
@@ -154,5 +154,31 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
     		e.printStackTrace();
     		System.exit(0);
     	}
+	}
+    
+    private float[][] createDataPacket(evolutionaryrobotics.neuralnetworks.Chromosome[] chromosomes) {
+		
+		int index = 0;
+		
+		float[][] totalPackets = new float[chromosomes.length][];
+		
+		for(int i = 0 ; i < totalPackets.length ; i++) {
+		
+			evolutionaryrobotics.neuralnetworks.Chromosome c = chromosomes[i];
+			
+			float[] params = new float[3 + c.getAlleles().length];
+			
+			params[index++] = c.getID(); //id of the chromosome
+			params[index++] = c.getAlleles().length + 1; //length of chromosome + type
+			params[index++] = controllerType; //type
+			
+			for(int j = 0 ; j < c.getAlleles().length ; j++) {
+				params[index++] = (float)c.getAlleles()[j];
+			}
+			
+			totalPackets[i] = params;
+		}
+		
+		return totalPackets;
 	}
 }

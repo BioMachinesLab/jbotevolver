@@ -8,6 +8,7 @@ import simulation.Executable;
 import simulation.JBotSim;
 import simulation.util.Arguments;
 import simulation.util.Factory;
+import evolution.MAPElitesEvolution;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evorbc.mappingfunctions.MappingFunction;
@@ -32,6 +33,8 @@ public class LoadRepertoireExecutable implements Executable{
 		System.out.println("[LoadRepertoireExecutable] Loading repertoire from "+f);
 		
 		MOChromosome[][] repertoire = loadRepertoire(f);
+		
+//		MAPElitesEvolution.printRepertoire(repertoire);
 		
 		System.out.println("[LoadRepertoireExecutable] Loaded repertoire? "+(repertoire!= null));
 		
@@ -64,7 +67,5 @@ public class LoadRepertoireExecutable implements Executable{
 			e.printStackTrace();
 			return null;
 		}
-		
 	}
-	
 }

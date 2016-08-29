@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 
 import javax.swing.JButton;
@@ -40,6 +42,7 @@ import evolution.PostEvaluator;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.populations.Population;
 import evorbc.qualitymetrics.CircularQualityMetric;
+import gui.ResultViewerGui;
 import gui.extended.TwoDRendererWheels;
 import gui.renderer.TwoDRendererDebug;
 
@@ -59,10 +62,10 @@ public class MAPElitesViewer {
 	protected ArrayList<String> files = new ArrayList<String>();
 	
 	public static void main(String[] args) throws Exception {
-//		new MAPElitesViewer("../../EvolutionAutomator/intersected_repertoire_all/", true);
-//		new MAPElitesViewer("../../EvolutionAutomator/repertoire/", true);
-//		new MAPElitesViewer("bigdisk/repertoiresize/", true);
-		new MAPElitesViewer("bigdisk/evorbc2/vsvanilla/", true);
+		new MAPElitesViewer("bigdisk/evorbc2/binsize/", true);
+//		new MAPElitesViewer("bigdisk/evorbc2/time/", true);
+//		new MAPElitesViewer("bigdisk/evorbc2/behaviormapping/", true);
+		
 //                new MAPElitesViewer("nao_map/", true);
 //		new MAPElitesViewer("../JBotMiguel/", true);
 //		new MAPElitesViewer("hexamap_big/", true);
@@ -93,6 +96,7 @@ public class MAPElitesViewer {
 			this.folder = baseFolder;
 		}
 		
+		Collections.sort(files);
 		
 		load();
 	}
@@ -102,9 +106,21 @@ public class MAPElitesViewer {
 		if(f.isDirectory()) {
 			
 			for(String s : f.list()) {
-				if(s.equals("repertoire_name.txt") || s.equals("_showbest_current.conf")) {
+				if(s.equals("repertoire_name.txt")) {
 					files.add(f.getPath().replaceAll(this.baseFolder, ""));
 					return;
+				} else if (s.equals("_showbest_current.conf")) {
+					
+					try {
+						JBotEvolver jb = new JBotEvolver(new String[]{f.getPath()+"/"+s});
+						
+						if(jb.getPopulation() instanceof MAPElitesPopulation) {
+							files.add(f.getPath().replaceAll(this.baseFolder, ""));
+							return;
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 				}
 			}
 			
@@ -263,6 +279,7 @@ public class MAPElitesViewer {
 				}
 			}
 		}
+		System.out.println("Count: "+count);
 	}
 	
 	protected Color getColor(double fitness) {

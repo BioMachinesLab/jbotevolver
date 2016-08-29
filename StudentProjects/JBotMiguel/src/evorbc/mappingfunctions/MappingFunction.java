@@ -53,4 +53,22 @@ public abstract class MappingFunction {
 		return count;
 	}
 	
+	public static void printRepertoire(double[][][] repertoire, int dx, int dy) {
+    	for(int x = 0 ; x < repertoire.length ; x++) {
+			System.out.println();
+			for(int y = 0 ; y < repertoire[x].length ; y++) {
+				
+				if (dx == x && dy == y) {
+					System.out.print("#");
+					continue;
+				}
+				
+				if(repertoire[x][y] == null)
+					System.out.print(" ");
+				else
+					System.out.print("X");
+			}
+		}
+    }
+	
 }
