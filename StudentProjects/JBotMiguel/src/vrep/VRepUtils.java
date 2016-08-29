@@ -42,10 +42,8 @@ public class VRepUtils {
 				index = 0;
 				
 				float[] chromosome = chromosomes[totalIndex++];
-				float[] params = new float[fixedParameters.length + chromosome.length];
-				
-				for(float f : fixedParameters)
-					params[index++] = f;
+				float[] params = new float[chromosome.length];
+
 				for(float f : chromosome)
 					params[index++] = f;
 				

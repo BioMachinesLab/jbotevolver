@@ -157,12 +157,10 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution{
 	}
     
     private float[][] createDataPacket(evolutionaryrobotics.neuralnetworks.Chromosome[] chromosomes) {
-		
-		int index = 0;
-		
 		float[][] totalPackets = new float[chromosomes.length][];
 		
 		for(int i = 0 ; i < totalPackets.length ; i++) {
+                        int index = 0;
 		
 			evolutionaryrobotics.neuralnetworks.Chromosome c = chromosomes[i];
 			
