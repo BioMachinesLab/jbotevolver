@@ -22,6 +22,7 @@ public class VRepNEATEvolution extends NEATEvolution {
 	protected int time;
 	protected int controllerType;
 	protected int nParams = 0;//repertoire params
+        protected float tiltKill = 99999999;
 
 	public VRepNEATEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
 		super(jBotEvolver, taskExecutor, args);
@@ -37,7 +38,8 @@ public class VRepNEATEvolution extends NEATEvolution {
 		time = args.getArgumentAsInt("time");
 		nParams = args.getArgumentAsIntOrSetDefault("nparams", nParams);
 		controllerType = jBotEvolver.getArguments().get("--controllers").getArgumentAsIntOrSetDefault("controllertype", controllerType);
-		
+		tiltKill = (float) args.getArgumentAsDoubleOrSetDefault("tiltkill", tiltKill);
+
 		descriptor.setInputNodes(inputNeurons);
 		descriptor.setOutputNodes(outputNeurons);
 	}
@@ -56,7 +58,7 @@ public class VRepNEATEvolution extends NEATEvolution {
 			algorithm.loadPopulation(population.getNEATPopulation4J());
 		}
 		
-		algorithm.setParameters(controllerType, time, nParams, inputNeurons, outputNeurons);
+		algorithm.setParameters(controllerType, time, tiltKill, nParams, inputNeurons, outputNeurons);
 
 		algorithm.pluginFitnessFunction(new PreEvaluatedFitnessFunction(Collections.<Chromosome, Float> emptyMap()));
 		algorithm.pluginCrossOver(new NEATCrossover());

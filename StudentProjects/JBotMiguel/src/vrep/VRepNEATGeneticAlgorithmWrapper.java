@@ -14,17 +14,19 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
 	protected int nParams;
 	protected int inputs;
 	protected int outputs;
+        protected float tiltKill;
 	
 	public VRepNEATGeneticAlgorithmWrapper(NEATGADescriptor descriptor, NEATEvolution evo) {
 		super(descriptor,evo);
 	}
 	
-	public void setParameters(int controllerType, int time, int nParams, int inputs, int outputs) {
+	public void setParameters(int controllerType, int time, float tiltKill, int nParams, int inputs, int outputs) {
 		this.controllerType = controllerType;
 		this.time = time;
 		this.nParams = nParams;
 		this.inputs = inputs;
 		this.outputs = outputs;
+                this.tiltKill = tiltKill;
 	}
 	
 	protected void evaluatePopulation(Chromosome[] genotypes) {
@@ -36,10 +38,9 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
 		
 		float[][] packet = createDataPacket(chromosomes);
 		
-		float fixedParameters[] = new float[1+1];
-		fixedParameters[0] = 1; //size
-		fixedParameters[1] = time; //seconds of evaluation
-		
+                // global params length; seconds of evaluation; max allowed tilt during eval
+                float fixedParameters[] = {2, time, tiltKill};
+
 		//controller type is hardcoded
 		int nTasks = VRepUtils.sendTasks((VREPTaskExecutor)evo.getTaskExecutor(), fixedParameters, packet);
 		
