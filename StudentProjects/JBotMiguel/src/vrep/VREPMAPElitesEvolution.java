@@ -126,7 +126,7 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution {
 
                     Vector2d pos = new Vector2d(posX, posY);
 
-                    double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation) + DistanceQualityMetric.getFitness(pos, distanceTraveled);
+                    double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);// + DistanceQualityMetric.getFitness(pos, distanceTraveled);
 
                     FitnessResult fr = new FitnessResult(fitness);
                     GenericEvaluationFunction br = new FinalPositionWithOrientationBehavior(new Arguments(""), pos, orientation);
