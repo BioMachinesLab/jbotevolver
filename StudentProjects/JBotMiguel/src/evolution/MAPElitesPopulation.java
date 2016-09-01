@@ -31,6 +31,9 @@ public class MAPElitesPopulation extends Population{
 	protected ArrayList<MOChromosome> chromosomes;
 	protected boolean randomMutation = false;
 	protected double gaussianStdDev = 1.0;
+        
+        protected boolean balanced = false;
+        protected ArrayList<ArrayList<MOChromosome>> quadrantChromosomes = new ArrayList<>();
 	
 	protected double maxAllele = 10;
 	protected double minAllele = -10;
@@ -47,6 +50,8 @@ public class MAPElitesPopulation extends Population{
 		behaviorIndex = arguments.getArgumentAsInt("behavior-index");
 		fitnessIndex = arguments.getArgumentAsInt("fitness-index");
 		randomMutation = arguments.getFlagIsTrue("randommutation");
+                
+                balanced = arguments.getArgumentAsIntOrSetDefault("balanced", 0) == 1;
 		
 		gaussianStdDev = arguments.getArgumentAsDoubleOrSetDefault("gaussian", gaussianStdDev);
 
@@ -110,7 +115,16 @@ public class MAPElitesPopulation extends Population{
 	
 	public MOChromosome getMutatedChromosome() {
 		numberOfChromosomesRequested++;
-		MOChromosome randomChromosome = chromosomes.get(randomNumberGenerator.nextInt(chromosomes.size()));
+                MOChromosome randomChromosome;
+                if(balanced) {
+                    if(quadrantChromosomes.isEmpty()) { // will happen in the initial batch
+                        updateQuadrantLists();
+                    }
+                    ArrayList<MOChromosome> randomList = quadrantChromosomes.get(randomNumberGenerator.nextInt(quadrantChromosomes.size()));
+                    randomChromosome = randomList.get(randomNumberGenerator.nextInt(randomList.size()));
+                } else {
+                    randomChromosome = chromosomes.get(randomNumberGenerator.nextInt(chromosomes.size()));
+                }
 		return mutate(randomChromosome);
 	}
 	
@@ -261,6 +275,63 @@ public class MAPElitesPopulation extends Population{
 				(currentGeneration == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == batchSize) ||
 				(earlyTerminationGenerations > 0 && stagnatedGenerations >= earlyTerminationGenerations); 
 	}
+        
+        private void updateQuadrantLists() {
+                    int[] center = getLocationFromBehaviorVector(new double[]{0,0});
+                    quadrantChromosomes.clear();
+                    
+                    // top-left
+                    ArrayList<MOChromosome> tempList = new ArrayList<>();
+                    for(int x = 0 ; x < center[0] ; x++) {
+                        for(int y = 0 ; y < center[1] ; y++) {
+                            if(map[x][y] != null) {
+                                tempList.add(map[x][y]);
+                            }
+                        }
+                    }
+                    if(!tempList.isEmpty()) {
+                        quadrantChromosomes.add(tempList);
+                    }
+                    
+                    // top-right
+                    tempList = new ArrayList<>();
+                    for(int x = center[0] ; x < map.length ; x++) {
+                        for(int y = 0 ; y < center[1] ; y++) {
+                            if(map[x][y] != null) {
+                                tempList.add(map[x][y]);
+                            }
+                        }
+                    }
+                    if(!tempList.isEmpty()) {
+                        quadrantChromosomes.add(tempList);
+                    }
+                                        
+                    // bottom-right
+                    tempList = new ArrayList<>();
+                    for(int x = center[0] ; x < map.length ; x++) {
+                        for(int y = center[1] ; y < map.length ; y++) {
+                            if(map[x][y] != null) {
+                                tempList.add(map[x][y]);
+                            }
+                        }
+                    }
+                    if(!tempList.isEmpty()) {
+                        quadrantChromosomes.add(tempList);
+                    }                    
+                    
+                    // bottom-left
+                    tempList = new ArrayList<>();
+                    for(int x = 0 ; x < center[0] ; x++) {
+                        for(int y = center[1] ; y < map.length ; y++) {
+                            if(map[x][y] != null) {
+                                tempList.add(map[x][y]);
+                            }
+                        }
+                    }     
+                    if(!tempList.isEmpty()) {
+                        quadrantChromosomes.add(tempList);
+                    }              
+        }
 	
 	@Override
 	public void createNextGeneration() {
@@ -268,6 +339,10 @@ public class MAPElitesPopulation extends Population{
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 		numberOfChromosomesRequested = 0;
 		stagnatedGenerations++;
+                
+                if(balanced) {
+                    updateQuadrantLists();
+                }
 	}
 	
 	@Override
