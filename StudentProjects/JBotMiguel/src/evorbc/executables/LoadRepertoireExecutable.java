@@ -1,14 +1,10 @@
 package evorbc.executables;
 
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
-
 import multiobjective.MOChromosome;
 import simulation.Executable;
 import simulation.JBotSim;
 import simulation.util.Arguments;
 import simulation.util.Factory;
-import evolution.MAPElitesEvolution;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evorbc.mappingfunctions.MappingFunction;
@@ -29,6 +25,8 @@ public class LoadRepertoireExecutable implements Executable{
 		}
 		
 		f+="/_showbest_current.conf";
+		
+		jbotsim.getSerializableObjectHashMap().put("repertoirepath", f);
 		
 		System.out.println("[LoadRepertoireExecutable] Loading repertoire from "+f);
 		
@@ -56,6 +54,7 @@ public class LoadRepertoireExecutable implements Executable{
 		
 		jbotsim.getSerializableObjectHashMap().put("repertoire", map);
 	}
+	
 	
 	protected MOChromosome[][] loadRepertoire(String f) {
 		

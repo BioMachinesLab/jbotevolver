@@ -81,7 +81,7 @@ public class CheckRepertoireFitness {
 		String[] split = folder.split("/");
 		
 		for(int i = 0 ; i <= gens ; i++) {
-			JBotEvolver jbot = new JBotEvolver(new String[]{folder+"show_best/showbest"+i+".conf"});
+			JBotEvolver jbot = new JBotEvolver(new String[]{folder+"show_best/showbest"+i+".conf","--init","skip=1"});
 			MAPElitesPopulation pop = (MAPElitesPopulation)jbot.getPopulation();
 			
 			double distanceFitness = 0;

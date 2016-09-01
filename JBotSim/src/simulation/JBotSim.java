@@ -47,6 +47,9 @@ public class JBotSim implements Serializable {
 		if(arguments.get("--init") != null) {
 			Arguments initArguments = arguments.get("--init");
 			
+			if(initArguments.getFlagIsTrue("skip"))
+				return;
+			
 			for(int i = 0 ; i < initArguments.getNumberOfArguments() ; i++){
 				String argName = initArguments.getArgumentAt(i);
 				String argVals = initArguments.getArgumentAsString(argName);

@@ -55,6 +55,10 @@ public abstract class TraverseFolders {
 	 * @param currentFolder
 	 */
 	private void traverse(File currentFolder) {
+
+		//check if the folder qualifies for an action
+		if(actFilter(currentFolder))
+			act(currentFolder);
 		
 		for(String subFolderName : currentFolder.list()) {
 			
@@ -62,10 +66,6 @@ public abstract class TraverseFolders {
 			
 			//ignore regular files and empty folders
 			if(target.isDirectory() && target.list() != null) {
-				
-				//check if the folder qualifies for an action
-				if(actFilter(target))
-					act(target);
 				
 				//recursive call
 				traverse(target);

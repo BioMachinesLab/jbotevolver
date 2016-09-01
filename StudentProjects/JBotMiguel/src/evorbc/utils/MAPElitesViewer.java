@@ -62,8 +62,8 @@ public class MAPElitesViewer {
 	protected ArrayList<String> files = new ArrayList<String>();
 	
 	public static void main(String[] args) throws Exception {
-		new MAPElitesViewer("bigdisk/evorbc2/binsize/", true);
-//		new MAPElitesViewer("bigdisk/evorbc2/time/", true);
+//		new MAPElitesViewer("bigdisk/evorbc2/binsize/", true);
+		new MAPElitesViewer("bigdisk/vsvanilla/", true);
 //		new MAPElitesViewer("bigdisk/evorbc2/behaviormapping/", true);
 		
 //                new MAPElitesViewer("nao_map/", true);
@@ -112,7 +112,7 @@ public class MAPElitesViewer {
 				} else if (s.equals("_showbest_current.conf")) {
 					
 					try {
-						JBotEvolver jb = new JBotEvolver(new String[]{f.getPath()+"/"+s});
+						JBotEvolver jb = new JBotEvolver(new String[]{f.getPath()+"/"+s,"--simulator","+folder=bigdisk/vsvanilla/"/*,"--init","skip=0"*/});
 						
 						if(jb.getPopulation() instanceof MAPElitesPopulation) {
 							files.add(f.getPath().replaceAll(this.baseFolder, ""));
@@ -236,7 +236,11 @@ public class MAPElitesViewer {
 				
 				MOChromosome res = pop.getMap()[x][y];
 				
-				if(res != null) {
+				double[] b = ((double[][][])jbot.getSerializableObjectHashMap().get("repertoire"))[x][y];
+				
+				if(b != null) {
+					
+					//show the rep with the filling
 					
 					ExpandedFitness fit = (ExpandedFitness)res.getEvaluationResult();
 					BehaviourResult br = (BehaviourResult)fit.getCorrespondingEvaluation(1);

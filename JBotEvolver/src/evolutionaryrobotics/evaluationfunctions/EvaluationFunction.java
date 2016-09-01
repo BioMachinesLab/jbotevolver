@@ -7,12 +7,20 @@ import simulation.util.Arguments;
 
 public abstract class EvaluationFunction implements Serializable, Updatable {
 	protected double fitness;
+	protected Arguments args;
 
-	public EvaluationFunction(Arguments args) {}
+	public EvaluationFunction(Arguments args) {
+		this.args = args;
+	}
 
 	public double getFitness() {
 		return fitness;
 	}
+	
+	public Arguments getArgs() {
+		return args;
+	}
+	
 	
 	public static EvaluationFunction getEvaluationFunction(Arguments arguments) {
 		if (!arguments.getArgumentIsDefined("classname"))

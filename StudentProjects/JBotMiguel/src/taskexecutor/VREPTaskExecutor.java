@@ -92,10 +92,16 @@ public class VREPTaskExecutor extends TaskExecutor {
 
         c.ip = ip;
         c.port = port;
+        System.out.println("[VREPTaskExecutor] Trying to connect to "+ip+":"+port);
         c.clientId = vrepApi.simxStart(c.ip, c.port, true, false, 5000, 5);
+        
         if (c.clientId == -1) {
+        	System.out.println("[VREPTaskExecutor] Not connected! "+ip+":"+port);
             return null;
         }
+        
+        System.out.println("[VREPTaskExecutor] Connected! "+ip+":"+port);
+        
         vrepApi.simxClearStringSignal(c.clientId, "toClient", remoteApi.simx_opmode_blocking);
         vrepApi.simxClearStringSignal(c.clientId, "fromClient", remoteApi.simx_opmode_blocking);
         availableClients.push(c);

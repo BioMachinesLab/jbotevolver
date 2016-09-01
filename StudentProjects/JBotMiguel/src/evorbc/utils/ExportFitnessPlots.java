@@ -2,9 +2,15 @@ package evorbc.utils;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.Serializable;
 import java.util.Scanner;
 
+import simulation.util.Arguments;
 import utils.TraverseFolders;
+import evolution.MAPElitesPopulation;
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evorbc.qualitymetrics.CircularQualityMetric;
 
 public class ExportFitnessPlots extends TraverseFolders{
 	
@@ -18,16 +24,18 @@ public class ExportFitnessPlots extends TraverseFolders{
 		this.fileName = fileName;
 	}
 	
+	public ExportFitnessPlots(String baseFolder, String fileName) throws Exception{
+		super(baseFolder);
+		this.fileName = fileName;
+	}
+	
 	public static void main(String[] args) throws Exception{
-		/*new ExportFitnessPlots("bigdisk/multimaze/", new String[]{"repertoire_obstacle/"}, "multimaze.txt").traverse();
-		new ExportFitnessPlots("bigdisk/qualitymetrics/", new String[]{"maze_radial/","maze_distance/","maze_quality/"}, "qualitymetrics.txt").traverse();
-		new ExportFitnessPlots("bigdisk/repertoiresize/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_30/","maze_quality_50/","maze_quality_100/"}, "repertoiresize.txt").traverse();
-		new ExportFitnessPlots("bigdisk/repertoireresolution/", new String[]{"maze_quality_5/","maze_quality_10/","maze_quality_20/","maze_quality_50/","maze_quality_100/","maze_quality_200/"} , "repertoireresolution.txt").traverse();
-		new ExportFitnessPlots("bigdisk/behaviormapping/", new String[]{"maze_type0_20/","maze_type1_20/","maze_type3_20/"}, "behaviormapping.txt").traverse();
-		new ExportFitnessPlots("bigdisk/orientation/", new String[]{"maze_orientation/"}, "orientation.txt").traverse();
-		new ExportFitnessPlots("bigdisk/ann/", new String[]{"maze_ann/"}, "ann.txt").traverse();*/
-		
-		new ExportFitnessPlots("/Volumes/Orico/ec/miguel/orientation/", new String[]{"maze_orientation/"}, "orientation.txt").traverse();
+//		new ExportFitnessPlots("bigdisk/vsvanilla/", "fitness-vsvanilla.txt").traverse();
+		new ExportFitnessPlots("bigdisk/behaviormapping/", "fitness-bm.txt").traverse();
+//		new ExportFitnessPlots("bigdisk/qualitymetrics/", "fitness-qm.txt").traverse();
+//		new ExportFitnessPlots("bigdisk/binsize/", "fitness-binsize.txt").traverse();
+//		new ExportFitnessPlots("bigdisk/time/", "fitness-time.txt").traverse();
+//		new ExportFitnessPlots("bigdisk/", "fitness.txt").traverse();
 	}
 	
 	@Override
@@ -36,8 +44,8 @@ public class ExportFitnessPlots extends TraverseFolders{
 		try {
 			new File(FOLDER_NAME).mkdir();
 			new File(FOLDER_NAME+"/"+fileName).delete();
-			fw = new FileWriter(new File(FOLDER_NAME+"/fitness-"+this.fileName));
-			fw.append("Setup\tRun\tGeneration\tHighestFitness\tAverageFitness\tLowestFitness\n");
+			fw = new FileWriter(new File(FOLDER_NAME+"/"+fileName));
+			fw.append("Method\tMapping\tQuality\tTime\tBinSize\tRobot\tRun\tGeneration\tHighestFitness\tAverageFitness\tLowestFitness\n");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -79,21 +87,68 @@ public class ExportFitnessPlots extends TraverseFolders{
 		
 		System.out.println(folder);
 		
-		StringBuffer result = new StringBuffer();
+		String[] split = folder.split("/");
+		
+		String baseFolder = "";
+		
+		for(int i = 0 ; i < split.length-3 ; i++ ) {
+			baseFolder+=split[i]+"/";
+		}
+		
+		String mapping = "";
+		String time = "0";
+		String quality = "";
+		String binsize = "0";
+		String robot = "";
+		String method = "";
+		
+		JBotEvolver jbot = new JBotEvolver(new String[]{folder+"/_showbest_current.conf","--simulator","+folder="+baseFolder});
+		Serializable obj = jbot.getSerializableObjectHashMap().get("repertoirepath");
+		
+		String actuatorType = new Arguments(jbot.getArguments().get("--robots").getArgumentAsString("actuators")).getArgumentAt(0);
+		
+		if(actuatorType.equals("MultipleWheelRepertoireActuator")) {
+			method = "EvoRBC";
+			String repertoirePath = (String)obj;
+			JBotEvolver repertoireEvo = new JBotEvolver(new String[]{repertoirePath,"--init","skip=1"});
+			MAPElitesPopulation pop = (MAPElitesPopulation)repertoireEvo.getPopulation();
+			
+			EvaluationFunction[] functions = repertoireEvo.getEvaluationFunction();
+			quality = functions[0].getClass().getSimpleName().replace("QualityMetric", "");
+			if(functions[0].getArgs().getFlagIsTrue("distance"))
+				quality+="+Distance";
+			
+			binsize = pop.getMapResolution()*100+"";
+			
+			time = (repertoireEvo.getArguments().get("--environment").getArgumentAsDouble("steps")/10.0)+"";
+			
+			Arguments wheelArgs = new Arguments(new Arguments(jbot.getArguments().get("--robots").getArgumentAsString("actuators")).getArgumentAsString("MultipleWheelRepertoireActuator"));
+			mapping = new Arguments(wheelArgs.getArgumentAsString("mapping")).getArgumentAsString("classname").split("\\.")[2].replace("MappingFunction", "").replace("180", "");
+			robot = new Arguments(wheelArgs.getArgumentAsString("wheels")).getArgumentAt(0).replace("Actuator", "").replace("_", "-").replace("A", "4").replace("F", "2");
+		} else {
+			method = "Vanilla";
+			robot = new Arguments(jbot.getArguments().get("--robots").getArgumentAsString("actuators")).getArgumentAt(0).replace("Actuator", "").replace("_", "-").replace("A", "4").replace("F", "2");
+		}
+		
+		String runNumber = split[split.length-1];
+		
+		String prefix = method+"\t"+
+				mapping+"\t"+
+				quality+"\t"+
+				time+"\t"+
+				binsize+"\t"+
+				robot+"\t"+
+				runNumber;
 		
 		Scanner s = new Scanner(new File(folder+"/_fitness.log"));
-		
 		String prevLine = "";
 		
-		String[] split = folder.split("/");
-		String prefix = split[split.length-3]+"_"+split[split.length-2]+"\t"+split[split.length-1];
+		StringBuffer result = new StringBuffer();
 		
 		while(s.hasNextLine()) {
 			String line = s.nextLine().trim().replaceAll("\\s+", "\t");
 			
 			String newLine = prefix+"\t"+line;
-			newLine = newLine.replaceAll("Actuator", "");
-			newLine = newLine.replaceAll("_maze", "");
 			
 			if(!line.startsWith("#") && !line.equals(prevLine) && !line.isEmpty()) {
 				result.append(newLine);
