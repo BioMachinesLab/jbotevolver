@@ -201,7 +201,9 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		}
 		
 		//get rid of isolated behaviors
+		System.out.println("[MAPElitesEvolution] Behaviors before pruning: "+MappingFunction.countBehaviors(rep));
 		MappingFunction.prune(rep);
+		System.out.println("[MAPElitesEvolution] Behaviors after pruning: "+MappingFunction.countBehaviors(rep));
     	
     	try {
     	

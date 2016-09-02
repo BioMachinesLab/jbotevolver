@@ -76,7 +76,7 @@ public abstract class MappingFunction {
 		return count;
 	}
 	
-	public static int countBehaviors(MOChromosome[][] repertoire) {
+	public static int countBehaviors(double[][][] repertoire) {
 		int count = 0;
 		for(int x = 0 ; x < repertoire.length ; x++) {
 			for(int y = 0 ; y < repertoire[x].length ; y++) {
