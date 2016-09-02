@@ -1,5 +1,7 @@
 package vrep;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 
 import mathutils.Vector2d;
@@ -183,4 +185,5 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution {
 
         return totalPackets;
     }
+    
 }

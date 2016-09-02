@@ -18,6 +18,7 @@ public class ExportFitnessPlots extends TraverseFolders{
 	
 	private String fileName;
 	private FileWriter fw;
+	private static int MAX_RUN = 10;
 	
 	public ExportFitnessPlots(String baseFolder, String[] setups, String fileName) throws Exception{
 		super(baseFolder, setups);
@@ -31,11 +32,11 @@ public class ExportFitnessPlots extends TraverseFolders{
 	
 	public static void main(String[] args) throws Exception{
 //		new ExportFitnessPlots("bigdisk/vsvanilla/", "fitness-vsvanilla.txt").traverse();
-		new ExportFitnessPlots("bigdisk/behaviormapping/", "fitness-bm.txt").traverse();
+//		new ExportFitnessPlots("bigdisk/behaviormapping/", "fitness-bm.txt").traverse();
 //		new ExportFitnessPlots("bigdisk/qualitymetrics/", "fitness-qm.txt").traverse();
 //		new ExportFitnessPlots("bigdisk/binsize/", "fitness-binsize.txt").traverse();
 //		new ExportFitnessPlots("bigdisk/time/", "fitness-time.txt").traverse();
-//		new ExportFitnessPlots("bigdisk/", "fitness.txt").traverse();
+		new ExportFitnessPlots("bigdisk/", "fitness.txt").traverse();
 	}
 	
 	@Override
@@ -67,8 +68,19 @@ public class ExportFitnessPlots extends TraverseFolders{
 		if(new File(folder.getPath()+"/repertoire_name.txt").exists())
 			return false;
 		
-		if(new File(folder.getPath()+"/_fitness.log").exists())
+		if(new File(folder.getPath()+"/_fitness.log").exists()) {
+			
+			if(MAX_RUN > 0) {
+				String[] split = folder.getPath().split("/");
+				int run = Integer.parseInt(split[split.length-1]);
+				if(run <= MAX_RUN)
+					return true;
+				else
+					return false;
+			}
+			
 			return true;
+		}
 		
 		return false;
 	}

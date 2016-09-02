@@ -43,6 +43,39 @@ public abstract class MappingFunction {
     	return nearest;
     }
 	
+	public static void prune(double[][][] repertoire){
+		//simplest pruning method is to remove behaviors with no neighbours
+		
+		for(int x = 0 ; x < repertoire.length ; x++) {
+			for(int y = 0 ; y < repertoire[x].length ; y++) {
+				
+				if(repertoire[x][y] != null) {
+					
+					int neighbours = countNeighbours(repertoire, x,y);
+					
+					if(neighbours == 0) {
+						repertoire[x][y] = null;
+					}
+				}
+			}
+		}
+	}
+	
+	private static int countNeighbours(double[][][] repertoire, int x, int y) {
+		int count = 0;
+		
+		for(int xi = x-1 ; xi <= x+1 ; xi++) {
+			for(int yi = y-1 ; yi <= y+1 ; yi++) {
+				if(xi >= 0 && yi >= 0 && xi < repertoire.length && yi < repertoire[xi].length) {
+					if(repertoire[xi][yi] != null) {
+						count++;
+					}
+				}
+			}
+		}
+		return count;
+	}
+	
 	public static int countBehaviors(MOChromosome[][] repertoire) {
 		int count = 0;
 		for(int x = 0 ; x < repertoire.length ; x++) {

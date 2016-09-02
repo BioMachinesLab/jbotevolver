@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
 
+import evorbc.mappingfunctions.MappingFunction;
+import evorbc.mappingfunctions.Polar180MappingFunction;
 import mathutils.Vector2d;
 
 public class VRepRepertoireController extends VRepController {
@@ -18,6 +20,7 @@ public class VRepRepertoireController extends VRepController {
 	protected VRepNEATController ann;
 	protected double heading;
 	protected double speed;
+	protected MappingFunction bm;
 	
 	public VRepRepertoireController(float[] parameters) {
 		super(parameters);
@@ -29,6 +32,8 @@ public class VRepRepertoireController extends VRepController {
 		nParams = (int)parameters[1];//locomotion parameters
 		
 		loadRepertoire(REPERTOIRE_FILENAME);
+		
+		bm = new Polar180MappingFunction(repertoire);
 	}
 
 	protected static synchronized void loadRepertoire(String filename) {
@@ -39,7 +44,7 @@ public class VRepRepertoireController extends VRepController {
 		double[][][] r = null;
 
 		try {
-
+			
 			Scanner s = new Scanner(new File(filename));
 			
 			int size = s.nextInt();
@@ -99,43 +104,27 @@ public class VRepRepertoireController extends VRepController {
 		
 		double s = this.speed;
 		
-		do {
-			Vector2d point = circlePoint(this.heading, s);
-			// int[] pos = getLocationFromBehaviorVector(new
-			// double[]{point.x,point.y});
-			// behavior = repertoire[pos[1]][pos[0]];
-			behavior = repertoire[(int) point.y][(int) point.x];
-
-			// reduce the size of the circle to find an appropriate point
-			s *= 0.95;
-			if (Math.abs(s) < 0.1)
-				break;
-		} while (behavior == null);
+		do{
+			Vector2d point = bm.map(this.heading,s);
+			behavior = repertoire[(int)point.x][(int)point.y];
+			
+			if(behavior == null) {
+				//reduce the size of the circle to find an appropriate point
+				//in case there is no filling. this is to deal with edge cases
+				s=s*2.0-1.0;
+				s*=0.95;
+//				MAPElitesEvolution.printRepertoire(repertoire, (int)point.x, (int)point.y);
+				if(Math.abs(s) < 0.1)
+					break;
+				
+				s=s/2.0 + 0.5;
+			}
+			
+		} while(behavior == null);
 		
 		return behavior;
 	}
 
-	private Vector2d circlePoint(double percentageAngle, double speedPercentage) {
-		Vector2d res = null;
-		
-		// percentageAngle = 1;
-		// speedPercentage = 0.5;
-
-		double h = percentageAngle * (Math.PI / 2);
-
-		if (speedPercentage < 0) {
-			h += Math.PI;
-			speedPercentage *= -1;
-		}
-		res = new Vector2d(speedPercentage * circleRadius * Math.cos(h),
-				speedPercentage * circleRadius * Math.sin(h));
-
-		res.x += repertoire.length / 2;
-		res.y += repertoire[0].length / 2;
-		
-		return res;
-	}
-	
 	private static double readDouble(Scanner s) {
 		return Double.parseDouble(s.next().trim().replace(',', '.'));
 	}

@@ -19,8 +19,8 @@ public class CheckProgress extends TraverseFolders {
 		int g = 1000;
 		int r = 10;
 		
-		new CheckProgress("bigdisk/vsvanilla/",new String[]{},r,g).traverse();//done
-		new CheckProgress("bigdisk/behaviormapping/",new String[]{},r,g).traverse();//done
+		new CheckProgress("bigdisk/vsvanilla/",new String[]{},r,g).traverse();
+		new CheckProgress("bigdisk/behaviormapping/",new String[]{},r,g).traverse();
 		new CheckProgress("bigdisk/qualitymetrics/",new String[]{},r,g).traverse();
 		new CheckProgress("bigdisk/binsize/",new String[]{},r,g).traverse();
 		new CheckProgress("bigdisk/time/",new String[]{},r,g).traverse();

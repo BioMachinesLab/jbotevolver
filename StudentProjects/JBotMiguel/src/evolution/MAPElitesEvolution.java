@@ -13,6 +13,7 @@ import taskexecutor.TaskExecutor;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evolution.GenerationalEvolution;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import evorbc.mappingfunctions.MappingFunction;
 
 /**
  *	MAP-Elites "illumination" algorithm
@@ -186,9 +187,21 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     	return ""+sb.toString().hashCode();
     }
 	
-	public static void saveRepertoireTxt(String dir, String file, MAPElitesPopulation p) {
-    	
-    	MOChromosome[][] map = p.getMap();
+	public void saveRepertoireTxt(String dir, String file, MAPElitesPopulation p) {
+		
+		MOChromosome[][] map = p.getMap();
+		
+		double[][][] rep = new double[map.length][map[0].length][];
+		
+		for(int x = 0 ; x < map.length ; x++) {
+			for(int y = 0 ; y < map[x].length ; y++) {
+				if(map[x][y] != null)
+					rep[x][y] = map[x][y].getAlleles();
+			}
+		}
+		
+		//get rid of isolated behaviors
+		MappingFunction.prune(rep);
     	
     	try {
     	
@@ -197,12 +210,12 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     		
     		buffer.append(map.length+" "+p.getMapResolution()+" ");
     		
-    		for(int y = 0 ; y < map.length ; y++) {
-    			for(int x = 0 ; x < map[y].length ; x++) {
-    				MOChromosome moc = map[y][x];
-    				if(moc != null) {
+    		for(int y = 0 ; y < rep.length ; y++) {
+    			for(int x = 0 ; x < rep[y].length ; x++) {
+    				double[] c = rep[y][x];
+    				if(rep != null) {
     					buffer.append(x+" "+y+" ");
-	    				for(double d : moc.getAlleles())
+	    				for(double d : c)
 	    					buffer.append(d+" ");
     				}
         		}
