@@ -14,7 +14,6 @@ public class VRepRepertoireController extends VRepController {
 	public static String REPERTOIRE_FILENAME = "../repertoire.txt";
 	protected static double[][][] repertoire;
 	protected static double resolution;
-	protected static double circleRadius;
 	protected static int nParams = 24;
 
 	protected VRepNEATController ann;
@@ -34,6 +33,7 @@ public class VRepRepertoireController extends VRepController {
 		loadRepertoire(REPERTOIRE_FILENAME);
 		
 		bm = new Polar180MappingFunction(repertoire);
+                bm.fill();
 	}
 
 	protected static synchronized void loadRepertoire(String filename) {
@@ -56,8 +56,6 @@ public class VRepRepertoireController extends VRepController {
 				int x = s.nextInt();
 				int y = s.nextInt();
 				
-				circleRadius = Math.max(circleRadius, new Vector2d(x - size / 2.0, y - size / 2.0).length());
-
 				r[x][y] = new double[nParams];
 				for (int d = 0; d < nParams; d++) {
 					r[x][y][d] = readDouble(s);

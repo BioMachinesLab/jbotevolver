@@ -33,7 +33,8 @@ import evorbc.qualitymetrics.DistanceQualityMetric;
 public class VREPMAPElitesEvolution extends MAPElitesEvolution {
 
     protected int controllerType = 0;
-    protected int time = 0; // s
+    protected float time = 0; // s
+    protected float stopTime = -1;
     public int excluded = 0;
     protected double feasibilityThreshold = 0.0;
     protected int genomeLength = 0;
@@ -53,9 +54,10 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution {
         }
 
         controllerType = arg.getArgumentAsIntOrSetDefault("controllertype", controllerType);
-        time = arg.getArgumentAsIntOrSetDefault("time", time);
+        time = (float) arg.getArgumentAsDoubleOrSetDefault("time", time);
         feasibilityThreshold = arg.getArgumentAsDoubleOrSetDefault("feasibility", feasibilityThreshold);
         tiltKill = (float) arg.getArgumentAsDoubleOrSetDefault("tiltkill", tiltKill);
+        stopTime = (float) arg.getArgumentAsDoubleOrSetDefault("stoptime", stopTime);
     }
 
     public static double getFitness(MOChromosome moc) {
@@ -81,8 +83,8 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution {
                 chromosomes[i] = randomChromosomes.get(i);
             }
 
-            // global params length; seconds of evaluation; max allowed tilt during eval
-            float fixedParameters[] = {2, time, tiltKill};
+            // global params length; seconds of evaluation; max allowed tilt during eval ; stopTime
+            float fixedParameters[] = stopTime > 0 && stopTime < time ? new float[]{3, time, tiltKill, stopTime} : new float[]{2, time, tiltKill};
 
             float[][] packet = createDataPacket(chromosomes);
 
