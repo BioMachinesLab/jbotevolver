@@ -44,21 +44,28 @@ public abstract class MappingFunction {
     }
 	
 	public static void prune(double[][][] repertoire){
-		//simplest pruning method is to remove behaviors with no neighbours
+		//simplest pruning method is to remove behaviors with a low number of neighbours
 		
-		for(int x = 0 ; x < repertoire.length ; x++) {
-			for(int y = 0 ; y < repertoire[x].length ; y++) {
-				
-				if(repertoire[x][y] != null) {
+		boolean removed;
+		
+		do {
+			removed = false;
+			
+			for(int x = 0 ; x < repertoire.length ; x++) {
+				for(int y = 0 ; y < repertoire[x].length ; y++) {
 					
-					int neighbours = countNeighbours(repertoire, x,y);
-					
-					if(neighbours == 0) {
-						repertoire[x][y] = null;
+					if(repertoire[x][y] != null) {
+						
+						int neighbours = countNeighbours(repertoire, x,y);
+						
+						if(neighbours <= 2) {
+							removed = true;
+							repertoire[x][y] = null;
+						}
 					}
 				}
 			}
-		}
+		}while(removed);
 	}
 	
 	private static int countNeighbours(double[][][] repertoire, int x, int y) {
@@ -66,7 +73,7 @@ public abstract class MappingFunction {
 		
 		for(int xi = x-1 ; xi <= x+1 ; xi++) {
 			for(int yi = y-1 ; yi <= y+1 ; yi++) {
-				if(xi >= 0 && yi >= 0 && xi < repertoire.length && yi < repertoire[xi].length) {
+				if(xi >= 0 && yi >= 0 && xi < repertoire.length && yi < repertoire[xi].length && (xi != x || yi != y)) {
 					if(repertoire[xi][yi] != null) {
 						count++;
 					}

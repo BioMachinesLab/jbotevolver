@@ -63,7 +63,7 @@ public class MAPElitesViewer {
 	
 	public static void main(String[] args) throws Exception {
 //		new MAPElitesViewer("bigdisk/evorbc2/binsize/", true);
-		new MAPElitesViewer("bigdisk/vsvanilla/", true);
+		new MAPElitesViewer("bigdisk/time/", true);
 //		new MAPElitesViewer("bigdisk/evorbc2/behaviormapping/", true);
 		
 //                new MAPElitesViewer("nao_map/", true);
@@ -112,7 +112,7 @@ public class MAPElitesViewer {
 				} else if (s.equals("_showbest_current.conf")) {
 					
 					try {
-						JBotEvolver jb = new JBotEvolver(new String[]{f.getPath()+"/"+s,"--simulator","+folder=bigdisk/vsvanilla/"/*,"--init","skip=0"*/});
+						JBotEvolver jb = new JBotEvolver(new String[]{f.getPath()+"/"+s,"--simulator","+folder=bigdisk/time/"/*,"--init","skip=0"*/});
 						
 						if(jb.getPopulation() instanceof MAPElitesPopulation) {
 							files.add(f.getPath().replaceAll(this.baseFolder, ""));
@@ -211,7 +211,7 @@ public class MAPElitesViewer {
 			refresh();
 			
 		} catch(Exception e) {
-			System.err.println("Can't find population file "+i);
+			System.err.println("Problem loading population file "+i);
 			e.printStackTrace();
 		}
 	}
@@ -231,12 +231,20 @@ public class MAPElitesViewer {
 		
 //		MAPElitesEvolution.printRepertoire(pop);
 		
+		double[][][] serializedRepertoire = (double[][][])jbot.getSerializableObjectHashMap().get("repertoire");
+		
 		for(int x = 0 ; x < pop.getMap().length ; x++) {
 			for(int y = 0 ; y < pop.getMap()[x].length ; y++) {
 				
 				MOChromosome res = pop.getMap()[x][y];
 				
-				double[] b = ((double[][][])jbot.getSerializableObjectHashMap().get("repertoire"))[x][y];
+				double[] b = null;
+				
+				if(serializedRepertoire == null && res != null) {
+					b = res.getAlleles();
+				} else if(serializedRepertoire != null){
+					b = serializedRepertoire[x][y];
+				}
 				
 				if(b != null) {
 					

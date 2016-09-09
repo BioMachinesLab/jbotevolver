@@ -1,5 +1,10 @@
 package vrep;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Vector;
 
 import simulation.util.Arguments;
@@ -26,10 +31,6 @@ public class VRepNEATController extends VRepController {
 		int inputNumber = (int)parameters[index++];
 		int outputNumber = (int)parameters[index++];
 		
-		//TODO hardcoded...
-//		int inputNumber = 6;
-//		int outputNumber = 2;
-		
 		inputs = new Vector<NNInput>();
 		Vector<NNOutput> outputs = new Vector<NNOutput>();
 		
@@ -46,6 +47,7 @@ public class VRepNEATController extends VRepController {
 		
 		ann = new NEATNeuralNetwork(inputs, outputs, new Arguments(""));
 		ann.setWeights(annParams);
+		
 	}
 
 	@Override

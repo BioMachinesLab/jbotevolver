@@ -17,11 +17,11 @@ public class CheckProgress extends TraverseFolders {
 	public static void main(String[] args) throws Exception{
 		
 		int g = 1000;
-		int r = 10;
+		int r = 30;
 		
-		new CheckProgress("bigdisk/vsvanilla/",new String[]{},r,g).traverse();
-		new CheckProgress("bigdisk/behaviormapping/",new String[]{},r,g).traverse();
-		new CheckProgress("bigdisk/qualitymetrics/",new String[]{},r,g).traverse();
+		new CheckProgress("bigdisk2/vsvanilla/",new String[]{},r,g).traverse();
+		new CheckProgress("bigdisk2/behaviormapping/",new String[]{},r,g).traverse();
+		new CheckProgress("bigdisk2/qualitymetrics/",new String[]{},r,g).traverse();
 		new CheckProgress("bigdisk/binsize/",new String[]{},r,g).traverse();
 		new CheckProgress("bigdisk/time/",new String[]{},r,g).traverse();
 	}

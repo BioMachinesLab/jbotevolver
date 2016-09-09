@@ -12,16 +12,30 @@ import utils.TraverseFolders;
 
 public class MAPElitesExporter extends TraverseFolders{
 	
+	private static int MAX_RUN = 30;
+	
 	public static void main(String[] args) throws Exception {
 		new MAPElitesExporter("bigdisk/").traverse();
+		new MAPElitesExporter("bigdisk2/").traverse();
 //		bigdisk_binsize_repertoire_50_AWS_5Actuator_20_3
 	}
 	
 	@Override
 	protected boolean actFilter(File folder) {
+		
+		if(new File(folder.getPath()+"/repertoire_name.txt").exists()) {
+		
+			if(MAX_RUN > 0) {
+				String[] split = folder.getPath().split("/");
+				int run = Integer.parseInt(split[split.length-1]);
+				if(run <= MAX_RUN)
+					return true;
+				else
+					return false;
+			}
 
-		if(new File(folder.getPath()+"/repertoire_name.txt").exists())
 			return true;
+		}
 
 		return false;
 	}

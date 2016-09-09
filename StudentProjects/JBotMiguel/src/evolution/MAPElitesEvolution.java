@@ -215,7 +215,7 @@ public class MAPElitesEvolution extends GenerationalEvolution{
     		for(int y = 0 ; y < rep.length ; y++) {
     			for(int x = 0 ; x < rep[y].length ; x++) {
     				double[] c = rep[y][x];
-    				if(rep != null) {
+    				if(c != null) {
     					buffer.append(x+" "+y+" ");
 	    				for(double d : c)
 	    					buffer.append(d+" ");
