@@ -21,11 +21,8 @@ public class RotationNNOutput extends NNOutput {
 	}
 
 	@Override
-	public void setValue(int output, double value) {
-//		System.out.println("vou dar status de andar"+ value);
-		
-			speed = value;
-					
+	public void setValue(int output, double value) {		
+			speed = value;		
 	}
 
 	@Override

@@ -53,7 +53,7 @@ public class Walls2PreyEvaluation extends EvaluationFunction{
 							preyClose=p;
 					}
 					//System.out.println(robotPosition.distanceTo(preyClose.getPosition())/robotPosition.distanceTo(preyInitialPosition.get(preyClose)));
-					current+=(1-(robotPosition.distanceTo(preyClose.getPosition())/nestPosition.distanceTo(preyInitialPosition.get(preyClose))))/(environment.getSteps()+environment.getRobots().size());
+					current+=(1-(robotPosition.distanceTo(preyClose.getPosition())/nestPosition.distanceTo(preyInitialPosition.get(preyClose))))/(environment.getSteps()*10+environment.getRobots().size());
 				}
 				
 			}

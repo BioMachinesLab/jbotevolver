@@ -88,46 +88,6 @@ public class MazeBigEnvironment extends Environment {
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
 		addObject(nest);
 
-//		// primeiro de lado do ninho horizontal
-//		addStaticObject(new Wall(simulator, 0.4, 0.5, 0.3, 0.1));
-//		addStaticObject(new Wall(simulator, -0.4, 0.5, 0.3, 0.1));
-//		addStaticObject(new Wall(simulator, 0.4, -0.5, 0.3, 0.1));
-//		addStaticObject(new Wall(simulator, -0.4, -0.5, 0.3, 0.1));
-//
-//		// //primeiro de lado do ninho vertical
-//		addStaticObject(new Wall(simulator, 0.5, 0, 0.1, 1));
-//		addStaticObject(new Wall(simulator, -0.5, 0, 0.1, 1));
-//
-//		// as || ao pe do ninho
-//		addStaticObject(new Wall(simulator, 0.2, 1, 0.1, 1.1));
-//		addStaticObject(new Wall(simulator, -0.2, 1, 0.1, 1.1));
-//		addStaticObject(new Wall(simulator, 0.2, -1, 0.1, 1.1));
-//		addStaticObject(new Wall(simulator, -0.2, -1, 0.1, 1.1));
-//
-//		// exterior ao ninho horizontal maior
-//		addStaticObject(new Wall(simulator, 0, -1.8, 3.4, 0.1));
-//		addStaticObject(new Wall(simulator, 0, 1.8, 3.4, 0.1));
-//
-//		// exterior ao ninho horizontal menorr
-//		addStaticObject(new Wall(simulator, 0.8, -1.5, 1.1, 0.1));
-//		addStaticObject(new Wall(simulator, 0.8, 1.5, 1.1, 0.1));
-//		addStaticObject(new Wall(simulator, -0.8, -1.5, 1.1, 0.1));
-//		addStaticObject(new Wall(simulator, -0.8, 1.5, 1.1, 0.1));
-//
-//		// exterior ao ninho vertical menores
-//		addStaticObject(new Wall(simulator, 1.3, 0, 0.1, 3.1));
-//		addStaticObject(new Wall(simulator, -1.3, 0, 0.1, 3.1));
-//
-//		// exterior ao ninho vertical maiores
-//		addStaticObject(new Wall(simulator, 1.7, 0, 0.1, 3.7));
-//		addStaticObject(new Wall(simulator, -1.7, 0, 0.1, 3.7));
-//		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
-//		addObject(nest);
-//		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
-//		addObject(nest);
-//		
-//		
-
 		
 		addStaticObject(new Wall(simulator, 1.4, 2, 1.2, 0.1));
 		addStaticObject(new Wall(simulator, -1.4, 2, 1.2, 0.1));
@@ -166,8 +126,6 @@ public class MazeBigEnvironment extends Environment {
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
 		addObject(nest);
 		
-		
-
 
 	}
 

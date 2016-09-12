@@ -3,57 +3,44 @@ package actuator;
 import java.util.Random;
 
 import robots.JumpingRobot;
+import robots.JumpingRobot;
+import robots.JumpingSumo;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class JumpActuator extends Actuator{
+		
+	private boolean isToJump=false;
+
+	@ArgumentsAnnotation(name="angle", defaultValue = "80.0")
+	protected double angle;
 	
-	public enum ActuatorStatus {
-		OFF, JUMP
-	}
+	@ArgumentsAnnotation(name="power", defaultValue = "4.0")
+	protected double power;
 	
-	protected ActuatorStatus status = ActuatorStatus.OFF;
-	private Random random;
 	
 	public JumpActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
-		this.random = simulator.getRandom();		// TODO Auto-generated constructor stub
-		
+		this.angle = args.getArgumentAsDoubleOrSetDefault("angle", 80.0);
+		this.power = args.getArgumentAsDoubleOrSetDefault("power", 4.0);
+
 	}
 
 	@Override
 	public void apply(Robot robot) {
 		// TODO Auto-generated method stub
-		if(status==ActuatorStatus.JUMP){
-			jump(robot);
+		if(isToJump){
+			((JumpingRobot) robot).jump(angle,power);
+			isToJump=false;
 		}
-		else{
-			stop(robot);
-		}
+		
 	}
 
-	public ActuatorStatus getStatus() {
-		return status;
-	}
-	
-	public void jumpStatus() {
-		status = ActuatorStatus.JUMP;
-	}
-	
-	public void offStatus() {
-		status = ActuatorStatus.OFF;
-	}
-	
-	
-	public void jump(Robot robot) {
-		((JumpingRobot) robot).jump(80,4);
-	}
-
-	
-	public void stop(Robot robot) {
-		((JumpingRobot) robot).stopjumping();
+	public void jump( ) {
+		isToJump=true;
 	}
 	
 }

@@ -3,16 +3,15 @@ package evaluationfunctions;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import environment.MazeDifficultEnvironment;
-import environment.WallsEnvironment;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import mathutils.Vector2d;
+import sensors.Jump_PreyCarriedSensor;
 import simulation.Simulator;
 import simulation.physicalobjects.Prey;
 import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
-import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
+import environment.WallsEnvironment;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class CloseToPreyEvaluationFunction extends EvaluationFunction{
 	private Vector2d   nestPosition = new Vector2d(0, 0);
@@ -44,7 +43,7 @@ public class CloseToPreyEvaluationFunction extends EvaluationFunction{
 				if(((DifferentialDriveRobot) r).getRightWheelSpeed()<0 || ((DifferentialDriveRobot) r).getLeftWheelSpeed()<0){
 					current+=-0.05;	
 				}
-				if (((PreyCarriedSensor)r.getSensorByType(PreyCarriedSensor.class)).preyCarried()==false) {
+				if (((Jump_PreyCarriedSensor)r.getSensorByType(Jump_PreyCarriedSensor.class)).preyCarried()==false) {
 				Prey closest_Prey=preys.get(0);
 				Vector2d robot_position=r.getPosition();
 					for(int i=0; i<preys.size(); i++){
@@ -57,6 +56,7 @@ public class CloseToPreyEvaluationFunction extends EvaluationFunction{
 			}
 			numberOfFoodForaged=environment.getNumberOfFoodSuccessfullyForaged();
 			fitness=current+numberOfFoodForaged; 
+			
 			
 		}else{  //tempo == 0
 				for(Prey p :preys){

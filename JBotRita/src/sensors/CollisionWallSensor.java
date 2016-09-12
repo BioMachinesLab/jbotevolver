@@ -7,7 +7,6 @@ import simulation.util.Arguments;
 
 public class CollisionWallSensor extends Sensor {
 
-	
 	public CollisionWallSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 	}

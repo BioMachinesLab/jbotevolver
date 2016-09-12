@@ -10,30 +10,24 @@ import simulation.util.ArgumentsAnnotation;
 
 public class JumpSumoActuator extends Actuator{
 
-	private double angle;
-	private double power;
 	private boolean isToJump=false;
 
 	public JumpSumoActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
-	
+		
 	}
 			
 	@Override
 	public void apply(Robot robot) {
 		// TODO Auto-generated method stub
 		if(isToJump){
-			
-			((JumpingSumo) robot).jump(angle, power);
-			
+			((JumpingSumo) robot).jump();
 			isToJump=false;
 		}
 		
 	}
 
-	public void jump(double angle, double power ) {
-		this.angle=angle;
-		this.power=power;
+	public void jump( ) {
 		isToJump=true;
 	}
 }

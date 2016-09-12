@@ -20,35 +20,7 @@ public class WallsEnvironment extends Environment {
 	private Vector2d   nestPosition = new Vector2d(0, 0);
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1;
-	private static final double MAX_X_LIMIT_FOR_PREY_WESTWALL_MOSTDIFFICULTMENV = -2;
-	private static final double MIN_X_LIMIT_FOR_PREY_WESTWALL_MOSTDIFFICULTMENV = -1.7;
-	private static final double MAX_Y_LIMIT_FOR_PREY_WESTWALL_MOSTDIFFICULTMENV =0;
-	private static final double MIN_Y_LIMIT_FOR_PREY_WESTWALL_MOSTDIFFICULTMENV = -1.7;
-
-	private static final double MAX_X_LIMIT_FOR_PREY_EASTWALL_MOSTDIFFICULTMENV = 0.5;
-	private static final double MIN_X_LIMIT_FOR_PREY_EASTWALL_MOSTDIFFICULTMENV = 0.1;
-	private static final double MAX_Y_LIMIT_FOR_PREY_EASTWALL_MOSTDIFFICULTMENV = 0;
-	private static final double MIN_Y_LIMIT_FOR_PREY_EASTWALL_MOSTDIFFICULTMENV = -1.7;
 	
-	 final double MAX_X_LIMIT_FOR_PREY_NORTHWALL_MOSTDIFFICULTMENV = 0.3;
-		private static final double MIN_X_LIMIT_FOR_PREY_NORTHWALL_MOSTDIFFICULTMENV = -1.7;
-		private static final double MAX_Y_LIMIT_FOR_PREY_NORTHWALL_MOSTDIFFICULTMENV = 0.7;
-		private static final double MIN_Y_LIMIT_FOR_PREY_NORTHWALL_MOSTDIFFICULTMENV = 0.3;
-
-		
-		private static final double MAX_X_LIMIT_FOR_PREY_SOUTHWALL_MOSTDIFFICULTMENV = 0.3;
-		private static final double MIN_X_LIMIT_FOR_PREY_SOUTHWALL_MOSTDIFFICULTMENV = -1.7;
-		private static final double MAX_Y_LIMIT_FOR_PREY_SOUTHWALL_MOSTDIFFICULTMENV = -1.8;
-		private static final double MIN_Y_LIMIT_FOR_PREY_SOUTHWALL_MOSTDIFFICULTMENV = -2;
-
-		
-		
-		private static final double MAX_X_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV = -0.3;
-		private static final double MIN_X_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV = -1.4;
-		private static final double MAX_Y_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV = -0.2;
-		private static final double MIN_Y_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV = -1.4;
-		
-		
 	@ArgumentsAnnotation(name="nestlimit", defaultValue="0.5")
 	private double nestLimit;
 	
@@ -75,13 +47,10 @@ public class WallsEnvironment extends Environment {
 	public WallsEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 		this.simulator = simulator;
-		
 		nestLimit       = arguments.getArgumentIsDefined("nestlimit") ? arguments.getArgumentAsDouble("nestlimit")       : .5;
 		forageLimit     = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit")       : 2.0;
 		forbiddenArea   = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")       : 5.0;
-		
 		this.random = simulator.getRandom();
-		
 		if(arguments.getArgumentIsDefined("densityofpreys")){
 			double densityoffood = arguments.getArgumentAsDouble("densityofpreys");
 			numberOfPreys = (int)(densityoffood*Math.PI*forageLimit*forageLimit+.5);
@@ -99,20 +68,12 @@ public class WallsEnvironment extends Environment {
 				addPrey(new Prey(simulator, "Prey "+i, position, 0, PREY_MASS, PREY_RADIUS));
 				wallsForPrey(position);
 			}
-			
-			addStaticObject(new Wall(simulator, -0.8, 0.2, 1.6, 0.1));
-			addStaticObject(new Wall(simulator, -1.6, -0.7, 0.1, 1.9)); //evertical north
-			addStaticObject(new Wall(simulator, -0.8, -1.6, 1.6, 0.1));
-			addStaticObject(new Wall(simulator, 0, -0.7, 0.1, 1.9)); 
-			
-			
-//			addStaticObject( new Wall( simulator, 0, 0.5, 1, 0.1));
-//			addStaticObject(new Wall( simulator, 0, -0.5, 1, 0.1));
-//			addStaticObject(new Wall( simulator, 0.5, 0, 0.1, 1));
-//			addStaticObject(new Wall( simulator, -0.5, 0, 0.1, 1));
+			addStaticObject( new Wall( simulator, 0, 0.5, 1, 0.1));
+			addStaticObject(new Wall( simulator, 0, -0.5, 1, 0.1));
+			addStaticObject(new Wall( simulator, 0.5, 0, 0.1, 1));
+			addStaticObject(new Wall( simulator, -0.5, 0, 0.1, 1));
 			nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
 			addObject(nest);	
-			
 	}
 
 	private Vector2d newRandomPosition() {
@@ -122,15 +83,10 @@ public class WallsEnvironment extends Environment {
 	}
 	
 	private void wallsForPrey(Vector2d position){
-//		addStaticObject( new Wall( simulator, position.x+0.2, position.y, 0.1, 0.4));
-//		addStaticObject(new Wall( simulator, position.x-0.2, position.y, 0.1, 0.4));
-//		addStaticObject(new Wall( simulator, position.x, position.y+ 0.2, 0.4, 0.1));
-//		addStaticObject(new Wall( simulator, position.x, position.y-0.2, 0.4, 0.1));
-	
-		addStaticObject(new Wall(simulator, -0.8, 0.2, 1.5, 0.1));
-		addStaticObject(new Wall(simulator, -1.6, -0.7, 0.1, 1.9));
-		addStaticObject(new Wall(simulator, -0.8, -1.6, 1.5, 0.1));
-		addStaticObject(new Wall(simulator, 0, -0.7, 0.1, 1.9));
+		addStaticObject( new Wall( simulator, position.x+0.2, position.y, 0.1, 0.4));
+		addStaticObject(new Wall( simulator, position.x-0.2, position.y, 0.1, 0.4));
+		addStaticObject(new Wall( simulator, position.x, position.y+ 0.2, 0.4, 0.1));
+		addStaticObject(new Wall( simulator, position.x, position.y-0.2, 0.4, 0.1));
 	}
 	
 	@Override
@@ -166,15 +122,12 @@ public class WallsEnvironment extends Environment {
 	}
 	
 	private Vector2d newRandomPositionSimplestEnvironment() {
-		return new Vector2d(random.nextDouble()
-				* (MAX_X_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV - MIN_X_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV)
-				+ MIN_X_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV, random.nextDouble()
-				* (MAX_X_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV - MIN_Y_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV)
-				+ MIN_Y_LIMIT_FOR_PREY_INSIDEWALL_MOSTDIFFICULTMENV);
+		double radius = random.nextDouble()*(forageLimit-nestLimit)+(nestLimit+0.2);
+		double angle = random.nextDouble()*2*Math.PI;
+		return new Vector2d(radius*Math.cos(angle),radius*Math.sin(angle));
 	}
 	
 	public int getNumberOfFoodSuccessfullyForaged() {
-//		System.out.println("food foragin"+numberOfFoodSuccessfullyForaged);
 		return numberOfFoodSuccessfullyForaged;
 	}
 

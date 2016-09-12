@@ -2,7 +2,6 @@ package evaluationfunctions;
 
 import java.util.HashMap;
 
-import environment.MazeDifficultEnvironment;
 import environment.WallsEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import mathutils.Vector2d;
@@ -35,7 +34,7 @@ public class WallsPreyEvaluation extends EvaluationFunction{
 			}
 			
 			for(Prey p : environment.getPrey()) {
-				current+=(1-(p.getPosition().distanceTo(nestPosition)/preyInicialDistance.get(p)))/(environment.getSteps());	
+				current+=(1-(p.getPosition().distanceTo(nestPosition)/preyInicialDistance.get(p)));	
 			}
 			
 			for(Robot r : environment.getRobots()){
