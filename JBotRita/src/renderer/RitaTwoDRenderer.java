@@ -235,33 +235,33 @@ public class RitaTwoDRenderer extends TwoDRenderer {
 //									System.out.println("sensor numero"+i);
 //									System.out.println("sensor tenho"+firesensor.getIsJumping(i));
 
-									if (firesensor.getIsJumping(i).equals( "POSITIVE")) {
-										Color[] colors2 = {
-												Color.DARK_GRAY,
-												Color.PINK };
-										RadialGradientPaint rgp = new RadialGradientPaint(
-												p, radius, dist,
-												colors2);
-										graphics2D.setPaint(rgp);
-										// }
-									} 
-									 if(firesensor.getIsJumping(i).equals("NO")) {
-										Color[] colors2 = {
-												Color.GRAY,
-												Color.DARK_GRAY };
-										RadialGradientPaint rgp = new RadialGradientPaint(
-												p, radius, dist,
-												colors2);
-										graphics2D.setPaint(rgp);
-									}	 if(firesensor.getIsJumping(i).equals("NULL")) {
-										Color[] colors2 = {
-												Color.BLUE,
-												Color.DARK_GRAY };
-										RadialGradientPaint rgp = new RadialGradientPaint(
-												p, radius, dist,
-												colors2);
-										graphics2D.setPaint(rgp);
-									}
+//									if (firesensor.getIsJumping(i).equals( "POSITIVE")) {
+//										Color[] colors2 = {
+//												Color.DARK_GRAY,
+//												Color.PINK };
+//										RadialGradientPaint rgp = new RadialGradientPaint(
+//												p, radius, dist,
+//												colors2);
+//										graphics2D.setPaint(rgp);
+//										// }
+//									} 
+//									 if(firesensor.getIsJumping(i).equals("NO")) {
+//										Color[] colors2 = {
+//												Color.GRAY,
+//												Color.DARK_GRAY };
+//										RadialGradientPaint rgp = new RadialGradientPaint(
+//												p, radius, dist,
+//												colors2);
+//										graphics2D.setPaint(rgp);
+//									}	 if(firesensor.getIsJumping(i).equals("NULL")) {
+//										Color[] colors2 = {
+//												Color.BLUE,
+//												Color.DARK_GRAY };
+//										RadialGradientPaint rgp = new RadialGradientPaint(
+//												p, radius, dist,
+//												colors2);
+//										graphics2D.setPaint(rgp);
+//									}
 									
 
 								}

@@ -67,7 +67,12 @@ public class CheckFitness {
 			Simulator sim = jbot.createSimulator();
 			jbot.createRobots(sim);
 			jbot.setupBestIndividual(sim);
-			EvaluationFunction eval = jbot.getEvaluationFunction() ;
+			
+			
+			EvaluationFunction eval =null;
+					
+			//EvaluationFunction eval =jbot.getEvaluationFunction() ; Antes era assim, ms com o update do JBotSim já não dá. Perguntar ao Miguel
+
 			sim.addCallback(eval);
 			sim.simulate();
 			

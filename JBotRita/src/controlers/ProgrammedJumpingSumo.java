@@ -80,7 +80,7 @@ public class ProgrammedJumpingSumo extends Controller {
 			}
 			isToJump = false;
 		} else if (isToJump = true && wallSensor.getSensorReading(0) >= 0.25) {
-			jump();
+			jump(time);
 		} else {
 			moveForward();
 		}
@@ -91,9 +91,9 @@ public class ProgrammedJumpingSumo extends Controller {
 	public void end() {
 	}
 
-	private boolean jump() {
+	private boolean jump(double time) {
 		jumpingActuator.jump();
-		jumpingActuator.apply(r);
+		jumpingActuator.apply(r,time);
 		return true;
 	}
 

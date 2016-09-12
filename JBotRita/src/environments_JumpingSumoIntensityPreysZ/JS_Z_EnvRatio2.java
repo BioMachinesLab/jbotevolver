@@ -5,6 +5,7 @@ import java.awt.Color;
 import mathutils.Vector2d;
 import net.jafama.FastMath;
 import physicalobjects.IntensityPrey;
+import physicalobjects.WallWithZ;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.physicalobjects.Prey;
@@ -47,10 +48,10 @@ public class JS_Z_EnvRatio2 extends JS_Environment {
 	}
 
 	public void init() {
-		env.addStaticObject(new Wall(simulator, 0, 2.5, 5, 0.125, 0.2)); // HorizontalWallNorth
-		env.addStaticObject(new Wall(simulator, 2.5, 0, 0.125, 5, 0.2)); // VerticalEast
-		env.addStaticObject(new Wall(simulator, 0, -2.5, 5, 0.125, 0.2)); // HorizontalSouth
-		env.addStaticObject(new Wall(simulator, -2.5, 0, 0.125, 5, 0.2)); // VerticalWest
+		env.addStaticObject(new WallWithZ(simulator, 0, 2.5, 5, 0.125, 0.2)); // HorizontalWallNorth
+		env.addStaticObject(new WallWithZ(simulator, 2.5, 0, 0.125, 5, 0.2)); // VerticalEast
+		env.addStaticObject(new WallWithZ(simulator, 0, -2.5, 5, 0.125, 0.2)); // HorizontalSouth
+		env.addStaticObject(new WallWithZ(simulator, -2.5, 0, 0.125, 5, 0.2)); // VerticalWest
 
 		// double b = random.nextDouble()
 		// * (MAX_WIDTH_LIMIT_FOR_WALL - MIN_WIDTH_LIMIT_FOR_WALL)

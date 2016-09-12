@@ -59,7 +59,9 @@ public class CheckFitnessBigEnv {
 			Simulator sim = jbot.createSimulator();
 			jbot.createRobots(sim);
 			jbot.setupBestIndividual(sim);
-			EvaluationFunction eval = jbot.getEvaluationFunction() ;
+			EvaluationFunction eval = null;
+			//ATENÇÃO ANTES ERA ASSIM: MS cm o update do JBotSim deixou de dar. depois perguntar ao Miguel.
+			//EvaluationFunction eval = jbot.getEvaluationFunction() ;
 			sim.addCallback(eval);
 			sim.simulate();
 			

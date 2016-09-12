@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import mathutils.Vector2d;
 import physicalobjects.IntensityPrey;
+import physicalobjects.WallWithZ;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.physicalobjects.Prey;
@@ -41,10 +42,10 @@ public class JS_Z_EnvWithoutRatio extends JS_Environment {
 	}
 
 	public void init(Environment env) {
-		env.addStaticObject(new Wall(simulator, 0, 2.5, 5, 0.125,1.5)); // HorizontalWallNorth
-		env.addStaticObject(new Wall(simulator, 2.5, 0, 0.125, 5,1.5)); // VerticalEast
-		env.addStaticObject(new Wall(simulator, 0, -2.5, 5, 0.125,1.5)); // HorizontalSouth
-		env.addStaticObject(new Wall(simulator, -2.5, 0, 0.125, 5,1.5)); // VerticalWest
+		env.addStaticObject(new WallWithZ(simulator, 0, 2.5, 5, 0.125,1.5)); // HorizontalWallNorth
+		env.addStaticObject(new WallWithZ(simulator, 2.5, 0, 0.125, 5,1.5)); // VerticalEast
+		env.addStaticObject(new WallWithZ(simulator, 0, -2.5, 5, 0.125,1.5)); // HorizontalSouth
+		env.addStaticObject(new WallWithZ(simulator, -2.5, 0, 0.125, 5,1.5)); // VerticalWest
 		
 		double width_Prey = random.nextDouble()
 				* (MAX_WIDTH_LIMIT_FOR_WALL - MIN_WIDTH_LIMIT_FOR_WALL)
@@ -68,7 +69,7 @@ public class JS_Z_EnvWithoutRatio extends JS_Environment {
 				* (height - (-2.1))
 				+ (-2.1);
 		
-		env.addStaticObject(new Wall(simulator, 0, height, 5, 0.125,1.5)); //centerWall
+		env.addStaticObject(new WallWithZ(simulator, 0, height, 5, 0.125,1.5)); //centerWall
 		env.addPrey(new IntensityPrey(simulator, "Prey " + 0,
 				
 				

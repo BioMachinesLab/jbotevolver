@@ -50,8 +50,8 @@ public class DifficultEnv_WallsZ_HalfSquare extends ForagingIntensityPreysEnviro
 		env.addStaticObject(new Wall(simulator, 0, 1.4, 3.1, 0.1)); // north
 		
 		
-	    env.addStaticObject(new Wall(simulator, 1.5, 0, 0.1, 2.8, 0.1)); // vertical left
-        env.addStaticObject(new Wall(simulator, -1.5, 0, 0.1, 2.8, 0.1)); // vertical right
+	    env.addStaticObject(new Wall(simulator, 1.5, 0, 0.1, 2.8 )); // vertical left
+        env.addStaticObject(new Wall(simulator, -1.5, 0, 0.1, 2.8 )); // vertical right
 		
 	}
 

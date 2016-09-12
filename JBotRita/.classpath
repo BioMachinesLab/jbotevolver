@@ -5,5 +5,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/JBotEvolver"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JBotSim"/>
 	<classpathentry kind="lib" path="/JBotSim/lib/jafama.jar"/>
+	<classpathentry kind="lib" path="/JBotSim/lib/jfreesvg-3.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

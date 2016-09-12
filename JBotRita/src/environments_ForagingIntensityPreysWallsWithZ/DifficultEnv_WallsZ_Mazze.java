@@ -2,7 +2,9 @@ package environments_ForagingIntensityPreysWallsWithZ;
 
 
 import java.awt.Color;
+
 import physicalobjects.IntensityPrey;
+import physicalobjects.WallWithZ;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
@@ -45,15 +47,15 @@ public class DifficultEnv_WallsZ_Mazze extends ForagingIntensityPreysEnvironment
 			env.addPrey(new IntensityPrey(simulator, "Prey " + i,
 					newRandomPosition(), 0, PREY_MASS,
 				PREY_RADIUS, randomIntensity()));
-		env.addStaticObject(new Wall(simulator, 0, 2, 4, 0.1,0.2)); // horizontal north in the forbidden area
-		env.addStaticObject(new Wall(simulator, 2, 0, 0.1, 4,0.2)); // vertical east in the forbidden area
-		env.addStaticObject(new Wall(simulator, 0, -2, 4, 0.1,0.2));  // horizontal south in the forbidden area
-		env.addStaticObject(new Wall(simulator, -2, 0, 0.1, 4,0.2)); // vertical west in the forbidden area
-		env.addStaticObject(new Wall(simulator, -1.4, 0.5, 1.2, 0.1,0.2)); //id=1 horizontal close to the vertical west in the forbidden area						
-		env.addStaticObject(new Wall(simulator, -0.8, -0.2, 0.1, 1.5,0.2)); //id=2 vertical right (close to the id==1)					
-		env.addStaticObject(new Wall(simulator, 0.1, -0.9, 1.9, 0.1,0.2)); //id=3 horizontal (close to the id==2)
-		env.addStaticObject(new Wall(simulator, 1, 0.2, 0.1, 2.1,0.2)); // id =4 vertical right (close to the id==3)	
-		env.addStaticObject(new Wall(simulator, 0, 1.2, 2, 0.1,0.2));// horizontal in top (begins with the id==4) 	
+		env.addStaticObject(new WallWithZ(simulator, 0, 2, 4, 0.1,0.2)); // horizontal north in the forbidden area
+		env.addStaticObject(new WallWithZ(simulator, 2, 0, 0.1, 4,0.2)); // vertical east in the forbidden area
+		env.addStaticObject(new WallWithZ(simulator, 0, -2, 4, 0.1,0.2));  // horizontal south in the forbidden area
+		env.addStaticObject(new WallWithZ(simulator, -2, 0, 0.1, 4,0.2)); // vertical west in the forbidden area
+		env.addStaticObject(new WallWithZ(simulator, -1.4, 0.5, 1.2, 0.1,0.2)); //id=1 horizontal close to the vertical west in the forbidden area						
+		env.addStaticObject(new WallWithZ(simulator, -0.8, -0.2, 0.1, 1.5,0.2)); //id=2 vertical right (close to the id==1)					
+		env.addStaticObject(new WallWithZ(simulator, 0.1, -0.9, 1.9, 0.1,0.2)); //id=3 horizontal (close to the id==2)
+		env.addStaticObject(new WallWithZ(simulator, 1, 0.2, 0.1, 2.1,0.2)); // id =4 vertical right (close to the id==3)	
+		env.addStaticObject(new WallWithZ(simulator, 0, 1.2, 2, 0.1,0.2));// horizontal in top (begins with the id==4) 	
 		
 	}
 
