@@ -16,9 +16,10 @@ public class ExportFitnessPlots extends TraverseFolders{
 	
 	private static String FOLDER_NAME = "export";
 	
+	
 	private String fileName;
 	private FileWriter fw;
-	private static int MAX_RUN = 10;
+	private static int MAX_RUN = 30;
 	
 	public ExportFitnessPlots(String baseFolder, String[] setups, String fileName) throws Exception{
 		super(baseFolder, setups);
@@ -36,7 +37,8 @@ public class ExportFitnessPlots extends TraverseFolders{
 //		new ExportFitnessPlots("bigdisk/qualitymetrics/", "fitness-qm.txt").traverse();
 //		new ExportFitnessPlots("bigdisk/binsize/", "fitness-binsize.txt").traverse();
 //		new ExportFitnessPlots("bigdisk/time/", "fitness-time.txt").traverse();
-		new ExportFitnessPlots("bigdisk/", "fitness.txt").traverse();
+		new ExportFitnessPlots("bigdisk/", "fitness-w1.txt").traverse();
+		new ExportFitnessPlots("bigdisk2/", "fitness-w2.txt").traverse();
 	}
 	
 	@Override
@@ -107,9 +109,9 @@ public class ExportFitnessPlots extends TraverseFolders{
 			baseFolder+=split[i]+"/";
 		}
 		
-		String mapping = "";
+		String mapping = "0";
 		String time = "0";
-		String quality = "";
+		String quality = "0";
 		String binsize = "0";
 		String robot = "";
 		String method = "";

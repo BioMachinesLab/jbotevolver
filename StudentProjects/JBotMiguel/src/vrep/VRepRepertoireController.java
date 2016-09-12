@@ -1,8 +1,12 @@
 package vrep;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 import evorbc.mappingfunctions.MappingFunction;
@@ -11,7 +15,7 @@ import mathutils.Vector2d;
 
 public class VRepRepertoireController extends VRepController {
 
-	public static String REPERTOIRE_FILENAME = "../repertoire.txt";
+	public static String REPERTOIRE_FILENAME = "repertoire.txt";
 	protected static double[][][] repertoire;
 	protected static double resolution;
 	protected static int nParams = 24;
@@ -20,6 +24,9 @@ public class VRepRepertoireController extends VRepController {
 	protected double heading;
 	protected double speed;
 	protected MappingFunction bm;
+	
+	protected String debugName;
+	protected boolean debug;
 	
 	public VRepRepertoireController(float[] parameters) {
 		super(parameters);
@@ -33,9 +40,21 @@ public class VRepRepertoireController extends VRepController {
 		loadRepertoire(REPERTOIRE_FILENAME);
 		
 		bm = new Polar180MappingFunction(repertoire);
-                bm.fill();
+		bm.fill();
+		
+		File f = new File("debug.txt");
+		debug = f.exists();
+		if(debug) {
+			System.out.println("################DEBUG MODE################");
+			try {
+				debugName = new SimpleDateFormat("yyyyMMdd_HHmmss").format(Calendar.getInstance().getTime()).toString()+".txt";
+			}catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+                
 	}
-
+	
 	protected static synchronized void loadRepertoire(String filename) {
 
 		if (repertoire != null)
@@ -70,7 +89,7 @@ public class VRepRepertoireController extends VRepController {
 		
 		repertoire = r;
 	}
-
+	
 	@Override
 	public float[] controlStep(float[] inputs) {
 		
@@ -79,32 +98,16 @@ public class VRepRepertoireController extends VRepController {
 		this.heading = outputs[0];
 		this.speed = outputs[1];
 		
-		double[] behavior = selectBehaviorFromRepertoire();
-		
-		return doubleToFloat(behavior);
-	}
-
-	// receives heading [0,1] and saves as angle [-1,1]
-	public void setHeading(double heading) {
-		this.heading = (heading - 0.5) * 2;
-		// System.out.print("h: "+heading+" -> "+Math.toDegrees(this.heading));
-	}
-
-	// receives speed [0,1] and saves as percentage [-1,1]
-	public void setWheelSpeed(double speed) {
-		this.speed = (speed - 0.5) * 2;
-		// System.out.println("\t\ts: "+speed+" -> "+this.speed);
-	}
-
-	protected double[] selectBehaviorFromRepertoire() {
-		
 		double[] behavior = null;
 		
 		double s = this.speed;
 		
+		Vector2d point = null;
+		
 		do{
-			Vector2d point = bm.map(this.heading,s);
-			behavior = repertoire[(int)point.x][(int)point.y];
+			point = bm.map(this.heading,s);
+			//TODO maybe change the values here
+			behavior = repertoire[(int)point.y][(int)point.x];
 			
 			if(behavior == null) {
 				//reduce the size of the circle to find an appropriate point
@@ -120,7 +123,45 @@ public class VRepRepertoireController extends VRepController {
 			
 		} while(behavior == null);
 		
-		return behavior;
+		if(debug)
+			debug(inputs, outputs, point);
+		
+		time++;
+		
+		return doubleToFloat(behavior);
+	}
+	
+	protected void debug(float[] inputs, float[] outputs, Vector2d point) {
+		try {
+			FileWriter fw = new FileWriter(new File(debugName), true);
+			String line = time+"";
+			
+			for(float f : inputs)
+				line = line+"\t"+f;
+			
+			for(float f : outputs)
+				line = line+"\t"+f;
+			
+			line = line+"\t"+point.x+"\t"+point.y;
+			
+			fw.append(line+"\n");
+			fw.close();
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// receives heading [0,1] and saves as angle [-1,1]
+	public void setHeading(double heading) {
+		this.heading = (heading - 0.5) * 2;
+		// System.out.print("h: "+heading+" -> "+Math.toDegrees(this.heading));
+	}
+
+	// receives speed [0,1] and saves as percentage [-1,1]
+	public void setWheelSpeed(double speed) {
+		this.speed = (speed - 0.5) * 2;
+		// System.out.println("\t\ts: "+speed+" -> "+this.speed);
 	}
 
 	private static double readDouble(Scanner s) {
