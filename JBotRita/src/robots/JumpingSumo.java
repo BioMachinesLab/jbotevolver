@@ -62,7 +62,7 @@ public class JumpingSumo extends JumpingRobot {
 			robotDriving(time, timeDelta);
 		}
 		for (Actuator actuator : actuators) {
-			actuator.apply(this);
+			actuator.apply(this,timeDelta);
 		}
 	}
 	

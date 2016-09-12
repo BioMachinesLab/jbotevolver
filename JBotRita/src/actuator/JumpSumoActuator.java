@@ -18,7 +18,7 @@ public class JumpSumoActuator extends Actuator{
 	}
 			
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot,double timeDelta) {
 		// TODO Auto-generated method stub
 		if(isToJump){
 			((JumpingSumo) robot).jump();

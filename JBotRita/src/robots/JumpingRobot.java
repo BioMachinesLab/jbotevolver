@@ -72,7 +72,7 @@ public class JumpingRobot extends DifferentialDriveRobot {
 			robotDriving(time, timeDelta);
 		}
 		for (Actuator actuator : actuators) {
-			actuator.apply(this);
+			actuator.apply(this, timeDelta);
 		}
 	}
 

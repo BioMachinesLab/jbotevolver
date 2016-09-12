@@ -28,7 +28,7 @@ public class IntensityPreyPickerActuator extends Jump_IntensityPreyPickerActuato
 
 	//in case there are obstacles between the robot and the prey, the robot can't pick it.
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot,double timeDelta) {
 		
 		if (!hasPrey) {
 			super.findBestPrey(robot);

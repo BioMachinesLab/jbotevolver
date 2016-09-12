@@ -24,12 +24,12 @@ public class Jump_PreyPickerActuator extends PreyPickerActuator {
 
 
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot,double timeDelta) {
 		if(robot instanceof JumpingRobot){
 			if(!((JumpingRobot)robot).ignoreWallCollisions())  
-				super.apply(robot);
+				super.apply(robot, timeDelta);
 		}else{
-			super.apply(robot);
+			super.apply(robot, timeDelta);
 		}
 	}
 	

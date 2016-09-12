@@ -32,7 +32,7 @@ public class RotationActuator extends Actuator {
 
 
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot,double timeDelta) {
 		leftSpeed*= (1 + random.nextGaussian() * NOISESTDEV);
 		rightSpeed*= (1 + random.nextGaussian() * NOISESTDEV);
 

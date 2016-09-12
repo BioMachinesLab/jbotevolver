@@ -34,7 +34,7 @@ public class Jump_IntensityPreyPickerActuator extends Actuator {
 	}
 
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot,double timeDelta) {
 			if (!hasPrey) {
 				findBestPrey(robot);
 				if (bestPrey != null) {

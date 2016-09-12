@@ -73,7 +73,7 @@ public class ChangeActuator extends Actuator {
 	}
 
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot,double timeDelta) {
 		if(sensor == null){
 			sensor = (ConeTypeSensor)robot.getSensorWithId(idSensor);
 			maxRange = sensor.getRange();

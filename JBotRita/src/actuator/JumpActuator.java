@@ -30,7 +30,7 @@ public class JumpActuator extends Actuator{
 	}
 
 	@Override
-	public void apply(Robot robot) {
+	public void apply(Robot robot,double timeDelta) {
 		// TODO Auto-generated method stub
 		if(isToJump){
 			((JumpingRobot) robot).jump(angle,power);
