@@ -297,7 +297,7 @@ public class SimpleCollisionManager extends CollisionManager {
 		return true;
 	}
 	
-	private void setLength(Vector2d vector, double length) {
+	protected void setLength(Vector2d vector, double length) {
 		if (vector.x == 0 && vector.y == 0) {
 			vector.x = simulator.getRandom().nextGaussian();
 			vector.y = simulator.getRandom().nextGaussian();
@@ -305,7 +305,7 @@ public class SimpleCollisionManager extends CollisionManager {
 		vector.setLength(length);
 	}
 	
-	private Vector2d handleCollision(PhysicalObject obj, Wall wall, int collisionStatus) {
+	protected Vector2d handleCollision(PhysicalObject obj, Wall wall, int collisionStatus) {
 		
 		double valueX = obj.getPosition().getX(), valueY = obj.getPosition().getY();
 		switch (collisionStatus) {
@@ -330,7 +330,7 @@ public class SimpleCollisionManager extends CollisionManager {
 		return new Vector2d(valueX, valueY);
 	}
 
-	private int checkIfCollided(Wall closeWall, PhysicalObject obj) {
+	protected int checkIfCollided(Wall closeWall, PhysicalObject obj) {
 
 		Vector2d topLeft = new Vector2d(closeWall.getTopLeftX(),
 				closeWall.getTopLeftY()), topRight = new Vector2d(
