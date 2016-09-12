@@ -37,8 +37,8 @@ public class ExportFitnessPlots extends TraverseFolders{
 //		new ExportFitnessPlots("bigdisk/qualitymetrics/", "fitness-qm.txt").traverse();
 //		new ExportFitnessPlots("bigdisk/binsize/", "fitness-binsize.txt").traverse();
 //		new ExportFitnessPlots("bigdisk/time/", "fitness-time.txt").traverse();
-		new ExportFitnessPlots("bigdisk2/", "fitness-w1.txt").traverse();
-		new ExportFitnessPlots("bigdisk/", "fitness-w2.txt").traverse();
+		new ExportFitnessPlots("bigdisk/", "fitness-w1.txt").traverse();
+		new ExportFitnessPlots("bigdisk2/", "fitness-w2.txt").traverse();
 	}
 	
 	@Override

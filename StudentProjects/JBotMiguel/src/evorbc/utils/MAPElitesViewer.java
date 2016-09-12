@@ -63,7 +63,7 @@ public class MAPElitesViewer {
 	
 	public static void main(String[] args) throws Exception {
 //		new MAPElitesViewer("bigdisk/evorbc2/binsize/", true);
-		new MAPElitesViewer("bigdisk/time/", true);
+		new MAPElitesViewer("bigdisk/time-binsize/", true);
 //		new MAPElitesViewer("bigdisk/evorbc2/behaviormapping/", true);
 		
 //                new MAPElitesViewer("nao_map/", true);
@@ -112,7 +112,7 @@ public class MAPElitesViewer {
 				} else if (s.equals("_showbest_current.conf")) {
 					
 					try {
-						JBotEvolver jb = new JBotEvolver(new String[]{f.getPath()+"/"+s,"--simulator","+folder=bigdisk/time/"/*,"--init","skip=0"*/});
+						JBotEvolver jb = new JBotEvolver(new String[]{f.getPath()+"/"+s,"--simulator","+folder="+baseFolder/*,"--init","skip=0"*/});
 						
 						if(jb.getPopulation() instanceof MAPElitesPopulation) {
 							files.add(f.getPath().replaceAll(this.baseFolder, ""));

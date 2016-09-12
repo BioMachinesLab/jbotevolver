@@ -45,6 +45,8 @@ public class VRepShowbestController extends Controller implements FixedLenghtGen
 //		if(!args.getArgumentIsDefined("time"))
 //			throw new RuntimeException("Argument 'time' not defined for class HexapodShowbestController!");
 		waitForResult = args.getArgumentAsIntOrSetDefault("waitforresult",1) == 1; 
+                
+                time = args.getArgumentAsInt("time");
 		
 		if(args.getArgumentIsDefined("weights")) {
 			String[] rawArray = args.getArgumentAsString("weights").split(",");
