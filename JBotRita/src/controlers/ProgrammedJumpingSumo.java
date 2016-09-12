@@ -73,7 +73,7 @@ public class ProgrammedJumpingSumo extends Controller {
 		if (isToJump = false || foodSensors.getSensorReading(0) >= 0.5) {
 			IntensityPrey prey = (IntensityPrey) simulator.getEnvironment()
 					.getPrey().get(0);
-			pickUpPrey.apply(r);
+			pickUpPrey.apply(r,time);
 			pickUpPrey.dropPrey();
 			if (prey.getIntensity() < 0) {
 				simulator.stopSimulation();
