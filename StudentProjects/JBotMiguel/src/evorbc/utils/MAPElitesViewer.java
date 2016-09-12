@@ -63,7 +63,7 @@ public class MAPElitesViewer {
 	
 	public static void main(String[] args) throws Exception {
 //		new MAPElitesViewer("bigdisk/evorbc2/binsize/", true);
-		new MAPElitesViewer("bigdisk/vsvanilla/", true);
+		new MAPElitesViewer("../../../Robot/V-REP/java/nao_map_stop2/", true);
 //		new MAPElitesViewer("bigdisk/evorbc2/behaviormapping/", true);
 		
 //                new MAPElitesViewer("nao_map/", true);
@@ -236,9 +236,9 @@ public class MAPElitesViewer {
 				
 				MOChromosome res = pop.getMap()[x][y];
 				
-				double[] b = ((double[][][])jbot.getSerializableObjectHashMap().get("repertoire"))[x][y];
+				//double[] b = ((double[][][])jbot.getSerializableObjectHashMap().get("repertoire"))[x][y];
 				
-				if(b != null) {
+				if(res != null) {
 					
 					//show the rep with the filling
 					
