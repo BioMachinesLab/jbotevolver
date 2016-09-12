@@ -137,7 +137,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 	protected JCheckBox neuralNetworkViewerCheckbox;
 	protected JCheckBox exportToBlender;
 
-	protected boolean enableDebugOptions = false;
+	protected boolean enableDebugOptions = true;
 	protected boolean showSleepError = false;
 	protected boolean showCurrentFileLabel = false;
 
@@ -156,7 +156,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 			createRenderer(new Arguments(args.getArgumentAsString("renderer")));
 		}
 
-		enableDebugOptions = args.getArgumentAsIntOrSetDefault("enabledebugoptions", 0) == 1;
+		enableDebugOptions = args.getArgumentAsIntOrSetDefault("enabledebugoptions", 1) == 1;
 		showCurrentFileLabel = args.getArgumentAsIntOrSetDefault("showCurrentFileLabel", 0) == 1;
 
 		setLayout(new BorderLayout());
