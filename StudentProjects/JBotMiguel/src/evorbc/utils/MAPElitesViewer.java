@@ -246,7 +246,7 @@ public class MAPElitesViewer {
 					b = serializedRepertoire[x][y];
 				}
 				
-				if(b != null) {
+				if(res != null) {
 					
 					//show the rep with the filling
 					

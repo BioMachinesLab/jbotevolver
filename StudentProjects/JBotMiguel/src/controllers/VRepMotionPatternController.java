@@ -141,10 +141,12 @@ public class VRepMotionPatternController extends Controller implements FixedLeng
 		
 		int parametersIndex = 0;
 		
-		this.parameters = new float[6+weights.length];
+		this.parameters = new float[8+weights.length];
 		
-		this.parameters[parametersIndex++] = 1;//1 fixed parameters
-		this.parameters[parametersIndex++] = time;//X seconds
+		this.parameters[parametersIndex++] = 3;//1 fixed parameters
+		this.parameters[parametersIndex++] = 4;//X seconds
+                this.parameters[parametersIndex++] = 20;//tilt kill
+                this.parameters[parametersIndex++] = 3;//stop time
 		this.parameters[parametersIndex++] = 1;//1 individual
 		this.parameters[parametersIndex++] = 1;//id
 		this.parameters[parametersIndex++] = genomeLength+1;//size of type+genome
