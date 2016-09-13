@@ -28,17 +28,15 @@ public class ForagingIntensityPreysEnvironment extends Environment {
 			
 	protected boolean change_PreyInitialDistance;
 	
-	
-	
 	protected Prey preyEated;
 	
 	private int fitnesssample = 0;
 	
 	@ArgumentsAnnotation(name="foragelimit", defaultValue="2.0")
-	private double forageLimit;
+	protected double forageLimit;
 	
 	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="5.0")
-	private	double forbiddenArea;
+	protected	double forbiddenArea;
 	
 	@ArgumentsAnnotation(name="numberofpreys", defaultValue="1")
 	protected int numberOfPreys;
@@ -68,12 +66,9 @@ public class ForagingIntensityPreysEnvironment extends Environment {
 			numberOfPreys = arguments.getArgumentIsDefined("numberofpreys") ? arguments.getArgumentAsInt("numberofpreys") : 1;
 		}
 				
-	
 		this.random = simulator.getRandom();
 		fitnesssample = arguments.getArgumentAsInt("fitnesssample");
 		fitnesssample = fitnesssample % 4;
-		
-		
 	}
 
 	@Override
@@ -81,13 +76,27 @@ public class ForagingIntensityPreysEnvironment extends Environment {
 		super.setup(simulator);
 	}
 
-
 	@Override
 	public void update(double time) {
-		
+		change_PreyInitialDistance = false;
+		for (Prey nextPrey : simulator.getEnvironment().getPrey()) {
+			IntensityPrey prey = (IntensityPrey) nextPrey;
+			if (nextPrey.isEnabled() && prey.getIntensity() <= 0) {
+				prey.setIntensity(randomIntensity());
+				prey.teleportTo(newRandomPosition());
+				numberOfFoodSuccessfullyForaged++;
+				preyEated = prey;
+				change_PreyInitialDistance = true;
+			}
+			if (prey.getIntensity() < 9)
+				prey.setColor(Color.BLACK);
+			else if (prey.getIntensity() < 13)
+				prey.setColor(Color.GREEN.darker());
+			else
+				prey.setColor(Color.RED);
+		}
 	}
 	
-
 	public int getNumberOfFoodSuccessfullyForaged() {
 		return numberOfFoodSuccessfullyForaged;
 	}
@@ -112,7 +121,9 @@ public class ForagingIntensityPreysEnvironment extends Environment {
 		return (random.nextInt((MAX_PREY_INTENSITY - MIN_PREY_INTENSITY) + 1) + MIN_PREY_INTENSITY);
 	}
 	
-	
+	protected Vector2d newRandomPosition(){
+		return new Vector2d(random.nextDouble()*(width),random.nextDouble()*(height));
+	}
 	
 }
 	

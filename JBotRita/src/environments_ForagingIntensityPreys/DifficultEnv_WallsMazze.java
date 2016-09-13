@@ -2,6 +2,7 @@ package environments_ForagingIntensityPreys;
 
 
 import java.awt.Color;
+
 import physicalobjects.IntensityPrey;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -79,7 +80,8 @@ public class DifficultEnv_WallsMazze extends ForagingIntensityPreysEnvironment {
 		
 	}
 	
-	public Vector2d newRandomPosition() {
+	@Override
+	protected Vector2d newRandomPosition() {
 		if (firstPositionOfPreyWasAdded == false) {
 			firstPositionOfPreyWasAdded = true;
 			return new Vector2d(random.nextDouble() * (MAX_X_LIMIT_FOR_PREY_NORTH_DIFFICULTENV - MIN_X_LIMIT_FOR_PREY_NORTH_DIFFICULTENV) + MIN_X_LIMIT_FOR_PREY_NORTH_DIFFICULTENV,

@@ -67,28 +67,7 @@ public class MeddiumEnv_WallsCross extends ForagingIntensityPreysEnvironment {
 	}
 
 	@Override
-	public void update(double time) {
-		change_PreyInitialDistance = false;
-		for (Prey nextPrey : simulator.getEnvironment().getPrey()) {
-			IntensityPrey prey = (IntensityPrey) nextPrey;
-			if (nextPrey.isEnabled() && prey.getIntensity() <= 0) {
-				prey.setIntensity(randomIntensity());
-				prey.teleportTo(newRandomPosition());
-				numberOfFoodSuccessfullyForaged++;
-				preyEated = prey;
-				change_PreyInitialDistance = true;
-			}
-			if (prey.getIntensity() < 9)
-				prey.setColor(Color.BLACK);
-			else if (prey.getIntensity() < 13)
-				prey.setColor(Color.GREEN.darker());
-			else
-				prey.setColor(Color.RED);
-		}
-		
-	}
-
-	public Vector2d newRandomPosition() {
+	protected Vector2d newRandomPosition() {
 		if (firstPositionOfPreyWasAdded == false) {
 
 			firstPositionOfPreyWasAdded = true;

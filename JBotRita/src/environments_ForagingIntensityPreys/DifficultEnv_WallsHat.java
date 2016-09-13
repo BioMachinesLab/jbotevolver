@@ -86,7 +86,8 @@ public class DifficultEnv_WallsHat extends ForagingIntensityPreysEnvironment {
 		
 	}
 
-	public Vector2d newRandomPosition() {
+	@Override
+	protected Vector2d newRandomPosition() {
 
 		if (firstPositionOfPreyWasAdded == false) {
 			firstPositionOfPreyWasAdded = true;

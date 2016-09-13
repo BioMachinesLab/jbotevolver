@@ -47,12 +47,6 @@ public class DifficultEnv_TwoWallsVertical extends ForagingIntensityPreysEnviron
 					newRandomPosition(), 0, PREY_MASS,
 				PREY_RADIUS, randomIntensity()));
 		
-	    
-       // env.addStaticObject(new Wall(simulator, -0.8, 0.4, 0.1, 3.3)); //id=2 vertical right (close to the id==1)					
-        //env.addStaticObject(new Wall(simulator, 0.5, -0.3, 0.1, 3)); //id=2 vertical right (close to the id==1)					
-        
-        
-        
         env.addStaticObject(new Wall(simulator, 0.5, 0.4, 0.1, 3.3)); //id=2 vertical right (close to the id==1)					
         env.addStaticObject(new Wall(simulator, -0.8, -0.4, 0.1, 3.3)); //id=2 vertical right (close to the id==1)					
         env.addStaticObject(new Wall(simulator, 0, 2, 4, 0.1)); // horizontal north in the forbidden area
@@ -64,28 +58,7 @@ public class DifficultEnv_TwoWallsVertical extends ForagingIntensityPreysEnviron
 	}
 
 	@Override
-	public void update(double time) {
-		change_PreyInitialDistance = false;
-		for (Prey nextPrey : simulator.getEnvironment().getPrey()) {
-			IntensityPrey prey = (IntensityPrey) nextPrey;
-			if (nextPrey.isEnabled() && prey.getIntensity() <= 0) {
-				prey.setIntensity(randomIntensity());
-				prey.teleportTo(newRandomPosition());
-				numberOfFoodSuccessfullyForaged++;
-				preyEated = prey;
-				change_PreyInitialDistance = true;
-			}
-			if (prey.getIntensity() < 9)
-				prey.setColor(Color.BLACK);
-			else if (prey.getIntensity() < 13)
-				prey.setColor(Color.GREEN.darker());
-			else
-				prey.setColor(Color.RED);
-		}
-		
-	}
-
-	public Vector2d newRandomPosition() {
+	protected Vector2d newRandomPosition() {
 
 		if (firstPositionOfPreyWasAdded == false) {
 			firstPositionOfPreyWasAdded = true;

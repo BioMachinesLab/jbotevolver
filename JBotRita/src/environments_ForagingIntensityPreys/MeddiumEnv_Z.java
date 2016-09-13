@@ -22,9 +22,7 @@ public class MeddiumEnv_Z extends ForagingIntensityPreysEnvironment {
 	private static final double MAX_Y_LIMIT_FOR_PREY_EASTSOUTHWALL_MEDDIUMENV = -0.5;
 	private static final double MIN_Y_LIMIT_FOR_PREY_EASTSOUTHWALL_MEDDIUMENV = -1;
 	
-	
 	private boolean firstPositionOfPreyWasAdded =false;
-	
 	
 	
 	public MeddiumEnv_Z(Simulator simulator, Arguments arguments) {
@@ -52,32 +50,10 @@ public class MeddiumEnv_Z extends ForagingIntensityPreysEnvironment {
         env.addStaticObject(new Wall(simulator, -1, 2, 2, 0.1)); // horizontal center in the forbidden area
         env.addStaticObject(new Wall(simulator, 1, -2, 2, 0.1)); // horizontal center in the forbidden area
         env.addStaticObject(new Wall(simulator, 0, 0, 0.1, 4)); // vertical center in the forbidden area
-
-	
 	}
 
 	@Override
-	public void update(double time) {
-		change_PreyInitialDistance = false;
-		for (Prey nextPrey : simulator.getEnvironment().getPrey()) {
-			IntensityPrey prey = (IntensityPrey) nextPrey;
-			if (nextPrey.isEnabled() && prey.getIntensity() <= 0) {
-				prey.setIntensity(randomIntensity());
-				prey.teleportTo(newRandomPosition());
-				numberOfFoodSuccessfullyForaged++;
-				preyEated = prey;
-				change_PreyInitialDistance = true;
-			}
-			if (prey.getIntensity() < 9)
-				prey.setColor(Color.BLACK);
-			else if (prey.getIntensity() < 13)
-				prey.setColor(Color.GREEN.darker());
-			else
-				prey.setColor(Color.RED);
-		}
-	}
-
-	public Vector2d newRandomPosition() {
+	protected Vector2d newRandomPosition() {
 		if (firstPositionOfPreyWasAdded == true) {
 
 			firstPositionOfPreyWasAdded = false;
@@ -88,8 +64,6 @@ public class MeddiumEnv_Z extends ForagingIntensityPreysEnvironment {
 			firstPositionOfPreyWasAdded = true;
 			return new Vector2d(random.nextDouble() * (MAX_X_LIMIT_FOR_PREY_EASTSOUTHWALL_MEDDIUMENV - MIN_X_LIMIT_FOR_PREY_EASTSOUTHWALL_MEDDIUMENV) + MIN_X_LIMIT_FOR_PREY_EASTSOUTHWALL_MEDDIUMENV,
 					random.nextDouble() * (MAX_Y_LIMIT_FOR_PREY_EASTSOUTHWALL_MEDDIUMENV - MIN_Y_LIMIT_FOR_PREY_EASTSOUTHWALL_MEDDIUMENV) + MIN_Y_LIMIT_FOR_PREY_EASTSOUTHWALL_MEDDIUMENV);
-
-			
 		}
 	}
 }

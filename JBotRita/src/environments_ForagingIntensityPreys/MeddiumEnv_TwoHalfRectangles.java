@@ -22,9 +22,6 @@ public class MeddiumEnv_TwoHalfRectangles extends ForagingIntensityPreysEnvironm
 	private static final double MAX_Y_LIMIT_FOR_PREY_RIGHT_DIFFICULTENV = 0.3;
 	private static final double MIN_Y_LIMIT_FOR_PREY_RIGHT_DIFFICULTENV = -0.3;
 
-	
-	
-	
 	private static final double MAX_X_LIMIT_FOR_PREY_LEFT_DIFFICULTENV = -1;
 	private static final double MIN_X_LIMIT_FOR_PREY_LEFT_DIFFICULTENV = -1.5;
 	private static final double MAX_Y_LIMIT_FOR_PREY_LEFT_DIFFICULTENV = 0.3;
@@ -67,28 +64,7 @@ public class MeddiumEnv_TwoHalfRectangles extends ForagingIntensityPreysEnvironm
 	}
 
 	@Override
-	public void update(double time) {
-		change_PreyInitialDistance = false;
-		for (Prey nextPrey : simulator.getEnvironment().getPrey()) {
-			IntensityPrey prey = (IntensityPrey) nextPrey;
-			if (nextPrey.isEnabled() && prey.getIntensity() <= 0) {
-				prey.setIntensity(randomIntensity());
-				prey.teleportTo(newRandomPosition());
-				numberOfFoodSuccessfullyForaged++;
-				preyEated = prey;
-				change_PreyInitialDistance = true;
-			}
-			if (prey.getIntensity() < 9)
-				prey.setColor(Color.BLACK);
-			else if (prey.getIntensity() < 13)
-				prey.setColor(Color.GREEN.darker());
-			else
-				prey.setColor(Color.RED);
-		}
-		
-	}
-
-	public Vector2d newRandomPosition() {
+	protected Vector2d newRandomPosition() {
 
 		if (firstPositionOfPreyWasAdded == false) {
 			firstPositionOfPreyWasAdded = true;
