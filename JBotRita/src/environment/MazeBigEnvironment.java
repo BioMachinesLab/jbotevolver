@@ -44,9 +44,7 @@ public class MazeBigEnvironment extends Environment {
 	@ArgumentsAnnotation(name="prey_max", defaultValue="1")
 	private double prey_max;
 	
-
 	private Simulator simulator;
-	private boolean foodInCenter = false;
 	private boolean change_PreyInitialDistance;
 
 	private Prey prey;
@@ -73,9 +71,7 @@ public class MazeBigEnvironment extends Environment {
 			numberOfPreys = arguments.getArgumentIsDefined("numberofpreys") ? arguments.getArgumentAsInt("numberofpreys") : 20;
 		}
 				
-				
 		this.random = simulator.getRandom();
-
 	}
 
 	@Override
@@ -125,8 +121,7 @@ public class MazeBigEnvironment extends Environment {
 		addObject(nest);
 		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
 		addObject(nest);
-		
-
+	
 	}
 
 	private Vector2d newRandomPosition() {
@@ -145,12 +140,8 @@ public class MazeBigEnvironment extends Environment {
 	public void update(double time) {
 		change_PreyInitialDistance = false;
 		for (Prey nextPrey : simulator.getEnvironment().getPrey()) {
-			// double distance = nextPrey.getPosition().length();
 			double distance = nextPrey.getPosition().distanceTo(nestPosition);
 			if (nextPrey.isEnabled() && distance < nestLimit) {
-				// if(distance == 0){
-				// System.out.println("ERRO--- zero");
-				// }
 				Vector2d position = newRandomPosition();
 				nextPrey.teleportTo(position);
 				numberOfFoodSuccessfullyForaged++;
@@ -162,7 +153,6 @@ public class MazeBigEnvironment extends Environment {
 	}
 
 	public int getNumberOfFoodSuccessfullyForaged() {
-		// System.out.println("food foragin"+numberOfFoodSuccessfullyForaged);
 		return numberOfFoodSuccessfullyForaged;
 	}
 

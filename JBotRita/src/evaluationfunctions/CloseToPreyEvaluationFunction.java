@@ -23,7 +23,6 @@ public class CloseToPreyEvaluationFunction extends EvaluationFunction{
 		super(args);	
 	}
 
-
 	//@Override
 	public void update(Simulator simulator) {	
 		WallsEnvironment environment= ((WallsEnvironment)(simulator.getEnvironment()));
@@ -31,13 +30,12 @@ public class CloseToPreyEvaluationFunction extends EvaluationFunction{
 		if(simulator.getTime()>0){
 			if(environment.isToChange_PreyInitialDistance()){
 				Prey prey= environment.preyWithNewDistace();
-				preyInicialPosition.replace(prey, prey.getPosition());
+				preyInicialPosition.put(prey, prey.getPosition());
 			}
 			
 			for(Prey p : environment.getPrey()) {  //Award for the prey is getting closer!
 				current+=(1-(p.getPosition().distanceTo(nestPosition)/preyInicialPosition.get(p).distanceTo(nestPosition)))/(environment.getSteps()*1000);	
 			}
-			// hierarquia!
 			
 			for(Robot r : environment.getRobots()){
 				if(((DifferentialDriveRobot) r).getRightWheelSpeed()<0 || ((DifferentialDriveRobot) r).getLeftWheelSpeed()<0){
@@ -51,13 +49,12 @@ public class CloseToPreyEvaluationFunction extends EvaluationFunction{
 						if(robot_position.distanceTo(closest_Prey.getPosition())>robot_position.distanceTo(current_prey.getPosition()))
 							closest_Prey=current_prey;
 					}
+					//award for robot getting closer to the closest prey
 					current+=(1-(robot_position.distanceTo(closest_Prey.getPosition())/preyInicialPosition.get(closest_Prey).distanceTo(nestPosition)))/(environment.getSteps()*10000);
 				}
 			}
 			numberOfFoodForaged=environment.getNumberOfFoodSuccessfullyForaged();
-			fitness=current+numberOfFoodForaged; 
-			
-			
+			fitness=current+numberOfFoodForaged;
 		}else{  //tempo == 0
 				for(Prey p :preys){
 					preyInicialPosition.put(p, p.getPosition());

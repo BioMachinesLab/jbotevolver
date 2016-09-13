@@ -52,11 +52,12 @@ public class FlockingEvaluationFunction extends JumpingSumoEvaluationFunction {
 		
 		//double rewardDistancia=(sumOfDistances / numberOfRobots) / ((simulator.getEnvironment().getSteps()/40/2));
 
-		double rewardDistancia=(distance / numberOfRobots) / ((simulator.getEnvironment().getSteps()/40/2));
-		
-		
+		//double rewardDistancia=(distance / numberOfRobots) / ((simulator.getEnvironment().getSteps()/2));
+		double rewardDistancia=(distance / numberOfRobots) / ((simulator.getEnvironment().getSteps()*0.1));
+
+		//System.out.println(rewardDistancia +"distance");
+
 		return fitness+rewardDistancia;
-		
 		
 	}
 
@@ -135,6 +136,8 @@ public class FlockingEvaluationFunction extends JumpingSumoEvaluationFunction {
 			
 
 			//fitness = current * -0.001 +  rewardForOrientation ;
+			//System.out.println(rewardForOrientation/environment.getSteps()  +"reward");
+			//System.out.println(clusters/environment.getSteps()  +"cluster");
 
 			fitness = current * -0.001  +  clusters/environment.getSteps()+ rewardForOrientation/environment.getSteps() ;
 		} else {

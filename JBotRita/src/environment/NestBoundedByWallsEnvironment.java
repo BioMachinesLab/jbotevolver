@@ -15,27 +15,26 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
-public class JumpingWallsEnvironment extends Environment {
+public class NestBoundedByWallsEnvironment extends Environment {
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1;
 	
 
-	
 	@ArgumentsAnnotation(name="nestlimit", defaultValue="0.5")
-	private double nestLimit;
+	protected double nestLimit;
 	
 	@ArgumentsAnnotation(name="foragelimit", defaultValue="2.0")
-	private double forageLimit;
+	protected double forageLimit;
 	
 	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="5.0")
-	private	double forbiddenArea;
+	protected	double forbiddenArea;
 		
 
-	private Nest nest;
-	private Random random;
-	private Simulator simulator;
+	protected Nest nest;
+	protected Random random;
+	protected Simulator simulator;
 	
-	public JumpingWallsEnvironment(Simulator simulator, Arguments arguments) {
+	public NestBoundedByWallsEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 		this.simulator = simulator;
 		nestLimit       = arguments.getArgumentIsDefined("nestlimit") ? arguments.getArgumentAsDouble("nestlimit")       : .5;
@@ -45,22 +44,29 @@ public class JumpingWallsEnvironment extends Environment {
 		
 	}
 	
+
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
+		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
+		addObject(nest);	
+		addWallsBoundingNest();
+		addRobots();
+	}
+
+	protected void addWallsBoundingNest(){
 		addStaticObject( new Wall( simulator, 0, 0.5, 1, 0.1));
 		addStaticObject(new Wall( simulator, 0, -0.5, 1, 0.1));
 		addStaticObject(new Wall( simulator, 0.5, 0, 0.1, 1));
 		addStaticObject(new Wall( simulator, -0.5, 0, 0.1, 1));
-		nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
-		addObject(nest);	
+	}
+	
+	protected void addRobots(){
 		for(Robot r: getRobots()){
 			r.teleportTo(newRandomPosition());
 			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
-		}
-			
+		}	
 	}
-
 	
 	public double getNestRadius() {
 		return nestLimit;
@@ -79,13 +85,10 @@ public class JumpingWallsEnvironment extends Environment {
 		double angle = random.nextDouble()*2*Math.PI;
 		return new Vector2d(radius*Math.cos(angle),radius*Math.sin(angle));
 	}
-	
+
 	@Override
 	public void update(double time) {
-//		if(time==0.0){
-//			for(Robot r: getRobots())
-//				r.teleportTo(newRandomPosition());
-//		}
 		// TODO Auto-generated method stub
 	}
+	
 }

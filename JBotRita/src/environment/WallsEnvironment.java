@@ -16,71 +16,40 @@ import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
-public class WallsEnvironment extends Environment {
+public class WallsEnvironment extends NestBoundedByWallsEnvironment {
 	private Vector2d   nestPosition = new Vector2d(0, 0);
 	private static final double PREY_RADIUS = 0.025;
 	private static final double PREY_MASS = 1;
 	
-	@ArgumentsAnnotation(name="nestlimit", defaultValue="0.5")
-	private double nestLimit;
-	
-	@ArgumentsAnnotation(name="foragelimit", defaultValue="2.0")
-	private double forageLimit;
-	
-	@ArgumentsAnnotation(name="forbiddenarea", defaultValue="5.0")
-	private	double forbiddenArea;
-	
-	@ArgumentsAnnotation(name="numberofpreys", defaultValue="20")
+	@ArgumentsAnnotation(name="numberofpreys", defaultValue="3")
 	private int numberOfPreys;
 	
-	@ArgumentsAnnotation(name="densityofpreys", defaultValue="")
-	private Nest nest;
 	private int numberOfFoodSuccessfullyForaged = 0;
-	private Random random;
 	
-	private Simulator simulator;
-	private boolean foodInCenter=false;
 	private boolean change_PreyInitialDistance;
 	
 	private Prey prey;
 
 	public WallsEnvironment(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
-		this.simulator = simulator;
-		nestLimit       = arguments.getArgumentIsDefined("nestlimit") ? arguments.getArgumentAsDouble("nestlimit")       : .5;
-		forageLimit     = arguments.getArgumentIsDefined("foragelimit") ? arguments.getArgumentAsDouble("foragelimit")       : 2.0;
-		forbiddenArea   = arguments.getArgumentIsDefined("forbiddenarea") ? arguments.getArgumentAsDouble("forbiddenarea")       : 5.0;
-		this.random = simulator.getRandom();
 		if(arguments.getArgumentIsDefined("densityofpreys")){
 			double densityoffood = arguments.getArgumentAsDouble("densityofpreys");
 			numberOfPreys = (int)(densityoffood*Math.PI*forageLimit*forageLimit+.5);
 		} else {
-			numberOfPreys = arguments.getArgumentIsDefined("numberofpreys") ? arguments.getArgumentAsInt("numberofpreys") : 20;
+			numberOfPreys = arguments.getArgumentIsDefined("numberofpreys") ? arguments.getArgumentAsInt("numberofpreys") : 3;
 		}
 	}
 	
 	@Override
 	public void setup(Simulator simulator) {
 			super.setup(simulator);
-				//addPrey(new Prey(simulator, "Prey "+0, newRandomPosition(), 0, PREY_MASS, PREY_RADIUS));
-			for(int i=0; i<3; i++){
+			for(int i=0; i<numberOfPreys; i++){
 				Vector2d position=  newRandomPositionSimplestEnvironment();
 				addPrey(new Prey(simulator, "Prey "+i, position, 0, PREY_MASS, PREY_RADIUS));
 				wallsForPrey(position);
-			}
-			addStaticObject( new Wall( simulator, 0, 0.5, 1, 0.1));
-			addStaticObject(new Wall( simulator, 0, -0.5, 1, 0.1));
-			addStaticObject(new Wall( simulator, 0.5, 0, 0.1, 1));
-			addStaticObject(new Wall( simulator, -0.5, 0, 0.1, 1));
-			nest = new Nest(simulator, "Nest", 0, 0, nestLimit);
-			addObject(nest);	
+			}			
 	}
 
-	private Vector2d newRandomPosition() {
-		double radius = random.nextDouble()*(forageLimit-nestLimit)+nestLimit+0.3;
-		double angle = random.nextDouble()*2*Math.PI;
-		return new Vector2d(radius*Math.cos(angle),radius*Math.sin(angle));
-	}
 	
 	private void wallsForPrey(Vector2d position){
 		addStaticObject( new Wall( simulator, position.x+0.2, position.y, 0.1, 0.4));
@@ -93,32 +62,22 @@ public class WallsEnvironment extends Environment {
 	public void update(double time) {
 		change_PreyInitialDistance=false;
 		for (Prey nextPrey : simulator.getEnvironment().getPrey()) {
-//			 double distance = nextPrey.getPosition().length();
 			 double distance = nextPrey.getPosition().distanceTo(nestPosition);
 			 if(nextPrey.isEnabled() && distance < 0.5){
-//				 if(distance == 0){
-//					 System.out.println("ERRO--- zero");
-//				 }
-				// Vector2d position= newRandomPosition();
 				 Vector2d position= newRandomPositionSimplestEnvironment();
 				 nextPrey.teleportTo(position);
 				 numberOfFoodSuccessfullyForaged++;
 				 prey=nextPrey;
 				 change_PreyInitialDistance=true;
 			 }
-		}
-//		for(Robot robot: robots){
-//			PreyCarriedSensor sensor = (PreyCarriedSensor)robot.getSensorByType(PreyCarriedSensor.class);
-//			if (sensor != null && sensor.preyCarried() && robot.isInvolvedInCollison()){
-//				PreyPickerActuator actuator = (PreyPickerActuator)robot.getActuatorByType(PreyPickerActuator.class);
-//				if(actuator != null) {
-//					Prey preyToDrop = actuator.dropPrey();
-////					preyToDrop.teleportTo(position);
-////					wallsForPrey(position);
-//				}
-//			}
-//		}
-		
+		}		
+	}
+	
+	@Override
+	protected void addRobots(){
+		for(Robot r: getRobots()){
+			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
+		}	
 	}
 	
 	private Vector2d newRandomPositionSimplestEnvironment() {
@@ -136,18 +95,6 @@ public class WallsEnvironment extends Environment {
 	}
 	
 	public Prey preyWithNewDistace(){
-		
 		return prey;
-	}
-	public double getNestRadius() {
-		return nestLimit;
-	}
-
-	public double getForageRadius() {
-		return forageLimit;
-	}
-
-	public double getForbiddenArea() {
-		return forbiddenArea;
 	}
 }
