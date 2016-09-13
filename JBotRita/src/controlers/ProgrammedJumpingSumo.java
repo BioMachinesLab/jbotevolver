@@ -18,7 +18,6 @@ import simulation.util.Arguments;
 import actuator.IntensityPreyPickerActuator;
 import actuator.JumpSumoActuator;
 import controllers.Controller;
-import environments_JumpingSumoIntensityPreys.JS_Environment;
 
 public class ProgrammedJumpingSumo extends Controller {
 

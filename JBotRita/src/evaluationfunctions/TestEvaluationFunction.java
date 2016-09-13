@@ -14,7 +14,6 @@ import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import environment.TestEnviroment;
-import environments_JumpingSumoIntensityPreys.JS_Environment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class TestEvaluationFunction extends JumpingSumoEvaluationFunction{

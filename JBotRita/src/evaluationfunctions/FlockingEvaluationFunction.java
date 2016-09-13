@@ -16,7 +16,6 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 import enviromentsSwarms.EmptyEnviromentsWithFixPositions;
 import enviromentsSwarms.FireEnv;
-import environments_JumpingSumoIntensityPreys.JS_Environment;
 
 public class FlockingEvaluationFunction extends JumpingSumoEvaluationFunction {
 

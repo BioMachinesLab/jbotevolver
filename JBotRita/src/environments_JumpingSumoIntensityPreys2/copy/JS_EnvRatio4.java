@@ -52,8 +52,6 @@ public class JS_EnvRatio4 extends JS_Environment { //ratio5
 		double a = b/  FastMath.sqrtQuick(255);
 		//b=b-1.6;
 		env.addStaticObject(new Wall(simulator, MIN_WIDTH_LIMIT_FOR_WALL/2-((b-MIN_WIDTH_LIMIT_FOR_WALL)/2)-0.4/2, 0, b+0.4, 0.08)); //centerWall
-		//env.addStaticObject(new Wall(simulator, MIN_WIDTH_LIMIT_FOR_WALL/2-((b-MIN_WIDTH_LIMIT_FOR_WALL)/2)-0.4/2, 0, b+0.4, 0.08)); //centerWall
-
 		env.addPrey(new IntensityPrey(simulator, "Prey " + 0, new Vector2d(MIN_WIDTH_LIMIT_FOR_WALL-0.4, a), 0, PREY_MASS, PREY_RADIUS, 1));
 		env.getRobots().get(0).setPosition(new Vector2d( MIN_WIDTH_LIMIT_FOR_WALL-0.4, -a));
 		
@@ -62,47 +60,6 @@ public class JS_EnvRatio4 extends JS_Environment { //ratio5
 			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
 		}	
 		
-//		if (random.nextDouble() < 0.5) {
-//
-//			env.addStaticObject(new Wall(simulator, 0, 0, b * 2 - 0.4, 0.125)); //centerWall
-//			
-//			addPreyAndRobotPosition(0, a, 0);
-//		
-//			if (random.nextDouble() < 0.5 && b<2) {
-//				double width = b - 0.2;
-//				env.addStaticObject(new Wall(simulator, width / 2 + 2.5 - width,a, width, 0.125)); // rightWall
-//				env.addStaticObject(new Wall(simulator, -width / 2 - (2.5 - width), a, width, 0.125)); // leftWall
-//				
-////				env.addStaticObject(new Wall(simulator, width / 2 + 2.5 - width,0, width, 0.125)); // rightWall
-////				env.addStaticObject(new Wall(simulator, -width / 2 - (2.5 - width), 0, width, 0.125)); // leftWall
-//				
-//				
-//			
-//			}
-//		}else{
-//			
-//			double randomYPosition_For_Wall=random.nextDouble()* (MAX_HEIGHT_LIMIT_FOR_WALL - MIN_HEIGHT_LIMIT_FOR_WALL)
-//					+ MIN_HEIGHT_LIMIT_FOR_WALL; 
-//					
-//			double newb_forWall=b+ (2.3-b);  // -> putting the wall larger (in case <0.5-> to put the right wall larger, else left wall larger
-//
-//			double b_forTheOtherWall= random.nextDouble()* (MAX_WIDTH_LIMIT_FOR_WALL - MIN_WIDTH_LIMIT_FOR_WALL)+ MIN_WIDTH_LIMIT_FOR_WALL -0.6;   
-//			  	
-//			if(random.nextDouble()<0.5){  
-//		
-//				env.addStaticObject(new Wall(simulator, -newb_forWall/2 -0.2 ,randomYPosition_For_Wall, newb_forWall, 0.125));  //leftWall
-//				addPreyAndRobotPosition(-b, a,randomYPosition_For_Wall);
-//				env.addStaticObject(new Wall(simulator, b_forTheOtherWall / 2 + 2.5 - b_forTheOtherWall, randomYPosition_For_Wall, b_forTheOtherWall, 0.125)); // rightWall
-//			
-//			}			
-//			else{
-//				
-//				env.addStaticObject(new Wall(simulator, newb_forWall/2+0.2 ,randomYPosition_For_Wall, newb_forWall, 0.125)); //rightWall
-//				addPreyAndRobotPosition(b, a,randomYPosition_For_Wall);
-//				env.addStaticObject(new Wall(simulator, -b_forTheOtherWall / 2 - 2.5 + b_forTheOtherWall, randomYPosition_For_Wall, b_forTheOtherWall, 0.125)); // leftWall
-//			}
-//		
-//		}
 		for(Robot r : env.getRobots()) {
 			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
 		}

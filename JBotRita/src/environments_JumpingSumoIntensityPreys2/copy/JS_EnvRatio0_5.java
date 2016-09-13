@@ -55,14 +55,7 @@ public class JS_EnvRatio0_5 extends JS_Environment {  //RATIO2
 		env.addPrey(new IntensityPrey(simulator, "Prey " + 0, new Vector2d(0, a), 0, PREY_MASS, PREY_RADIUS, 1));
 		env.getRobots().get(0).setPosition(new Vector2d( 0, -a));
 		
-//		if (random.nextDouble() < 0.5) {
-//			double new_a=a/2;
-//			double new_b = new_a*FastMath.sqrtQuick(3);
-//			env.addStaticObject(new Wall(simulator, 0, a-new_a, new_b * 2-0.8 , 0.08)); //upWall
-//			env.addStaticObject(new Wall(simulator, 0, -(a-new_a), new_b * 2-0.8 ,  0.08)); //aboveWall	
-//			
-//		}
-		
+
 		for(Robot r : env.getRobots()) {
 			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
 		}
