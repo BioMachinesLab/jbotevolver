@@ -1,5 +1,6 @@
 package evorbc.executables;
 
+import mathutils.Vector2d;
 import multiobjective.MOChromosome;
 import simulation.Executable;
 import simulation.JBotSim;
@@ -8,6 +9,7 @@ import simulation.util.Factory;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evorbc.mappingfunctions.MappingFunction;
+import evorbc.mappingfunctions.Polar180MappingFunction;
 
 public class LoadRepertoireExecutable implements Executable{
 	
@@ -45,16 +47,60 @@ public class LoadRepertoireExecutable implements Executable{
 			}
 		}
 		
+		//test
+		map = shrink(map);
+		
 		if(args.getArgumentIsDefined("fill")) {
 			Arguments fillArguments = new Arguments(args.getArgumentAsString("fill"));
 			System.out.println("[LoadRepertoireExecutable] Filling with "+fillArguments.getArgumentAsString("classname"));
 			MappingFunction mf = (MappingFunction)Factory.getInstance(fillArguments.getArgumentAsString("classname"),(Object)map);
 			mf.fill();
 		}
-		
+
 		jbotsim.getSerializableObjectHashMap().put("repertoire", map);
 	}
 	
+	protected double[][][] shrink(double[][][] map) {
+		
+		int maxDist = 0;
+		
+		for(int x = 0 ; x < map.length ; x++) {
+    		for(int y = 0 ; y < map[x].length ; y++) {
+    			if(map[x][y] != null) {
+    				int posY = y;
+    				int posX = x; 
+	    			posX-= map.length/2;
+	        		posY-= map[0].length/2;
+	        		maxDist = Math.max(maxDist,posX);
+	        		maxDist = Math.max(maxDist,posY);
+    			}
+    		}
+    	}
+		
+		
+		double[][][] newMap = new double[maxDist*2+10][maxDist*2+10][];
+		
+		int half = map.length/2;
+		int nhalf = newMap.length/2;
+		
+		for(int x = -maxDist ; x <= maxDist ; x++) {
+    		for(int y = -maxDist ; y <= maxDist ; y++) {
+    			
+    			int newX = nhalf+x;
+    			int newY = nhalf+y;
+    			int oldX = half+x;
+    			int oldY = half+y;
+    			
+    			newMap[newX][newY] = map[oldX][oldY];
+    		}
+		}
+		
+		if(map[map.length/2][map.length/2] != newMap[newMap.length/2][newMap.length/2]) {
+			throw new RuntimeException("[LoadRepertoireExecutable] The shrinking of the map failed!");
+		}
+			
+		return newMap;
+	}
 	
 	protected MOChromosome[][] loadRepertoire(String f) {
 		

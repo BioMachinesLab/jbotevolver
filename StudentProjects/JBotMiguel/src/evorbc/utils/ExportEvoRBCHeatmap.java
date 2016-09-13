@@ -19,14 +19,14 @@ import fourwheeledrobot.MultipleWheelRepertoireNDActuator;
 public class ExportEvoRBCHeatmap extends TraverseFolders{
 	
 	private static String FOLDER_NAME = "export";
+	private static int MAX_RUN = 30;//30
 	
 	private int samples = 25;//50
-	private int maxRuns = 30;//30
 	private int fitnessSamples = 5;
 	private boolean realPoint = false;
 	private boolean evorbcND = false;
 	
-	private boolean randomizeSeed = false;
+	private boolean randomizeSeed = true;
 	private boolean postEvalBest = false;
 	
 	private String fileName;
@@ -40,15 +40,23 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 	public static void main(String[] args) throws Exception{
 		
 		ExportEvoRBCHeatmap heatmap = null;
-		/*
-		heatmap = new ExportEvoRBCHeatmap("bigdisk/multimaze/", new String[]{"repertoire_obstacle/"}, "multimaze.txt");
+		
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/vsvanilla/", new String[]{"maze_circular/"}, "heatmap-polar.txt");
 		heatmap.realPoint = false;
 		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
 		
-		heatmap = new ExportEvoRBCHeatmap("bigdisk/multimaze/", new String[]{"repertoire_obstacle/"}, "multimaze-real.txt");
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/vsvanilla/", new String[]{"maze_circular/"}, "heatmap-polar-real.txt");
 		heatmap.realPoint = true;
 		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
 		
+//		heatmap = new ExportEvoRBCHeatmap("bigdisk/behaviormapping/", new String[]{"maze_cartesian/"}, "heatmap-cartesian.txt");
+//		heatmap.realPoint = false;
+//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		
+//		heatmap = new ExportEvoRBCHeatmap("bigdisk/behaviormapping/", new String[]{"maze_cartesian/"}, "heatmap-cartesian-real.txt");
+//		heatmap.realPoint = true;
+//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		/*
 		
 		heatmap = new ExportEvoRBCHeatmap("bigdisk/qualitymetrics/", new String[]{"maze_radial/","maze_distance/","maze_quality/"}, "qualitymetrics.txt");
 		heatmap.realPoint = false;
@@ -89,12 +97,12 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
 		
 
-		*/
+		
 		heatmap = new ExportEvoRBCHeatmap("/Volumes/Orico/ec/miguel/orientation/", new String[]{"maze_orientation/"}, "orientation.txt");
 		heatmap.realPoint = false;
 		heatmap.evorbcND = true;
 		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
-		
+		*/
 		
 //		heatmap = new ExportEvoRBCHeatmap("/Volumes/Orico/ec/miguel/orientation/", new String[]{"maze_orientation/"}, "orientation-real.txt");
 //		heatmap.realPoint = true;
@@ -108,8 +116,8 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 		try {
 		
 			new File(FOLDER_NAME).mkdir();
-			new File(FOLDER_NAME+"/heatmap-"+this.fileName).delete();
-			fw = new FileWriter(new File(FOLDER_NAME+"/heatmap-"+this.fileName));
+			new File(FOLDER_NAME+"/"+this.fileName).delete();
+			fw = new FileWriter(new File(FOLDER_NAME+"/"+this.fileName));
 			
 			if(evorbcND)
 				fw.append("Folder Setup Run X Y Z Count\n");
@@ -136,8 +144,19 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 		if(new File(folder.getPath()+"/repertoire_name.txt").exists())
 			return false;
 		
-		if(new File(folder.getPath()+"/_showbest_current.conf").exists())
+		if(new File(folder.getPath()+"/_fitness.log").exists()) {
+			
+			if(MAX_RUN > 0) {
+				String[] split = folder.getPath().split("/");
+				int run = Integer.parseInt(split[split.length-1]);
+				if(run <= MAX_RUN)
+					return true;
+				else
+					return false;
+			}
+			
 			return true;
+		}
 		
 		return false;
 	}
@@ -153,7 +172,7 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 	
 	private void exportHeatmap(String folder) throws Exception {
 		
-		JBotEvolver jbot = new JBotEvolver(new String[]{folder+"/_showbest_current.conf"});
+		JBotEvolver jbot = new JBotEvolver(new String[]{folder+"/_showbest_current.conf","--simulator", "+folder="+baseFolder});
 		
 //		if(!jbot.getPopulation().evolutionDone())
 //			return result;
@@ -188,15 +207,17 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 		
 		String filename = folder+"/_showbest_current.conf";
 		jbot.loadFile(filename, "--simulator +folder="+baseFolder);
+		Arguments a = new Arguments(jbot.getArguments().get("--init").getArgumentAsString("LoadRepertoireExecutable"));
+		System.out.println();
 		
-		Simulator sim = jbot.createSimulator();
-		jbot.createRobots(sim);
-		jbot.setupBestIndividual(sim);
-		MultipleWheelRepertoireActuator actuator = (MultipleWheelRepertoireActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireActuator.class);
-		String string = baseFolder+actuator.getRepertoireLocation();
+//		Simulator sim = jbot.createSimulator();
+//		jbot.createRobots(sim);
+//		jbot.setupBestIndividual(sim);
+//		MultipleWheelRepertoireActuator actuator = (MultipleWheelRepertoireActuator)sim.getRobots().get(0).getActuatorByType(MultipleWheelRepertoireActuator.class);
+		String string = baseFolder+a.getArgumentAsString("repertoire")+"/";
 		
 		File f = new File(string);
-		jbot.loadFile(f.getParent()+"/_showbest_current.conf", "--simulator +folder="+baseFolder);
+		jbot.loadFile(f+"/_showbest_current.conf", "--simulator +folder="+baseFolder);
 		
 		return (MAPElitesPopulation)jbot.getPopulation();
 	}
@@ -209,7 +230,10 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 		String setupName = split[split.length-2]+"_"+split[split.length-3];
 		String runName = split[split.length-1];
 		
-		if(maxRuns > 0 && Integer.parseInt(runName) > maxRuns)
+		if(!folder.contains("AWS_5"))
+			return;
+		
+		if(MAX_RUN > 0 && Integer.parseInt(runName) > MAX_RUN)
 			return;
 		
 		int generation = 0;
@@ -284,6 +308,10 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 					
 					if(realPoint) {
 						MOChromosome c = mapPop.getChromosomoeFromLocation(new int[]{(int)point.x,(int)point.y});
+						
+						if(c == null)
+							continue;
+						
 						int[] loc = mapPop.getLocationFromBehaviorVector(mapPop.getBehaviorVector(c));
 						point = new Vector2d(loc[0],loc[1]);
 					}

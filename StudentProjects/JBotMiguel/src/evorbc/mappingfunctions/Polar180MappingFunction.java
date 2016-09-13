@@ -25,6 +25,8 @@ public class Polar180MappingFunction extends PolarMappingFunction{
 		int x = polarX(alpha,rho);
 		int y = polarY(alpha,rho);
 		
+//		printRepertoire(repertoire, x, y);
+		
 		return new Vector2d(x,y);
 	}
 

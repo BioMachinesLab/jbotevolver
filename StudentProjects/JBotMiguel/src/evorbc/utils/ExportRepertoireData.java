@@ -2,17 +2,17 @@ package evorbc.utils;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.Serializable;
-import java.util.Scanner;
+import java.nio.file.Files;
+import java.util.ArrayList;
 
-import simulation.util.Arguments;
-import utils.TraverseFolders;
+import mathutils.Vector2d;
+import multiobjective.MOChromosome;
 import novelty.BehaviourResult;
 import novelty.ExpandedFitness;
 import novelty.FitnessResult;
 import novelty.results.VectorBehaviourExtraResult;
-import mathutils.Vector2d;
-import multiobjective.MOChromosome;
+import simulation.util.Arguments;
+import utils.TraverseFolders;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
@@ -27,9 +27,12 @@ public class ExportRepertoireData extends TraverseFolders {
 	private String fileName;
 	private FileWriter fw;
 	
+	private ArrayList<String> symbolicLinks = new ArrayList<String>();
+	
 	public static void main(String[] args) throws Exception{
 		
-		new ExportRepertoireData("bigdisk/qualitymetrics/","repertoire-data-qm.txt").traverse();
+//		new ExportRepertoireData("bigdisk/","repertoire-data-w1.txt").traverse();
+		new ExportRepertoireData("bigdisk2/","repertoire-data-w2.txt").traverse();
 	}
 	
 	public ExportRepertoireData(String folder, String fileName) throws Exception{
@@ -43,7 +46,7 @@ public class ExportRepertoireData extends TraverseFolders {
 			new File(FOLDER_NAME).mkdir();
 			new File(FOLDER_NAME+"/"+fileName).delete();
 			fw = new FileWriter(new File(FOLDER_NAME+"/"+fileName));
-			fw.append("Quality\tTime\tBinSize\tRobot\tRun\tChromosomeId\tBinX\tBinY\tX\tY\tOrientationFitness\tDistanceFitness\tAllele\n");
+			fw.append("Folder\tQuality\tTime\tBinSize\tRobot\tRun\tChromosomeId\tBinX\tBinY\tX\tY\tOrientationFitness\tDistanceFitness\tAllele\n");
 		}catch(Exception e){
 			e.printStackTrace();
 		}
@@ -61,6 +64,19 @@ public class ExportRepertoireData extends TraverseFolders {
 	
 	@Override
 	protected boolean actFilter(File folder) {
+		
+		for(String s : symbolicLinks) {
+			if (folder.getPath().contains(s+"/")) {
+				System.out.println("link: "+folder.getPath());
+				return false;
+			}
+		}
+		
+		if(Files.isSymbolicLink(folder.toPath())) {
+			symbolicLinks.add(folder.getPath());
+			System.out.println("link: "+folder.getPath());
+			return false;
+		}
 
 		if(new File(folder.getPath()+"/repertoire_name.txt").exists())
 			return true;
@@ -104,7 +120,8 @@ public class ExportRepertoireData extends TraverseFolders {
 			
 			String runNumber = split[split.length-1];
 			
-			String prefix = quality+"\t"+
+			String prefix = folder+"\t"+
+					quality+"\t"+
 					time+"\t"+
 					binsize+"\t"+
 					robot+"\t"+

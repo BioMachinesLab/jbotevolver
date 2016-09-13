@@ -15,8 +15,8 @@ public class MAPElitesExporter extends TraverseFolders{
 	private static int MAX_RUN = 30;
 	
 	public static void main(String[] args) throws Exception {
-		new MAPElitesExporter("bigdisk/").traverse();
-		new MAPElitesExporter("bigdisk2/").traverse();
+		new MAPElitesExporter("bigdisk/time-binsize/").traverse();
+//		new MAPElitesExporter("bigdisk2/").traverse();
 //		bigdisk_binsize_repertoire_50_AWS_5Actuator_20_3
 	}
 	

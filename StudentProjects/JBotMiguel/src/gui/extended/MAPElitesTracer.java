@@ -18,7 +18,10 @@ import simulation.physicalobjects.Marker;
 import simulation.util.Arguments;
 import updatables.Tracer;
 import evolution.MAPElitesPopulation;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evorbc.qualitymetrics.CircularQualityMetric;
+import evorbc.qualitymetrics.DistanceQualityMetric;
+import evorbc.qualitymetrics.RadialQualityMetric;
 
 public class MAPElitesTracer extends Tracer {
 	
@@ -67,6 +70,8 @@ public class MAPElitesTracer extends Tracer {
 		
 		drawGrid(g, limit);
 		
+		String function = sim.getArguments().get("--evaluation").getCompleteArgumentString();
+		
 		for(int x = 0 ; x < pop.getMap().length ; x++) {
 			for(int y = 0 ; y < pop.getMap()[x].length ; y++) {
 				
@@ -83,7 +88,15 @@ public class MAPElitesTracer extends Tracer {
 						
 						double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
 						
-						double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);
+						double fitness = 0;//CircularQualityMetric.calculateOrientationFitness(pos, orientation);
+						
+						if(function.contains("CircularQualityMetric")) {
+							fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);
+						} else if(function.contains("RadialQualityMetric")) {
+							fitness = RadialQualityMetric.calculateOrientationFitness(pos, orientation);
+						}  else if(function.contains("DistanceQualityMetric")) {
+							fitness = fit.getFitness();
+						}
 						
 						int[] supposedLocation = pop.getLocationFromBehaviorVector(behavior);
 						
@@ -93,13 +106,18 @@ public class MAPElitesTracer extends Tracer {
 						orientation+=Math.PI/2;
 						orientation*=-1;
 						orientation+=Math.PI;
-						pos.x = (y - pop.getMap().length/2.0) * pop.getMapResolution();
-						pos.y = (x - pop.getMap().length/2.0) * pop.getMapResolution();
+						//TODO enable to this center the behaviors on the actual 
+//						pos.x = (y - pop.getMap().length/2.0) * pop.getMapResolution();
+//						pos.y = (x - pop.getMap().length/2.0) * pop.getMapResolution();
+						double xx = pos.y;
+						double yy = pos.x;
+						pos.x = xx;
+						pos.y = yy;
 						
 						if(supposedLocation[0] != x || supposedLocation[1] != y) {
 							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.GRAY);
 						} else {
-							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, /*getColor(fitness)*/Color.GREEN.darker());
+							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, getColor(fitness));//Color.GREEN.darker());
 						}
 						
 						drawMarker(g,m);
@@ -206,6 +224,16 @@ public class MAPElitesTracer extends Tracer {
 		a = transform(0, limit);
 		b = transform(0, limit-0.015);
 		g.drawLine(a.x, a.y, b.x, b.y);
+	}
+	
+	protected void drawGradient(Graphics2D g) {
+		int j = 0;
+		for(double i = 0 ; i <= 1 ; i+=0.01) {
+			Color c = getColor(i);
+			g.setColor(c);
+			g.drawLine(10, j, 40, j);
+			j++;
+		}
 	}
 	
 	protected void drawMarker(Graphics2D g, Marker m) {
