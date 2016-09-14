@@ -4,16 +4,16 @@ import coppelia.CharWA;
 import coppelia.FloatWA;
 import coppelia.remoteApi;
 import result.Result;
-import taskexecutor.VREPTaskExecutor.VREPContainer;
+import taskexecutor.VRepTaskExecutor.VREPContainer;
 import tasks.Task;
 
-public class VREPTask extends Task{
+public class VRepTask extends Task{
 	
 	private float[] parameters;
         private remoteApi vrepApi;
 	private VREPContainer container;
 	
-	public VREPTask(float[] parameters) {
+	public VRepTask(float[] parameters) {
 		this.parameters = parameters;
 	}
 	
@@ -29,7 +29,7 @@ public class VREPTask extends Task{
 
 	@Override
 	public Result getResult() {
-		return new VREPResult(getId(),getDataFromVREP());
+		return new VRepResult(getId(),getDataFromVREP());
 	}
 	
 	protected float[] getDataFromVREP() {

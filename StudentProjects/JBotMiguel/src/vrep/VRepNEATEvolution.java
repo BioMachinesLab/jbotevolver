@@ -1,12 +1,12 @@
 package vrep;
 
+import static controllers.VRepGenericController.parseDoubleArray;
 import java.util.Collections;
 
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evolution.NEATEvolution;
-import evolutionaryrobotics.evolution.neat.NEATGeneticAlgorithmWrapper;
 import evolutionaryrobotics.evolution.neat.PreEvaluatedFitnessFunction;
 import evolutionaryrobotics.evolution.neat.core.InnovationDatabase;
 import evolutionaryrobotics.evolution.neat.core.NEATPopulation4J;
@@ -16,105 +16,98 @@ import evolutionaryrobotics.evolution.neat.core.xover.NEATCrossover;
 import evolutionaryrobotics.evolution.neat.ga.core.Chromosome;
 
 public class VRepNEATEvolution extends NEATEvolution {
-	
-	protected int inputNeurons;
-	protected int outputNeurons;
-	protected int time;
-	protected int controllerType;
-	protected int nParams = 0;//repertoire params
-        protected float tiltKill = 99999999;
 
-	public VRepNEATEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
-		super(jBotEvolver, taskExecutor, args);
-		
-		if(!args.getArgumentIsDefined("inputs") || !args.getArgumentIsDefined("outputs"))
-			throw new RuntimeException("Missing 'inputs' and/or 'outputs' arguments on VRepNEATEvolution!");
-		
-		if(!args.getArgumentIsDefined("time"))
-			throw new RuntimeException("Missing 'time' argument on VRepNEATEvolution!");
-		
-		inputNeurons = args.getArgumentAsInt("inputs");
-		outputNeurons = args.getArgumentAsInt("outputs");
-		time = args.getArgumentAsInt("time");
-		nParams = args.getArgumentAsIntOrSetDefault("nparams", nParams);
-		controllerType = jBotEvolver.getArguments().get("--controllers").getArgumentAsIntOrSetDefault("controllertype", controllerType);
-		tiltKill = (float) args.getArgumentAsDoubleOrSetDefault("tiltkill", tiltKill);
+    protected int inputNeurons;
+    protected int outputNeurons;
+    // Expected: simulation time | tiltkill (optional)
+    protected float[] globalParams;
+    // Expected (at least): controllerType | number of locomotion parameters | inputs | outputs    
+    protected float[] controllerParams;
 
-		descriptor.setInputNodes(inputNeurons);
-		descriptor.setOutputNodes(outputNeurons);
-	}
+    public VRepNEATEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments args) {
+        super(jBotEvolver, taskExecutor, args);
 
-	@Override
-	public void executeEvolution() {
+        globalParams = parseDoubleArray(args.getArgumentAsString("globalparams"));
+        controllerParams = parseDoubleArray(args.getArgumentAsString("controllerparams"));
 
-		VRepNEATGeneticAlgorithmWrapper algorithm;
+        inputNeurons = (int) controllerParams[2];
+        outputNeurons = (int) controllerParams[3];
 
-		int i = population.getNumberOfCurrentGeneration();
+        descriptor.setInputNodes(inputNeurons);
+        descriptor.setOutputNodes(outputNeurons);
+    }
 
-		if (i == 0) {
-			algorithm = new VRepNEATGeneticAlgorithmWrapper(descriptor, this);
-		} else {
-			algorithm = new VRepNEATGeneticAlgorithmWrapper(descriptor, this);
-			algorithm.loadPopulation(population.getNEATPopulation4J());
-		}
-		
-		algorithm.setParameters(controllerType, time, tiltKill, nParams, inputNeurons, outputNeurons);
+    @Override
+    public void executeEvolution() {
+        VRepNEATGeneticAlgorithmWrapper algorithm;
+        int i = population.getNumberOfCurrentGeneration();
 
-		algorithm.pluginFitnessFunction(new PreEvaluatedFitnessFunction(Collections.<Chromosome, Float> emptyMap()));
-		algorithm.pluginCrossOver(new NEATCrossover());
-		algorithm.pluginMutator(new NEATMutator());
-		algorithm.pluginParentSelector(new TournamentSelector());
+        if (i == 0) {
+            algorithm = new VRepNEATGeneticAlgorithmWrapper(descriptor, this);
+        } else {
+            algorithm = new VRepNEATGeneticAlgorithmWrapper(descriptor, this);
+            algorithm.loadPopulation(population.getNEATPopulation4J());
+        }
 
-		if (i == 0) {
-			algorithm.createPopulation();
-			population.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
-			population.createRandomPopulation();
-			population.setNEATPopulation4J((NEATPopulation4J) algorithm.population());
-			population.getNEATPopulation4J().setSpecies(algorithm.getSpecies());
-		}
+        algorithm.setParameters(globalParams, controllerParams);
+        algorithm.pluginFitnessFunction(new PreEvaluatedFitnessFunction(Collections.<Chromosome, Float>emptyMap()));
+        algorithm.pluginCrossOver(new NEATCrossover());
+        algorithm.pluginMutator(new NEATMutator());
+        algorithm.pluginParentSelector(new TournamentSelector());
 
-		if (!population.evolutionDone())
-			taskExecutor.setTotalNumberOfTasks(
-					(population.getNumberOfGenerations() - population.getNumberOfCurrentGeneration())
-							* population.getPopulationSize());
+        if (i == 0) {
+            algorithm.createPopulation();
+            population.setGenerationRandomSeed(jBotEvolver.getRandomSeed());
+            population.createRandomPopulation();
+            population.setNEATPopulation4J((NEATPopulation4J) algorithm.population());
+            population.getNEATPopulation4J().setSpecies(algorithm.getSpecies());
+        }
 
-		double highestFitness = population.getHighestFitness();
+        if (!population.evolutionDone()) {
+            taskExecutor.setTotalNumberOfTasks(
+                    (population.getNumberOfGenerations() - population.getNumberOfCurrentGeneration())
+                    * population.getPopulationSize());
+        }
 
-		while (!population.evolutionDone() && executeEvolution) {
-			double d = Double.valueOf(df.format(highestFitness));
+        double highestFitness = population.getHighestFitness();
 
-			taskExecutor.setDescription(output + " " + population.getNumberOfCurrentGeneration() + "/"
-					+ population.getNumberOfGenerations() + " " + d);
+        while (!population.evolutionDone() && executeEvolution) {
+            double d = Double.valueOf(df.format(highestFitness));
 
-			algorithm.runEpoch();
+            taskExecutor.setDescription(output + " " + population.getNumberOfCurrentGeneration() + "/"
+                    + population.getNumberOfGenerations() + " " + d);
 
-			i++;
+            algorithm.runEpoch();
 
-			if (executeEvolution) {
-				System.out.println("\nGeneration " + getPopulation().getNumberOfCurrentGeneration() + "\tHighest: "
-						+ population.getHighestFitness() + "\tAverage: " + population.getAverageFitness() + "\tLowest: "
-						+ population.getLowestFitness());
+            i++;
 
-				try {
-					diskStorage.savePopulation(population);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+            if (executeEvolution) {
+                System.out.println("\nGeneration " + getPopulation().getNumberOfCurrentGeneration() + "\tHighest: "
+                        + population.getHighestFitness() + "\tAverage: " + population.getAverageFitness() + "\tLowest: "
+                        + population.getLowestFitness());
 
-				highestFitness = population.getHighestFitness();
-			}
+                try {
+                    diskStorage.savePopulation(population);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-			if (population.evolutionDone())
-				break;
+                highestFitness = population.getHighestFitness();
+            }
 
-			population.createNextGeneration();
-		}
+            if (population.evolutionDone()) {
+                break;
+            }
 
-		InnovationDatabase db = algorithm.innovationDatabase();
-		System.err.println("Innovation Database Stats - Hits:" + db.hits + " - misses:" + db.misses);
-	}
+            population.createNextGeneration();
+        }
 
-	protected int[] getInputOutputNeurons() {
-		return new int[] { inputNeurons, outputNeurons };
-	}
+        InnovationDatabase db = algorithm.innovationDatabase();
+        System.err.println("Innovation Database Stats - Hits:" + db.hits + " - misses:" + db.misses);
+    }
+
+    @Override
+    protected int[] getInputOutputNeurons() {
+        return new int[]{inputNeurons, outputNeurons};
+    }
 }

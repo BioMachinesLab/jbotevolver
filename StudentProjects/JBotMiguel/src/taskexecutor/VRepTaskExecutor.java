@@ -12,25 +12,23 @@ import simulation.util.Arguments;
 import tasks.Task;
 import coppelia.remoteApi;
 import evolutionaryrobotics.JBotEvolver;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public class VREPTaskExecutor extends TaskExecutor {
+public class VRepTaskExecutor extends TaskExecutor {
 
-    private static int DEFAULT_PORT = 19996;
+    private static final int BASE_PORT = 19996;
+    private static final int ALLOWED_FAULTS = 2;
 
-    private Stack<VREPContainer> availableClients = new Stack<VREPContainer>();
-    private ExecutorService executor;
-    private LinkedList<Future<Result>> resultsList = new LinkedList<Future<Result>>();
+    private final Stack<VREPContainer> availableClients = new Stack<>();
+    private final ExecutorService executor;
+    private final LinkedList<Future<Result>> resultsList = new LinkedList<>();
     private boolean setup = false;
 
     private String remoteIps[];
     private int remoteInstances[];
-    private static int ALLOWED_FAULTS = 3;
 
     private remoteApi vrepApi;
 
-    public VREPTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
+    public VRepTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
         super(jBotEvolver, args);
 
         int instances = 0;
@@ -75,7 +73,7 @@ public class VREPTaskExecutor extends TaskExecutor {
             vrepApi = new remoteApi();
             for (int r = 0; r < remoteIps.length; r++) {
                 for (int i = 0; i < remoteInstances[r]; i++) {
-                    initContainer(remoteIps[r], DEFAULT_PORT + i);
+                    initContainer(remoteIps[r], BASE_PORT + i);
                 }
             }
             setup = true;
@@ -185,14 +183,14 @@ public class VREPTaskExecutor extends TaskExecutor {
                 container = availableClients.pop();
             }
 
-            VREPTask vt = (VREPTask) t;
+            VRepTask vt = (VRepTask) t;
             vt.setVREP(container, vrepApi);
 
             t.run();
 
             Result r = t.getResult();
 
-            VREPResult vrepR = (VREPResult) r;
+            VRepResult vrepR = (VRepResult) r;
 
             synchronized (availableClients) {
                 //return the VREP conn
