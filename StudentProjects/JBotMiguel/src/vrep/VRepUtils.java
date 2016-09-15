@@ -11,7 +11,7 @@ public class VRepUtils {
 
     public static final String DEFAULT_IP = "127.0.0.1";
     public static final int DEFAULT_PORT = 19996;
-    public static remoteApi defaultVrep = null;
+    public static remoteApi defaultVrep = new remoteApi();
     public static int defaultClientId = -1;
 
     public static float[][] createDataPacket(evolutionaryrobotics.neuralnetworks.Chromosome[] chromosomes, float[] controllerParams) {
@@ -31,7 +31,7 @@ public class VRepUtils {
         }
         return totalPackets;
     }
-    
+
     public static int sendTasks(VRepTaskExecutor te, float[] fixedParameters, float[][] chromosomes) {
 
         int instances = te.getInstances();
@@ -101,66 +101,95 @@ public class VRepUtils {
     }
 
     public static float[][] receiveTasks(VRepTaskExecutor te, int nTasks) {
-
         float[][] results = new float[nTasks][];
-
         for (int i = 0; i < nTasks; i++) {
             VRepResult res = (VRepResult) te.getResult();
-
             float[] vals = res.getValues();
-
             results[i] = vals;
-
             float nResults = vals[0];
-
             for (int n = 0; n < nResults; n++) {
                 System.out.print("!");
             }
-
             System.out.print("\n");
         }
         return results;
     }
 
-    private static synchronized void init(boolean force) {
-        if (defaultVrep == null || force) {
-            defaultVrep = new remoteApi();
+    private static synchronized void initDefault(boolean force) {
+        if (defaultClientId == -1 || force) {
             defaultVrep.simxFinish(-1); // just in case, close all opened connections
-            defaultClientId = defaultVrep.simxStart(DEFAULT_IP, DEFAULT_PORT, true, false, 5000, 5);
-            System.out.println("Tried connection to " + DEFAULT_IP + "@" + DEFAULT_PORT + ": " + defaultClientId);
+            defaultClientId = initClient(DEFAULT_IP, DEFAULT_PORT);
         }
     }
 
-    public static synchronized float[] getDataFromVREP() {
-        init(false);
+    public static int initClient(String ip, int port) {
+        System.out.println("[VREP] Trying to connect to " + ip + ":" + port);
+        int clientId = defaultVrep.simxStart(ip, port, true, false, 5000, 5);
+
+        if (clientId == -1) {
+            System.out.println("[VREP] Not connected! " + ip + ":" + port);
+        } else {
+            System.out.println("[VREP] Connected client " + clientId + " @ " + ip + ":" + port);
+            defaultVrep.simxClearStringSignal(clientId, "toClient", remoteApi.simx_opmode_oneshot_wait);
+            defaultVrep.simxClearStringSignal(clientId, "fromClient", remoteApi.simx_opmode_oneshot_wait);
+        }
+        return clientId;
+    }
+    
+    public static void terminateClient(int clientId) {
+        defaultVrep.simxFinish(clientId);
+    }
+
+    public static synchronized float[] getDataFromVREPDefault() {
+        initDefault(false);
+        return getDataFromVREP(defaultClientId);
+    }
+
+    public static synchronized void sendDataToVREPDefault(float[] arr) {
+        initDefault(false);
+        int status = sendDataToVREP(defaultClientId, arr);
+        if (status != remoteApi.simx_return_ok) {
+            initDefault(true);
+            sendDataToVREPDefault(arr);
+        }
+    }
+
+    public static float[] getDataFromVREP(int clientId) {
         CharWA str = new CharWA(0);
-        try {
-            while (defaultVrep.simxGetStringSignal(defaultClientId, "toClient", str, remoteApi.simx_opmode_oneshot_wait) != remoteApi.simx_return_ok) {
-                Thread.sleep(10);
+
+        int signalVal = defaultVrep.simxGetStringSignal(clientId, "toClient", str, remoteApi.simx_opmode_oneshot_wait);
+
+        while (signalVal != remoteApi.simx_return_ok) {
+            if (signalVal == 3 || signalVal == remoteApi.simx_return_initialize_error_flag) { //error in the connection
+                System.out.println("[VREP] Fatal error receiving data from "+clientId+": " + signalVal);
+                return null;
             }
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-            return new float[]{0, 0, 0, 0};
+            //System.out.println("[VREP] Error receiving data from "+clientId+": " + signalVal + ", trying again");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            signalVal = defaultVrep.simxGetStringSignal(clientId, "toClient", str, remoteApi.simx_opmode_oneshot_wait);
         }
 
-        defaultVrep.simxClearStringSignal(defaultClientId, "toClient", remoteApi.simx_opmode_oneshot_wait);
+        defaultVrep.simxClearStringSignal(clientId, "toClient", remoteApi.simx_opmode_oneshot_wait);
+
         FloatWA f = new FloatWA(0);
         f.initArrayFromCharArray(str.getArray());
         return f.getArray();
     }
 
-    public static synchronized void sendDataToVREP(float[] arr) {
-        init(false);
+    public static int sendDataToVREP(int clientId, float[] arr) {
         FloatWA f = new FloatWA(arr.length);
         f.setValue(arr);
         char[] chars = f.getCharArrayFromArray();
         String tempStr = new String(chars);
         CharWA str = new CharWA(tempStr);
-        int opStatus = defaultVrep.simxWriteStringStream(defaultClientId, "fromClient", str, remoteApi.simx_opmode_oneshot_wait);
-        if(opStatus != remoteApi.simx_return_ok) {
-            System.out.println("Error sending data: " + opStatus);
-            init(true);
-            sendDataToVREP(arr);
+        int status = defaultVrep.simxWriteStringStream(clientId, "fromClient", str, remoteApi.simx_opmode_oneshot_wait);
+        if(status != remoteApi.simx_return_ok) {
+            System.out.println("[VREP] Error sending data to "+clientId+": " + status);
         }
+        return status;
     }
 }

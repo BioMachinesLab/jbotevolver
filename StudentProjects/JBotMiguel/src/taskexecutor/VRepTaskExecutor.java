@@ -10,23 +10,21 @@ import java.util.concurrent.Future;
 import result.Result;
 import simulation.util.Arguments;
 import tasks.Task;
-import coppelia.remoteApi;
 import evolutionaryrobotics.JBotEvolver;
+import vrep.VRepUtils;
 
 public class VRepTaskExecutor extends TaskExecutor {
 
     private static final int BASE_PORT = 19996;
-    private static final int ALLOWED_FAULTS = 2;
+    private static final int ALLOWED_FAULTS = 3;
 
-    private final Stack<VREPContainer> availableClients = new Stack<>();
+    private final Stack<VRepContainer> availableClients = new Stack<>();
     private final ExecutorService executor;
     private final LinkedList<Future<Result>> resultsList = new LinkedList<>();
     private boolean setup = false;
 
     private String remoteIps[];
     private int remoteInstances[];
-
-    private remoteApi vrepApi;
 
     public VRepTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
         super(jBotEvolver, args);
@@ -70,7 +68,6 @@ public class VRepTaskExecutor extends TaskExecutor {
     @Override
     public void run() {
         try {
-            vrepApi = new remoteApi();
             for (int r = 0; r < remoteIps.length; r++) {
                 for (int i = 0; i < remoteInstances[r]; i++) {
                     initContainer(remoteIps[r], BASE_PORT + i);
@@ -85,27 +82,17 @@ public class VRepTaskExecutor extends TaskExecutor {
         }
     }
 
-    protected VREPContainer initContainer(String ip, int port) {
-        VREPContainer c = new VREPContainer();
-
+    protected VRepTaskExecutor.VRepContainer initContainer(String ip, int port) {
+        VRepTaskExecutor.VRepContainer c = new VRepTaskExecutor.VRepContainer();
         c.ip = ip;
         c.port = port;
-        System.out.println("[VREPTaskExecutor] Trying to connect to "+ip+":"+port);
-        c.clientId = vrepApi.simxStart(c.ip, c.port, true, false, 5000, 5);
-        
+        c.clientId = VRepUtils.initClient(ip, port);        
         if (c.clientId == -1) {
-        	System.out.println("[VREPTaskExecutor] Not connected! "+ip+":"+port);
             return null;
         }
-        
-        System.out.println("[VREPTaskExecutor] Connected! "+ip+":"+port);
-        
-        vrepApi.simxClearStringSignal(c.clientId, "toClient", remoteApi.simx_opmode_blocking);
-        vrepApi.simxClearStringSignal(c.clientId, "fromClient", remoteApi.simx_opmode_blocking);
         availableClients.push(c);
-
         return c;
-    }
+    }    
 
     @Override
     public void stopTasks() {
@@ -152,8 +139,7 @@ public class VRepTaskExecutor extends TaskExecutor {
         return obj;
     }
 
-    public class VREPContainer {
-
+    public class VRepContainer {
         int clientId;
         String ip;
         int port;
@@ -171,7 +157,7 @@ public class VRepTaskExecutor extends TaskExecutor {
         @Override
         public Result call() throws Exception {
 
-            VREPContainer container = null;
+            VRepContainer container = null;
 
             synchronized (availableClients) {
 
@@ -184,7 +170,7 @@ public class VRepTaskExecutor extends TaskExecutor {
             }
 
             VRepTask vt = (VRepTask) t;
-            vt.setVREP(container, vrepApi);
+            vt.setVREP(container);
 
             t.run();
 
@@ -203,8 +189,11 @@ public class VRepTaskExecutor extends TaskExecutor {
                     addTask(this.t);
 
                     if (container.faults < ALLOWED_FAULTS) {
-                        vrepApi.simxFinish(container.clientId);
-                        VREPContainer inited = initContainer(container.ip, container.port);
+                        VRepUtils.terminateClient(container.clientId);
+                        try {
+                            Thread.sleep(5000); // wait 5s before trying to init the client again
+                        } catch(Exception e) {}
+                        VRepContainer inited = initContainer(container.ip, container.port);
                         if (inited != null) {
                             inited.faults = container.faults + 1;
                         }

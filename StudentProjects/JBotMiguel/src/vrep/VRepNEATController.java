@@ -50,7 +50,7 @@ public class VRepNEATController extends VRepController {
         for (int i = 0; i < inputs.length; i++) {
             ((DummyNNInput) this.inputs.get(i)).setInput(inputs[i]);
         }
-        ann.controlStep(0);
+        ann.controlStep(ticks);
         return doubleToFloat(ann.getOutputNeuronStates());
     }
 }

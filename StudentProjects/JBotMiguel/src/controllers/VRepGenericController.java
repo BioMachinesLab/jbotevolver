@@ -77,11 +77,11 @@ public class VRepGenericController extends Controller implements FixedLenghtGeno
         if(sim.getTime() > 0) { // do just one step (that will do everything)
             return;
         }
-        VRepUtils.sendDataToVREP(params);
+        VRepUtils.sendDataToVREPDefault(params);
         System.out.println("Sent to VRep: " + Arrays.toString(params));
 
         if (waitForResult) {
-            float[] data = VRepUtils.getDataFromVREP();
+            float[] data = VRepUtils.getDataFromVREPDefault();
             System.out.println("Received from VRep: " + Arrays.toString(data));
 
             double fit = parseResult(data);
