@@ -24,5 +24,4 @@ public class JumpingSensor extends Sensor {
 		return isJumping() ? 1 : 0;
 	}
 
-	
 }

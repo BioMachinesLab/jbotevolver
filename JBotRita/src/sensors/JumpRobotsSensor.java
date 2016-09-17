@@ -15,7 +15,7 @@ import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
 
 public class JumpRobotsSensor extends ConeTypeSensor  {
-
+	
 	public JumpRobotsSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);
 		setAllowedObjectsChecker(new AllowAllRobotsChecker(robot.getId()));

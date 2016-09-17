@@ -3,36 +3,46 @@ package sensors;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import robots.JumpingSumo;
+import robots.JumpingRobot;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
+import simulation.physicalobjects.checkers.AllowAllRobotsChecker;
 import simulation.physicalobjects.checkers.AllowLightChecker;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 
 public class JumpingRobotPositionSensor extends ConeTypeSensor {
-
+	protected boolean rangedIncreased=false;
+	@ArgumentsAnnotation(name = "increaseRange", help = "Increase range of the sensor while jumping.", defaultValue = "1.0")
+	protected double increaseRange = 1.0;
+	
 	public JumpingRobotPositionSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
-		setAllowedObjectsChecker(new AllowLightChecker());
+		increaseRange = (args.getArgumentIsDefined("increaseRange")) ? args
+				.getArgumentAsDouble("increaseRange") : 1.0;
+		setAllowedObjectsChecker(new AllowAllRobotsChecker(robot.getId()));
 	}
 
 	@Override
 	protected double calculateContributionToSensor(int sensorNumber,
 			PhysicalObjectDistance source) {
-		if (((JumpingSumo) robot).isJumping())
-			range = range + 1;
+		if (((JumpingRobot) robot).isJumping() && !rangedIncreased){
+			range+= increaseRange;
+			rangedIncreased=true;
+		}
 		GeometricInfo sensorInfo = getSensorGeometricInfo(sensorNumber, source);
 		if ((sensorInfo.getDistance() < getCutOff())
 				&& (sensorInfo.getAngle() < (openingAngle / 2.0))
 				&& (sensorInfo.getAngle() > (-openingAngle / 2.0))) {
-
-			return (getRange() - sensorInfo.getDistance()) / getRange();
-
+			double reading= (getRange() - sensorInfo.getDistance()) / getRange();
+			rangeBackToDefault();
+			return reading; 
 		}
+		rangeBackToDefault();
 		return 0;
 	}
 
@@ -52,5 +62,10 @@ public class JumpingRobotPositionSensor extends ConeTypeSensor {
 				+ "]";
 	}
 
-
+	private void rangeBackToDefault(){
+		if( rangedIncreased==true){
+			rangedIncreased=false;
+			range=range-increaseRange;
+		}
+	}
 }

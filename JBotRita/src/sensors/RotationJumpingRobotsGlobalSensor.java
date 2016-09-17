@@ -1,5 +1,6 @@
 package sensors;
 
+
 import mathutils.Vector2d;
 import robots.JumpingRobot;
 import simulation.Simulator;
@@ -8,7 +9,7 @@ import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
-public class RotationRobotsGlobalSensor extends Sensor {
+public class RotationJumpingRobotsGlobalSensor extends Sensor {
 	private Simulator simulator;
 	private Robot robot;
 	protected boolean rangedIncreased = false;
@@ -20,7 +21,7 @@ public class RotationRobotsGlobalSensor extends Sensor {
 	@ArgumentsAnnotation(name = "increaseRange", help = "Increase range of the sensor while jumping.", defaultValue = "1.0")
 	protected double increaseRange = 1.0;
 
-	public RotationRobotsGlobalSensor(Simulator simulator, int id, Robot robot,
+	public RotationJumpingRobotsGlobalSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;
@@ -42,11 +43,11 @@ public class RotationRobotsGlobalSensor extends Sensor {
 				rangedIncreased = true;
 			}
 		}
-		for (Robot robotNeighbour : simulator.getRobots()) {
+		for (Robot robotNeighbour :  simulator.getRobots()) {
 
 			if (robotPosition.distanceTo(robotNeighbour.getPosition()) < range) {
 
-				if (robot.getId() != robotNeighbour.getId()) {
+				if (robot.getId() != robotNeighbour.getId() && ((JumpingRobot)robotNeighbour).charging()) {
 					double differenceOfOrientation = calculateDifferenceBetweenAngles(
 							Math.toDegrees(robotNeighbour.getOrientation()),
 							Math.toDegrees(robot.getOrientation()));

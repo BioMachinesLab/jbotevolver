@@ -1,7 +1,7 @@
 package sensors;
 
 import mathutils.Vector2d;
-import robots.JumpingSumo;
+import robots.JumpingRobot;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.sensors.Sensor;
@@ -10,17 +10,25 @@ import simulation.util.ArgumentsAnnotation;
 
 public class JumpingRobotsGlobalSensor extends Sensor {
 	private Simulator simulator;
-	private Robot robot;
-	@ArgumentsAnnotation(name = "rangeLimit", help = "Range of the sensor.", defaultValue = "1.0")
-	protected double rangeLimit = 1.0;
+	private JumpingRobot robot;
+	protected boolean rangedIncreased = false;
+	
+	@ArgumentsAnnotation(name = "range", help = "Range of the sensor.", defaultValue = "1.0")
+	protected double range = 1.0;
 
+	@ArgumentsAnnotation(name = "increaseRange", help = "Increase range of the sensor while jumping.", defaultValue = "1.0")
+	protected double increaseRange = 1.0;
+	
+	
 	public JumpingRobotsGlobalSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;
-		this.robot = robot;
-		rangeLimit = (args.getArgumentIsDefined("rangeLimit")) ? args
-				.getArgumentAsDouble("rangeLimit") : 1.0;
+		this.robot = (((JumpingRobot) robot));
+		range = (args.getArgumentIsDefined("range")) ? args
+				.getArgumentAsDouble("range") : 1.0;
+		increaseRange = (args.getArgumentIsDefined("increaseRange")) ? args
+				.getArgumentAsDouble("increaseRange") : 1.0;
 	}
 
 	@Override
@@ -29,23 +37,21 @@ public class JumpingRobotsGlobalSensor extends Sensor {
 		double totalRobotsJumping = 0.0;
 		double numberOfRobots_withinRange = 0.0;
 
-		if (robot instanceof JumpingSumo) {
-
-			if (((JumpingSumo) robot).isJumping())
-				rangeLimit = rangeLimit + 1;
-
-			for (Robot robotNeighbour : simulator.getRobots()) {
-				if (robotPosition.distanceTo(robotNeighbour.getPosition()) < rangeLimit) {
-					if (robot.getId() != robotNeighbour.getId()) {
-						if (((JumpingSumo) robotNeighbour).statusOfJumping()) {
-							totalRobotsJumping += 1;
-						}
-						numberOfRobots_withinRange += 1.0;
+		if (robot.isJumping()) {
+			range += increaseRange;
+			rangedIncreased = true;
+		}
+		for (Robot robotNeighbour : simulator.getRobots()) {
+			if (robotPosition.distanceTo(robotNeighbour.getPosition()) < range) {
+				if (robot.getId() != robotNeighbour.getId()) {
+					if (((JumpingRobot) robotNeighbour).statusOfJumping()) {
+						totalRobotsJumping += 1;
 					}
+					numberOfRobots_withinRange += 1.0;
 				}
 			}
 		}
-
+		rangeBackToDefault();
 		if (numberOfRobots_withinRange > 0.0)
 			return totalRobotsJumping / numberOfRobots_withinRange;
 		else
@@ -56,4 +62,12 @@ public class JumpingRobotsGlobalSensor extends Sensor {
 	public String toString() {
 		return "JumpingRobotsGlobalSensor [" + getSensorReading(0) + "]";
 	}
+
+	private void rangeBackToDefault() {
+		if (rangedIncreased == true) {
+			rangedIncreased = false;
+			range = range - increaseRange;
+		}
+	}
+
 }
