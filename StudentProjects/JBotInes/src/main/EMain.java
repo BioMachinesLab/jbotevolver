@@ -11,7 +11,9 @@ public class EMain {
 
 	public static void main(String[] args) {
 //		String configName="experiments/forage_environment.conf";
-		String configName="experiments/coevolutionpatrolling_tests151127/1/_restartevolution.conf";
+		String configName="experiments/walkers_tests.conf";
+//		String configName="experiments/20160201/coevolution_patrolling1/_restartevolution.conf";
+//		String configName="experiments/patrolling_new2.conf";
 //		String configName="experiments/joined2.conf";
 //		String configName="experiments/chain_tests_4xSR3_2LR7/_restartevolution.conf";
 		try {

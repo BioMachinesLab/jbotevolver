@@ -49,6 +49,8 @@ public class CoEvolutionTask extends JBotEvolverTask {
 
 			ArrayList<Robot> robots = jBotEvolver.createCoEvolutionRobots(simulator);
 			
+			numPreys = jBotEvolver.getArguments().get("--robots").getArgumentAsInt("numberofrobots"); //more computation but ensures that there can be a variable number of robots per sample
+			
 			ArrayList<Robot> preys = new ArrayList<Robot>();
 			ArrayList<Robot> predators = new ArrayList<Robot>();
 			for (int j = 0; j < robots.size(); j++) {
@@ -67,7 +69,7 @@ public class CoEvolutionTask extends JBotEvolverTask {
 			EvaluationFunction eval = EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get(evaluation));
 			simulator.addCallback(eval);
 			simulator.simulate();
-			System.out.println(seed+" "+eval.getFitness());
+//			System.out.println(seed+" "+eval.getFitness());
 			fitness += eval.getFitness();
 		}
 	}

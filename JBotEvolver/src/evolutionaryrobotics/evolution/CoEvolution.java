@@ -64,6 +64,7 @@ public class CoEvolution extends Evolution {
 				
 				//Obter valor do tamanho da tabela
 				tablesize = args.getArgumentAsIntOrSetDefault("tablesize", 10);
+				System.out.println(tablesize);
 				// Obter o numero de gerações da população A
 				Arguments ppA = jBotEvolver.getArguments().get("--populationa");
 				gA = ppA.getArgumentAsIntOrSetDefault("size", 100);
@@ -268,8 +269,8 @@ public class CoEvolution extends Evolution {
 		private int getGenomePredatorLength() {
 			
 			Simulator sim = jBotEvolver.createSimulator();
-			Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots2"));
-			Controller c = Controller.getController(sim,r, jBotEvolver.getArguments().get("--controllers2"));
+			Robot r = Robot.getRobot(sim, jBotEvolver.getArguments().get("--robots1"));
+			Controller c = Controller.getController(sim,r, jBotEvolver.getArguments().get("--controllers1"));
 			
 			int genomeLength = 0;
 			

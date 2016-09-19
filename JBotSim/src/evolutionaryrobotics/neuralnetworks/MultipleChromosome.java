@@ -10,6 +10,10 @@ import simulation.robot.Robot;
 
 public class MultipleChromosome extends Chromosome {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5649437611641475806L;
 	private int[] genomeLengths;
 	private int numberOfChromosomes;
 	

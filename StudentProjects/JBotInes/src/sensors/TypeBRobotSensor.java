@@ -61,10 +61,11 @@ public class TypeBRobotSensor extends LightTypeSensor{
 
 			if(source.getObject() instanceof AltDifferentialDriveRobot) {
 				AltDifferentialDriveRobot robot = (AltDifferentialDriveRobot) source.getObject();
-				int numbNeighbors = robot.getNeighbors().size();
+//				int numbNeighbors = robot.getNeighbors().size();
 
-				return ((2/(1 + Math.exp(-numbNeighbors/3.0)))-1); // y=2/1+exp(-x/3) -1 
+//				return ((2/(1 + Math.exp(-numbNeighbors/3.0)))-1); // y=2/1+exp(-x/3) -1 
 
+				//TO DO
 			}
 		}
 

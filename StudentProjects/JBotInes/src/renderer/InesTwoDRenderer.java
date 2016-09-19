@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 
+import sensors.BoundarySensor;
 import sensors.DistanceToASensor;
 import sensors.DistanceToBSensor;
 import sensors.TypeBRobotSensor;
@@ -45,7 +46,7 @@ public class InesTwoDRenderer extends TwoDRendererDebug {
 
 			for(Robot robot: typeB) {
 				DistanceToBSensor sensorB = (DistanceToBSensor) robot.getSensorByType(DistanceToBSensor.class);
-				DistanceToASensor sensorA = (DistanceToASensor) robot.getSensorByType(DistanceToASensor.class);
+				BoundarySensor sensorA = (BoundarySensor) robot.getSensorByType(BoundarySensor.class);
 				for(Robot r: env.getRobots()) {
 					if(!r.equals(robot) && r.getDescription().equals("type1") && 
 							r.getPosition().distanceTo(robot.getPosition()) <= sensorB.getRange() - robot.getRadius()) {								

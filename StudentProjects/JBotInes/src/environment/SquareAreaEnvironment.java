@@ -35,6 +35,8 @@ public class SquareAreaEnvironment extends Environment {
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
 		
+		
+		
 		if(distance > 0) {
 			for(Robot r : robots) {
 				double x = simulator.getRandom().nextDouble()*distance*2-distance;
@@ -48,16 +50,16 @@ public class SquareAreaEnvironment extends Environment {
 		communicationRange = sensor.getRange();
 		
 		//geofence points
-				LinkedList<Vector2d> points = new LinkedList<Vector2d>();
-				
-				Vector2d upperLeft = new Vector2d(-1*wallsDistance, 1*wallsDistance);
-				points.add(upperLeft);
-				Vector2d upperRight = new Vector2d(1*wallsDistance, 1*wallsDistance);
-				points.add(upperRight);
-				Vector2d lowerRight = new Vector2d(1*wallsDistance, -1*wallsDistance);
-				points.add(lowerRight);
-				Vector2d lowerLeft = new Vector2d(-1*wallsDistance, -1*wallsDistance);
-				points.add(lowerLeft);
+		LinkedList<Vector2d> points = new LinkedList<Vector2d>();
+		
+		Vector2d upperLeft = new Vector2d(-1*wallsDistance, 1*wallsDistance);
+		points.add(upperLeft);
+		Vector2d upperRight = new Vector2d(1*wallsDistance, 1*wallsDistance);
+		points.add(upperRight);
+		Vector2d lowerRight = new Vector2d(1*wallsDistance, -1*wallsDistance);
+		points.add(lowerRight);
+		Vector2d lowerLeft = new Vector2d(-1*wallsDistance, -1*wallsDistance);
+		points.add(lowerLeft);
 				
 				addLines(points, simulator);
 		

@@ -84,6 +84,7 @@ public class Chromosome implements Serializable, Cloneable {
 		if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
 			FixedLenghtGenomeEvolvableController controller = (FixedLenghtGenomeEvolvableController)r.getController();
 			controller.setNNWeights(getAlleles());
+			
 		}
 	}
 	

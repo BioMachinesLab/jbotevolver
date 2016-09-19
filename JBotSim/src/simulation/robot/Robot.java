@@ -1,4 +1,3 @@
-
 package simulation.robot;
 
 import java.awt.Color;
@@ -13,6 +12,7 @@ import simulation.Simulator;
 import simulation.physicalobjects.MovableObject;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.physicalobjects.collisionhandling.knotsandbolts.CircularShape;
+import simulation.robot.LedState;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
@@ -435,6 +435,53 @@ public class Robot extends MovableObject {
 			int totalRobots = arguments.getArgumentAsInt("totalrobots");
 			int previousNumberOfRobots = arguments.getArgumentAsIntOrSetDefault("previousrobots", 0);
 			numberOfRobots = totalRobots - previousNumberOfRobots;
+		}
+		
+		if(arguments.getArgumentIsDefined("isaytherulesnow")) {
+			int sample = simulator.getArguments().get("--environment").getArgumentAsInt("fitnesssample");
+			int i = sample % 5;
+			switch(i){
+			case 0: 
+				numberOfRobots = 6;
+				arguments.setArgument("numberofrobots", numberOfRobots);
+				if(arguments.getArgumentIsDefined("iamb")){ 
+					numberOfRobots = 2;
+					arguments.setArgument("numberofrobots", numberOfRobots);
+				}
+				break;
+			case 1: 
+				numberOfRobots = 9;
+				arguments.setArgument("numberofrobots", numberOfRobots);
+				if(arguments.getArgumentIsDefined("iamb")) {
+					numberOfRobots = 3;
+					arguments.setArgument("numberofrobots", numberOfRobots);
+				}
+				break;
+			case 2: 
+				numberOfRobots = 12;
+				arguments.setArgument("numberofrobots", numberOfRobots);
+				if(arguments.getArgumentIsDefined("iamb")) {
+					numberOfRobots = 4;
+					arguments.setArgument("numberofrobots", numberOfRobots);
+				}
+				break;
+			case 3: 
+				numberOfRobots = 6;
+				arguments.setArgument("numberofrobots", numberOfRobots);
+				if(arguments.getArgumentIsDefined("iamb")) {
+					numberOfRobots = 3;
+					arguments.setArgument("numberofrobots", numberOfRobots);
+				}
+				break;
+			case 4: 
+				numberOfRobots = 8;
+				arguments.setArgument("numberofrobots", numberOfRobots);
+				if(arguments.getArgumentIsDefined("iamb")) {
+					numberOfRobots = 4;
+					arguments.setArgument("numberofrobots", numberOfRobots);
+				}
+				break;
+			}
 		}
 		
 		if(arguments.getArgumentIsDefined("randomize")) {
