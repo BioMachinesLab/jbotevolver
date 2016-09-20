@@ -33,7 +33,7 @@ public class WalkerController extends Controller{
 	@Override
 	public void controlStep(double time) {
 		
-		prob += random.nextDouble()/150;
+		prob += random.nextDouble()/100;
 		if(prob >= 1){
 			if(current == 1){
 				current = -1;

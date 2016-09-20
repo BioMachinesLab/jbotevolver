@@ -12,6 +12,7 @@ public class ConnectivityEvaluationFunction extends EvaluationFunction{
 	private NestEnvironment env;
 	private int numberOfSteps = 0;
 	private int clustersSum = 0;
+	private double f = 0.0;
 
 	public ConnectivityEvaluationFunction(Arguments args) {
 		super(args);
@@ -28,8 +29,13 @@ public class ConnectivityEvaluationFunction extends EvaluationFunction{
 			clustersSum += env.getNumberOfClusters();
 		}
 		
-		fitness = 1 / (clustersSum / (env.getSteps()/10.0));
+		f += 1 / (clustersSum / (env.getSteps()/10.0));
 		
+	}
+	
+	@Override
+	public double getFitness() {
+		return f / env.getSteps();
 	}
 
 }

@@ -10,7 +10,7 @@ public class InesVMain {
 	
 	public static void main(String[] args) {
 		try {
-			new CombinedGui(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRenderer,drawarea=1))"});
+			new CombinedGui(new String[]{"--gui","classname=ResultViewerGui,renderer=(classname=TwoDRendererDebug,drawarea=1))"});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

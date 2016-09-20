@@ -46,6 +46,7 @@ public class NestEnvironment extends Environment{
 			Robot walker = Robot.getRobot(simulator, args);
 			walker.setController(new WalkerController(simulator, walker, args));
 			walker.setPosition(newRandomPosition()); //random dispersion from center
+			walker.setOrientation(random.nextDouble()*2*Math.PI);
 			addRobot(walker);
 		}	
 		
@@ -54,6 +55,17 @@ public class NestEnvironment extends Environment{
 				preprogRobots.add(r);
 			else if(r.getDescription().equals("type1")) {
 				evolvedRobots.add(r);
+				switch (r.getId()){
+				case 0:
+					r.setPosition(-12.5,12.5);
+					break;
+				case 1:
+					r.setPosition(12.5,12.5);
+					break;
+				case 2:
+					r.setPosition(12.5,-12.5);
+					break;
+				}
 			}
 		}
 		
@@ -120,5 +132,13 @@ public class NestEnvironment extends Environment{
 			}
 		}
 		return clusters;
+	}
+	
+	public double getShortRange() {
+		return shortRange;
+	}
+	
+	public double getLongRange() {
+		return longRange;
 	}
 }

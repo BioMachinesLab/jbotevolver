@@ -16,10 +16,10 @@ import simulation.physicalobjects.Nest;
 import simulation.robot.LedState;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
-import simulation.robot.sensors.RobotSensor;
 import simulation.robot.sensors.Sensor;
 import simulation.robot.sensors.WallRaySensor;
 import simulation.util.Arguments;
+
 
 public class TwoDRendererDebug extends TwoDRenderer {
 
@@ -50,7 +50,7 @@ public class TwoDRendererDebug extends TwoDRenderer {
 		
 		if(drawArea){
 
-			double range = ((RobotSensor)environment.getRobots().get(0).getSensorByType(RobotSensor.class)).getRange();
+			double range = 7;
 
 			ArrayList<Robot> temp = new ArrayList<Robot>();
 			for(Robot a: environment.getRobots()){
