@@ -1,8 +1,6 @@
 /*
  * Created on 23-Jun-2005
  *
- * TODO To change the template for this generated file go to
- * Window - Preferences - Java - Code Style - Code Templates
  */
 package evolutionaryrobotics.evolution.neat.core;
 
@@ -42,7 +40,8 @@ public class NEATSpecie extends Specie {
         this.copyBest = copyBest;
     }
 
-    public boolean addSpecieMember(Chromosome specieMember) {
+    @Override
+	public boolean addSpecieMember(Chromosome specieMember) {
         boolean addedOk = false;
         if (super.addSpecieMember(specieMember)) {
             ((NEATChromosome) specieMember).setSpecieId(this.id());
@@ -80,7 +79,8 @@ public class NEATSpecie extends Specie {
         this.youthBoost = youthBoost;
     }
 
-    protected void adjustFitness() {
+    @Override
+	protected void adjustFitness() {
         ArrayList members = this.specieMembers();
         int i;
         Chromosome member;
@@ -98,11 +98,13 @@ public class NEATSpecie extends Specie {
         }
     }
 
-    protected double fitnessMultiplier() {
+    @Override
+	protected double fitnessMultiplier() {
         return (this.fitnessMultiplier);
     }
 
-    protected boolean isCompatable(Chromosome specieApplicant, Chromosome specieRepresentative) {
+    @Override
+	protected boolean isCompatable(Chromosome specieApplicant, Chromosome specieRepresentative) {
         boolean compatable = false;
         double compatabilityScore = Integer.MAX_VALUE;
 
@@ -117,7 +119,8 @@ public class NEATSpecie extends Specie {
         return (compatable);
     }
 
-    protected Chromosome[] produceOffspring(int count, Mutator mut, ParentSelector selector, CrossOver xOver) {
+    @Override
+	protected Chromosome[] produceOffspring(int count, Mutator mut, ParentSelector selector, CrossOver xOver) {
         int i = 0;
         ChromosomeSet parents;
         ChromosomeSet child;
@@ -185,7 +188,8 @@ public class NEATSpecie extends Specie {
         return (clonedSet);
     }
 
-    public int compareTo(Object arg0) {
+    @Override
+	public int compareTo(Object arg0) {
         int compare = 0;
         Specie s;
         if (arg0 instanceof Specie) {

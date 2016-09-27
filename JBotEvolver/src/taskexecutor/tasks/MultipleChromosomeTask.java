@@ -3,17 +3,13 @@ package taskexecutor.tasks;
 import java.util.ArrayList;
 import java.util.Random;
 
-import result.Result;
-import simulation.Simulator;
-import simulation.SimulatorObject;
-import simulation.robot.Robot;
-import taskexecutor.results.SimpleFitnessResult;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.evolution.JoinedGenerationalEvolution;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.neuralnetworks.MultipleChromosome;
-import gui.ResultViewerGui.SimulationRunner;
+import result.Result;
+import simulation.Simulator;
+import simulation.robot.Robot;
+import taskexecutor.results.SimpleFitnessResult;
 
 public class MultipleChromosomeTask extends JBotEvolverTask{
 
@@ -37,7 +33,7 @@ public class MultipleChromosomeTask extends JBotEvolverTask{
 		for(int i = 0 ; i < samples ; i++) {
 
 			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
-			Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
+			Simulator simulator = jBotEvolver.createSimulator(random.nextLong());
 			simulator.setFileProvider(getFileProvider());
 
 			//for(int j = 0; j < JoinedGenerationalEvolution.CHROM_NUM; j++){
@@ -55,8 +51,9 @@ public class MultipleChromosomeTask extends JBotEvolverTask{
 			fitness+= eval.getFitness();
 		}
 	}
+	@Override
 	public Result getResult() {
-		SimpleFitnessResult fr = new SimpleFitnessResult(chromosome.getID(),fitness/samples);
+		SimpleFitnessResult fr = new SimpleFitnessResult(getId(),chromosome.getID(),fitness/samples);
 		return fr;
 	}
 

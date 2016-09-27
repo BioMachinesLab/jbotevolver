@@ -1,15 +1,14 @@
 package taskexecutor.tasks;
 
 import java.util.ArrayList;
-import java.util.Random;
+
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.Chromosome;
 import result.Result;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import taskexecutor.results.PostEvaluationResult;
-import taskexecutor.results.SimpleFitnessResult;
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 public class PostEvaluationTask extends JBotEvolverTask {
 	
@@ -34,7 +33,7 @@ public class PostEvaluationTask extends JBotEvolverTask {
 	public void run() {
 		
 		for(int i = 0 ; i < nSamples ; i++) {
-			Simulator simulator = jBotEvolver.createSimulator(new Random(i));
+			Simulator simulator = jBotEvolver.createSimulator(i);
 			simulator.setFileProvider(getFileProvider());
 			
 			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
@@ -54,11 +53,12 @@ public class PostEvaluationTask extends JBotEvolverTask {
 				fitness+= eval.getFitness();	
 		}
 	}
+	@Override
 	public Result getResult() {
 		
-		double val = threshold > 0 ? fitness : fitness/(double)nSamples;
+		double val = threshold > 0 ? fitness : fitness/nSamples;
 		
-		PostEvaluationResult fr = new PostEvaluationResult(run,fitnesssample,val);
+		PostEvaluationResult fr = new PostEvaluationResult(getId(),run,fitnesssample,val);
 		return fr;
 	}
 }

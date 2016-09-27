@@ -10,11 +10,11 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Random;
 import java.util.Vector;
 import java.util.zip.GZIPOutputStream;
-import simulation.util.Arguments;
+
 import evolutionaryrobotics.populations.Population;
+import simulation.util.Arguments;
 
 public class DiskStorage implements Serializable{
 	String outputDirectory;
@@ -190,7 +190,7 @@ public class DiskStorage implements Serializable{
 		}
 	
 		fitnessLog
-				.printf("\t%3d\t\t%18.10f\t%18.10f\t%18.10f\t%18.10f\t%18.10f\t%18.10f\n",
+				.printf("\t%3d\t\t%18.10f\t%18.10f\t%18.10f\t%18.10f\t%18.10f\t%18.10f%n",
 						populationA.getNumberOfCurrentGeneration(),
 						populationA.getHighestFitness(),
 						populationA.getAverageFitness(),
@@ -205,7 +205,7 @@ public class DiskStorage implements Serializable{
 		if(population.getNumberOfCurrentGeneration() == 0) {
 			openFitnessLog(false);
 		}
-		fitnessLog.printf("\t%3d\t\t%8.3f\t%8.3f\t%8.3f\n",
+		fitnessLog.printf("\t%3d\t\t%8.3f\t%8.3f\t%8.3f%n",
 				population.getNumberOfCurrentGeneration(),
 				population.getHighestFitness(), population.getAverageFitness(),
 				population.getLowestFitness());

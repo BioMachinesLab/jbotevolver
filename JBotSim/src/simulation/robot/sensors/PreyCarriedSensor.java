@@ -7,15 +7,16 @@ import simulation.util.Arguments;
 
 public class PreyCarriedSensor extends Sensor{
 	
-	private PreyPickerActuator actuator;
+	protected PreyPickerActuator actuator;
 
 	public PreyCarriedSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 	}
 	
 	public boolean preyCarried() {
-		if(actuator == null)
+		if(actuator == null) {
 			actuator = (PreyPickerActuator) robot.getActuatorByType(PreyPickerActuator.class);
+		}
 		return actuator.isCarryingPrey();
 	}
 	

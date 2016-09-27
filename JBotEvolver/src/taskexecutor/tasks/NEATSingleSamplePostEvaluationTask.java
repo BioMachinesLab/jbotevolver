@@ -1,15 +1,14 @@
 package taskexecutor.tasks;
 
 import java.util.ArrayList;
-import java.util.Random;
 
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.Chromosome;
 import result.Result;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import taskexecutor.results.NEATPostEvaluationResult;
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 public class NEATSingleSamplePostEvaluationTask extends JBotEvolverTask {
 
@@ -35,7 +34,7 @@ public class NEATSingleSamplePostEvaluationTask extends JBotEvolverTask {
 	public void run() {
 		jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", fitnesssample);
 		
-		Simulator simulator = jBotEvolver.createSimulator(new Random(sample));
+		Simulator simulator = jBotEvolver.createSimulator(sample);
 		simulator.setFileProvider(getFileProvider());
 //		ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
 //		jBotEvolver.setChromosome(robots, chromosome);
@@ -49,8 +48,9 @@ public class NEATSingleSamplePostEvaluationTask extends JBotEvolverTask {
 		else
 			fitness= eval.getFitness();
 	}
+	@Override
 	public Result getResult() {
-		NEATPostEvaluationResult fr = new NEATPostEvaluationResult(run,generation,fitnesssample,fitness,sample);
+		NEATPostEvaluationResult fr = new NEATPostEvaluationResult(getId(),run,generation,fitnesssample,fitness,sample);
 		return fr;
 	}
 	

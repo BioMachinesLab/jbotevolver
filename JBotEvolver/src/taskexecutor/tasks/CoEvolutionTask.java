@@ -44,7 +44,7 @@ public class CoEvolutionTask extends JBotEvolverTask {
 			long seed = random
 					.nextLong();
 			
-			Simulator simulator = jBotEvolver.createSimulator(new Random(seed));
+			Simulator simulator = jBotEvolver.createSimulator(seed);
 			simulator.setFileProvider(getFileProvider());
 
 			ArrayList<Robot> robots = jBotEvolver.createCoEvolutionRobots(simulator);
@@ -76,7 +76,7 @@ public class CoEvolutionTask extends JBotEvolverTask {
 
 	public Result getResult() {
 		SimpleCoEvolutionFitnessResult fr = new SimpleCoEvolutionFitnessResult(chromosome.getID(),opponentChromosome.getID(),
-				fitness / samples);
+				numPreys, fitness / samples);
 		return fr;
 	}
 }

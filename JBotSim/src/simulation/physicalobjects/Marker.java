@@ -10,6 +10,7 @@ public class Marker extends PhysicalObject{
 	private Color color = Color.RED;
 	private double length;
 	private double radius;
+	private boolean square = false;
 
 	public Marker(Simulator simulator,  String name, double x, double y, double orientation, double radius, double length, Color color) {
 		super(simulator, name, x, y, orientation, 0, PhysicalObjectType.MARKER);
@@ -17,6 +18,15 @@ public class Marker extends PhysicalObject{
 		this.length = length;
 		this.radius = radius;
 		this.color = color;
+	}
+	
+	public Marker(Simulator simulator,  String name, double x, double y, double orientation, double radius, double length, Color color, boolean square) {
+		this(simulator, name, x, y, orientation, radius, length, color);
+		this.square = square;
+	}
+	
+	public boolean isSquare() {
+		return square;
 	}
 	
 	public Color getColor() {

@@ -1,5 +1,6 @@
 package simulation.physicalobjects.collisionhandling.knotsandbolts;
 
+import java.awt.geom.Area;
 import java.util.LinkedList;
 
 import mathutils.Vector2d;

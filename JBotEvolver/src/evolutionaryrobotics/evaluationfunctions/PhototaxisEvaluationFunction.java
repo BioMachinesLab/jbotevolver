@@ -5,6 +5,7 @@ import simulation.physicalobjects.LightPole;
 import simulation.physicalobjects.PhysicalObject;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import tests.Cronometer;
 
 public class PhototaxisEvaluationFunction extends EvaluationFunction {
 
@@ -16,10 +17,12 @@ public class PhototaxisEvaluationFunction extends EvaluationFunction {
 	private boolean countTime = false;
 	private int totalSteps = 0;
 	private double currentSteps = 0;
+	private boolean kill = false;
 	
 	public PhototaxisEvaluationFunction(Arguments args) {
 		super(args);
 		countTime = args.getFlagIsTrue("counttime");
+		kill = args.getFlagIsTrue("kill");
 	}
 
 	@Override
@@ -39,6 +42,10 @@ public class PhototaxisEvaluationFunction extends EvaluationFunction {
 		currentSteps = simulator.getTime();
 		
 		currentDistance = r.getPosition().distanceTo(light.getPosition());
+		
+		if(kill && r.isInvolvedInCollison()) {
+			simulator.stopSimulation();
+		}
 		
 		if(currentDistance < 0.05) {
 			simulator.stopSimulation();

@@ -150,4 +150,9 @@ public class Vector2d extends Point2d implements Serializable {
 		return "[angle=" + angle + ", x=" + x + ", y=" + y + "]";
 	}
 
+	public void multiply(double t) {
+		x*=t;
+		y*=t;
+	}
+
 }

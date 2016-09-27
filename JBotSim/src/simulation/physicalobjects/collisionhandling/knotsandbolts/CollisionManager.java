@@ -24,7 +24,7 @@ public abstract class CollisionManager implements Serializable {
 	static public boolean checkCollisionBetweenTwoObjects(
 				Shape collisionObject1,
 				Shape collisionObject2) {
-
+		
 		// Check if the objects are enabled:
 		if (!collisionObject1.isEnabled() || !collisionObject2.isEnabled() || collisionObject1 == collisionObject2)
 			return false;

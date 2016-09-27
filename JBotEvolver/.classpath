@@ -4,7 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JBotSim"/>
 	<classpathentry kind="lib" path="commons-io-2.2.jar"/>
-	<classpathentry kind="lib" path="/JBotSim/jafama.jar"/>
-	<classpathentry kind="lib" path="/JBotSim/BaseClient.jar"/>
+	<classpathentry kind="lib" path="/JBotSim/lib/jafama.jar"/>
+	<classpathentry kind="lib" path="/JBotSim/lib/BaseClient.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

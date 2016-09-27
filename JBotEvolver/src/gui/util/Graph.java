@@ -111,7 +111,7 @@ public class Graph extends JPanel {
 			
 			if(dataList[i] != null && dataList[i] > max)
 				max = dataList[i];
-			else if (dataList[i] != null && dataList[i] < min)
+			if (dataList[i] != null && dataList[i] < min)
 				min = dataList[i];
 		}
 		

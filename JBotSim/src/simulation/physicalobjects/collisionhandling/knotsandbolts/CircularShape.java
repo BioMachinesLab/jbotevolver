@@ -1,5 +1,6 @@
 package simulation.physicalobjects.collisionhandling.knotsandbolts;
 
+import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
 import mathutils.Vector2d;

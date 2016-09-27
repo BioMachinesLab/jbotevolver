@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Vector;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -24,15 +25,16 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import simulation.Simulator;
-import simulation.Updatable;
-import simulation.robot.Robot;
+
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.neuralnetworks.CTRNNMultilayer;
 import evolutionaryrobotics.neuralnetworks.NeuralNetwork;
 import evolutionaryrobotics.neuralnetworks.NeuralNetworkController;
 import evolutionaryrobotics.neuralnetworks.inputs.NNInput;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
+import simulation.Simulator;
+import simulation.Updatable;
+import simulation.robot.Robot;
 
 public class GraphPlotter extends JFrame implements Updatable {
 
@@ -120,24 +122,28 @@ public class GraphPlotter extends JFrame implements Updatable {
 			buttonsPanel.add(plotButton);
 	
 			checkAllButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					changeAllCheckboxes(true);
 				}
 			});
 			
 			uncheckAllButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					changeAllCheckboxes(false);
 				}
 			});
 			
 			plotButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					plotGraph();
 				}
 			});
 			
 			saveToFileButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					saveToFile = true;
 					plotGraph();
@@ -195,7 +201,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		        
 		        while (sc.hasNextLine()) {
 		        	String line = sc.nextLine();
-		            if(line.charAt(0) == '#')
+		            if(line.charAt(0) == '#' || (line.charAt(0)=='\t' && line.contains("#")))
 		            	continue;
 		            else{
 		            	line = line.replaceAll(" ", "");
@@ -340,6 +346,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 		}catch(Exception e) {e.printStackTrace();}
 	}
 	
+	@Override
 	public void update(Simulator simulator) {
 		
 		currentStep = simulator.getTime();
@@ -500,6 +507,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 			
 			JButton hiddenTausButton = new JButton("Print Hidden Taus");
 			hiddenTausButton.addActionListener(new ActionListener() {
+				@Override
 				public void actionPerformed(ActionEvent arg0) {
 					printHiddenTaus();					
 				}

@@ -1,10 +1,13 @@
 package simulation.physicalobjects;
 
+import gui.renderer.TwoDRendererDebug;
+
 import java.awt.Color;
 import java.awt.Polygon;
 import java.awt.Shape;
 import java.io.Serializable;
 
+import net.jafama.FastMath;
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -219,6 +222,98 @@ public class Wall extends PhysicalObject{
 		}
 		return closestPoint;
 	}
+	
+	public double getMinDist(Vector2d pos) {
+		double d = Double.MAX_VALUE;
+		
+		for (Edge e : edges) {
+			Vector2d e1 = new Vector2d(e.getP1());
+			Vector2d e2 = new Vector2d(e.getP2());
+			d = Math.min(d,distToSegment(new Vector2d(pos), e1, e2));
+		}
+		return d;
+	}
+	/**
+	 * "Shortest distance between a point and a line segment" by Grumdrig
+	 * http://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+	 */
+	public static double distToSegment(Vector2d p, Vector2d v, Vector2d w) {
+
+	       double l2 = FastMath.pow2(v.x - w.x) + FastMath.pow2(v.y - w.y);
+	       if (l2 == 0.0) {
+	           return p.distanceTo(v);   // v == w case
+	       }
+	       // Consider the line extending the segment, parameterized as v + t (w - v).
+	       // We find projection of point p onto the line. 
+	       // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+	       
+	       Vector2d pp = new Vector2d(p);
+	       Vector2d vv = new Vector2d(v);
+	       Vector2d ww = new Vector2d(w);
+	       
+	       pp.sub(v);
+	       ww.sub(v);
+	       double t = pp.dot(ww) / l2;
+	       
+	       if (t < 0.0) {
+	           return p.distanceTo(v); // Beyond the 'v' end of the segment
+	       } else if (t > 1.0) {
+	           return p.distanceTo(w);  // Beyond the 'w' end of the segment
+	       }
+	       
+	    // Projection falls on the segment
+
+	       pp = new Vector2d(p);
+	       vv = new Vector2d(v);
+	       ww = new Vector2d(w);
+	       
+	       ww.sub(v);
+	       ww.multiply(t);
+	       vv.add(ww); 
+	       
+	       return p.distanceTo(vv);
+	   }
+	
+	public static Vector2d debug(Vector2d p, Vector2d v, Vector2d w) {
+
+	       double l2 = FastMath.pow2(v.x - w.x) + FastMath.pow2(v.y - w.y);
+	       if (l2 == 0.0) {
+	           return v;   // v == w case
+	       }
+	       // Consider the line extending the segment, parameterized as v + t (w - v).
+	       // We find projection of point p onto the line. 
+	       // It falls where t = [(p-v) . (w-v)] / |w-v|^2
+	       
+//	       double t = p.sub(v).dot(w.sub(v)) / l2;
+	       
+	       Vector2d pp = new Vector2d(p);
+	       Vector2d vv = new Vector2d(v);
+	       Vector2d ww = new Vector2d(w);
+	       
+	       pp.sub(v);
+	       ww.sub(v);
+	       double t = pp.dot(ww) / l2;
+	       
+	       if (t < 0.0) {
+	           return v; // Beyond the 'v' end of the segment
+	       } else if (t > 1.0) {
+	           return w;  // Beyond the 'w' end of the segment
+	       }
+	       
+	    // Projection falls on the segment
+//	       Vector2d projection = v.add((w.sub(v)).multiply(t));
+	       
+	       pp = new Vector2d(p);
+	       vv = new Vector2d(v);
+	       ww = new Vector2d(w);
+	       
+	       ww.sub(v);
+	       ww.multiply(t);
+	       vv.add(ww); 
+	       
+	       return vv;
+	   }
+	
 	
 	@Override
 	public double getDistanceBetween(Vector2d fromPoint) {

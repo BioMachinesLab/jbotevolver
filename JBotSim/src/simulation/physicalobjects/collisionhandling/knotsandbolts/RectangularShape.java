@@ -1,5 +1,7 @@
 package simulation.physicalobjects.collisionhandling.knotsandbolts;
 
+import java.awt.geom.Area;
+
 import mathutils.MathUtils;
 import mathutils.Vector2d;
 import simulation.Simulator;
@@ -178,4 +180,5 @@ public class RectangularShape extends Shape {
 
 		computeNewPositionAndOrientationFromParent();
 	}
+	
 }

@@ -2,8 +2,10 @@ package simulation.physicalobjects.collisionhandling.knotsandbolts;
 
 import java.awt.Polygon;
 import java.awt.geom.Area;
+
 import simulation.Simulator;
 import simulation.physicalobjects.*;
+import tests.Cronometer;
 
 public class PolygonShape extends Shape {
 	
@@ -11,6 +13,7 @@ public class PolygonShape extends Shape {
 	private double[] y;
 	private Polygon polygon;
 	public boolean collision = false;
+	private Area area;
 
 	public PolygonShape(Simulator simulator, String name, PhysicalObject parent,
 			double relativePosX, double relativePosY, double range, double[] x, double[] y) {
@@ -33,6 +36,7 @@ public class PolygonShape extends Shape {
 		}
 		
 		this.polygon = new Polygon(xi, yi, xi.length);
+		area = new Area(this.polygon);
 	}
 
 	public int getCollisionObjectType(){
@@ -41,23 +45,6 @@ public class PolygonShape extends Shape {
 	
 	public Polygon getPolygon() {
 		return polygon;
-	}
-	
-	public boolean checkCollisionWithShape(java.awt.Shape other) {
-		Area areaA = new Area(this.polygon);
-		areaA.intersect(new Area(other));
-		
-		if(!areaA.isEmpty()) { 
-			collision = true;
-		}
-	
-		return !areaA.isEmpty();
-	}
-	
-	public boolean checkCollisionWithShape(Shape other){
-		if(other instanceof CircularShape)
-			return this.checkCollisionWithShape(((CircularShape)other).getCircle());
-		return false;
 	}
 	
 }

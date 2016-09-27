@@ -1,5 +1,6 @@
 package simulation.physicalobjects.collisionhandling;
 
+import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 
 import mathutils.Vector2d;
@@ -87,14 +88,16 @@ public class SimpleCollisionManager extends CollisionManager {
 			ClosePhysicalObjects closeWalls = robot.shape.getCloseWalls();
 			CloseObjectIterator iterator = closeWalls.iterator();
 			
+			
 			while (iterator.hasNext()) {
 
 				Wall closeWall = (Wall) (iterator.next().getObject());
-
-				PolygonShape ps = (PolygonShape) closeWall.shape;
 				
-				if(ps.checkCollisionWithShape(robot.shape)) {
+				if(closeWall.getMinDist(new Vector2d(robot.getPosition())) < robot.getRadius()) {
 					
+					PolygonShape ps = (PolygonShape) closeWall.shape;
+					ps.collision = true;
+
 					robot.setInvolvedInCollison(true);
 					robot.setInvolvedInCollisonWall(true);
 					robot.getCollidingObjects().add(closeWall);
@@ -129,7 +132,6 @@ public class SimpleCollisionManager extends CollisionManager {
 						else
 							robot.moveTo(prev);
 						
-						
 					} else {
 						robot.moveTo(robot.getPreviousPosition());
 						break;
@@ -144,15 +146,20 @@ public class SimpleCollisionManager extends CollisionManager {
 			ClosePhysicalObjects closeWalls = prey.shape.getCloseWalls();
 			CloseObjectIterator iterator = closeWalls.iterator();
 			while (iterator.hasNext()) {
-
+				
 				Wall closeWall = (Wall) (iterator.next().getObject());
-				int status = checkIfCollided(closeWall, prey);
-				if (status != -1) {
-					Vector2d newPosition = handleCollision(prey, closeWall,
-							status);
-					prey.moveTo(newPosition);
+				
+				if(closeWall.getMinDist(new Vector2d(prey.getPosition())) < prey.getRadius()) {
+					
+					PolygonShape ps = (PolygonShape) closeWall.shape;
+					ps.collision = true;
+
 					prey.setInvolvedInCollison(true);
-				}
+					prey.setInvolvedInCollisonWall(true);
+					
+					prey.moveTo(prey.getPreviousPosition());
+					break;
+				} 
 			}
 		}
 		
@@ -284,15 +291,13 @@ public class SimpleCollisionManager extends CollisionManager {
 
 		while(iterator.hasNext()) {
 			Wall w = (Wall)iterator.next().getObject();
-			PolygonShape ps = (PolygonShape)w.shape;
-			Ellipse2D.Double ell = CircularShape.getEllipse2D(pos, new Vector2d(), radius);
-			if(ps.checkCollisionWithShape(ell))
+			if(w.getMinDist(pos) < radius)
 				return false;
 		}
 		return true;
 	}
-
-	private void setLength(Vector2d vector, double length) {
+	
+	protected void setLength(Vector2d vector, double length) {
 		if (vector.x == 0 && vector.y == 0) {
 			vector.x = simulator.getRandom().nextGaussian();
 			vector.y = simulator.getRandom().nextGaussian();
@@ -300,7 +305,7 @@ public class SimpleCollisionManager extends CollisionManager {
 		vector.setLength(length);
 	}
 	
-	private Vector2d handleCollision(PhysicalObject obj, Wall wall, int collisionStatus) {
+	protected Vector2d handleCollision(PhysicalObject obj, Wall wall, int collisionStatus) {
 		
 		double valueX = obj.getPosition().getX(), valueY = obj.getPosition().getY();
 		switch (collisionStatus) {
@@ -325,7 +330,7 @@ public class SimpleCollisionManager extends CollisionManager {
 		return new Vector2d(valueX, valueY);
 	}
 
-	private int checkIfCollided(Wall closeWall, PhysicalObject obj) {
+	protected int checkIfCollided(Wall closeWall, PhysicalObject obj) {
 
 		Vector2d topLeft = new Vector2d(closeWall.getTopLeftX(),
 				closeWall.getTopLeftY()), topRight = new Vector2d(

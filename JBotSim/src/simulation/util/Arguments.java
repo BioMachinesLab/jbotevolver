@@ -1,7 +1,5 @@
 package simulation.util;
 
-import gui.StartupGui;
-
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
@@ -18,6 +16,7 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gui.StartupGui;
 import mathutils.Vector2d;
 
 /**
@@ -700,7 +699,7 @@ public class Arguments implements Serializable {
 			for (int i = 0; i < argsFromFile.length; i++) {
 				newArgs[i] = argsFromFile[i];
 			}
-
+			
 			for (int i = 1; i < argsFromCommandline.length; i++) {
 				newArgs[argsFromFile.length + i - 1] = argsFromCommandline[i];
 			}
@@ -725,7 +724,6 @@ public class Arguments implements Serializable {
 
 			String key = args[currentIndex].toLowerCase();
 			// this replaces the big ol' if then
-			// System.out.println(args[currentIndex]+" # "+args[currentIndex+1]);
 			result.put(
 					key,
 					createOrPrependArguments(result.get(key),
@@ -840,6 +838,7 @@ public class Arguments implements Serializable {
 		}
 	}
 
+	@Override
 	public String toString() {
 		return getCompleteArgumentString();
 	}
@@ -855,7 +854,7 @@ public class Arguments implements Serializable {
 	public static String beautifyString(String s) {
 		
 		int nParenthesis = 0;
-		String newString = "\t";
+		String newString = "";
 		
 		for(int i = 0 ; i < s.length(); i++) {
 			char c = s.charAt(i);

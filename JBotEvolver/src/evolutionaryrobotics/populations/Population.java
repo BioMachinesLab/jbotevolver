@@ -362,10 +362,12 @@ public abstract class Population implements Serializable {
 	private static Population loadPopulationFromFile(Arguments args) throws Exception{
 		File f = new File(args.getArgumentAsString("load"));
 		
-		File populationFile = new File(args.getArgumentAsString("parentfolder")+"/populations/"+f.getName());
+		String parentFolder = args.getArgumentAsString("parentfolder") != null ? args.getArgumentAsString("parentfolder") : "";
+		
+		File populationFile = new File(parentFolder+"/populations/"+f.getName());
 		
 		if(!populationFile.exists())
-			populationFile = new File(args.getArgumentAsString("parentfolder")+"/../populations/"+f.getName());
+			populationFile = new File(parentFolder+"/../populations/"+f.getName());
 		
 		FileInputStream fis = new FileInputStream(populationFile);
 		GZIPInputStream gzipIn = new GZIPInputStream(fis);
