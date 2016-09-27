@@ -5,19 +5,15 @@ import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 
-import mathutils.Vector2d;
 import multiobjective.MOChromosome;
 import multiobjective.MOFitnessResult;
 import multiobjective.MOTask;
-import novelty.BehaviourResult;
-import novelty.ExpandedFitness;
-import novelty.results.VectorBehaviourExtraResult;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
-import evaluationfunctions.OrientationEvaluationFunction;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evolution.GenerationalEvolution;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
+import evorbc.mappingfunctions.MappingFunction;
 
 /**
  *	MAP-Elites "illumination" algorithm
@@ -26,11 +22,8 @@ import evolutionaryrobotics.neuralnetworks.Chromosome;
  */
 public class MAPElitesEvolution extends GenerationalEvolution{
 	
-	protected double pruneThreshold = 0.0;
-	
     public MAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
     	super(jBotEvolver, taskExecutor, arg);
-    	pruneThreshold = arg.getArgumentAsDoubleOrSetDefault("prune", pruneThreshold);
     }
     
     /*	procedure MAP-ELITES ALGORITHM (SIMPLE, DEFAULT VERSION)
@@ -98,14 +91,13 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 			}
 		}
 		
-		prune((MAPElitesPopulation)population, pruneThreshold);
-		expandToCircle((MAPElitesPopulation)population);
-		
 		String dir = diskStorage.getOutputDirectory()+"/";
 		String hash = getRepertoireHash((MAPElitesPopulation)population);
     	String file = "repertoire_"+hash+".txt";
 		
+    	System.out.println("Saving repertoire to file...");
 		saveRepertoireTxt(dir,file,(MAPElitesPopulation)population);
+		System.out.println("Saved!");
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(dir+"repertoire_name.txt")));
 			bw.write(hash);
@@ -121,13 +113,14 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		
 		evolutionFinished = true;
 		diskStorage.close();
+		System.out.println("Finished evolution!");
 	}
     
-    public static void printRepertoire(MAPElitesPopulation p) {
-    	for(int x = 0 ; x < p.getMap().length ; x++) {
+    public static void printRepertoire(MOChromosome[][] map) {
+    	for(int x = 0 ; x < map.length ; x++) {
 			System.out.println();
-			for(int y = 0 ; y < p.getMap()[x].length ; y++) {
-				if(p.getMap()[x][y] == null)
+			for(int y = 0 ; y < map[x].length ; y++) {
+				if(map[x][y] == null)
 					System.out.print(" ");
 				else
 					System.out.print("X");
@@ -135,137 +128,25 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 		}
     }
     
-    public static void expandToCircle(MAPElitesPopulation p) {
-    	
-    	MOChromosome[][] map = p.getMap();
-    	double maxDist = 0;
-//    	double resolution = p.getMapResolution();
-    	
-    	int xx = 0;
-    	int yy = 0;
-    	
+    public static void printRepertoire(MOChromosome[][] map, int dx, int dy) {
     	for(int x = 0 ; x < map.length ; x++) {
-    		for(int y = 0 ; y < map[x].length ; y++) {
-    			if(map[x][y] != null) {
-	    			int posX = x;
-	    			int posY = y;
-	    			posX-= map.length/2;
-	        		posY-= map[0].length/2;
-	        		xx = posX;
-	        		yy = posY;
-	        		maxDist = Math.max(maxDist,new Vector2d(posX,posY).length());
-    			}
-    		}
-    	}
-    	
-    	//create a copy of the map so that we only expand the map
-    	//with some of the original behaviors
-    	MOChromosome[][] mapNew = new MOChromosome[map.length][map[0].length];
-    	
-    	for(int x = 0 ; x < map.length ; x++) {
-    		for(int y = 0 ; y < map[x].length ; y++) {
-    			
-    			double len = new Vector2d(x-map.length/2,y-map[x].length/2).length();
-    			if(len <= maxDist) {
-//    				int[] pos = p.getLocationFromBehaviorVector(new double[]{x,y});
-    				if(map[x][y] == null) {
-    					mapNew[x][y] = findNearest(x,y,map);
-    				}
-    			}
-    		}
-    	}
-    	
-    	//merge the two maps
-    	for(int i = 0 ; i < mapNew.length ; i++) {
-    		for(int j = 0 ; j < mapNew[i].length ; j++) {
-    			if(mapNew[i][j] != null) {
-    				p.addToMapForced(mapNew[i][j],new int[]{i,j});
-    			}
-    		}
-    	}
-    	
-    }
-    
-    private static MOChromosome findNearest(int x, int y, MOChromosome[][] map) {
-    	
-    	MOChromosome nearest = null;
-    	double nearestDistance = Double.MAX_VALUE;
-    	Vector2d refPos = new Vector2d(x,y);
-    	
-    	for(int i = 0 ; i < map.length ; i++) {
-    		for(int j = 0 ; j < map[i].length ; j++) {
-    			if(map[i][j] != null) {
-    				double dist = new Vector2d(i,j).distanceTo(refPos);
-    				if(dist < nearestDistance) {
-    					nearestDistance = dist;
-    					nearest = map[i][j];
-    				}
-    			}
-    		}
-    	}
-    	
-    	return nearest;
-    }
-    
-    public static String getRepertoireHash(MAPElitesPopulation p) {
-    	StringBuffer sb = new StringBuffer();
-    	for(Chromosome c : p.getChromosomes()) {
-    		for(double d : c.getAlleles())
-    			sb.append(d+" ");
-    	}
-    	return ""+sb.toString().hashCode();
-    }
-    
-    public static void saveRepertoireTxt(String dir, String file, MAPElitesPopulation p) {
-    	
-    	MOChromosome[][] map = p.getMap();
-    	
-    	try {
-    	
-    		FileWriter fw = new FileWriter(new File(dir+file));
-    		StringBuffer buffer = new StringBuffer();
-    		
-    		buffer.append(map.length+" "+p.getMapResolution()+" ");
-    		
-    		for(int y = 0 ; y < map.length ; y++) {
-    			for(int x = 0 ; x < map[y].length ; x++) {
-    				MOChromosome moc = map[y][x];
-    				if(moc != null) {
-    					buffer.append(x+" "+y+" ");
-	    				for(double d : moc.getAlleles())
-	    					buffer.append(d+" ");
-    				}
-        		}
-    		}
-    		
-    		fw.write(buffer.toString().trim());
-    		
-    		fw.close();
-    	} catch(Exception e){
-    		e.printStackTrace();
-    	}
-    }
-    
-    //TODO make this more abstract
-    public static void prune(MAPElitesPopulation mapPop, double pruneThreshold) {
-    	
-    	for(Chromosome c : mapPop.getChromosomes()) {
-    		MOChromosome moc = (MOChromosome)c;
-    		ExpandedFitness fit = (ExpandedFitness)moc.getEvaluationResult();
-			BehaviourResult br = (BehaviourResult)fit.getCorrespondingEvaluation(1);
-			
-			double[] behavior = (double[])br.value();
-			Vector2d pos = new Vector2d(behavior[0],behavior[1]);
-			double orientation = ((VectorBehaviourExtraResult)br).getExtraValue();
-			double fitness = OrientationEvaluationFunction.calculateOrientationFitness(pos, orientation);
-			
-			if(fitness < pruneThreshold) {
-				mapPop.removeFromMap(moc);
+			System.out.println();
+			for(int y = 0 ; y < map[x].length ; y++) {
+				
+				if (dx == x && dy == y) {
+					System.out.print("#");
+					continue;
+				}
+				
+				if(map[x][y] == null)
+					System.out.print(" ");
+				else
+					System.out.print("X");
 			}
-    	}
+		}
     }
-
-	private void evaluateAndAdd(ArrayList<MOChromosome> randomChromosomes) {
+    
+	protected void evaluateAndAdd(ArrayList<MOChromosome> randomChromosomes) {
 		
 		int totalEvaluations = 0;
 		
@@ -296,4 +177,57 @@ public class MAPElitesEvolution extends GenerationalEvolution{
 			print("!");
 		}
 	}
+	
+	public static String getRepertoireHash(MAPElitesPopulation p) {
+    	StringBuffer sb = new StringBuffer();
+    	for(Chromosome c : p.getChromosomes()) {
+    		for(double d : c.getAlleles())
+    			sb.append(d+" ");
+    	}
+    	return ""+sb.toString().hashCode();
+    }
+	
+	public void saveRepertoireTxt(String dir, String file, MAPElitesPopulation p) {
+		
+		MOChromosome[][] map = p.getMap();
+		
+		double[][][] rep = new double[map.length][map[0].length][];
+		
+		for(int x = 0 ; x < map.length ; x++) {
+			for(int y = 0 ; y < map[x].length ; y++) {
+				if(map[x][y] != null)
+					rep[x][y] = map[x][y].getAlleles();
+			}
+		}
+		
+		//get rid of isolated behaviors
+		System.out.println("[MAPElitesEvolution] Behaviors before pruning: "+MappingFunction.countBehaviors(rep));
+		MappingFunction.prune(rep);
+		System.out.println("[MAPElitesEvolution] Behaviors after pruning: "+MappingFunction.countBehaviors(rep));
+    	
+    	try {
+    	
+    		FileWriter fw = new FileWriter(new File(dir+file));
+    		StringBuffer buffer = new StringBuffer();
+    		
+    		buffer.append(map.length+" "+p.getMapResolution()+" ");
+    		
+    		for(int y = 0 ; y < rep.length ; y++) {
+    			for(int x = 0 ; x < rep[y].length ; x++) {
+    				double[] c = rep[y][x];
+    				if(c != null) {
+    					buffer.append(x+" "+y+" ");
+	    				for(double d : c)
+	    					buffer.append(d+" ");
+    				}
+        		}
+    		}
+    		
+    		fw.write(buffer.toString().trim());
+    		
+    		fw.close();
+    	} catch(Exception e){
+    		e.printStackTrace();
+    	}
+    }
 }

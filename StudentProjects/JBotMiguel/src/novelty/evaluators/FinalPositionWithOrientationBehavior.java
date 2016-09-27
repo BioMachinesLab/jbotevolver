@@ -18,6 +18,12 @@ public class FinalPositionWithOrientationBehavior extends GenericEvaluationFunct
     public FinalPositionWithOrientationBehavior(Arguments args) {
 		super(args);
 	}
+    
+    public FinalPositionWithOrientationBehavior(Arguments args, Vector2d pos, double orientation) {
+		this(args);
+		this.pos = pos;
+		this.orientation = orientation;
+	}
 
     @Override
     public EvaluationResult getEvaluationResult() {

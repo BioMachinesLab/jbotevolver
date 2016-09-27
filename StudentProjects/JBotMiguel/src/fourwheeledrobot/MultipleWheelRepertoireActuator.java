@@ -1,12 +1,13 @@
 package fourwheeledrobot;
 
-import java.util.Scanner;
-
+import evorbc.mappingfunctions.MappingFunction;
 import mathutils.Vector2d;
+import multiobjective.MOChromosome;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
+import simulation.util.Factory;
 
 /**
  * This actuator uses a behavior repertoire to choose the
@@ -25,9 +26,13 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	//locomotion parameters (a double[]) for a total of 3 dimensions
 	protected double[][][] repertoire;
 	protected int nParams;
-	protected double resolution;
-	protected double circleRadius;
-	protected int type = 0;
+	protected double stop = 0;
+	protected int lock = 0;
+	protected int controlCycle = 0;
+	protected Vector2d lastPoint;
+	protected String repertoireLocation;
+	protected double[] prevBehavior;
+	protected MappingFunction mappingFunction;
 	
 	public MultipleWheelRepertoireActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
@@ -39,40 +44,46 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			Arguments wheelArgs = new Arguments(a.getArgumentAsString(a.getArgumentAt(0)));
 			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
 			nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
-			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
+			this.repertoireLocation = wheelArgs.getArgumentAsString("repertoire");
+			repertoire = (double[][][])simulator.getSerializableObjects().get("repertoire");
+			lock = (int)(args.getArgumentAsDoubleOrSetDefault("lock", lock) / simulator.getTimeDelta());
 		} else {
 			
 			int fitnessSample = simulator.getArguments().get("--environment").getArgumentAsInt("fitnesssample");
-			
 			int actuatorChosen = fitnessSample % numArgs;
-			
 			boolean randomize = simulator.getArguments().get("--robots").getFlagIsTrue("randomizeactuator");
 			
 			if(randomize)
 				actuatorChosen = simulator.getRandom().nextInt(numArgs);
 			
+			if(simulator.getArguments().get("--robots").getArgumentIsDefined("chosenactuator"))
+				actuatorChosen = simulator.getArguments().get("--robots").getArgumentAsInt("chosenactuator");
+			
 			Arguments wheelArgs = new Arguments(a.getArgumentAsString(a.getArgumentAt(actuatorChosen)));
 			wheels = (MultipleWheelAxesActuator)Actuator.getActuator(simulator, wheelArgs.getArgumentAsString("classname"), wheelArgs);
 			nParams = wheels.getNumberOfSpeeds()+wheels.getNumberOfRotations();
-			repertoire = loadRepertoire(simulator, wheelArgs.getArgumentAsString("repertoire"));
-//			System.out.println(actuatorChosen+" "+numArgs+" "+wheelArgs.getArgumentAsString("repertoire"));
+			repertoire = (double[][][])simulator.getSerializableObjects().get("repertoire");
 		}
 		
-//		for(int i = 0 ; i < repertoire.length ; i++) {
-//			for(int j = 0 ; j < repertoire[i].length ; j++) {
-//				System.out.print(repertoire[i][j] == null ? " " : "X");
-//			}
-//			System.out.println();
-//		}
+		if(args.getArgumentIsDefined("mapping")) {
+			Arguments fillArguments = new Arguments(args.getArgumentAsString("mapping"));
+			mappingFunction = (MappingFunction)Factory.getInstance(fillArguments.getArgumentAsString("classname"),(Object)repertoire);
+		}
 		
-		type = args.getArgumentAsIntOrSetDefault("type", type);
 	}
-
+	
 	@Override
 	public void apply(Robot robot, double timeDelta) {
 		
-		//select correct behavior from repertoire
-		double[] behavior = selectBehaviorFromRepertoire();
+		controlCycle++;
+		
+		//select correct behavior from repertoire, or lock for X number of timesteps
+		double[] behavior;
+		if(prevBehavior == null || (lock == 0 || controlCycle % lock == 0)) {
+			behavior = selectBehaviorFromRepertoire();
+		}else{
+			behavior = prevBehavior;
+		}
 		
 		if(behavior == null) {
 			System.err.println("Cannot find the correct behavior in repertoire! "+heading+" "+speed);
@@ -88,127 +99,52 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 				wheels.setRotation(i, val);
 			}
 		}
+		if(stop-- <= 0) {
+			wheels.apply(robot, timeDelta);
+		}
 		
-		wheels.apply(robot, timeDelta);
+		prevBehavior = behavior;
 	}
 	
 	protected double[] selectBehaviorFromRepertoire() {
-		
+
 		double[] behavior = null;
 		
 		double s = this.speed;
 		
+		Vector2d point = null;
+		
 		do{
-			Vector2d point = circlePoint(this.heading,s);
-//			int[] pos = getLocationFromBehaviorVector(new double[]{point.x,point.y});
-//			behavior = repertoire[pos[1]][pos[0]];
-			behavior = repertoire[(int)point.y][(int)point.x];
+			point = mappingFunction.map(this.heading,s);
+			behavior = repertoire[(int)point.x][(int)point.y];
+			lastPoint = new Vector2d(point);
 			
-			//reduce the size of the circle to find an appropriate point
-			s*=0.95;
-			if(Math.abs(s) < 0.1)
-				break;
+			if(behavior == null) {
+				//reduce the size of the circle to find an appropriate point
+				//in case there is no filling. this is to deal with edge cases
+				s=s*2.0-1.0;
+				s*=0.95;
+//				MAPElitesEvolution.printRepertoire(repertoire, (int)point.x, (int)point.y);
+				if(Math.abs(s) < 0.1)
+					break;
+				
+				s=s/2.0 + 0.5;
+			}
+			
 		} while(behavior == null);
 		
 		return behavior;
 	}
 	
-	private Vector2d circlePoint(double percentageAngle, double speedPercentage) {
-		Vector2d res = null;
-		
-//		percentageAngle = 1;
-//		speedPercentage = 0.5;
-		
-		if(type == 0) {
-			
-			double h =  percentageAngle * (Math.PI/2);
-			
-			if(speedPercentage < 0) {
-				h+=Math.PI;
-				speedPercentage*=-1;
-			}
-			res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
-		
-		} else if(type == 1){
-			
-			speedPercentage = speedPercentage/2.0 + 0.5;
-			
-			double h =  percentageAngle * (Math.PI);
-			res = new Vector2d(speedPercentage*circleRadius*Math.cos(h),speedPercentage*circleRadius*Math.sin(h));
-			
-		}
-		
-		res.x+=repertoire.length/2;
-		res.y+=repertoire[0].length/2;
-		
-		return res;
-	}
-	
-	private int[] getLocationFromBehaviorVector(double[] vec) {
-		int[] mapLocation = new int[vec.length];
-		
-		for(int i = 0 ; i < vec.length ; i++) {
-			int pos = (int)(vec[i]/resolution + repertoire.length/2.0);
-			mapLocation[i] = pos;
-		}
-		return mapLocation;
-	}
-	
-	protected double[][][] loadRepertoire(Simulator simulator, String f) {
-		
-		double[][][] r = null;
-		
-		try {
-		
-			Scanner s = new Scanner(simulator.getFileProvider().getFile(f));
-			
-			int size = s.nextInt();
-			r = new double[size][size][];
-			
-			resolution = readDouble(s);
-			
-			while(s.hasNext()) {
-				int x = s.nextInt();
-				int y = s.nextInt();
-				
-				circleRadius = Math.max(circleRadius,new Vector2d(x - size/2.0, y - size/2.0).length());
-				
-				r[x][y] = new double[nParams];
-				for(int d = 0 ; d < nParams ; d++) {
-					r[x][y][d] = readDouble(s);
-				}
-			}
-			
-			s.close();
-		
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-//		System.out.print("BEHAVIOR! ");
-//		for(int i = 0 ; i < r.length ; i++) {
-//			for(int j = 0 ; j < r[i].length ; j++) {
-//				if(r[i][j] != null) {
-//					for(int z = 0 ; z < r[i][j].length ; z++) {
-//						System.out.print(r[i][j][z]+" ");
-//					}
-//				}
-//			}
-//		}
-//		System.out.println();
-		
-		return r;
-	}
-	
-	//receives heading [0,1] and saves as angle [-1,1]
+	//receives heading [0,1]
 	public void setHeading(double heading) {
-		this.heading = (heading - 0.5) * 2;
+		this.heading = heading;
 //		System.out.print("h: "+heading+" -> "+Math.toDegrees(this.heading));
 	}
 
-	//receives speed [0,1] and saves as percentage [-1,1]
+	//receives speed [0,1]
 	public void setWheelSpeed(double speed) {
-		this.speed = (speed - 0.5) * 2;
+		this.speed = speed;
 //		System.out.println("\t\ts: "+speed+" -> "+this.speed);
 	}
 	
@@ -218,10 +154,6 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	
 	public double getWheelSpeed() {
 		return speed;
-	}
-	
-	private double readDouble(Scanner s) {
-		return Double.parseDouble(s.next().trim().replace(',','.'));
 	}
 	
 	public double[] getCompleteRotations() {
@@ -235,4 +167,25 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 	public double getMaxSpeed() {
 		return wheels.getMaxSpeed();
 	}
+	
+	public void stop(double val) {
+		this.stop = val;
+	}
+	
+	public Vector2d getLastPoint() {
+		return lastPoint;
+	}
+
+	public String getRepertoireLocation() {
+		return repertoireLocation;
+	}
+	
+	public double[][][] getRepertoire() {
+		return repertoire;
+	}
+	
+	public double[] getLastBehavior() {
+		return repertoire[(int)lastPoint.y][(int)lastPoint.x];
+	}
+	
 }

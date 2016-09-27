@@ -119,10 +119,10 @@ public class MazeReader {
     }
     
     public static void main(String[] args) throws Exception{
-		String[] mazes = new String[]{/*"star","zigzag","hard","medium","multi","open","subset","trumpet",*/ "obstacle"};
+		String[] mazes = new String[]{/*"star","zigzag","hard","medium","multi","open","subset","trumpet",*/ "zigzag1","zigzag2","zigzag3","zigzag4","zigzag5"};
 		for(String s : mazes) {
 			MazeReader m = new MazeReader(FileProvider.getDefaultFileProvider().getFile("mazes/svg/"+s+".svg"));
-			JBotEvolver j = new JBotEvolver(new String[]{"../../EvolutionAutomator/wheels_maze/AWS_3Actuator_zigzag/1/_showbest_current.conf"});
+			JBotEvolver j = new JBotEvolver(new String[]{"/Users/robot/git/jbotevolver/StudentProjects/JBotMiguel/bigdisk/june2016/radial/repertoire_obstacle/AWS_3Actuator_20_obstacle/1/_showbest_current.conf"});
 			String txt = m.getSegmentsAsText(j.createSimulator());
 			FileWriter file = new FileWriter("mazes/svg/"+s+".txt");
 		    BufferedWriter output = new BufferedWriter(file);

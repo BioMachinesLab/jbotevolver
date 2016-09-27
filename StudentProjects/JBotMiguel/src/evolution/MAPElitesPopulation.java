@@ -4,8 +4,6 @@ import java.util.ArrayList;
 
 import multiobjective.MOChromosome;
 import novelty.ExpandedFitness;
-import novelty.evaluators.FinalPositionBehavior;
-import novelty.evaluators.FinalPositionWithOrientationBehavior;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import controllers.FixedLenghtGenomeEvolvableController;
@@ -28,7 +26,19 @@ public class MAPElitesPopulation extends Population{
 	protected int behaviorIndex;
 	protected int fitnessIndex;
 	protected int numberOfChromosomesRequested;
+	protected int earlyTerminationGenerations = 0;
+	protected int stagnatedGenerations = 0;
 	protected ArrayList<MOChromosome> chromosomes;
+	protected boolean randomMutation = false;
+	protected double gaussianStdDev = 1.0;
+        
+        protected boolean balanced = false;
+        protected ArrayList<ArrayList<MOChromosome>> quadrantChromosomes = new ArrayList<>();
+	
+	protected double maxAllele = 10;
+	protected double minAllele = -10;
+	
+	protected double[] possibleValues;
 
 	public MAPElitesPopulation(Arguments arguments) {
 		super(arguments);
@@ -39,6 +49,11 @@ public class MAPElitesPopulation extends Population{
 		genomeLength = arguments.getArgumentAsInt("genomelength");
 		behaviorIndex = arguments.getArgumentAsInt("behavior-index");
 		fitnessIndex = arguments.getArgumentAsInt("fitness-index");
+		randomMutation = arguments.getFlagIsTrue("randommutation");
+                
+                balanced = arguments.getArgumentAsIntOrSetDefault("balanced", 0) == 1;
+		
+		gaussianStdDev = arguments.getArgumentAsDoubleOrSetDefault("gaussian", gaussianStdDev);
 
 		limit = arguments.getArgumentAsDouble("limit");
 		resolution = arguments.getArgumentAsDouble("resolution");
@@ -47,6 +62,30 @@ public class MAPElitesPopulation extends Population{
 		map = new MOChromosome[size][size];
 		
 		chromosomes = new ArrayList<MOChromosome>();
+		
+		if(arguments.getArgumentIsDefined("maxallele")) {
+			maxAllele = arguments.getArgumentAsInt("maxallele");
+			minAllele = -maxAllele;
+		}
+		
+		if(arguments.getArgumentIsDefined("minallele")) {
+			minAllele = arguments.getArgumentAsInt("minallele");
+		}
+		
+		if(arguments.getArgumentIsDefined("possiblevalues")) {
+			String values = arguments.getArgumentAsString("possiblevalues");
+			String[] split = values.split(",");
+			possibleValues = new double[split.length];
+			int index = 0;
+			for(String s : split) {
+				possibleValues[index++] = Double.parseDouble(s);
+			}
+		}
+		
+		if(arguments.getArgumentIsDefined("earlyterminationgenerations")) {
+			earlyTerminationGenerations = arguments.getArgumentAsInt("earlyterminationgenerations");
+		}
+		
 	}
 	
 	public ArrayList<MOChromosome> getRandomPopulation() {
@@ -58,7 +97,14 @@ public class MAPElitesPopulation extends Population{
 		for (int i = 0; i < initialBatch; i++) {
 			double[] alleles = new double[genomeLength];
 			for (int j = 0; j < genomeLength; j++) {
-				alleles[j] = randomNumberGenerator.nextGaussian() * 2;
+				
+				if(possibleValues != null) {
+					alleles[j] = possibleValues[randomNumberGenerator.nextInt(possibleValues.length)];
+				} else {
+					double interval = maxAllele-minAllele; 
+					double val = randomNumberGenerator.nextDouble()*interval;
+					alleles[j] = val+minAllele;
+				}
 			}
 			chromosomes.add(new MOChromosome(alleles, currentChromosomeId++));
 		}
@@ -69,7 +115,16 @@ public class MAPElitesPopulation extends Population{
 	
 	public MOChromosome getMutatedChromosome() {
 		numberOfChromosomesRequested++;
-		MOChromosome randomChromosome = chromosomes.get(randomNumberGenerator.nextInt(chromosomes.size()));
+                MOChromosome randomChromosome;
+                if(balanced) {
+                    if(quadrantChromosomes.isEmpty()) { // will happen in the initial batch
+                        updateQuadrantLists();
+                    }
+                    ArrayList<MOChromosome> randomList = quadrantChromosomes.get(randomNumberGenerator.nextInt(quadrantChromosomes.size()));
+                    randomChromosome = randomList.get(randomNumberGenerator.nextInt(randomList.size()));
+                } else {
+                    randomChromosome = chromosomes.get(randomNumberGenerator.nextInt(chromosomes.size()));
+                }
 		return mutate(randomChromosome);
 	}
 	
@@ -90,20 +145,31 @@ public class MAPElitesPopulation extends Population{
 		chromosomes.add(moc);
 	}
 	
+	public MOChromosome getChromosomoeFromLocation(int[] pos) {
+		return map[pos[0]][pos[1]];
+	}
+	
 	public void addToMap(MOChromosome moc) {
 		int[] mocMapLocation = positionInMap(moc);
+		
+		if(mocMapLocation[0] >= map.length || mocMapLocation[0] < 0 ||
+				mocMapLocation[1] >= map[mocMapLocation[0]].length || mocMapLocation[1] < 0)
+			return;
+		
  		MOChromosome currentMapIndividual = map[mocMapLocation[0]][mocMapLocation[1]];
 		
 		if(currentMapIndividual == null) {
 			//the cell is empty, add immediately
 			map[mocMapLocation[0]][mocMapLocation[1]] = moc;
 			chromosomes.add(moc);
+			stagnatedGenerations = 0;
 		} else {
 			//check fitness performance to figure out if current chromosome has to be replace
 			if(getFitness(moc) > getFitness(currentMapIndividual)) {
 				map[mocMapLocation[0]][mocMapLocation[1]] = moc;
 				int index = chromosomes.indexOf(currentMapIndividual);
 				chromosomes.set(index, moc);
+				stagnatedGenerations = 0;
 			} else {
 			}
 		}
@@ -135,10 +201,21 @@ public class MAPElitesPopulation extends Population{
 		int[] mapLocation = new int[vec.length];
 		
 		for(int i = 0 ; i < vec.length ; i++) {
-			int pos = (int)(vec[i]/resolution + map.length/2.0);
+			int pos = (int)Math.floor((vec[i]+resolution/2.0)/resolution + map.length/2.0);
 			mapLocation[i] = pos;
 		}
 		return mapLocation;
+	}
+	
+	public static void main(String[] args) {
+		double resolution = 0.02;
+		double veci = 0.017;
+		double val = Math.floor((veci+resolution/2.0)/(resolution));
+		int pos = (int)(val);
+		System.out.println(val+" "+pos);
+		
+//		pos = (int)((veci+resolution/2.0)/resolution);
+//		System.out.println(pos);
 	}
 	
 	public int[] positionInMap(MOChromosome c) {
@@ -155,17 +232,36 @@ public class MAPElitesPopulation extends Population{
 		
 		double[] alleles = new double[c.getAlleles().length];
 		
-		for (int j = 0; j < c.getAlleles().length; j++) {
-			double allele = c.getAlleles()[j];
-			if (randomNumberGenerator.nextDouble() < mutationRate) {
-				allele = allele + randomNumberGenerator.nextGaussian();
-				if (allele < -10)
-					allele = -10;
-				if (allele > 10)
-					allele = 10;
+		boolean mutated = false;
+		
+		do {
+		
+			for (int j = 0; j < c.getAlleles().length; j++) {
+				double allele = c.getAlleles()[j];
+				if (randomNumberGenerator.nextDouble() < mutationRate) {
+					mutated = true;
+					if(possibleValues != null) {
+						double currentValue = allele;
+						do {
+							allele = possibleValues[randomNumberGenerator.nextInt(possibleValues.length)];
+						} while(allele == currentValue);
+					} else if(!randomMutation)
+						allele = allele + randomNumberGenerator.nextGaussian()*gaussianStdDev;
+					else {
+						double interval = maxAllele-minAllele; 
+						double val = randomNumberGenerator.nextDouble()*interval;
+						allele = val+minAllele;
+					}
+					
+					if (allele < -maxAllele)
+						allele = -maxAllele;
+					if (allele > maxAllele)
+						allele = maxAllele;
+				}
+				alleles[j] = allele;
 			}
-			alleles[j] = allele;
-		}
+		}while(!mutated);
+		
 		return new MOChromosome(alleles, currentChromosomeId++);
 	}
 	
@@ -175,15 +271,78 @@ public class MAPElitesPopulation extends Population{
 	
 	@Override
 	public boolean evolutionDone() {
-		return currentGeneration >= numberOfGenerations ||
-				(currentGeneration == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == batchSize); 
+		return (currentGeneration >= numberOfGenerations) ||
+				(currentGeneration == numberOfGenerations-1 && getNumberOfChromosomesEvaluated() == batchSize) ||
+				(earlyTerminationGenerations > 0 && stagnatedGenerations >= earlyTerminationGenerations); 
 	}
+        
+        private void updateQuadrantLists() {
+                    int[] center = getLocationFromBehaviorVector(new double[]{0,0});
+                    quadrantChromosomes.clear();
+                    
+                    // top-left
+                    ArrayList<MOChromosome> tempList = new ArrayList<>();
+                    for(int x = 0 ; x < center[0] ; x++) {
+                        for(int y = 0 ; y < center[1] ; y++) {
+                            if(map[x][y] != null) {
+                                tempList.add(map[x][y]);
+                            }
+                        }
+                    }
+                    if(!tempList.isEmpty()) {
+                        quadrantChromosomes.add(tempList);
+                    }
+                    
+                    // top-right
+                    tempList = new ArrayList<>();
+                    for(int x = center[0] ; x < map.length ; x++) {
+                        for(int y = 0 ; y < center[1] ; y++) {
+                            if(map[x][y] != null) {
+                                tempList.add(map[x][y]);
+                            }
+                        }
+                    }
+                    if(!tempList.isEmpty()) {
+                        quadrantChromosomes.add(tempList);
+                    }
+                                        
+                    // bottom-right
+                    tempList = new ArrayList<>();
+                    for(int x = center[0] ; x < map.length ; x++) {
+                        for(int y = center[1] ; y < map.length ; y++) {
+                            if(map[x][y] != null) {
+                                tempList.add(map[x][y]);
+                            }
+                        }
+                    }
+                    if(!tempList.isEmpty()) {
+                        quadrantChromosomes.add(tempList);
+                    }                    
+                    
+                    // bottom-left
+                    tempList = new ArrayList<>();
+                    for(int x = 0 ; x < center[0] ; x++) {
+                        for(int y = center[1] ; y < map.length ; y++) {
+                            if(map[x][y] != null) {
+                                tempList.add(map[x][y]);
+                            }
+                        }
+                    }     
+                    if(!tempList.isEmpty()) {
+                        quadrantChromosomes.add(tempList);
+                    }              
+        }
 	
 	@Override
 	public void createNextGeneration() {
 		currentGeneration++;
 		setGenerationRandomSeed(randomNumberGenerator.nextInt());
 		numberOfChromosomesRequested = 0;
+		stagnatedGenerations++;
+                
+                if(balanced) {
+                    updateQuadrantLists();
+                }
 	}
 	
 	@Override
@@ -236,6 +395,10 @@ public class MAPElitesPopulation extends Population{
 	@Override
 	public int getNumberOfChromosomesEvaluated() {
 		return this.numberOfChromosomesRequested;
+	}
+	
+	public double getDistanceLimit() {
+		return limit;
 	}
 	
 	@Override

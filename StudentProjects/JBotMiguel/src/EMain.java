@@ -7,7 +7,20 @@ import gui.evolution.EvolutionGui;
 public class EMain {
 	public static void main(String[] args) throws Exception {
 		
-		String configName = "repertoire_nav.conf";
+//		String configName = "hexamap.conf";
+//		String configName = "hexa_neat_big.conf";
+//		String configName = "hexa_neat.conf";
+//		String configName = "hexamap_big.conf";
+		
+//		String configName = "maze_square.conf";
+
+//		String configName = "benchmark.conf";
+//		String configName = "rep_test/_restartevolution.conf";
+		String configName = "hexapod_maze.conf";
+//		String configName = "repertoire_square/AWS_5Actuator_20/1/_restartevolution.conf";
+//		String configName = "hexamap_big/_restartevolution.conf";
+//		String configName = "hexamap/_restartevolution.conf";
+//		String configName = "repertoire_nav.conf";
 //		String configName = "nsga2_novelty.conf";
 //		String configName = "nsga2_fitness.conf";
 //		String configName = "nsga2_nf.conf";

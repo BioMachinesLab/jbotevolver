@@ -37,7 +37,7 @@ public class MOTask extends JBotEvolverTask {
 		for(int i = 0 ; i < samples ; i++) {
 			
 			jBotEvolver.getArguments().get("--environment").setArgument("fitnesssample", i);
-			Simulator simulator = jBotEvolver.createSimulator(new Random(random.nextLong()));
+			Simulator simulator = jBotEvolver.createSimulator(random.nextLong());
 			simulator.setFileProvider(getFileProvider());
 			
 //			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator);
@@ -68,7 +68,7 @@ public class MOTask extends JBotEvolverTask {
 		}
 	}
 	public Result getResult() {
-		MOFitnessResult fr = new MOFitnessResult(chromosome, ExpandedFitness.setToMeanOf(results));
+		MOFitnessResult fr = new MOFitnessResult(getId(),chromosome, ExpandedFitness.setToMeanOf(results));
 		return fr;
 	}
 }

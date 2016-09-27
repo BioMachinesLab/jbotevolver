@@ -8,8 +8,8 @@ public class MOFitnessResult extends Result {
 	private MOChromosome chromosome;
 	private EvaluationResult result;
 	
-	public MOFitnessResult(MOChromosome chromosome, EvaluationResult result) {
-		super();
+	public MOFitnessResult(int taskId, MOChromosome chromosome, EvaluationResult result) {
+		super(taskId);
 		this.chromosome = chromosome;
 		this.result = result;
 	}
