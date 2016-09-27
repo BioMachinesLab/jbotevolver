@@ -181,4 +181,5 @@ public class CTRNNMultilayer extends NeuralNetwork {
 	public int getNumberOfHiddenNodes() {
 		return numberOfHiddenNodes;
 	}
+
 }

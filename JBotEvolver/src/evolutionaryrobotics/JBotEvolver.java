@@ -73,7 +73,9 @@ public class JBotEvolver extends JBotSim {
 	}
 
 	public ArrayList<Robot> createRobots(Simulator simulator, Chromosome chromosome) {
+		// TODO debug
 		return chromosome.setupRobots(this, simulator);
+		// return createRobots(simulator);
 	}
 
 	public void setChromosome(ArrayList<Robot> robots, Chromosome chromosome) {
@@ -137,6 +139,10 @@ public class JBotEvolver extends JBotSim {
 
 	public void setupBestCoIndividual(Simulator simulator) {
 
+		// Obter o numero de presas
+		Arguments numbRobotsPreys = getArguments().get("--robots");
+		int nPreys = numbRobotsPreys.getArgumentAsIntOrSetDefault("numberofrobots", 1);
+
 		ArrayList<Robot> robots;
 
 		if (simulator.getRobots().isEmpty()) {
@@ -144,11 +150,7 @@ public class JBotEvolver extends JBotSim {
 			simulator.addRobots(robots);
 		} else
 			robots = simulator.getRobots();
-		
-		// Obter o numero de presas
-		Arguments numbRobotsPreys= getArguments().get("--robots");
-		int nPreys = numbRobotsPreys.getArgumentAsIntOrSetDefault("numberofrobots", 1);
-		
+
 		ArrayList<Robot> preys = new ArrayList<Robot>();
 		ArrayList<Robot> predators = new ArrayList<Robot>();
 		for (int j = 0; j < robots.size(); j++) {
@@ -188,13 +190,13 @@ public class JBotEvolver extends JBotSim {
 			cb = pb.getChromosome(popArgs.getArgumentAsInt("chromosomeb"));
 		else
 			cb = pb.getBestChromosome();
-		
-//		System.out.println(ca.getID()+" "+cb.getID());
-		
-		for(Robot r : predators) {
-			if(r.getController() instanceof FixedLenghtGenomeEvolvableController) {
-				FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController)r.getController();
-				if(fc.getNNWeights() == null) {
+
+		System.out.println(ca.getID() + " " + cb.getID());
+
+		for (Robot r : predators) {
+			if (r.getController() instanceof FixedLenghtGenomeEvolvableController) {
+				FixedLenghtGenomeEvolvableController fc = (FixedLenghtGenomeEvolvableController) r.getController();
+				if (fc.getNNWeights() == null) {
 					fc.setNNWeights(cb.getAlleles());
 				}
 			}

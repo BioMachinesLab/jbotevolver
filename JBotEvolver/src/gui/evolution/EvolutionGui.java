@@ -1,13 +1,5 @@
 package gui.evolution;
 
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evolution.CoEvolution;
-import evolutionaryrobotics.evolution.Evolution;
-import evolutionaryrobotics.populations.Population;
-import gui.Gui;
-import gui.renderer.Renderer;
-import gui.util.Graph;
-
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -28,6 +20,12 @@ import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evolution.Evolution;
+import evolutionaryrobotics.populations.Population;
+import gui.Gui;
+import gui.renderer.Renderer;
+import gui.util.Graph;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;

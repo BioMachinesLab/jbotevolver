@@ -3,14 +3,13 @@ package taskexecutor.tasks;
 import java.util.ArrayList;
 import java.util.Random;
 
+import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.Chromosome;
 import result.Result;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import taskexecutor.results.SimpleCoEvolutionFitnessResult;
-import taskexecutor.results.SimpleFitnessResult;
-import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import evolutionaryrobotics.neuralnetworks.Chromosome;
 
 public class CoEvolutionTask extends JBotEvolverTask {
 
@@ -49,8 +48,6 @@ public class CoEvolutionTask extends JBotEvolverTask {
 
 			ArrayList<Robot> robots = jBotEvolver.createCoEvolutionRobots(simulator);
 			
-			numPreys = jBotEvolver.getArguments().get("--robots").getArgumentAsInt("numberofrobots"); //more computation but ensures that there can be a variable number of robots per sample
-			
 			ArrayList<Robot> preys = new ArrayList<Robot>();
 			ArrayList<Robot> predators = new ArrayList<Robot>();
 			for (int j = 0; j < robots.size(); j++) {
@@ -69,14 +66,15 @@ public class CoEvolutionTask extends JBotEvolverTask {
 			EvaluationFunction eval = EvaluationFunction.getEvaluationFunction(jBotEvolver.getArguments().get(evaluation));
 			simulator.addCallback(eval);
 			simulator.simulate();
-//			System.out.println(seed+" "+eval.getFitness());
+			System.out.println(seed+" "+eval.getFitness());
 			fitness += eval.getFitness();
 		}
 	}
 
+	@Override
 	public Result getResult() {
-		SimpleCoEvolutionFitnessResult fr = new SimpleCoEvolutionFitnessResult(chromosome.getID(),opponentChromosome.getID(),
-				numPreys, fitness / samples);
+		SimpleCoEvolutionFitnessResult fr = new SimpleCoEvolutionFitnessResult(getId(),chromosome.getID(),opponentChromosome.getID(),
+				fitness / samples);
 		return fr;
 	}
 }

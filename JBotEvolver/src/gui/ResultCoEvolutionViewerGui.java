@@ -1,18 +1,12 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.GridLayout;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.HashMap;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -57,108 +51,43 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		}
 	}
 	
-	@Override
+	
 	protected void updateStatus() {
 		controlStepTextField.setText("" + simulator.getTime().intValue());
+		initBottomPanel();
 		fitnessTextFieldA.setText(String.format("%12.6f", evaluationFunctionA.getFitness()));
 		fitnessTextFieldB.setText(String.format("%12.6f", evaluationFunctionB.getFitness()));
 		updatePlaySlider(simulator.getTime(), simulator.getEnvironment().getSteps());
 		renderer.drawFrame();
 	}
 	
-	@Override
-	protected JPanel initRightWrapperPanel() {
-		
-		int panelWidth = 150;
+	protected JPanel initBottomPanel() {
 
-		JPanel sideTopPanel = new JPanel();
-		sideTopPanel.setLayout(new BoxLayout(sideTopPanel, BoxLayout.Y_AXIS));
-		
-		pauseButton = new JButton("Start/Pause");
-		plotButton = new JButton("Plot Neural Activations");
-		
-		pauseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sideTopPanel.add(pauseButton);
-		plotButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sideTopPanel.add(plotButton);
-		
-		sideTopPanel.add(new JLabel(" "));
-		
-		JLabel sleep = new JLabel("Sleep between control steps (ms)");
-		sideTopPanel.add(sleep);
-		sleep.setAlignmentX(Component.CENTER_ALIGNMENT);
+		JPanel bottomPanel   = new JPanel();
 
-		sleepSlider.setMajorTickSpacing(20);
-		sleepSlider.setMinorTickSpacing(5);
-		sleepSlider.setPaintTicks(true);
-		sleepSlider.setPaintLabels(true);
-		sleepSlider.setValue(10);
-
-		sleepSlider.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sideTopPanel.add(sleepSlider);
-
-		sideTopPanel.add(new JLabel("Play position (%)"));
-		playPosition.setMajorTickSpacing(20);
-		playPosition.setMinorTickSpacing(5);
-		playPosition.setPaintTicks(true);
-		playPosition.setPaintLabels(true);
-		playPosition.setValue(0);
-		playPosition.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sideTopPanel.add(playPosition);
-		
-		sideTopPanel.add(new JLabel(" "));
-		
-		if(enableDebugOptions) {
-		
-			neuralNetworkCheckbox = new JCheckBox("Show Neural Network");
-			neuralNetworkCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
-			sideTopPanel.add(neuralNetworkCheckbox);
-		/*	
-			neuralNetworkViewerCheckbox = new JCheckBox("Show Neural Network #2");
-			neuralNetworkViewerCheckbox.setAlignmentX(Component.CENTER_ALIGNMENT);
-			sideTopPanel.add(neuralNetworkViewerCheckbox);
-		*/
-			exportToBlender = new JCheckBox("Export to Blender");
-			exportToBlender.setAlignmentX(Component.CENTER_ALIGNMENT);
-			sideTopPanel.add(exportToBlender);
-			
-			sideTopPanel.add(new JLabel(" "));
-		}
-
-		//Status panel
-		JPanel statusPanel = new JPanel(new GridLayout(3,2));
-		statusPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-		
-		statusPanel.add(new JLabel("Control step: "));
+		bottomPanel.add(new JLabel("Control step: "));
 		controlStepTextField = new JTextField("N/A");
-		controlStepTextField.setHorizontalAlignment(JTextField.CENTER);
-		statusPanel.add(controlStepTextField);
+		controlStepTextField.setPreferredSize(new Dimension(50, 20));
+		controlStepTextField.setHorizontalAlignment(JTextField.RIGHT);
+		bottomPanel.add(controlStepTextField);
 
-		statusPanel.add(new JLabel("Fitness A: "));
-		
+		bottomPanel.add(new JLabel("Fitness A: "));
 		fitnessTextFieldA = new JTextField("N/A");
 		fitnessTextFieldA.setPreferredSize(new Dimension(100, 20));
 		fitnessTextFieldA.setHorizontalAlignment(JTextField.RIGHT);
-		statusPanel.add(fitnessTextFieldA);
+		bottomPanel.add(fitnessTextFieldA);
 		
-		statusPanel.add(new JLabel("Fitness B: "));
+		fitnessTextField = new JTextField("N/A");
 		
+		bottomPanel.add(new JLabel("Fitness B: "));
 		fitnessTextFieldB = new JTextField("N/A");
 		fitnessTextFieldB.setPreferredSize(new Dimension(100, 20));
 		fitnessTextFieldB.setHorizontalAlignment(JTextField.RIGHT);
-		statusPanel.add(fitnessTextFieldB);
-		
-		sideTopPanel.add(statusPanel);
-		statusPanel.setPreferredSize(new Dimension(panelWidth,100));
-		
-		JPanel sideWrapperPanel = new JPanel(new BorderLayout());
-		sideWrapperPanel.add(sideTopPanel,BorderLayout.NORTH);
-		sideWrapperPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
-		
-		pauseButton.setPreferredSize(new Dimension(panelWidth,50));
-		plotButton.setPreferredSize(new Dimension(panelWidth,50));
+		bottomPanel.add(fitnessTextFieldB);
 
-		return sideWrapperPanel;
+		bottomPanel.setBorder(BorderFactory.createTitledBorder("Status"));
+
+		return bottomPanel;
 	}
 	
 	@Override
@@ -210,8 +139,7 @@ public class ResultCoEvolutionViewerGui extends ResultViewerGui {
 		
 		if(simulateUntil == 0) {
 			controlStepTextField.setText("0");
-			fitnessTextFieldA.setText("0");
-			fitnessTextFieldB.setText("0");
+			fitnessTextField.setText("0");
 		}
 		
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new EnvironmentKeyDispatcher(simulator));
