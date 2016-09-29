@@ -10,27 +10,23 @@ import java.util.concurrent.Future;
 import result.Result;
 import simulation.util.Arguments;
 import tasks.Task;
-import coppelia.remoteApi;
 import evolutionaryrobotics.JBotEvolver;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import vrep.VRepUtils;
 
-public class VREPTaskExecutor extends TaskExecutor {
+public class VRepTaskExecutor extends TaskExecutor {
 
-    private static int DEFAULT_PORT = 19996;
+    private static final int BASE_PORT = 19996;
+    private static final int ALLOWED_FAULTS = 3;
 
-    private Stack<VREPContainer> availableClients = new Stack<VREPContainer>();
-    private ExecutorService executor;
-    private LinkedList<Future<Result>> resultsList = new LinkedList<Future<Result>>();
+    private final Stack<VRepContainer> availableClients = new Stack<>();
+    private final ExecutorService executor;
+    private final LinkedList<Future<Result>> resultsList = new LinkedList<>();
     private boolean setup = false;
 
     private String remoteIps[];
     private int remoteInstances[];
-    private static int ALLOWED_FAULTS = 3;
 
-    private remoteApi vrepApi;
-
-    public VREPTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
+    public VRepTaskExecutor(JBotEvolver jBotEvolver, Arguments args) {
         super(jBotEvolver, args);
 
         int instances = 0;
@@ -72,10 +68,9 @@ public class VREPTaskExecutor extends TaskExecutor {
     @Override
     public void run() {
         try {
-            vrepApi = new remoteApi();
             for (int r = 0; r < remoteIps.length; r++) {
                 for (int i = 0; i < remoteInstances[r]; i++) {
-                    initContainer(remoteIps[r], DEFAULT_PORT + i);
+                    initContainer(remoteIps[r], BASE_PORT + i);
                 }
             }
             setup = true;
@@ -87,27 +82,17 @@ public class VREPTaskExecutor extends TaskExecutor {
         }
     }
 
-    protected VREPContainer initContainer(String ip, int port) {
-        VREPContainer c = new VREPContainer();
-
+    protected VRepTaskExecutor.VRepContainer initContainer(String ip, int port) {
+        VRepTaskExecutor.VRepContainer c = new VRepTaskExecutor.VRepContainer();
         c.ip = ip;
         c.port = port;
-        System.out.println("[VREPTaskExecutor] Trying to connect to "+ip+":"+port);
-        c.clientId = vrepApi.simxStart(c.ip, c.port, true, false, 5000, 5);
-        
+        c.clientId = VRepUtils.initClient(ip, port);        
         if (c.clientId == -1) {
-        	System.out.println("[VREPTaskExecutor] Not connected! "+ip+":"+port);
             return null;
         }
-        
-        System.out.println("[VREPTaskExecutor] Connected! "+ip+":"+port);
-        
-        vrepApi.simxClearStringSignal(c.clientId, "toClient", remoteApi.simx_opmode_blocking);
-        vrepApi.simxClearStringSignal(c.clientId, "fromClient", remoteApi.simx_opmode_blocking);
         availableClients.push(c);
-
         return c;
-    }
+    }    
 
     @Override
     public void stopTasks() {
@@ -154,8 +139,7 @@ public class VREPTaskExecutor extends TaskExecutor {
         return obj;
     }
 
-    public class VREPContainer {
-
+    public class VRepContainer {
         int clientId;
         String ip;
         int port;
@@ -173,7 +157,7 @@ public class VREPTaskExecutor extends TaskExecutor {
         @Override
         public Result call() throws Exception {
 
-            VREPContainer container = null;
+            VRepContainer container = null;
 
             synchronized (availableClients) {
 
@@ -185,14 +169,14 @@ public class VREPTaskExecutor extends TaskExecutor {
                 container = availableClients.pop();
             }
 
-            VREPTask vt = (VREPTask) t;
-            vt.setVREP(container, vrepApi);
+            VRepTask vt = (VRepTask) t;
+            vt.setVREP(container);
 
             t.run();
 
             Result r = t.getResult();
 
-            VREPResult vrepR = (VREPResult) r;
+            VRepResult vrepR = (VRepResult) r;
 
             synchronized (availableClients) {
                 //return the VREP conn
@@ -205,8 +189,11 @@ public class VREPTaskExecutor extends TaskExecutor {
                     addTask(this.t);
 
                     if (container.faults < ALLOWED_FAULTS) {
-                        vrepApi.simxFinish(container.clientId);
-                        VREPContainer inited = initContainer(container.ip, container.port);
+                        VRepUtils.terminateClient(container.clientId);
+                        try {
+                            Thread.sleep(20000); // wait 20s before trying to init the client again
+                        } catch(Exception e) {}
+                        VRepContainer inited = initContainer(container.ip, container.port);
                         if (inited != null) {
                             inited.faults = container.faults + 1;
                         }

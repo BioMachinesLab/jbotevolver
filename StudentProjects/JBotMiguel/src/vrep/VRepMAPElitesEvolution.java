@@ -1,5 +1,6 @@
 package vrep;
 
+import static controllers.VRepGenericController.parseDoubleArray;
 import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
@@ -16,13 +17,12 @@ import novelty.evaluators.FinalPositionWithOrientationBehavior;
 import novelty.results.VectorBehaviourExtraResult;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
-import taskexecutor.VREPTaskExecutor;
+import taskexecutor.VRepTaskExecutor;
 import evolution.MAPElitesEvolution;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evorbc.qualitymetrics.CircularQualityMetric;
-import evorbc.qualitymetrics.DistanceQualityMetric;
 
 /**
  * MAP-Elites "illumination" algorithm J.-B. Mouret and J. Clune, Illuminating
@@ -30,34 +30,29 @@ import evorbc.qualitymetrics.DistanceQualityMetric;
  *
  * @author miguelduarte
  */
-public class VREPMAPElitesEvolution extends MAPElitesEvolution {
+public class VRepMAPElitesEvolution extends MAPElitesEvolution {
 
-    protected int controllerType = 0;
-    protected float time = 0; // s
-    protected float stopTime = -1;
+    // Expected: time | tiltkill | stoptime (optional)
+    protected float[] globalParams;
+    // Expected: 0 (controller type)
+    protected float[] controllerParams;
+
     public int excluded = 0;
     protected double feasibilityThreshold = 0.0;
     protected int genomeLength = 0;
-    protected float tiltKill = 99999999;
 
-    public VREPMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
+    public VRepMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
         super(jBotEvolver, taskExecutor, arg);
 
         if (!arg.getArgumentIsDefined("genomelength")) {
             throw new RuntimeException("Missing 'genomelength' arg in VREPMapElitesEvolution");
         }
-
         this.genomeLength = arg.getArgumentAsInt("genomelength");
 
-        if (!arg.getArgumentIsDefined("time")) {
-            throw new RuntimeException("Missing 'time' arg in VREPMapElitesEvolution");
-        }
+        globalParams = parseDoubleArray(arg.getArgumentAsString("globalparams"));
+        controllerParams = parseDoubleArray(arg.getArgumentAsString("controllerparams"));
 
-        controllerType = arg.getArgumentAsIntOrSetDefault("controllertype", controllerType);
-        time = (float) arg.getArgumentAsDoubleOrSetDefault("time", time);
         feasibilityThreshold = arg.getArgumentAsDoubleOrSetDefault("feasibility", feasibilityThreshold);
-        tiltKill = (float) arg.getArgumentAsDoubleOrSetDefault("tiltkill", tiltKill);
-        stopTime = (float) arg.getArgumentAsDoubleOrSetDefault("stoptime", stopTime);
     }
 
     public static double getFitness(MOChromosome moc) {
@@ -83,28 +78,23 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution {
                 chromosomes[i] = randomChromosomes.get(i);
             }
 
-            // global params length; seconds of evaluation; max allowed tilt during eval ; stopTime
-            float fixedParameters[] = stopTime > 0 && stopTime < time ? new float[]{3, time, tiltKill, stopTime} : new float[]{2, time, tiltKill};
+            float fixedParams[] = new float[globalParams.length + 1];
+            fixedParams[0] = globalParams.length;
+            System.arraycopy(globalParams, 0, fixedParams, 1, globalParams.length);
 
-            float[][] packet = createDataPacket(chromosomes);
+            float[][] packet = VRepUtils.createDataPacket(chromosomes, controllerParams);
 
-            int nTasks = VRepUtils.sendTasks((VREPTaskExecutor) taskExecutor, fixedParameters, packet);
-
-            float[][] results = VRepUtils.receiveTasks((VREPTaskExecutor) taskExecutor, nTasks);
+            int nTasks = VRepUtils.sendTasks((VRepTaskExecutor) taskExecutor, fixedParams, packet);
+            float[][] results = VRepUtils.receiveTasks((VRepTaskExecutor) taskExecutor, nTasks);
 
             for (int t = 0; t < results.length; t++) {
-
                 float[] vals = results[t];
-
                 int index = 0;
-
                 int nResults = (int) vals[index++];
-
                 for (int r = 0; r < nResults; r++) {
                     int id = (int) vals[index++];
 
                     Chromosome c = null;
-
                     for (int ch = 0; ch < randomChromosomes.size(); ch++) {
                         if (randomChromosomes.get(ch).getID() == id) {
                             c = randomChromosomes.get(ch);
@@ -118,24 +108,18 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution {
                     float posX = vals[index++];
                     float posY = vals[index++];
                     float posZ = vals[index++];
-
-                    //orientation of robot
                     double orientation = vals[index++]; // [-PI,PI]
-
-                    //distance
                     float distanceTraveled = vals[index++];
-
-                    //feasibility
                     float feasibility = vals[index++];
 
                     Vector2d pos = new Vector2d(posX, posY);
 
-                    double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);// + DistanceQualityMetric.getFitness(pos, distanceTraveled);
+                    double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);
 
                     FitnessResult fr = new FitnessResult(fitness);
                     GenericEvaluationFunction br = new FinalPositionWithOrientationBehavior(new Arguments(""), pos, orientation);
 
-                    ArrayList<EvaluationResult> sampleResults = new ArrayList<EvaluationResult>();
+                    ArrayList<EvaluationResult> sampleResults = new ArrayList<>();
                     int sampleIndex = 0;
 
                     sampleResults.add(sampleIndex++, fr);
@@ -164,28 +148,4 @@ public class VREPMAPElitesEvolution extends MAPElitesEvolution {
         }
     }
 
-    private float[][] createDataPacket(evolutionaryrobotics.neuralnetworks.Chromosome[] chromosomes) {
-        float[][] totalPackets = new float[chromosomes.length][];
-
-        for (int i = 0; i < totalPackets.length; i++) {
-            int index = 0;
-
-            evolutionaryrobotics.neuralnetworks.Chromosome c = chromosomes[i];
-
-            float[] params = new float[3 + c.getAlleles().length];
-
-            params[index++] = c.getID(); //id of the chromosome
-            params[index++] = c.getAlleles().length + 1; //length of chromosome + type
-            params[index++] = controllerType; //type
-
-            for (int j = 0; j < c.getAlleles().length; j++) {
-                params[index++] = (float) c.getAlleles()[j];
-            }
-
-            totalPackets[i] = params;
-        }
-
-        return totalPackets;
-    }
-    
 }

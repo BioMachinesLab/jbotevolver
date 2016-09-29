@@ -2,11 +2,11 @@ package taskexecutor;
 
 import result.Result;
 
-public class VREPResult extends Result{
+public class VRepResult extends Result{
 	
 	private float[] values;
 	
-	public VREPResult(int taskId, float[] values) {
+	public VRepResult(int taskId, float[] values) {
 		super(taskId);
 		this.values = values;
 	}
