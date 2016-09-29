@@ -96,7 +96,7 @@ public class VRepRepertoireController extends VRepController {
             line.append(point.x).append(" ").append(point.y);
             super.appendToDebug(line.toString());
         }
-        return doubleToFloat(behavior);
+        return ControllerFactory.doubleToFloat(behavior);
     }
     
     private static double readDouble(Scanner s) {

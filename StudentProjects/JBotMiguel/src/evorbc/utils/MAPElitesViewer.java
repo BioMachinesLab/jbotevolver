@@ -64,7 +64,7 @@ public class MAPElitesViewer {
     public static void main(String[] args) throws Exception {
 //		new MAPElitesViewer("bigdisk/evorbc2/binsize/", true);
 //		new MAPElitesViewer("../../../Robot/V-REP/java/nao_map_stop/", true);
-        new MAPElitesViewer("hexapod_map_test/", true);
+        new MAPElitesViewer("../../../Robot/V-REP/java/nao_map_stop", true);
 //		new MAPElitesViewer("bigdisk/evorbc2/behaviormapping/", true);
 
 //                new MAPElitesViewer("nao_map/", true);

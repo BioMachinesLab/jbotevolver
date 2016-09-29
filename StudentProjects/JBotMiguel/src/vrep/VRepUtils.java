@@ -14,25 +14,27 @@ public class VRepUtils {
     public static remoteApi defaultVrep = new remoteApi();
     public static int defaultClientId = -1;
 
+    
     public static float[][] createDataPacket(evolutionaryrobotics.neuralnetworks.Chromosome[] chromosomes, float[] controllerParams) {
         float[][] totalPackets = new float[chromosomes.length][];
         for (int i = 0; i < totalPackets.length; i++) {
 
             evolutionaryrobotics.neuralnetworks.Chromosome c = chromosomes[i];
-            float[] params = new float[2 + controllerParams.length + c.getAlleles().length];
+            float[] params = new float[3 + controllerParams.length + c.getAlleles().length];
 
             params[0] = c.getID(); //id of the chromosome
-            params[1] = controllerParams.length + c.getAlleles().length;
+            params[1] = controllerParams.length + 1 + c.getAlleles().length;
             System.arraycopy(controllerParams, 0, params, 2, controllerParams.length);
+            params[2 + controllerParams.length] = ControllerFactory.WEIGHTS_START_CODE;
             for (int j = 0; j < c.getAlleles().length; j++) {
-                params[2 + controllerParams.length + j] = (float) c.getAlleles()[j];
+                params[3 + controllerParams.length + j] = (float) c.getAlleles()[j];
             }
             totalPackets[i] = params;
         }
         return totalPackets;
     }
 
-    public static int sendTasks(VRepTaskExecutor te, float[] fixedParameters, float[][] chromosomes) {
+    public static int sendTasks(VRepTaskExecutor te, float[] globalParams, float[][] chromosomes) {
 
         int instances = te.getInstances();
         int chromosomesPerInstance = chromosomes.length / instances;
@@ -55,10 +57,10 @@ public class VRepUtils {
             int index = 0;
             int toSendIndex = 0;
 
-            float[] parameters = new float[fixedParameters.length + 1];
+            float[] parameters = new float[globalParams.length + 1];
 
-            for (int fp = 0; fp < fixedParameters.length; fp++) {
-                parameters[index++] = fixedParameters[fp];
+            for (int fp = 0; fp < globalParams.length; fp++) {
+                parameters[index++] = globalParams[fp];
             }
 
             parameters[index++] = currentTasks; //nInds

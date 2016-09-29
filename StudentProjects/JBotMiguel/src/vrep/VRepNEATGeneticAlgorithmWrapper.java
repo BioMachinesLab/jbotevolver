@@ -16,9 +16,9 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
         super(descriptor, evo);
     }
 
-    public void setParameters(float[] globalParams, float[] controllerParams) {
+    public void setParameters(float[] globalParams, float[] controlPar) {
         this.globalParams = globalParams;
-        this.controllerParams = controllerParams;
+        this.controllerParams = controlPar;
     }
 
     @Override
@@ -29,7 +29,6 @@ public class VRepNEATGeneticAlgorithmWrapper extends NEATGeneticAlgorithmWrapper
         }
         float[][] packet = VRepUtils.createDataPacket(chromosomes, controllerParams);
 
-        // global params length; seconds of evaluation; max allowed tilt during eval
         float fixedParams[] = new float[globalParams.length + 1];
         fixedParams[0] = globalParams.length;
         System.arraycopy(globalParams, 0, fixedParams, 1, globalParams.length);

@@ -34,23 +34,19 @@ public class VRepNEATController extends VRepController {
         }
 
         outputs.add(new SimpleNNOutput(new Arguments("numberofoutputs=" + outputNumber)));
-
+        
         //init NEAT ANN
-        double[] annParams = new double[parameters.length - index];
-        for (int i = 0; i < annParams.length; i++) {
-            annParams[i] = parameters[index++];
-        }
-
+        double[] annParams = ControllerFactory.extractWeights(parameters);
         ann = new NEATNeuralNetwork(inputs, outputs, new Arguments(""));
         ann.setWeights(annParams);
     }
-
+    
     @Override
     public float[] controlStep(float[] inputs) {
         for (int i = 0; i < inputs.length; i++) {
             ((DummyNNInput) this.inputs.get(i)).setInput(inputs[i]);
         }
         ann.controlStep(ticks);
-        return doubleToFloat(ann.getOutputNeuronStates());
+        return ControllerFactory.doubleToFloat(ann.getOutputNeuronStates());
     }
 }

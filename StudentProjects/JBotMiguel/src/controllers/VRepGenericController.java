@@ -13,6 +13,8 @@ import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import vrep.ControllerFactory;
+import vrep.VRepNEATController;
 import vrep.VRepUtils;
 
 /**
@@ -34,7 +36,7 @@ public class VRepGenericController extends Controller implements FixedLenghtGeno
         globalParams = parseDoubleArray((args.getArgumentIsDefined("globalparams") ? args : evolutionArgs).getArgumentAsString("globalparams"));
         controllerParams = parseDoubleArray((args.getArgumentIsDefined("controllerparams") ? args : evolutionArgs).getArgumentAsString("controllerparams"));
         waitForResult = args.getArgumentAsIntOrSetDefault("waitforresult", 1) == 1;
-        this.sim = simulator;
+        this.sim = simulator;    
     }
 
     public static float[] parseDoubleArray(String str) {
@@ -58,12 +60,13 @@ public class VRepGenericController extends Controller implements FixedLenghtGeno
         }
         temp.add(1f); // number of individuals (1)
         temp.add(1f); // individual id
-        temp.add((float) controllerParams.length + weights.length); // size of the individual (including type)
+        temp.add((float) controllerParams.length + 1 + weights.length); // size of the individual (including type)
         for (float p : controllerParams) {
             temp.add(p);
         }
-        for (double p : weights) {
-            temp.add((float) p);
+        temp.add(ControllerFactory.WEIGHTS_START_CODE);
+        for (double w : weights) {
+            temp.add((float) w);
         }
 
         this.params = new float[temp.size()];

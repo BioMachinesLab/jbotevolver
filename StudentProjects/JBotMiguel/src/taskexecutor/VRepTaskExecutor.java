@@ -191,7 +191,7 @@ public class VRepTaskExecutor extends TaskExecutor {
                     if (container.faults < ALLOWED_FAULTS) {
                         VRepUtils.terminateClient(container.clientId);
                         try {
-                            Thread.sleep(5000); // wait 5s before trying to init the client again
+                            Thread.sleep(20000); // wait 20s before trying to init the client again
                         } catch(Exception e) {}
                         VRepContainer inited = initContainer(container.ip, container.port);
                         if (inited != null) {
