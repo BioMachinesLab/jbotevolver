@@ -4,10 +4,10 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
-import actuator.Jump_LimitIntensityPreyPickerActuator;
+import actuator.LimitIntensityPreyPickerActuator;
 
 public class Jump_LimitIntensityPreyCarriedSensor extends Sensor {
-	private Jump_LimitIntensityPreyPickerActuator actuator;
+	private LimitIntensityPreyPickerActuator actuator;
 
 	public Jump_LimitIntensityPreyCarriedSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
@@ -15,7 +15,7 @@ public class Jump_LimitIntensityPreyCarriedSensor extends Sensor {
 	
 	public boolean preyCarried() {
 		if(actuator == null)
-			actuator = (Jump_LimitIntensityPreyPickerActuator) robot.getActuatorByType(Jump_LimitIntensityPreyPickerActuator.class);
+			actuator = (LimitIntensityPreyPickerActuator) robot.getActuatorByType(LimitIntensityPreyPickerActuator.class);
 		return actuator.isCarryingPrey();
 	}
 	

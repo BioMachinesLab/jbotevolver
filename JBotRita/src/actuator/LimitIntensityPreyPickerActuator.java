@@ -17,13 +17,13 @@ import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
-public class Jump_LimitIntensityPreyPickerActuator extends
+public class LimitIntensityPreyPickerActuator extends
 		Jump_IntensityPreyPickerActuator {
 	
 	@ArgumentsAnnotation(name = "limitOfTaking", defaultValue = "1")
 	protected double limitOfTaking;
 	
-	public Jump_LimitIntensityPreyPickerActuator(Simulator simulator,
+	public LimitIntensityPreyPickerActuator(Simulator simulator,
 			int id, Arguments args) {
 		super(simulator, id, args);
 		

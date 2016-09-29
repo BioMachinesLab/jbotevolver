@@ -74,6 +74,7 @@ public class ForagingIntensityPreysEnvironment extends Environment {
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
+		
 	}
 
 	@Override

@@ -5,14 +5,14 @@ import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 import actuator.IntensityPreyPickerActuator;
-import actuator.Jump_LimitIntensityPreyPickerActuator;
+import actuator.LimitIntensityPreyPickerActuator;
 
-public class Jump_LimitIntensityPreyPickerNNOutput extends NNOutput{
-	private Jump_LimitIntensityPreyPickerActuator preyPicker;
+public class LimitIntensityPreyPickerNNOutput extends NNOutput{
+	private LimitIntensityPreyPickerActuator preyPicker;
 	
-	public Jump_LimitIntensityPreyPickerNNOutput(Actuator preyPicker, Arguments args) {
+	public LimitIntensityPreyPickerNNOutput(Actuator preyPicker, Arguments args) {
 		super(preyPicker,args);
-		this.preyPicker = (Jump_LimitIntensityPreyPickerActuator)preyPicker;
+		this.preyPicker = (LimitIntensityPreyPickerActuator)preyPicker;
 	}
 
 	@Override
