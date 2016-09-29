@@ -19,11 +19,11 @@ public class CheckProgress extends TraverseFolders {
 		int g = 1000;
 		int r = 30;
 		
-		new CheckProgress("bigdisk2/vsvanilla/",new String[]{},r,g).traverse();
-		new CheckProgress("bigdisk2/behaviormapping/",new String[]{},r,g).traverse();
-		new CheckProgress("bigdisk2/qualitymetrics/",new String[]{},r,g).traverse();
-		new CheckProgress("bigdisk/binsize/",new String[]{},r,g).traverse();
-		new CheckProgress("bigdisk/time/",new String[]{},r,g).traverse();
+//		new CheckProgress("bigdisk2/vsvanilla/",new String[]{},r,g).traverse();
+//		new CheckProgress("bigdisk2/behaviormapping/",new String[]{},r,g).traverse();
+//		new CheckProgress("bigdisk2/qualitymetrics/",new String[]{},r,g).traverse();
+//		new CheckProgress("bigdisk/binsize/",new String[]{},r,g).traverse();
+		new CheckProgress("bigdisk/time-binsize/",new String[]{},r,g).traverse();
 	}
 	
 	public CheckProgress(String baseFolder, String[] setups, int runs, int generations) {

@@ -62,7 +62,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 	protected double currentStep = 0;
 	protected int currentIndex = 0;
 	
-	protected boolean saveToFile = false;
 	protected Simulator simulator;
 	protected NeuralNetwork network;
 	
@@ -138,16 +137,14 @@ public class GraphPlotter extends JFrame implements Updatable {
 			plotButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					plotGraph();
+					plotGraph(false);
 				}
 			});
 			
 			saveToFileButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					saveToFile = true;
-					plotGraph();
-					saveToFile = false;
+					plotGraph(true);
 				}
 			});
 	
@@ -269,7 +266,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 			c.setSelected(value);
 	}
 	
-	protected void plotGraph() {
+	protected void plotGraph(boolean saveToFile) {
 		
 		valuesList = new ArrayList<double[][]>();
 		titlesList = new ArrayList<String>();
@@ -340,7 +337,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 				}
 			}
 			
-			Thread worker = new Thread(new GraphSimulationRunner(simulator));
+			Thread worker = new Thread(new GraphSimulationRunner(simulator, saveToFile));
 			worker.start();
 			
 		}catch(Exception e) {e.printStackTrace();}
@@ -562,8 +559,10 @@ public class GraphPlotter extends JFrame implements Updatable {
 	
 	public class GraphSimulationRunner implements Runnable {
 		protected Simulator sim;
-		public GraphSimulationRunner(Simulator sim) {
+		protected boolean saveToFile;
+		public GraphSimulationRunner(Simulator sim, boolean saveToFile) {
 			this.sim = sim;
+			this.saveToFile = saveToFile;
 		}
 		@Override
 		public void run() {
@@ -580,6 +579,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 			}
 			
 			if(saveToFile) {
+				System.out.println("Saving to file data.csv");
 				try {
 					String[] array = new String[valuesList.get(0).length];
 					

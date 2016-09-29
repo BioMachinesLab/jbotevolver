@@ -117,7 +117,7 @@ public class MAPElitesTracer extends Tracer {
 						if(supposedLocation[0] != x || supposedLocation[1] != y) {
 							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, Color.GRAY);
 						} else {
-							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02, getColor(fitness));//Color.GREEN.darker());
+							m = new Marker(sim, "m", pos.x, pos.y, orientation, 0.05, 0.02,getColor(fitness));// Color.BLACK);//getColor(fitness));//Color.GREEN.darker());
 						}
 						
 						drawMarker(g,m);
@@ -151,7 +151,7 @@ public class MAPElitesTracer extends Tracer {
 		g.setColor(Color.BLACK);
 		g.setFont(new Font("Arial", Font.PLAIN, axisFontSize));
 		
-		String limitStr = String.format("%1$,.2f", limit);
+		String limitStr = String.format("%1$,.2f", limit*2);
 		
 		//bl
 		IntPos a = transform(-limit+0.01, -limit+0.02);

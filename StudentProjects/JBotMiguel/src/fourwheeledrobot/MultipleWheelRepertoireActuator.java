@@ -117,7 +117,6 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 		do{
 			point = mappingFunction.map(this.heading,s);
 			behavior = repertoire[(int)point.x][(int)point.y];
-			lastPoint = new Vector2d(point);
 			
 			if(behavior == null) {
 				//reduce the size of the circle to find an appropriate point
@@ -132,6 +131,8 @@ public class MultipleWheelRepertoireActuator extends Actuator{
 			}
 			
 		} while(behavior == null);
+		
+		lastPoint = new Vector2d(point);
 		
 		return behavior;
 	}

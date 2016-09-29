@@ -3,6 +3,7 @@ package evorbc.utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Scanner;
 
 import mathutils.Vector2d;
@@ -13,6 +14,7 @@ import utils.TraverseFolders;
 import evolution.MAPElitesPopulation;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
+import evolutionaryrobotics.neuralnetworks.Chromosome;
 import fourwheeledrobot.MultipleWheelRepertoireActuator;
 import fourwheeledrobot.MultipleWheelRepertoireNDActuator;
 
@@ -49,13 +51,13 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 		heatmap.realPoint = true;
 		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
 		
-//		heatmap = new ExportEvoRBCHeatmap("bigdisk/behaviormapping/", new String[]{"maze_cartesian/"}, "heatmap-cartesian.txt");
-//		heatmap.realPoint = false;
-//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/behaviormapping/", new String[]{"maze_cartesian/"}, "heatmap-cartesian.txt");
+		heatmap.realPoint = false;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
 		
-//		heatmap = new ExportEvoRBCHeatmap("bigdisk/behaviormapping/", new String[]{"maze_cartesian/"}, "heatmap-cartesian-real.txt");
-//		heatmap.realPoint = true;
-//		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
+		heatmap = new ExportEvoRBCHeatmap("bigdisk/behaviormapping/", new String[]{"maze_cartesian/"}, "heatmap-cartesian-real.txt");
+		heatmap.realPoint = true;
+		heatmap.traverse(); System.out.println("Done "+heatmap.fileName);
 		/*
 		
 		heatmap = new ExportEvoRBCHeatmap("bigdisk/qualitymetrics/", new String[]{"maze_radial/","maze_distance/","maze_quality/"}, "qualitymetrics.txt");
@@ -172,7 +174,7 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 	
 	private void exportHeatmap(String folder) throws Exception {
 		
-		JBotEvolver jbot = new JBotEvolver(new String[]{folder+"/_showbest_current.conf","--simulator", "+folder="+baseFolder});
+		JBotEvolver jbot = new JBotEvolver(new String[]{folder+"/_showbest_current.conf","--simulator", "+folder=("+baseFolder+"),shrink=0"});
 		
 //		if(!jbot.getPopulation().evolutionDone())
 //			return result;
@@ -206,7 +208,7 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 	private MAPElitesPopulation getMapPop(JBotEvolver jbot, String folder) throws Exception {
 		
 		String filename = folder+"/_showbest_current.conf";
-		jbot.loadFile(filename, "--simulator +folder="+baseFolder);
+		jbot.loadFile(filename, "--simulator +folder="+baseFolder+",shrink=0");
 		Arguments a = new Arguments(jbot.getArguments().get("--init").getArgumentAsString("LoadRepertoireExecutable"));
 		System.out.println();
 		
@@ -217,7 +219,7 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 		String string = baseFolder+a.getArgumentAsString("repertoire")+"/";
 		
 		File f = new File(string);
-		jbot.loadFile(f+"/_showbest_current.conf", "--simulator +folder="+baseFolder);
+		jbot.loadFile(f+"/_showbest_current.conf", "--simulator +folder=("+baseFolder+"),shrink=0");
 		
 		return (MAPElitesPopulation)jbot.getPopulation();
 	}
@@ -260,7 +262,7 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 			
 			String options = "--environment +fitnesssample="+sample+randomizeSeed+"\n";
 			options+="--robots +chosenactuator="+actNumber+"\n";
-			options+="--simulator +folder=("+baseFolder+")\n";
+			options+="--simulator +folder=("+baseFolder+"),shrink=0\n";
 			
 			jbot.loadFile(filename, options);
 			
@@ -289,39 +291,65 @@ public class ExportEvoRBCHeatmap extends TraverseFolders{
 				count = new int[actuator.getRepertoire().length][actuator.getRepertoire()[0].length];
 			}
 			
+			int cnull = 0;
+			
 			for(double time = 0 ; time < sim.getEnvironment().getSteps() ; time++){
-				sim.performOneSimulationStep(time);
-				
-				if(evorbcND) {
+				if(!sim.simulationFinished()) {
+					sim.performOneSimulationStep(time);
 					
-					int[] points = actuatorND.getPrevBehavior();
-					
-					if(realPoint)
-						points = actuatorND.getRealPrevBehavior();
-					
-					countND[(int)points[0]][(int)points[1]][(int)points[2]]++;
-					
-				} else {
-					
-					
-					Vector2d point = actuator.getLastPoint();
-					
-					if(realPoint) {
-						MOChromosome c = mapPop.getChromosomoeFromLocation(new int[]{(int)point.x,(int)point.y});
+					if(evorbcND) {
 						
-						if(c == null)
-							continue;
+						int[] points = actuatorND.getPrevBehavior();
 						
-						int[] loc = mapPop.getLocationFromBehaviorVector(mapPop.getBehaviorVector(c));
-						point = new Vector2d(loc[0],loc[1]);
+						if(realPoint)
+							points = actuatorND.getRealPrevBehavior();
+						
+						countND[(int)points[0]][(int)points[1]][(int)points[2]]++;
+						
+					} else {
+						
+						
+						Vector2d point = actuator.getLastPoint();
+						
+						if(realPoint) {
+							
+							int[] loc = null;
+							MOChromosome[][] map = mapPop.getMap();
+							
+							double[] alleles = actuator.getRepertoire()[(int)point.x][(int)point.y];
+							
+							for(int x = 0 ; x < map.length ; x++) {
+								for(int y = 0 ; y < map[x].length ; y++) {
+									if(map[x][y] == null)
+										continue;
+									MOChromosome c = map[x][y];
+									if(Arrays.equals(c.getAlleles(), alleles)){
+										loc = new int[]{x,y};
+										break;
+									}
+								}
+								if(loc != null)
+									break;
+							}
+							
+							if(loc == null) {
+								cnull++;
+								continue;
+							}
+							
+							point = new Vector2d(loc[0],loc[1]);
+						}
+						count[(int)point.x][(int)point.y]++;
 					}
-					count[(int)point.x][(int)point.y]++;
-				}
 
+				}
 			}
+			if(cnull > 0)
+				System.out.println("###### null="+cnull);
 			
 			if(generation == 0)
 				generation = jbot.getPopulation().getNumberOfCurrentGeneration();
+			
 			
 //			result.append(bigLine);
 		}

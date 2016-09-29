@@ -31,8 +31,8 @@ public class ExportRepertoireData extends TraverseFolders {
 	
 	public static void main(String[] args) throws Exception{
 		
-//		new ExportRepertoireData("bigdisk/","repertoire-data-w1.txt").traverse();
-		new ExportRepertoireData("bigdisk2/","repertoire-data-w2.txt").traverse();
+		new ExportRepertoireData("bigdisk/","repertoire-data-w1.txt").traverse();
+//		new ExportRepertoireData("bigdisk/time-binsize/","repertoire-data-time-binsize.txt").traverse();
 	}
 	
 	public ExportRepertoireData(String folder, String fileName) throws Exception{

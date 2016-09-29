@@ -26,6 +26,7 @@ public class LoadRepertoireExecutable implements Executable{
 			f= prefix+f;
 		}
 		
+		
 		f+="/_showbest_current.conf";
 		
 		jbotsim.getSerializableObjectHashMap().put("repertoirepath", f);
@@ -47,8 +48,10 @@ public class LoadRepertoireExecutable implements Executable{
 			}
 		}
 		
-		//test
-		map = shrink(map);
+		boolean shrink = jbotsim.getArguments().get("--simulator").getArgumentAsIntOrSetDefault("shrink", 1) == 1;
+		System.out.println("[LoadRepertoireExecutable] shrink "+shrink);
+		if(shrink)
+			map = shrink(map);
 		
 		if(args.getArgumentIsDefined("fill")) {
 			Arguments fillArguments = new Arguments(args.getArgumentAsString("fill"));
