@@ -199,7 +199,7 @@ public class TargetGenerationalTask extends JBotEvolverTask {
 
 	@Override
 	public Result getResult() {
-		SimpleFitnessResult fr = new SimpleFitnessResult(chromosome.getID(), fitness / totalRuns);
+		SimpleFitnessResult fr = new SimpleFitnessResult(getId(),chromosome.getID(), fitness / totalRuns);
 		return fr;
 	}
 
