@@ -10,7 +10,7 @@ import taskexecutor.VRepTaskExecutor;
 public class VRepUtils {
 
     public static final String DEFAULT_IP = "127.0.0.1";
-    public static final int DEFAULT_PORT = 19996;
+    public static final int DEFAULT_PORT = 25000;
     public static remoteApi defaultVrep = new remoteApi();
     public static int defaultClientId = -1;
 

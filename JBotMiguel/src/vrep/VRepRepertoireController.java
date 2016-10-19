@@ -62,6 +62,9 @@ public class VRepRepertoireController extends VRepController {
     
     @Override
     public float[] controlStep(float[] inputs) {
+        if(inputs == null || inputs.length == 0) {
+            return null;
+        }
         float[] outputs = ann.controlStep(inputs);
         
         double heading = outputs[0];

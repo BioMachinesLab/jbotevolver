@@ -38,8 +38,9 @@ public class VRepMAPElitesEvolution extends MAPElitesEvolution {
     protected float[] controllerParams;
 
     public int excluded = 0;
-    protected double feasibilityThreshold = 0.0;
+    protected double maxTilt = 9999;
     protected int genomeLength = 0;
+    protected String fitness;
 
     public VRepMAPElitesEvolution(JBotEvolver jBotEvolver, TaskExecutor taskExecutor, Arguments arg) {
         super(jBotEvolver, taskExecutor, arg);
@@ -51,8 +52,10 @@ public class VRepMAPElitesEvolution extends MAPElitesEvolution {
 
         globalParams = parseDoubleArray(arg.getArgumentAsString("globalparams"));
         controllerParams = parseDoubleArray(arg.getArgumentAsString("controllerparams"));
+        
+        fitness = arg.getArgumentAsString("fitness");
 
-        feasibilityThreshold = arg.getArgumentAsDoubleOrSetDefault("feasibility", feasibilityThreshold);
+        maxTilt = arg.getArgumentAsDoubleOrSetDefault("maxtilt", maxTilt);
     }
 
     public static double getFitness(MOChromosome moc) {
@@ -94,7 +97,7 @@ public class VRepMAPElitesEvolution extends MAPElitesEvolution {
                 for (int r = 0; r < nResults; r++) {
                     int id = (int) vals[index++];
 
-                    Chromosome c = null;
+                    MOChromosome c = null;
                     for (int ch = 0; ch < randomChromosomes.size(); ch++) {
                         if (randomChromosomes.get(ch).getID() == id) {
                             c = randomChromosomes.get(ch);
@@ -103,38 +106,29 @@ public class VRepMAPElitesEvolution extends MAPElitesEvolution {
                     }
 
                     int nVals = (int) vals[index++];
-
+                    
                     //positions of robot
                     float posX = vals[index++];
                     float posY = vals[index++];
                     float posZ = vals[index++];
                     double orientation = vals[index++]; // [-PI,PI]
-                    float distanceTraveled = vals[index++];
-                    float feasibility = vals[index++];
-
+                    float tilt = vals[index++];
                     Vector2d pos = new Vector2d(posX, posY);
 
-                    double fitness = CircularQualityMetric.calculateOrientationFitness(pos, orientation);
-
-                    FitnessResult fr = new FitnessResult(fitness);
-                    GenericEvaluationFunction br = new FinalPositionWithOrientationBehavior(new Arguments(""), pos, orientation);
+                    double fit = getFitness(fitness, pos, orientation, tilt, maxTilt, false);
+                    FitnessResult fr = new FitnessResult(fit);
+                    VectorBehaviourExtraResult br = new VectorBehaviourExtraResult(orientation, pos.getX(),  pos.getY());
 
                     ArrayList<EvaluationResult> sampleResults = new ArrayList<>();
-                    int sampleIndex = 0;
-
-                    sampleResults.add(sampleIndex++, fr);
-                    sampleResults.add(sampleIndex++, ((GenericEvaluationFunction) br).getEvaluationResult());
+                    sampleResults.add(fr);
+                    sampleResults.add(br);
 
                     ExpandedFitness ef = new ExpandedFitness();
                     ef.setEvaluationResults(sampleResults);
+                    c.setEvaluationResult(ef);
 
-                    MOFitnessResult result = new MOFitnessResult(r, (MOChromosome) c, ef);
-                    MOChromosome moc = result.getChromosome();
-
-                    moc.setEvaluationResult(result.getEvaluationResult());
-
-                    if (feasibility > this.feasibilityThreshold) {
-                        ((MAPElitesPopulation) population).addToMap(moc);
+                    if (tilt < maxTilt) {
+                        ((MAPElitesPopulation) population).addToMap(c);
                     } else {
                         excluded++;
                     }
@@ -146,6 +140,25 @@ public class VRepMAPElitesEvolution extends MAPElitesEvolution {
             e.printStackTrace();
             System.exit(0);
         }
+    }    
+    
+    public static double getFitness(String mode, Vector2d pos, double ori, double tilt, double maxTilt, boolean debug) {
+        double f = 0;
+        if(mode.contains("circular")) {
+            double t = CircularQualityMetric.calculateOrientationFitness(pos, ori);
+            if(debug) {
+                System.out.println("Circular: " + t);
+            }
+            f += t;
+        }
+        if(mode.contains("tilt")) {
+            double t = 1 - Math.min(1, (double) tilt / maxTilt);
+            if(debug) {
+                System.out.println("Tilt: " + t + " (" + tilt + "/" + maxTilt + ")");
+            }
+            f+= t;
+        }
+        return f;
     }
 
 }

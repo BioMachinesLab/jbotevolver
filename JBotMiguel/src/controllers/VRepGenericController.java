@@ -14,6 +14,7 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import vrep.ControllerFactory;
+import vrep.VRepMAPElitesEvolution;
 import vrep.VRepNEATController;
 import vrep.VRepUtils;
 
@@ -106,16 +107,19 @@ public class VRepGenericController extends Controller implements FixedLenghtGeno
 
         float fitness = 0;
 
-        if ((int) controllerParams[0] == 0) { // controller type
+        if (sim.getArguments().get("--evolution").getArgumentAsString("classname").contains("VRepMAPElitesEvolution")) {
             float x = vals[index++];
             float y = vals[index++];
             float z = vals[index++];
             float orientation = vals[index++];
-            float distanceTravelled = vals[index++];
-            float feasibility = vals[index++];
-            fitness = (float) CircularQualityMetric.calculateOrientationFitness(new Vector2d(x, y), orientation);
-
-            robot.setPosition(new Vector2d(x, y));
+            float tilt = vals[index++];
+            Vector2d pos = new Vector2d(x, y);
+            
+            String fitnessFun = sim.getArguments().get("--evolution").getArgumentAsString("fitness");
+            double maxTilt = sim.getArguments().get("--evolution").getArgumentAsDouble("maxtilt");
+            fitness = (float) VRepMAPElitesEvolution.getFitness(fitnessFun, pos, orientation, tilt, maxTilt, true);
+            
+            robot.setPosition(pos);
             robot.setOrientation(orientation);
         } else {
             fitness = vals[index++];

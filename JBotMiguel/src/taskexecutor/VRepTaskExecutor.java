@@ -156,30 +156,25 @@ public class VRepTaskExecutor extends TaskExecutor {
 
         @Override
         public Result call() throws Exception {
-
+            // get available container
             VRepContainer container = null;
-
             synchronized (availableClients) {
-
-                while (availableClients.size() == 0) {
+                while (availableClients.isEmpty()) {
                     availableClients.wait();
                 }
-
                 //get the VREP conn
                 container = availableClients.pop();
             }
 
+            // run task
             VRepTask vt = (VRepTask) t;
             vt.setVREP(container);
-
             t.run();
-
             Result r = t.getResult();
-
             VRepResult vrepR = (VRepResult) r;
 
+            // parse result
             synchronized (availableClients) {
-                //return the VREP conn
                 if (vrepR.getValues() != null) {
                     container.faults = 0;
                     availableClients.push(container);
@@ -191,7 +186,7 @@ public class VRepTaskExecutor extends TaskExecutor {
                     if (container.faults < ALLOWED_FAULTS) {
                         VRepUtils.terminateClient(container.clientId);
                         try {
-                            Thread.sleep(20000); // wait 20s before trying to init the client again
+                            Thread.sleep(10000); // wait 10s before trying to init the client again
                         } catch(Exception e) {}
                         VRepContainer inited = initContainer(container.ip, container.port);
                         if (inited != null) {

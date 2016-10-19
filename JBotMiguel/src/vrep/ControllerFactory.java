@@ -24,9 +24,15 @@ public class ControllerFactory {
                     CONTROLLERS.put(handles[i], new VRepRepertoireController(parameters));
                     break;
                 case 2:
-                    CONTROLLERS.put(handles[i], new VRepRepertoireTransitionController(parameters));
-                    break;
+                    CONTROLLERS.put(handles[i], new VRepRepertoireControllerStable(parameters));
+                    break;                    
                 case 3:
+                    CONTROLLERS.put(handles[i], new VRepRepertoireStopController(parameters));
+                    break;
+                case 4:
+                    CONTROLLERS.put(handles[i], new VRepRepertoireDiscreteController(parameters));
+                    break;
+                case 5:
                     CONTROLLERS.put(handles[i], new VRepNEATController(parameters));
                     break;
             }

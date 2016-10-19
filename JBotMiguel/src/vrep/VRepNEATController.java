@@ -43,6 +43,9 @@ public class VRepNEATController extends VRepController {
     
     @Override
     public float[] controlStep(float[] inputs) {
+        if(inputs == null || inputs.length == 0) {
+            return null;
+        }        
         for (int i = 0; i < inputs.length; i++) {
             ((DummyNNInput) this.inputs.get(i)).setInput(inputs[i]);
         }
