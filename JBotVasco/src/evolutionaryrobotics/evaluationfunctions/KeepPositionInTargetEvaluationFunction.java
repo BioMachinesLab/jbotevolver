@@ -34,6 +34,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 	private boolean energyFactorEnable = false;
 	private boolean orientationFactorEnable = false;
 	private boolean distanceBootstrapFactorEnable = false;
+	private double inTargetRadius=1.0;
 
 	private Simulator simulator;
 	private Arguments args;
@@ -62,6 +63,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		energyFactorEnable = args.getArgumentAsIntOrSetDefault("energyFactorEnable", 0) == 1;
 		orientationFactorEnable = args.getArgumentAsIntOrSetDefault("orientationFactorEnable", 0) == 1;
 		distanceBootstrapFactorEnable = args.getArgumentAsIntOrSetDefault("distanceBootstrapFactorEnable", 0) == 1;
+		inTargetRadius = args.getArgumentAsDoubleOrSetDefault("inTargetRadius", inTargetRadius);
 	}
 
 	@Override
@@ -358,7 +360,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 
 	private boolean isInsideTarget(AquaticDroneCI robot, Target target) {
 		Vector2d pos = targetsPositions.get(target);
-		return pos.distanceTo(CoordinateUtilities.GPSToCartesian(robot.getGPSLatLon())) <= target.getRadius();
+		return pos.distanceTo(CoordinateUtilities.GPSToCartesian(robot.getGPSLatLon())) <= inTargetRadius;
 	}
 
 	private boolean isInsideTarget(AquaticDroneCI robot) {
