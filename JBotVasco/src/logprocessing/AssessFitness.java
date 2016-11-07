@@ -1,4 +1,4 @@
-package main.logprocessing;
+package logprocessing;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,8 +9,14 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 
+import simulation.robot.AquaticDrone;
+import simulation.robot.Robot;
+import simulation.util.Arguments;
+import updatables.CoverageTracer;
+import updatables.PathTracer;
 import commoninterface.AquaticDroneCI;
 import commoninterface.AquaticDroneCI.DroneType;
+import commoninterface.entities.GeoFence;
 import commoninterface.entities.RobotLocation;
 import commoninterface.entities.Waypoint;
 import commoninterface.mathutils.Vector2d;
@@ -19,10 +25,8 @@ import commoninterface.utils.CIArguments;
 import commoninterface.utils.CoordinateUtilities;
 import commoninterface.utils.jcoord.LatLon;
 import commoninterface.utils.logger.LogData;
-import simulation.robot.Robot;
-import simulation.util.Arguments;
-import updatables.CoverageTracer;
-import updatables.PathTracer;
+import fieldtests.evaluation.CoverageFitnessTest;
+import fieldtests.updatables.Coverage;
 
 public class AssessFitness {
 	
@@ -187,8 +191,8 @@ public class AssessFitness {
 				startControllers(exp, setupReal);
 			
 			if(gui) {
-				viewer.setRendererLeft(setupReal.getRenderer());
-				viewer.setRendererRight(setupSim.getRenderer());
+				viewer.setRenderer1(setupReal.getRenderer());
+				viewer.setRenderer2(setupSim.getRenderer());
 				viewer.validate();
 			}
 			
@@ -402,7 +406,7 @@ public class AssessFitness {
 				setupReal.robots.get(position).setOrientation(Math.toRadians(orientation));
 				
 				String expid = setupReal.exp.toString();
-				FieldTestLogParser.writer.println(expid + " " + step + " " + position + " " + (pos.x + setupReal.start.x - setupReal.firstPos.x) + " " + (pos.y + setupReal.start.y - setupReal.firstPos.y) + " " + Math.toRadians(orientation));
+				FieldTest.writer.println(expid + " " + step + " " + position + " " + (pos.x + setupReal.start.x - setupReal.firstPos.x) + " " + (pos.y + setupReal.start.y - setupReal.firstPos.y) + " " + Math.toRadians(orientation));
 				
 				System.out.println(Waypoint.getWaypoints(((AquaticDroneCI)setupSim.sim.getRobots().get(0))));
 				for(Waypoint wp : Waypoint.getWaypoints((AquaticDroneCI)setupSim.sim.getRobots().get(0))) {

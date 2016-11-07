@@ -1,4 +1,4 @@
-package main.logprocessing;
+package logprocessing;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -290,7 +290,7 @@ public class CompareFitnessField extends Thread {
 }
 
 class JFrameViewerFitnessField extends JFrame {
-	private static final long serialVersionUID = -4035958538326415419L;
+	private static final long serialVersionUID = 1883889233408199167L;
 	private Renderer renderer1;
 	private Renderer renderer2;
 	private CompareFitnessField plot;

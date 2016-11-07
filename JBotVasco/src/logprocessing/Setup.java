@@ -1,4 +1,4 @@
-package main.logprocessing;
+package logprocessing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,6 @@ import commoninterface.utils.jcoord.LatLon;
 import commoninterface.utils.logger.LogData;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
-import fieldtests.data.FitnessViewer;
 import gui.renderer.CITwoDRenderer;
 import gui.renderer.Renderer;
 import mathutils.Vector2d;

@@ -1,4 +1,4 @@
-package main.logprocessing;
+package logprocessing;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -8,7 +8,7 @@ import org.joda.time.DateTime;
 import commoninterface.utils.logger.LogData;
 
 public class Experiment implements Serializable{
-	private static final long serialVersionUID = 475577063328901829L;
+	
 	public DateTime start;
 	public DateTime end;
 	public int timeSteps;
