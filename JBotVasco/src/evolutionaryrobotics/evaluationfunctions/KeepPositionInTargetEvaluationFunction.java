@@ -1,6 +1,5 @@
 package evolutionaryrobotics.evaluationfunctions;
 
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +33,6 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 	private boolean energyFactorEnable = false;
 	private boolean orientationFactorEnable = false;
 	private boolean distanceBootstrapFactorEnable = false;
-	private double inTargetRadius=1.0;
 
 	private Simulator simulator;
 	private Arguments args;
@@ -63,7 +61,6 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		energyFactorEnable = args.getArgumentAsIntOrSetDefault("energyFactorEnable", 0) == 1;
 		orientationFactorEnable = args.getArgumentAsIntOrSetDefault("orientationFactorEnable", 0) == 1;
 		distanceBootstrapFactorEnable = args.getArgumentAsIntOrSetDefault("distanceBootstrapFactorEnable", 0) == 1;
-		inTargetRadius = args.getArgumentAsDoubleOrSetDefault("inTargetRadius", inTargetRadius);
 	}
 
 	@Override
@@ -77,21 +74,6 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 			Vector2d newPosition = CoordinateUtilities.GPSToCartesian(target.getLatLon());
 			targetsPositions.remove(target);
 			targetsPositions.put(target, newPosition);
-		}
-
-		// Update the robots status and target occupancy
-		for (AquaticDroneCI robot : robots) {
-			if (robot instanceof AquaticDrone) {
-				if (((AquaticDrone) robot).hasFault()) {
-					((AquaticDrone) robot).setBodyColor(Color.MAGENTA);
-				} else {
-					if (isInsideTarget(robot)) {
-						((AquaticDrone) robot).setBodyColor(Color.BLUE);
-					} else {
-						((AquaticDrone) robot).setBodyColor(Color.BLACK);
-					}
-				}
-			}
 		}
 
 		// Calculate in target reward and orientation factors
@@ -360,7 +342,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 
 	private boolean isInsideTarget(AquaticDroneCI robot, Target target) {
 		Vector2d pos = targetsPositions.get(target);
-		return pos.distanceTo(CoordinateUtilities.GPSToCartesian(robot.getGPSLatLon())) <= inTargetRadius;
+		return pos.distanceTo(CoordinateUtilities.GPSToCartesian(robot.getGPSLatLon())) <= target.getRadius();
 	}
 
 	private boolean isInsideTarget(AquaticDroneCI robot) {
