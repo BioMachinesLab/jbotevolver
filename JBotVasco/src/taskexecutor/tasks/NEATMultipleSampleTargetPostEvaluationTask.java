@@ -60,19 +60,14 @@ public class NEATMultipleSampleTargetPostEvaluationTask extends JBotEvolverTask 
 		}
 
 		// Check if the environment is the correct and if there is a specific
-		// shape selected (we only run this if the selected shape is mix)
+		// Shape selected
 		ArrayList<FormationType> formations = new ArrayList<FormationType>();
 		Arguments envArgs = args.get("--environment");
-		if (envArgs.getArgumentAsString("classname").equals(FormationMultiTargetEnvironment.class.getName())
-		/*
-		 * &&
-		 * envArgs.getArgumentAsString("formationShape").equals(FormationType.
-		 * mix.toString())
-		 */) {
+		if (envArgs.getArgumentAsString("classname").equals(FormationMultiTargetEnvironment.class.getName())) {
 
-			// Run for each formation, excluding the mix one
+			// Run for each formation, excluding the mix and random ones
 			for (FormationType formation : FormationType.values()) {
-				if (formation != FormationType.mix) {
+				if (formation != FormationType.mix && formation != FormationType.random) {
 					formations.add(formation);
 				}
 			}
@@ -171,7 +166,7 @@ public class NEATMultipleSampleTargetPostEvaluationTask extends JBotEvolverTask 
 
 		localFitness += eval.getFitness();
 		totalRuns++;
-		
+
 		envArgs.setArgument("moveTarget", 1);
 		envArgs.setArgument("rotateFormation", 1);
 		envArgs.setArgument("formationShape", formation.toString());
@@ -217,7 +212,7 @@ public class NEATMultipleSampleTargetPostEvaluationTask extends JBotEvolverTask 
 
 	@Override
 	public Result getResult() {
-		NEATPostEvaluationResult fr = new NEATPostEvaluationResult(getId(),run, generation, 0, fitness, startSample);
+		NEATPostEvaluationResult fr = new NEATPostEvaluationResult(getId(), run, generation, 0, fitness, startSample);
 		return fr;
 	}
 
