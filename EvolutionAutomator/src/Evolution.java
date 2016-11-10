@@ -3,7 +3,6 @@ package src;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -92,8 +91,13 @@ public class Evolution extends Thread {
 
 		File post = new File(outputFolder + "/post.txt");
 
-		if (post.exists())
-			return Integer.parseInt(new Scanner(post).nextLine().split(":")[1].trim());
+		if (post.exists()) {
+			Scanner s = new Scanner(post);
+			int i = Integer.parseInt(s.nextLine().split(":")[1].trim());
+			s.close();
+			
+			return i;
+		}
 
 		String runsVariable = main.getGlobalVariable("%runs");
 		int nRuns = 1;
@@ -338,34 +342,34 @@ public class Evolution extends Thread {
 				String runEvolution = outputFolder + "/" + controller.getName() + ".conf";
 				String resumeEvolution = outputFolder + "/" + run + "/_restartevolution.conf --population +generations="
 						+ generations;
-				
-				
+
 				JBotEvolver jBotEvolver;
 
-				if(f.exists()) {
-					//evolution was already started before, we need to resume it
+				if (f.exists()) {
+					// evolution was already started before, we need to resume
+					// it
 					jBotEvolver = new JBotEvolver(resumeEvolution.split(" "));
 				} else {
-					
+
 					String[] originalArgs = Arguments.readOptionsFromFile(runEvolution);
-					for(int i = 0 ; i < originalArgs.length ; i++) {
-						originalArgs[i] = originalArgs[i].replaceAll("\\%run", this.run+"");
+					for (int i = 0; i < originalArgs.length; i++) {
+						originalArgs[i] = originalArgs[i].replaceAll("\\%run", this.run + "");
 					}
-					
+
 					String[] extraArgs = ("--output " + outputFolder + "/" + run + " --random-seed " + seed).split(" ");
-					
-					String[] fullArgs = new String[originalArgs.length+extraArgs.length];
-					
+
+					String[] fullArgs = new String[originalArgs.length + extraArgs.length];
+
 					int index;
-					for(index = 0; index < originalArgs.length ; index++)
+					for (index = 0; index < originalArgs.length; index++)
 						fullArgs[index] = originalArgs[index];
-					
-					for(int i = 0; i < extraArgs.length ; i++)
+
+					for (int i = 0; i < extraArgs.length; i++)
 						fullArgs[index++] = extraArgs[i];
 
 					jBotEvolver = new JBotEvolver(fullArgs);
 				}
-				
+
 				TaskExecutor taskExecutor;
 
 				if (controller.getArguments("--executor") != null) {
