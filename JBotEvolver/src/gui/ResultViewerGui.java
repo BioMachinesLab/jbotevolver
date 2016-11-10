@@ -2,6 +2,7 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.KeyboardFocusManager;
@@ -243,7 +244,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		return treeWrapper;
 	}
 
-	protected JPanel initRightWrapperPanel() {
+	protected Container initRightWrapperPanel() {
 
 		int panelWidth = 300;
 
@@ -945,14 +946,6 @@ public class ResultViewerGui extends Gui implements Updatable {
 		setVisible(false);
 	}
 
-	// protected void startButton() {
-	// simulationState = RUN;
-	// simulateUntil = 0;
-	// readyToSkip = true;
-	// if(simulator != null && simulator.simulationFinished())
-	// loadCurrentFile();
-	// }
-
 	protected void startPauseButton() {
 
 		if (simulator != null && simulator.simulationFinished()) {
@@ -1413,7 +1406,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 				totalNeuronsTextField.setText(
 						Integer.toString(network.getNumberOfInputNeurons() + network.getNumberOfOutputNeurons()));
 			}
-			if(network.getWeights() != null)
+			if (network.getWeights() != null)
 				synapsesTextField.setText(Integer.toString(network.getWeights().length));
 		}
 
