@@ -1,7 +1,7 @@
 package logprocessing;
 
-import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -9,18 +9,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import commoninterface.controllers.Figure8CIBehavior;
 import commoninterface.utils.CIArguments;
 import commoninterface.utils.CoordinateUtilities;
 import commoninterface.utils.jcoord.LatLon;
 import commoninterface.utils.logger.LogCodex;
-import commoninterface.utils.logger.LogData;
-import gui.renderer.Renderer;
+import commoninterface.utils.logger.ToLogData;
 import gui.renderer.TwoDRenderer;
+import logprocessing.rendererViewers.SingleRendererViewer;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
@@ -33,20 +29,14 @@ import simulation.util.Arguments;
 public class PositionPlot extends Thread {
 
 	private String file;
-	private JFrameViewer frame;
+	private SingleRendererViewer renderViewer;
 	private ArrayList<String> lines = new ArrayList<String>();
 	private boolean pause = false;
-	private boolean useFile = true;
 
-	public PositionPlot(String file, JFrameViewer frame) {
+	public PositionPlot(String file) {
 		this.file = file;
-		this.frame = frame;
-
-		if (!useFile)
-			return;
 
 		try {
-
 			Scanner s = new Scanner(new File(file));
 
 			while (s.hasNextLine()) {
@@ -58,10 +48,32 @@ public class PositionPlot extends Thread {
 			System.out.println(lines.size());
 
 			s.close();
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		buildGUI();
+	}
+
+	private void buildGUI() {
+		renderViewer = new SingleRendererViewer("Position Plot");
+
+		renderViewer.addReplayButtonListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				replay();
+			}
+		});
+
+		renderViewer.addPlayButtonListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				pause();
+			}
+		});
+
+		renderViewer.setRendererDimension(new Dimension(1000, 1000));
+		renderViewer.setVisible(true);
 	}
 
 	public void alternativeRun() {
@@ -169,7 +181,7 @@ public class PositionPlot extends Thread {
 		Environment env = sim.getEnvironment();
 
 		commoninterface.utils.logger.DecodedLog dld = LogCodex.decodeLog(lines.get(0));
-		LogData l = (LogData) dld.getPayload();
+		ToLogData l = (ToLogData) dld.getPayload();
 
 		double lat = l.latLon.getLat();
 		double lon = l.latLon.getLon();
@@ -191,7 +203,7 @@ public class PositionPlot extends Thread {
 		for (int i = 0; i < lines.size(); i++) {
 
 			dld = LogCodex.decodeLog(lines.get(i));
-			l = (LogData) dld.getPayload();
+			l = (ToLogData) dld.getPayload();
 
 			if (pause) {
 				i--;
@@ -251,66 +263,15 @@ public class PositionPlot extends Thread {
 		this.pause = !pause;
 	}
 
+	public void replay() {
+		if(!pause){
+			
+		}
+	}
+
 	public static void main(String[] args) {
 		String file = "logs/figure8.log";
 
-		new JFrameViewer(file);
+		new PositionPlot(file);
 	}
-
-}
-
-class JFrameViewer extends JFrame {
-	private static final long serialVersionUID = -2156271524259331774L;
-	private String file;
-	private Renderer renderer;
-	private PositionPlot plot;
-
-	public JFrameViewer(String file) {
-		super("Position Plot");
-		this.file = file;
-		setLayout(new BorderLayout());
-
-		final JFrameViewer t = this;
-
-		JButton button = new JButton("Replay");
-
-		button.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (plot != null)
-					plot.interrupt();
-				plot = new PositionPlot(t.file, t);
-				plot.start();
-			}
-		});
-
-		JButton pause = new JButton("Pause/Play");
-		pause.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (plot != null)
-					plot.pause();
-			}
-		});
-
-		JPanel south = new JPanel();
-		south.add(button);
-		south.add(pause);
-
-		add(south, BorderLayout.SOUTH);
-
-		setSize(1000, 1000);
-		setLocationRelativeTo(null);
-		setVisible(true);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		button.doClick();
-	}
-
-	public void setRenderer(Renderer renderer) {
-		if (this.renderer != null)
-			remove(this.renderer);
-		add(renderer, BorderLayout.CENTER);
-		this.renderer = renderer;
-	}
-
 }

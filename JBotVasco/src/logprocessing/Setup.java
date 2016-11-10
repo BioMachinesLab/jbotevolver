@@ -10,11 +10,12 @@ import commoninterface.entities.RobotLocation;
 import commoninterface.entities.Waypoint;
 import commoninterface.utils.CoordinateUtilities;
 import commoninterface.utils.jcoord.LatLon;
-import commoninterface.utils.logger.LogData;
+import commoninterface.utils.logger.ToLogData;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import gui.renderer.CITwoDRenderer;
 import gui.renderer.Renderer;
+import logprocessing.dataObjects.Experiment;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.AquaticDrone;
@@ -30,7 +31,7 @@ class Setup {
 	public HashMap<Integer, Integer> robotList = new HashMap<Integer, Integer>();
 	public Vector2d start = new Vector2d(0, 0);
 	public commoninterface.mathutils.Vector2d firstPos;
-	public FitnessViewer viewer;
+	public RendererViewer viewer;
 	public Experiment exp;
 	public boolean simulation = false;
 	public double resolution = 0.6;
@@ -102,7 +103,7 @@ class Setup {
 
 		HashMap<Integer, Integer> robotList = new HashMap<Integer, Integer>();
 
-		for (LogData d : exp.logs) {
+		for (ToLogData d : exp.logs) {
 			if (d.latLon != null) {
 				RobotLocation rl = getRobotLocation(d);
 				int id = Integer.parseInt(rl.getName());
@@ -118,7 +119,7 @@ class Setup {
 		this.firstPos = CoordinateUtilities.GPSToCartesian(firstRL.getLatLon());
 
 		for (Integer id : robotList.keySet()) {
-			for (LogData d : exp.logs) {
+			for (ToLogData d : exp.logs) {
 
 				if (d.latLon == null)
 					continue;
@@ -145,7 +146,7 @@ class Setup {
 		if (exp.controllerName.contains("hierarchical")) {
 			for (Robot r : robots) {
 				int c = 0;
-				for (LogData d : exp.logs) {
+				for (ToLogData d : exp.logs) {
 					if (d.entities.size() == 2)
 						break;
 					c++;
@@ -192,12 +193,12 @@ class Setup {
 		 */
 		if (gui) {
 			renderer = getRenderer();
-			viewer = new FitnessViewer(renderer);
+			viewer = new RendererViewer(renderer);
 		}
 
 	}
 
-	public void updateRobotEntities(LogData d, AquaticDrone aq) {
+	public void updateRobotEntities(ToLogData d, AquaticDrone aq) {
 		Iterator<Entity> i = aq.getEntities().iterator();
 		while (i.hasNext()) {
 			Entity e = i.next();
@@ -228,12 +229,12 @@ class Setup {
 		}
 	}
 
-	public void updateRobotEntities(LogData d, String ip) {
+	public void updateRobotEntities(ToLogData d, String ip) {
 		AquaticDrone aq = (AquaticDrone) getRobot(ip);
 		updateRobotEntities(d, aq);
 	}
 
-	public void updateRobotEntities(LogData d) {
+	public void updateRobotEntities(ToLogData d) {
 		updateRobotEntities(d, d.ip);
 	}
 
@@ -258,7 +259,7 @@ class Setup {
 		return renderer;
 	}
 
-	public static RobotLocation getRobotLocation(LogData d) {
+	public static RobotLocation getRobotLocation(ToLogData d) {
 		String[] split = d.ip.split("\\.");
 		return new RobotLocation(split[split.length - 1], d.latLon, d.compassOrientation, d.droneType);
 	}

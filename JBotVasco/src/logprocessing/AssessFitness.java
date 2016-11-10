@@ -24,9 +24,11 @@ import commoninterface.network.messages.BehaviorMessage;
 import commoninterface.utils.CIArguments;
 import commoninterface.utils.CoordinateUtilities;
 import commoninterface.utils.jcoord.LatLon;
-import commoninterface.utils.logger.LogData;
+import commoninterface.utils.logger.ToLogData;
 import fieldtests.evaluation.CoverageFitnessTest;
 import fieldtests.updatables.Coverage;
+import logprocessing.dataObjects.Experiment;
+import logprocessing.rendererViewers.DoubleRendererViewer;
 
 public class AssessFitness {
 	
@@ -47,7 +49,7 @@ public class AssessFitness {
 		DateTime currentTime;
 		int step = 0;
 		
-		for(LogData d : exp.logs) {
+		for(ToLogData d : exp.logs) {
 			
 			if(d.comment != null)
 				continue;
@@ -107,7 +109,7 @@ public class AssessFitness {
 		
 		startControllers(exp, setup);
 		
-		for(LogData d : exp.logs) {
+		for(ToLogData d : exp.logs) {
 			
 			if(d.comment != null || d.ip == null)
 				continue;
@@ -162,10 +164,10 @@ public class AssessFitness {
 		boolean useReal = true;
 		boolean useSim = false;
 		
-		DoubleFitnessViewer viewer = null;
+		DoubleRendererViewer viewer = null;
 		
 		if(gui) {
-			viewer = new DoubleFitnessViewer();
+			viewer = new DoubleRendererViewer();
 		}
 		
 //		while(true) {
@@ -271,7 +273,7 @@ public class AssessFitness {
 			double[] totalDistanceSim = new double[8];
 			double[] totalDistanceReal = new double[8];
 			
-			for(LogData d : exp.logs) {
+			for(ToLogData d : exp.logs) {
 				
 				if(stopRun)
 					break;
