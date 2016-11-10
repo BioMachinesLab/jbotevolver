@@ -1,5 +1,8 @@
 package main;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import javax.swing.JFrame;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -31,9 +34,11 @@ public class VMain {
 
 		JFrame frame = new JFrame();
 		frame.add(Gui.getGui(jbot, jbot.getArguments().get("--gui")));
-		frame.setSize(1000, 600);
+		frame.setSize(1200, 800);
 		frame.setVisible(true);
-		frame.setLocationRelativeTo(null);
+		
+		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+		frame.setLocation(dim.width / 2 - frame.getSize().width / 2, dim.height / 2 - frame.getSize().height / 2);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
