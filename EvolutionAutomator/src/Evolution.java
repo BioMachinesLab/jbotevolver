@@ -41,15 +41,22 @@ public class Evolution extends Thread {
 
 				createConfigFile(outputFolder, controller.getName() + ".conf");
 				runEvolutions();
+				
 				Arguments postArguments = controller.getArguments("--postevaluation");
 				if (postArguments != null) {
-					System.out.println("\nEvolution finished, running Post Eval on " + controller.getName());
+					System.out.println();
+					System.out.printf("[%s] #####################%n[%s] Evolution finished, running Post Eval on %s%n",
+							getClass().getSimpleName(), getClass().getSimpleName(), controller.getName());
+
 					int run = runPostEvaluation();
-					System.out.println("Post-evaluation on " + controller.getName() + ": " + run);
+					System.out.printf("[%s] Post-evaluation on %s: %d%n", getClass().getSimpleName(),
+							controller.getName(), run);
+
 					String weights = getWeights(run);
-					System.out.println(
-							"Got weights (#" + weights.length() + ") for " + controller.getName() + ": " + run);
 					controller.setWeights(weights);
+					System.out.printf("[%s] Got weights (#%d) for %s: %d%n", getClass().getSimpleName(),
+							weights.length(), controller.getName(), run);
+
 					createConfigFile(outputFolder, "best.conf");
 				} else {
 					controller.setWeights("weights");
@@ -66,7 +73,7 @@ public class Evolution extends Thread {
 		main.evolutionFinished(controller.getName());
 	}
 
-	private String getWeights(int run) {
+	protected String getWeights(int run) {
 
 		String execute = outputFolder + "/" + run + "/_showbest_current.conf";
 		String weights = "";
@@ -95,7 +102,7 @@ public class Evolution extends Thread {
 			Scanner s = new Scanner(post);
 			int i = Integer.parseInt(s.nextLine().split(":")[1].trim());
 			s.close();
-			
+
 			return i;
 		}
 
@@ -236,7 +243,7 @@ public class Evolution extends Thread {
 
 	}
 
-	private void runEvolutions() throws Exception {
+	protected void runEvolutions() throws Exception {
 
 		if (!new File(outputFolder + "/post.txt").exists()) {
 			int nRuns = 1;
@@ -256,7 +263,7 @@ public class Evolution extends Thread {
 		}
 	}
 
-	private void createConfigFile(String folderName, String configName) throws Exception {
+	protected void createConfigFile(String folderName, String configName) throws Exception {
 		createFile(folderName, configName, Arguments.beautifyString(controller.getCompleteConfiguration()));
 	}
 
