@@ -15,7 +15,7 @@ public class VMain {
 	public static void main(String[] args) {
 		//StackDumper.dumpWhenSysOutContains("{--environment=classname=environment");
 
-		args = new String[] { "--gui", "classname=CIResultViewerGui," + "enabledebugoptions=1,"
+		args = new String[] { "--gui", "classname=FormationCIResultViewerGui," + "enabledebugoptions=1,"
 				+ "showCurrentFileLabel=1," + "renderer=(" + "classname=CITwoDRenderer" + ")" };
 
 		JBotEvolver jbot = null;
