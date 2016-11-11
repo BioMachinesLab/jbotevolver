@@ -15,6 +15,7 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class JBotEvolver extends JBotSim {
+	private static final long serialVersionUID = 6224570911022753575L;
 
 	public JBotEvolver(HashMap<String, Arguments> arguments, long randomSeed) {
 		super(arguments, randomSeed);

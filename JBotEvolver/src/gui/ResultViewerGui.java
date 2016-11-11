@@ -73,7 +73,7 @@ import simulation.util.Arguments;
 import updatables.BlenderExport;
 
 public class ResultViewerGui extends Gui implements Updatable {
-
+	private static final long serialVersionUID = 2669357117363678332L;
 	private final int LEFTWRAPPERPANEL_INIT_WIDTH_WINDOWS = 400;
 	private final int LEFTWRAPPERPANEL_INIT_WIDTH_UNIX = 300;
 
