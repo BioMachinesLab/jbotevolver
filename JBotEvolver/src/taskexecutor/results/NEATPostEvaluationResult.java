@@ -3,6 +3,7 @@ package taskexecutor.results;
 import result.Result;
 
 public class NEATPostEvaluationResult extends Result {
+	private static final long serialVersionUID = 1520884116355434650L;
 	private int run;
 	private int generation;
 	private int fitnesssample;
