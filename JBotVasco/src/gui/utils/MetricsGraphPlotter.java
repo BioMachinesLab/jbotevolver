@@ -13,6 +13,8 @@ import gui.util.Graph;
 import gui.util.GraphPlotter;
 
 public class MetricsGraphPlotter extends GraphPlotter {
+	private static final long serialVersionUID = 6178820332224992218L;
+
 	public enum MetricsType {
 		TIME_INSIDE_FORMATION, TIME_TO_FIRST_OCCUPATION, PERMUTATION_METRICS, REOCUPATION_TIME;
 	}
@@ -82,7 +84,9 @@ public class MetricsGraphPlotter extends GraphPlotter {
 				dataList_2[i] = data.getNumberDiffSpotsOccupied_max();
 				break;
 			case REOCUPATION_TIME:
-				dataList_0[i] = (double) data.getReocupationTime();
+				dataList_0[i] = data.getReocupationTime_min();
+				dataList_1[i] = data.getReocupationTime_avg();
+				dataList_2[i] = data.getReocupationTime_max();
 				break;
 			}
 		}
@@ -94,6 +98,7 @@ public class MetricsGraphPlotter extends GraphPlotter {
 		switch (type) {
 		case TIME_INSIDE_FORMATION:
 		case PERMUTATION_METRICS:
+		case REOCUPATION_TIME:
 			graph.addDataList(dataList_0);
 			graph.addDataList(dataList_1);
 			graph.addDataList(dataList_2);
@@ -103,7 +108,6 @@ public class MetricsGraphPlotter extends GraphPlotter {
 			graph.addLegend(name + "_max");
 			break;
 		case TIME_TO_FIRST_OCCUPATION:
-		case REOCUPATION_TIME:
 			graph.addDataList(dataList_0);
 
 			graph.setyLabel(name);

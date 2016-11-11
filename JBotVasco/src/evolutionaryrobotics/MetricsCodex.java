@@ -22,22 +22,24 @@ public class MetricsCodex {
 	public static final String NUM_DIFF_SPOTS_OCCUP_MIN = "numberDiffSpotsOccupied_min";
 	public static final String NUM_DIFF_SPOTS_OCCUP_AVG = "numberDiffSpotsOccupied_avg";
 	public static final String NUM_DIFF_SPOTS_OCCUP_MAX = "numberDiffSpotsOccupied_max";
-	public static final String TIME_REOCUPATION = "reocupationTime";
+	public static final String TIME_REOCUPATION_MIN = "reocupationTime_min";
+	public static final String TIME_REOCUPATION_AVG = "reocupationTime_avg";
+	public static final String TIME_REOCUPATION_MAX = "reocupationTime_max";
 
 	// Separators
 	private static final String GENERATION_NUMBER = "generation";
 	private static final String COMMENT_INITIATOR = "#";
 	private static final String HEADER_LINE_INITIATOR = "$";
-	
+
 	public static String encodeMetricsData(MetricsData data) {
 		StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb, Locale.US);
 
-		formatter.format("%d\t%8.3f\t%8.3f\t%8.3f\t%d\t%8.3f\t%8.3f\t%8.3f\t%d", data.getGeneration(),
+		formatter.format("%d\t%8.3f\t%8.3f\t%8.3f\t%d\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f", data.getGeneration(),
 				data.getTimeInside_min(), data.getTimeInside_avg(), data.getTimeInside_max(),
 				data.getTimeFirstTotalOccup(), data.getNumberDiffSpotsOccupied_min(),
 				data.getNumberDiffSpotsOccupied_avg(), data.getNumberDiffSpotsOccupied_max(),
-				data.getReocupationTime());
+				data.getReocupationTime_min(), data.getReocupationTime_avg(), data.getReocupationTime_max());
 
 		formatter.close();
 		return sb.toString();
@@ -49,9 +51,10 @@ public class MetricsCodex {
 
 		formatter.format("%s\tMetrics written on %s%n", COMMENT_INITIATOR,
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-		formatter.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", HEADER_LINE_INITIATOR, GENERATION_NUMBER,
+		formatter.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", HEADER_LINE_INITIATOR, GENERATION_NUMBER,
 				TIME_INSIDE_SPOT_MIN, TIME_INSIDE_SPOT_AVG, TIME_INSIDE_SPOT_MAX, TIME_FIRST_TOTAL_OCCUP,
-				NUM_DIFF_SPOTS_OCCUP_MIN, NUM_DIFF_SPOTS_OCCUP_AVG, NUM_DIFF_SPOTS_OCCUP_MAX, TIME_REOCUPATION);
+				NUM_DIFF_SPOTS_OCCUP_MIN, NUM_DIFF_SPOTS_OCCUP_AVG, NUM_DIFF_SPOTS_OCCUP_MAX, TIME_REOCUPATION_MIN,
+				TIME_REOCUPATION_AVG, TIME_REOCUPATION_MAX);
 
 		formatter.close();
 		return sb.toString();
@@ -61,7 +64,7 @@ public class MetricsCodex {
 		if (!line.startsWith(COMMENT_INITIATOR) && !line.startsWith(HEADER_LINE_INITIATOR)) {
 			String[] args = line.split("\t");
 
-			if (args.length < 9) {
+			if (args.length < 11) {
 				return null;
 			} else {
 				for (String str : args) {
@@ -77,7 +80,9 @@ public class MetricsCodex {
 				data.setNumberDiffSpotsOccupied_min(Double.parseDouble(args[5]));
 				data.setNumberDiffSpotsOccupied_avg(Double.parseDouble(args[6]));
 				data.setNumberDiffSpotsOccupied_max(Double.parseDouble(args[7]));
-				data.setReocupationTime(Integer.parseInt(args[8]));
+				data.setReocupationTime_min(Double.parseDouble(args[8]));
+				data.setReocupationTime_avg(Double.parseDouble(args[9]));
+				data.setReocupationTime_max(Double.parseDouble(args[10]));
 				return data;
 			}
 		} else {
@@ -169,7 +174,9 @@ public class MetricsCodex {
 				data.setNumberDiffSpotsOccupied_min(r.nextDouble() * 10);
 				data.setNumberDiffSpotsOccupied_avg(r.nextDouble() * 10);
 				data.setNumberDiffSpotsOccupied_max(r.nextDouble() * 10);
-				data.setReocupationTime(r.nextInt(10));
+				data.setReocupationTime_min(r.nextDouble() * 10);
+				data.setReocupationTime_avg(r.nextDouble() * 10);
+				data.setReocupationTime_max(r.nextDouble() * 10);
 
 				outputBuffWriter.write(encodeMetricsData(data));
 				outputBuffWriter.newLine();
@@ -211,14 +218,16 @@ public class MetricsCodex {
 		data.setNumberDiffSpotsOccupied_min(5);
 		data.setNumberDiffSpotsOccupied_avg(6);
 		data.setNumberDiffSpotsOccupied_max(7);
-		data.setReocupationTime(8);
+		data.setReocupationTime_min(8);
+		data.setReocupationTime_avg(9);
+		data.setReocupationTime_max(10);
 
 		String encodedLine = MetricsCodex.encodeMetricsData(data);
 		System.out.println(encodedLine);
 
 		MetricsData decodedData = MetricsCodex.decodeMetricsData(encodedLine);
 		if (data.equals(decodedData)) {
-			System.out.println("Encoding working fine!");
+			System.out.println("Encoding & decoding working fine!");
 		} else {
 			System.out.println("Error on encoding/decoding!");
 		}

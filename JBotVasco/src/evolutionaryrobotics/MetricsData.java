@@ -11,7 +11,10 @@ public class MetricsData {
 	private double numberDiffSpotsOccupied_avg = -1;
 	private double numberDiffSpotsOccupied_max = -1;
 
-	private int reocupationTime = -1;
+	private double reocupationTime_min = -1;
+	private double reocupationTime_avg = -1;
+	private double reocupationTime_max = -1;
+
 	private int generation = -1;
 
 	public MetricsData(int generation) {
@@ -47,8 +50,16 @@ public class MetricsData {
 		this.numberDiffSpotsOccupied_max = numberDiffSpotsOccupied_max;
 	}
 
-	public void setReocupationTime(int reocupationTime) {
-		this.reocupationTime = reocupationTime;
+	public void setReocupationTime_min(double reocupationTime_min) {
+		this.reocupationTime_min = reocupationTime_min;
+	}
+
+	public void setReocupationTime_avg(double reocupationTime_avg) {
+		this.reocupationTime_avg = reocupationTime_avg;
+	}
+
+	public void setReocupationTime_max(double reocupationTime_max) {
+		this.reocupationTime_max = reocupationTime_max;
 	}
 
 	// Getters
@@ -80,8 +91,16 @@ public class MetricsData {
 		return numberDiffSpotsOccupied_max;
 	}
 
-	public int getReocupationTime() {
-		return reocupationTime;
+	public double getReocupationTime_min() {
+		return reocupationTime_min;
+	}
+
+	public double getReocupationTime_avg() {
+		return reocupationTime_avg;
+	}
+
+	public double getReocupationTime_max() {
+		return reocupationTime_max;
 	}
 
 	public int getGeneration() {
@@ -98,7 +117,9 @@ public class MetricsData {
 					&& data.getNumberDiffSpotsOccupied_min() == numberDiffSpotsOccupied_min
 					&& data.getNumberDiffSpotsOccupied_avg() == numberDiffSpotsOccupied_avg
 					&& data.getNumberDiffSpotsOccupied_max() == numberDiffSpotsOccupied_max
-					&& data.getReocupationTime() == reocupationTime;
+					&& data.getReocupationTime_min() == reocupationTime_min
+					&& data.getReocupationTime_avg() == reocupationTime_avg
+					&& data.getReocupationTime_max() == reocupationTime_max;
 		} else {
 			return false;
 		}
