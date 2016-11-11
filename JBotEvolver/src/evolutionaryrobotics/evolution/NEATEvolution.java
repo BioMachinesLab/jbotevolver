@@ -22,7 +22,6 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import taskexecutor.TaskExecutor;
-import tests.Cronometer;
 
 public class NEATEvolution extends Evolution {
 
