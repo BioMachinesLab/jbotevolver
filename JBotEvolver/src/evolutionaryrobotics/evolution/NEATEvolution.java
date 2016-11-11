@@ -58,7 +58,7 @@ public class NEATEvolution extends Evolution {
 
 	@Override
 	public void executeEvolution() {
-		
+
 		NEATGeneticAlgorithmWrapper algorithm;
 
 		int i = population.getNumberOfCurrentGeneration();
@@ -81,7 +81,7 @@ public class NEATEvolution extends Evolution {
 			population.createRandomPopulation();
 			population.setNEATPopulation4J((NEATPopulation4J) algorithm.population());
 			population.getNEATPopulation4J().setSpecies(algorithm.getSpecies());
-		} 
+		}
 
 		if (!population.evolutionDone())
 			taskExecutor.setTotalNumberOfTasks(
@@ -121,7 +121,8 @@ public class NEATEvolution extends Evolution {
 		}
 
 		InnovationDatabase db = algorithm.innovationDatabase();
-		System.out.println("Innovation Database Stats - Hits: " + db.hits + " - misses: " + db.misses);
+		System.out.printf("[%s] Innovation Database Stats - Hits: %d - misses: %d%n", getClass().getSimpleName(),
+				db.hits, db.misses);
 	}
 
 	protected void configureDescriptor(Arguments args) {
