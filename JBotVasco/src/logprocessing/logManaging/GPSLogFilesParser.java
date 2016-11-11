@@ -42,22 +42,22 @@ public class GPSLogFilesParser {
 					File[] fileList = folder.listFiles(filenameFilter);
 
 					if (fileList.length == 1) {
-						System.out.printf("[%s] Parsing %s\n", getClass().getSimpleName(),
+						System.out.printf("[%s] Parsing %s%n", getClass().getSimpleName(),
 								fileList[0].getAbsolutePath());
 
 						int currentRobot = Integer.parseInt(folder.getName());
 						ArrayList<GPSData> data = parseNMEAData(fileList[0]);
 						gpsData.put(currentRobot, data);
 
-						System.out.printf("[%s] -----> %d GPRMC sentences parsed\n", getClass().getSimpleName(),
+						System.out.printf("[%s] -----> %d GPRMC sentences parsed%n", getClass().getSimpleName(),
 								data.size());
 					} else {
-						System.err.printf("[%s] Ambiguous or missing GPS log file\n", getClass().getSimpleName());
+						System.err.printf("[%s] Ambiguous or missing GPS log file%n", getClass().getSimpleName());
 					}
 				}
 			}
 		} else {
-			System.err.printf("[%s] Input folder does not exist\n", getClass().getSimpleName());
+			System.err.printf("[%s] Input folder does not exist%n", getClass().getSimpleName());
 		}
 	}
 
@@ -87,7 +87,7 @@ public class GPSLogFilesParser {
 						String[] split = line.split(",");
 						data.add(parseGPRMCSentence(split));
 					} catch (RuntimeException e) {
-						// System.err.printf("[%s] Error parsing %s message\n",
+						// System.err.printf("[%s] Error parsing %s message%n",
 						// getClass().getSimpleName(), line);
 						parsingErrors++;
 					}
@@ -95,13 +95,13 @@ public class GPSLogFilesParser {
 				line = inputBuffReader.readLine();
 			}
 		} catch (IOException e) {
-			System.err.printf("[%s] %s\n", getClass().getSimpleName(), e.getMessage());
+			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
 		} finally {
 			if (fileReader != null) {
 				try {
 					fileReader.close();
 				} catch (IOException e) {
-					System.err.printf("[%s] %s\n", getClass().getSimpleName(), e.getMessage());
+					System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
 				}
 			}
 
@@ -109,12 +109,12 @@ public class GPSLogFilesParser {
 				try {
 					inputBuffReader.close();
 				} catch (IOException e) {
-					System.err.printf("[%s] %s\n", getClass().getSimpleName(), e.getMessage());
+					System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
 				}
 			}
 		}
 
-		System.out.printf("[%s] -----> %d parsing errors\n", getClass().getSimpleName(), parsingErrors);
+		System.out.printf("[%s] -----> %d parsing errors%n", getClass().getSimpleName(), parsingErrors);
 		return data;
 	}
 
@@ -171,8 +171,8 @@ public class GPSLogFilesParser {
 	}
 
 	public static void main(String[] args) {
-		System.out.printf("[%S] [INIT]\n", GPSLogFilesParser.class.getSimpleName());
+		System.out.printf("[%S] [INIT]%n", GPSLogFilesParser.class.getSimpleName());
 		new GPSLogFilesParser(INPUT_FOLDER);
-		System.out.printf("[%S] [FINISH]\n", GPSLogFilesParser.class.getSimpleName());
+		System.out.printf("[%S] [FINISH]%n", GPSLogFilesParser.class.getSimpleName());
 	}
 }

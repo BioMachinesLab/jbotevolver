@@ -48,12 +48,12 @@ public class LogFilesMerger {
 				}
 			}
 		} else {
-			System.err.printf("[%s] Input folder does not exist\n", getClass().getSimpleName());
+			System.err.printf("[%s] Input folder does not exist%n", getClass().getSimpleName());
 		}
 	}
 
 	private void mergeLogs(File inputFolder, File outputFolder) throws IOException {
-		System.out.printf("[%s] Merging files in %s\n", getClass().getSimpleName(), inputFolder.getAbsolutePath());
+		System.out.printf("[%s] Merging files in %s%n", getClass().getSimpleName(), inputFolder.getAbsolutePath());
 
 		for (final String prefix : FILES_PREFIXES) {
 			FilenameFilter filenameFilter = new FilenameFilter() {
@@ -89,9 +89,9 @@ public class LogFilesMerger {
 
 	public static void main(String[] args) {
 		try {
-			System.out.printf("[%S] [INIT]\n", LogFilesMerger.class.getSimpleName());
+			System.out.printf("[%S] [INIT]%n", LogFilesMerger.class.getSimpleName());
 			new LogFilesMerger(INPUT_FOLDER, OUTPUT_FOLDER);
-			System.out.printf("[%S] [FINISH]\n", LogFilesMerger.class.getSimpleName());
+			System.out.printf("[%S] [FINISH]%n", LogFilesMerger.class.getSimpleName());
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
