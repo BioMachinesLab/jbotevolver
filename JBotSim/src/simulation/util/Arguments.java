@@ -16,6 +16,8 @@ import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.JOptionPane;
+
 import gui.StartupGui;
 import mathutils.Vector2d;
 
@@ -59,7 +61,7 @@ public class Arguments implements Serializable {
 	 * Vector of the values for the arguments in "arguments".
 	 */
 	protected Vector<String> values = new Vector<String>();
-	
+
 	protected String loadedFile = "";
 
 	/**
@@ -75,118 +77,121 @@ public class Arguments implements Serializable {
 		parseString(unparsedArgumentString);
 		removeRepeated();
 	}
+
 	public Arguments(String unparsedArgumentString, boolean translateClasses) {
-		if(translateClasses) {
+		if (translateClasses) {
 			unparsedArgumentString = translateClasses(unparsedArgumentString);
-//			System.out.println(unparsedArgumentString);
+			// System.out.println(unparsedArgumentString);
 		}
 		parseString(unparsedArgumentString);
 		removeRepeated();
 	}
-	
+
 	private void removeRepeated() {
 		Iterator<String> iArgs = arguments.iterator();
 		Iterator<String> iValues = values.iterator();
-		
+
 		ArrayList<String> found = new ArrayList<String>();
-		
-		while(iArgs.hasNext()) {
+
+		while (iArgs.hasNext()) {
 			String current = iArgs.next();
 			iValues.next();
-			if(found.contains(current)) {
+			if (found.contains(current)) {
 				iArgs.remove();
 				iValues.remove();
-			}else {
+			} else {
 				found.add(current);
 			}
 		}
 	}
-	
-	public static String replaceAndGetArguments(String argName, String arg ,String by,List<String> removedStrings){
-		Pattern p = Pattern.compile(argName+"=\\w*(\\.\\w*)*");
-	 	Matcher m = p.matcher(arg);
 
-		while(m.find()) {
+	public static String replaceAndGetArguments(String argName, String arg, String by, List<String> removedStrings) {
+		Pattern p = Pattern.compile(argName + "=\\w*(\\.\\w*)*");
+		Matcher m = p.matcher(arg);
+
+		while (m.find()) {
 			String found = m.group();
 			String[] split = found.split("=");
 			removedStrings.add(split[1]);
 			arg = m.replaceFirst(by);
 			m = p.matcher(arg);
-	 	}
+		}
 		return arg;
 	}
-	
-	public static String repleceTagByStrings(String argName, String arg, String tag, List<String> newStrings){
-		for(String s : newStrings)
-			arg = arg.replaceFirst(tag, argName+"="+s);
+
+	public static String repleceTagByStrings(String argName, String arg, String tag, List<String> newStrings) {
+		for (String s : newStrings)
+			arg = arg.replaceFirst(tag, argName + "=" + s);
 		return arg;
 	}
-	
+
 	private String translateClasses(String arg) {
 		Pattern p = Pattern.compile("classname=\\w*(\\.\\w*)*");
-	 	Matcher m = p.matcher(arg);
-	 	
-	 	LinkedList<String> strings = new LinkedList<String>();
-		while(m.find()) {
+		Matcher m = p.matcher(arg);
+
+		LinkedList<String> strings = new LinkedList<String>();
+		while (m.find()) {
 			String found = m.group();
 			String[] split = found.split("=");
 			strings.add(split[1]);
 			arg = m.replaceFirst("__PLACEHOLDER__");
 			m = p.matcher(arg);
-	 	}
-		
-		for(int i = 0 ; i < strings.size() ; i++) {
+		}
+
+		for (int i = 0; i < strings.size(); i++) {
 			List<String> names = ClassSearchUtils.searchFullNameInPath(strings.get(i));
 			if (names.size() == 0) {
 				String[] split = strings.get(i).split("\\.");
-				names = ClassSearchUtils.searchFullNameInPath(split[split.length-1]);
-				
+				names = ClassSearchUtils.searchFullNameInPath(split[split.length - 1]);
+
 				if (names.size() == 0) {
-					
-					//We're really sorry for this crappy code, but we needed this for legacy support :( authors: Miguel and Tiago
-					if(strings.get(i).endsWith("NNInput")) {
+
+					// We're really sorry for this crappy code, but we needed
+					// this for legacy support :( authors: Miguel and Tiago
+					if (strings.get(i).endsWith("NNInput")) {
 						List<String> sensorinputnames = ClassSearchUtils.searchFullNameInPath("SensorNNInput");
 						strings.set(i, sensorinputnames.get(0));
 						continue;
-					} if(strings.get(i).contains("Simple") && strings.get(i).contains("Sensor")) {
+					}
+					if (strings.get(i).contains("Simple") && strings.get(i).contains("Sensor")) {
 						String currentString = strings.get(i);
 						currentString = currentString.replace("Simple", "");
 						List<String> sensorinputnames = ClassSearchUtils.searchFullNameInPath(currentString);
 						strings.set(i, sensorinputnames.get(0));
 						continue;
 					} else {
-						throw new RuntimeException("Class not found "+ strings.get(i));
+						throw new RuntimeException("Class not found " + strings.get(i));
 					}
 				}
 			} else if (names.size() > 1) {
-				throw new RuntimeException("Multiple implementations of class: "+ strings.get(i) + " - " + names);
+				throw new RuntimeException("Multiple implementations of class: " + strings.get(i) + " - " + names);
 			}
 			strings.set(i, names.get(0));
 		}
-		
-		for(String s : strings)
-			arg = arg.replaceFirst("__PLACEHOLDER__", CLASS_NAME_TAG+"="+s);
+
+		for (String s : strings)
+			arg = arg.replaceFirst("__PLACEHOLDER__", CLASS_NAME_TAG + "=" + s);
 		return arg;
 	}
 
-//	private void translate() {
-//		for (int i = 0; i < arguments.size(); i++) {
-//			if (arguments.get(i).equals(CLASS_NAME_TAG)) {
-//				List<String> names = ClassSearchUtils
-//						.searchFullNameInPath(values.get(i));
-//				if (names.size() == 0) {
-//					throw new RuntimeException("Class not found "
-//							+ values.get(i));
-//				} else if (names.size() > 1) {
-//					throw new RuntimeException(
-//							"Multiple implementations of class: "
-//									+ values.get(i) + " - " + names);
-//				}
-//				values.set(i, names.get(0));
-//			}
-//		}
-//
-//	}
+	// private void translate() {
+	// for (int i = 0; i < arguments.size(); i++) {
+	// if (arguments.get(i).equals(CLASS_NAME_TAG)) {
+	// List<String> names = ClassSearchUtils
+	// .searchFullNameInPath(values.get(i));
+	// if (names.size() == 0) {
+	// throw new RuntimeException("Class not found "
+	// + values.get(i));
+	// } else if (names.size() > 1) {
+	// throw new RuntimeException(
+	// "Multiple implementations of class: "
+	// + values.get(i) + " - " + names);
+	// }
+	// values.set(i, names.get(0));
+	// }
+	// }
+	//
+	// }
 
 	/**
 	 * Parses a string of arguments.
@@ -195,10 +200,10 @@ public class Arguments implements Serializable {
 	 *            the raw, unparsed argument string.
 	 */
 	protected void parseString(String unparsedArgumentString) {
-		
-		if(unparsedArgumentString==null)
+
+		if (unparsedArgumentString == null)
 			return;
-		
+
 		this.unparsedArgumentString = unparsedArgumentString;
 
 		int stringIndex = 0;
@@ -224,8 +229,7 @@ public class Arguments implements Serializable {
 			} else if (currentChar == '=' && parenthesisLevel == 0) {
 				if (currentArgument.length() == 0)
 					throw new java.lang.RuntimeException(
-							"Something is wrong. Argument starts with a = "
-									+ unparsedArgumentString);
+							"Something is wrong. Argument starts with a = " + unparsedArgumentString);
 
 				currentlyValue = true;
 			} else if (currentChar == ',' && parenthesisLevel == 0) {
@@ -328,9 +332,8 @@ public class Arguments implements Serializable {
 		try {
 			result = Integer.parseInt(value);
 		} catch (NumberFormatException e) {
-			throw new RuntimeException("Trying to parse the argument \""
-					+ argument + "\" as an int, but the specified value \""
-					+ value + "\" isn't an int");
+			throw new RuntimeException("Trying to parse the argument \"" + argument
+					+ "\" as an int, but the specified value \"" + value + "\" isn't an int");
 		}
 		return result;
 
@@ -412,8 +415,7 @@ public class Arguments implements Serializable {
 	 * @return the double value of the argument or the default value if it does
 	 *         not exist.
 	 */
-	public double getArgumentAsDoubleOrSetDefault(String argument,
-			double defaultValue) {
+	public double getArgumentAsDoubleOrSetDefault(String argument, double defaultValue) {
 		String value = getArgumentValue(argument);
 		if (value == null) {
 			return defaultValue;
@@ -422,9 +424,8 @@ public class Arguments implements Serializable {
 		try {
 			return Double.parseDouble(value);
 		} catch (NumberFormatException e) {
-			throw new RuntimeException("Trying to parse the argument \""
-					+ argument + "\" as a double, but the specified value \""
-					+ value + "\" isn't a double");
+			throw new RuntimeException("Trying to parse the argument \"" + argument
+					+ "\" as a double, but the specified value \"" + value + "\" isn't a double");
 		}
 	}
 
@@ -450,8 +451,7 @@ public class Arguments implements Serializable {
 	 *            default value returned in case the argument is not defined.
 	 * @return the value of the argument or null if the argument does not exist.
 	 */
-	public String getArgumentAsStringOrSetDefault(String argument,
-			String defaultValue) {
+	public String getArgumentAsStringOrSetDefault(String argument, String defaultValue) {
 		String value = getArgumentValue(argument);
 		if (value == null) {
 			value = defaultValue;
@@ -478,8 +478,7 @@ public class Arguments implements Serializable {
 	 * @throws ClassNotFoundException
 	 */
 	public Vector2d getArgumentAsVector2d(String argument) {
-		Arguments coordinateArguments = new Arguments(
-				getArgumentValue(argument));
+		Arguments coordinateArguments = new Arguments(getArgumentValue(argument));
 
 		try {
 			double x = Double.parseDouble(coordinateArguments.getArgumentAt(0));
@@ -487,8 +486,8 @@ public class Arguments implements Serializable {
 			return new Vector2d(x, y);
 
 		} catch (NumberFormatException e) {
-			throw new java.lang.RuntimeException("Error - cannot convert "
-					+ getArgumentValue(argument) + " into a Vector2d");
+			throw new java.lang.RuntimeException(
+					"Error - cannot convert " + getArgumentValue(argument) + " into a Vector2d");
 		}
 	}
 
@@ -503,11 +502,11 @@ public class Arguments implements Serializable {
 		for (int i = 0; i < arguments.size(); i++) {
 			if (sb.length() > 0)
 				sb.append(",");
-			
+
 			sb.append(arguments.get(i));
 			if (values.get(i).length() > 0) {
-				if(values.get(i).contains("=") || values.get(i).contains(","))
-					sb.append("=(" + values.get(i)+")");
+				if (values.get(i).contains("=") || values.get(i).contains(","))
+					sb.append("=(" + values.get(i) + ")");
 				else
 					sb.append("=" + values.get(i));
 			}
@@ -602,11 +601,8 @@ public class Arguments implements Serializable {
 		String value = getArgumentValue(argument);
 		if (value == null) {
 			return false;
-		} else if (value.equalsIgnoreCase("true")
-				|| value.equalsIgnoreCase("on")
-				|| value.equalsIgnoreCase("enable")
-				|| value.equalsIgnoreCase("enabled")
-				|| value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("1")) {
+		} else if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("on") || value.equalsIgnoreCase("enable")
+				|| value.equalsIgnoreCase("enabled") || value.equalsIgnoreCase("yes") || value.equalsIgnoreCase("1")) {
 			return true;
 		} else {
 			return false;
@@ -630,23 +626,19 @@ public class Arguments implements Serializable {
 		String value = getArgumentValue(argument);
 		if (value == null) {
 			return false;
-		} else if (value.equalsIgnoreCase("false")
-				|| value.equalsIgnoreCase("off")
-				|| value.equalsIgnoreCase("disable")
-				|| value.equalsIgnoreCase("disabled")
-				|| value.equalsIgnoreCase("no") || value.equalsIgnoreCase("0")) {
+		} else if (value.equalsIgnoreCase("false") || value.equalsIgnoreCase("off") || value.equalsIgnoreCase("disable")
+				|| value.equalsIgnoreCase("disabled") || value.equalsIgnoreCase("no") || value.equalsIgnoreCase("0")) {
 			return true;
 		} else {
 			return false;
 		}
 	}
 
-	public static HashMap<String, Arguments> parseArgs(String[] args)
-			throws IOException, ClassNotFoundException {
+	public static HashMap<String, Arguments> parseArgs(String[] args) throws IOException, ClassNotFoundException {
 		String optionsFilename = null;
-		
-//		 for(String s : args)
-//			 System.out.println(s);
+
+		// for(String s : args)
+		// System.out.println(s);
 
 		if (args.length == 0) {
 
@@ -686,10 +678,15 @@ public class Arguments implements Serializable {
 		// System.out.println(Util.usageToString());
 		// System.exit(0);
 		// }
-		
+
 		if (args[0].charAt(0) != '-') {
 			optionsFilename = args[0];
 			String[] argsFromFile = readOptionsFromFile(optionsFilename);
+
+			if (argsFromFile == null) {
+				return null;
+			}
+
 			String[] argsFromCommandline = args;
 			String[] newArgs = new String[argsFromFile.length + args.length - 1];
 
@@ -699,7 +696,7 @@ public class Arguments implements Serializable {
 			for (int i = 0; i < argsFromFile.length; i++) {
 				newArgs[i] = argsFromFile[i];
 			}
-			
+
 			for (int i = 1; i < argsFromCommandline.length; i++) {
 				newArgs[argsFromFile.length + i - 1] = argsFromCommandline[i];
 			}
@@ -711,23 +708,17 @@ public class Arguments implements Serializable {
 
 		while (currentIndex < args.length) {
 			if (currentIndex + 1 == args.length) {
-				throw new RuntimeException(("Error: " + args[currentIndex]
-						+ " misses an argument"));
+				throw new RuntimeException(("Error: " + args[currentIndex] + " misses an argument"));
 			}
 
-			if (!args[currentIndex].equalsIgnoreCase("--random-seed")
-					&& args[currentIndex + 1].charAt(0) == '-') {
+			if (!args[currentIndex].equalsIgnoreCase("--random-seed") && args[currentIndex + 1].charAt(0) == '-') {
 				throw new RuntimeException("Error: Argument for " + args[currentIndex]
-				                                 						+ " cannot start with a '-' (and therefore cannot be "
-				                                						+ args[currentIndex + 1] + ")");
+						+ " cannot start with a '-' (and therefore cannot be " + args[currentIndex + 1] + ")");
 			}
 
 			String key = args[currentIndex].toLowerCase();
 			// this replaces the big ol' if then
-			result.put(
-					key,
-					createOrPrependArguments(result.get(key),
-							args[currentIndex + 1],true));
+			result.put(key, createOrPrependArguments(result.get(key), args[currentIndex + 1], true));
 
 			currentIndex += 2;
 		}
@@ -739,63 +730,72 @@ public class Arguments implements Serializable {
 				commandLine += "\n";
 			commandLine += s + " ";
 		}
-		
-//		Arguments commandLineArguments = new Arguments(commandLine.trim(),true);
-//		result.put("commandline",result);
+
+		// Arguments commandLineArguments = new
+		// Arguments(commandLine.trim(),true);
+		// result.put("commandline",result);
 		AutoArgumentsGeneration.getAuto(result);
-		
-		if(optionsFilename != null && result.get("--output") != null) {
+
+		if (optionsFilename != null && result.get("--output") != null) {
 			String pop = null;
-			
-			if(result.containsKey("--population")){
+
+			if (result.containsKey("--population")) {
 				pop = result.get("--population").getCompleteArgumentString();
-			}else{
+			} else {
 				pop = result.get("--populationa").getCompleteArgumentString();
 			}
-			
-			if(pop != null && pop.contains("load")) {
+
+			if (pop != null && pop.contains("load")) {
 				String output = result.get("--output").getCompleteArgumentString();
-				
+
 				String parent = new File(optionsFilename).getParent();
-				
-				if(!parent.equals(output)) {
+
+				if (!parent.equals(output)) {
 					result.put("--output", new Arguments(parent));
 				}
 			}
 		}
-		
+
 		return result;
 	}
-	
-	public static String[] readOptionsFromFile(String filename)
-			throws IOException {
+
+	public static String[] readOptionsFromFile(String filename) throws IOException {
 		String oldString = readContentFromFile(filename);
-		return readOptionsFromString(oldString);
+
+		if (oldString != null) {
+			return readOptionsFromString(oldString);
+		} else {
+			return null;
+		}
 	}
 
-	public static String readContentFromFile(String filename)
-			throws IOException {
+	public static String readContentFromFile(String filename) throws IOException {
 		BufferedReader bufferedReader;
 		StringBuffer sb = new StringBuffer();
 		String nextLine;
-		
-		bufferedReader = new BufferedReader(new InputStreamReader(
-				new DataInputStream(new FileInputStream(filename))));
 
-		while ((nextLine = bufferedReader.readLine()) != null) {
-			int index = nextLine.indexOf('#');
-			if (index > -1) {
-				if (index == 0)
-					nextLine = "";
-				else
-					nextLine = nextLine.substring(0, index - 1);
+		if (new File(filename).exists()) {
+			bufferedReader = new BufferedReader(
+					new InputStreamReader(new DataInputStream(new FileInputStream(filename))));
+
+			while ((nextLine = bufferedReader.readLine()) != null) {
+				int index = nextLine.indexOf('#');
+				if (index > -1) {
+					if (index == 0)
+						nextLine = "";
+					else
+						nextLine = nextLine.substring(0, index - 1);
+				}
+
+				sb.append(nextLine + " ");
 			}
 
-			sb.append(nextLine + " ");
+			bufferedReader.close();
+			return sb.toString();
+		} else {
+			JOptionPane.showMessageDialog(null, "Experiment files not found!", "Error", JOptionPane.ERROR_MESSAGE);
+			return null;
 		}
-
-		bufferedReader.close();
-		return sb.toString();
 	}
 
 	public static String[] readOptionsFromString(String oldString) {
@@ -813,28 +813,27 @@ public class Arguments implements Serializable {
 
 		return newString.trim().split(" ");
 	}
-	
+
 	public static Arguments createOrPrependArguments(Arguments previous, String newArgumentString) {
 		try {
-			return createOrPrependArguments(previous, newArgumentString,false);
-		} catch(Exception e){e.printStackTrace();}
+			return createOrPrependArguments(previous, newArgumentString, false);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		return null;
 	}
 
-	private static Arguments createOrPrependArguments(Arguments previous,
-			String newArgumentString, boolean translateArguments) throws ClassNotFoundException {
+	private static Arguments createOrPrependArguments(Arguments previous, String newArgumentString,
+			boolean translateArguments) throws ClassNotFoundException {
 		if (newArgumentString.charAt(0) == '+') {
 			if (previous != null) {
-				return new Arguments(newArgumentString.substring(1,
-						newArgumentString.length())
-						+ ","
-						+ previous.getCompleteArgumentString(),translateArguments);
+				return new Arguments(newArgumentString.substring(1, newArgumentString.length()) + ","
+						+ previous.getCompleteArgumentString(), translateArguments);
 			} else {
-				return new Arguments(newArgumentString.substring(1,
-						newArgumentString.length()),translateArguments);
+				return new Arguments(newArgumentString.substring(1, newArgumentString.length()), translateArguments);
 			}
 		} else {
-			return new Arguments(newArgumentString,translateArguments);
+			return new Arguments(newArgumentString, translateArguments);
 		}
 	}
 
@@ -842,62 +841,62 @@ public class Arguments implements Serializable {
 	public String toString() {
 		return getCompleteArgumentString();
 	}
-	
+
 	public Vector<String> getArguments() {
 		return arguments;
 	}
-	
+
 	public Vector<String> getValues() {
 		return values;
 	}
-	
+
 	public static String beautifyString(String s) {
-		
+
 		int nParenthesis = 0;
 		String newString = "";
-		
-		for(int i = 0 ; i < s.length(); i++) {
+
+		for (int i = 0; i < s.length(); i++) {
 			char c = s.charAt(i);
-			
-			switch(c) {
-				case ',':
-					newString+=",\n";
-					newString+=repeatString("\t", nParenthesis+1);
-					break;
-				case '(':
-					nParenthesis++;
-					newString+="(\n";
-					newString+=repeatString("\t", nParenthesis+1);
-					break;
-				case ')':
-					nParenthesis--;
-					newString+="\n";
-					newString+=repeatString("\t", nParenthesis+1);
-					newString+=")";
-					break;
-				default:
-					newString+=c;
+
+			switch (c) {
+			case ',':
+				newString += ",\n";
+				newString += repeatString("\t", nParenthesis + 1);
+				break;
+			case '(':
+				nParenthesis++;
+				newString += "(\n";
+				newString += repeatString("\t", nParenthesis + 1);
+				break;
+			case ')':
+				nParenthesis--;
+				newString += "\n";
+				newString += repeatString("\t", nParenthesis + 1);
+				newString += ")";
+				break;
+			default:
+				newString += c;
 			}
 		}
 		return newString;
 	}
-	
+
 	public static String repeatString(String s, int n) {
 		String newString = "";
-		
-		for(int i = 0 ; i < n ; i++)
-			newString+=s;
-		
+
+		for (int i = 0; i < n; i++)
+			newString += s;
+
 		return newString;
 	}
-	
+
 	public void removeArgument(String key) {
 		int index = arguments.indexOf(key);
-		
-		if(index >= 0) {
+
+		if (index >= 0) {
 			arguments.remove(index);
 			values.remove(index);
 		}
 	}
-	
+
 }

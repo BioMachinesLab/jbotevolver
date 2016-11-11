@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Locale;
 
 import controllers.Controller;
@@ -14,12 +13,12 @@ import simulation.util.Arguments;
 import simulation.util.Factory;
 
 public class JBotSim implements Serializable {
-	
+
 	private static final long serialVersionUID = -3428397257087885544L;
 	protected HashMap<String, Arguments> arguments;
 	protected String parentFolder = "";
 	protected long randomSeed;
-	protected HashMap<String,Serializable> serializableObjects = new HashMap<String, Serializable>();
+	protected HashMap<String, Serializable> serializableObjects = new HashMap<String, Serializable>();
 
 	public JBotSim(HashMap<String, Arguments> arguments, long randomSeed) {
 		Locale.setDefault(new Locale("en", "US"));
@@ -34,28 +33,30 @@ public class JBotSim implements Serializable {
 			loadArguments(commandLineArgs);
 		runInit();
 	}
-	
+
 	protected JBotSim(HashMap<String, Arguments> arguments, long randomSeed, boolean runInit) {
 		Locale.setDefault(new Locale("en", "US"));
 		this.arguments = arguments;
 		this.randomSeed = randomSeed;
-		if(runInit)
+		if (runInit)
 			runInit();
 	}
-	
+
 	private void runInit() {
-		if(arguments.get("--init") != null) {
-			Arguments initArguments = arguments.get("--init");
-			
-			if(initArguments.getFlagIsTrue("skip"))
-				return;
-			
-			for(int i = 0 ; i < initArguments.getNumberOfArguments() ; i++){
-				String argName = initArguments.getArgumentAt(i);
-				String argVals = initArguments.getArgumentAsString(argName);
-				Arguments executableArgs = new Arguments(argVals);
-				Executable exec = (Executable)Factory.getInstance(executableArgs.getArgumentAsString("classname"));
-				exec.execute(this, executableArgs);
+		if (arguments != null) {
+			if (arguments.get("--init") != null) {
+				Arguments initArguments = arguments.get("--init");
+
+				if (initArguments.getFlagIsTrue("skip"))
+					return;
+
+				for (int i = 0; i < initArguments.getNumberOfArguments(); i++) {
+					String argName = initArguments.getArgumentAt(i);
+					String argVals = initArguments.getArgumentAsString(argName);
+					Arguments executableArgs = new Arguments(argVals);
+					Executable exec = (Executable) Factory.getInstance(executableArgs.getArgumentAsString("classname"));
+					exec.execute(this, executableArgs);
+				}
 			}
 		}
 	}
@@ -128,8 +129,10 @@ public class JBotSim implements Serializable {
 		arguments = Arguments.parseArgs(args);
 		randomSeed = 0;
 
-		if (arguments.get("--random-seed") != null) {
-			randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());
+		if (arguments != null) {
+			if (arguments.get("--random-seed") != null) {
+				randomSeed = Long.parseLong(arguments.get("--random-seed").getCompleteArgumentString());
+			}
 		}
 	}
 
@@ -155,7 +158,7 @@ public class JBotSim implements Serializable {
 
 		return newArgs;
 	}
-	
+
 	public HashMap<String, Serializable> getSerializableObjectHashMap() {
 		return this.serializableObjects;
 	}
@@ -163,5 +166,5 @@ public class JBotSim implements Serializable {
 	public long getRandomSeed() {
 		return randomSeed;
 	}
-	
+
 }

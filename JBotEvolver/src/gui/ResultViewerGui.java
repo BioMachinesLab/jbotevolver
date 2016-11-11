@@ -1352,65 +1352,69 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 		HashMap<String, Arguments> args = jBotEvolver.getArguments();
 
-		if (renderer != null)
-			remove(renderer);
+		if (args != null) {
+			if (renderer != null)
+				remove(renderer);
 
-		if (args.get("--gui") != null && args.get("--gui").getArgumentIsDefined("renderer"))
-			createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
+			if (args.get("--gui") != null && args.get("--gui").getArgumentIsDefined("renderer"))
+				createRenderer(new Arguments(args.get("--gui").getArgumentAsString("renderer")));
 
-		Simulator simulator = jBotEvolver.createSimulator();
+			Simulator simulator = jBotEvolver.createSimulator();
 
-		evaluationFunction = jBotEvolver.getEvaluationFunction()[0];
+			evaluationFunction = jBotEvolver.getEvaluationFunction()[0];
 
-		simulator.addCallback(evaluationFunction);
+			simulator.addCallback(evaluationFunction);
 
-		jBotEvolver.setupBestIndividual(simulator);
+			jBotEvolver.setupBestIndividual(simulator);
 
-		simulator.addCallback(this);
-		simulator.setupEnvironment();
+			simulator.addCallback(this);
+			simulator.setupEnvironment();
 
-		for (Updatable up : simulator.getCallbacks()) {
-			if (up instanceof EvaluationFunction) {
-				this.evaluationFunction = (EvaluationFunction) up;
-				break;
+			for (Updatable up : simulator.getCallbacks()) {
+				if (up instanceof EvaluationFunction) {
+					this.evaluationFunction = (EvaluationFunction) up;
+					break;
+				}
 			}
-		}
 
-		if (renderer != null) {
-			renderer.enableInputMethods(true);
-			renderer.setSimulator(simulator);
-			rightAndCenterWrapperPanel.add(renderer);
-			if (simulateUntil == 0)
-				renderer.drawFrame();
-			validate();
-		}
-
-		if (simulateUntil == 0) {
-			controlStepTextField.setText("0");
-			fitnessTextField.setText("0");
-		}
-
-		KeyboardFocusManager.getCurrentKeyboardFocusManager()
-				.addKeyEventDispatcher(new EnvironmentKeyDispatcher(simulator));
-
-		Controller controller = simulator.getEnvironment().getRobots().get(0).getController();
-		if (controller instanceof NeuralNetworkController) {
-			NeuralNetwork network = ((NeuralNetworkController) controller).getNeuralNetwork();
-			inputNeuronsTextField.setText(Integer.toString(network.getNumberOfInputNeurons()));
-			outputNeuronsTextField.setText(Integer.toString(network.getNumberOfOutputNeurons()));
-
-			if (network instanceof CTRNNMultilayer) {
-				CTRNNMultilayer net = (CTRNNMultilayer) network;
-				totalNeuronsTextField.setText(Integer.toString(net.getNumberOfHiddenNodes()));
-			} else {
-				totalNeuronsTextField.setText(
-						Integer.toString(network.getNumberOfInputNeurons() + network.getNumberOfOutputNeurons()));
+			if (renderer != null) {
+				renderer.enableInputMethods(true);
+				renderer.setSimulator(simulator);
+				rightAndCenterWrapperPanel.add(renderer);
+				if (simulateUntil == 0)
+					renderer.drawFrame();
+				validate();
 			}
-			if (network.getWeights() != null)
-				synapsesTextField.setText(Integer.toString(network.getWeights().length));
-		}
 
-		return simulator;
+			if (simulateUntil == 0) {
+				controlStepTextField.setText("0");
+				fitnessTextField.setText("0");
+			}
+
+			KeyboardFocusManager.getCurrentKeyboardFocusManager()
+					.addKeyEventDispatcher(new EnvironmentKeyDispatcher(simulator));
+
+			Controller controller = simulator.getEnvironment().getRobots().get(0).getController();
+			if (controller instanceof NeuralNetworkController) {
+				NeuralNetwork network = ((NeuralNetworkController) controller).getNeuralNetwork();
+				inputNeuronsTextField.setText(Integer.toString(network.getNumberOfInputNeurons()));
+				outputNeuronsTextField.setText(Integer.toString(network.getNumberOfOutputNeurons()));
+
+				if (network instanceof CTRNNMultilayer) {
+					CTRNNMultilayer net = (CTRNNMultilayer) network;
+					totalNeuronsTextField.setText(Integer.toString(net.getNumberOfHiddenNodes()));
+				} else {
+					totalNeuronsTextField.setText(
+							Integer.toString(network.getNumberOfInputNeurons() + network.getNumberOfOutputNeurons()));
+				}
+				if (network.getWeights() != null)
+					synapsesTextField.setText(Integer.toString(network.getWeights().length));
+			}
+
+			return simulator;
+		} else {
+			return null;
+		}
 	}
 
 	public class SimulationRunner implements Runnable {
@@ -1422,7 +1426,9 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 		@Override
 		public void run() {
-			sim.simulate();
+			if (sim != null) {
+				sim.simulate();
+			}
 		}
 	}
 

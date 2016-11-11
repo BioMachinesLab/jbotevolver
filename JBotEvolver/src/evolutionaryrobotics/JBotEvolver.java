@@ -23,7 +23,7 @@ public class JBotEvolver extends JBotSim {
 	public JBotEvolver(String[] args) throws Exception {
 		super(args);
 	}
-	
+
 	protected JBotEvolver(HashMap<String, Arguments> arguments, long randomSeed, boolean runInit) {
 		super(arguments, randomSeed, runInit);
 	}
@@ -89,22 +89,25 @@ public class JBotEvolver extends JBotSim {
 		super.loadArguments(args);
 
 		String absolutePath = "";
-		if (arguments.get("--output") != null) {
-			if (arguments.get("--bestcontrollerweights") != null
-					&& arguments.get("--bestcontrollerweights").getCompleteArgumentString().equals("enable")
-					&& System.getProperty("os.name").toLowerCase().contains("win")) {
-				absolutePath = arguments.get("--output").getCompleteArgumentString().replace("\\", "/");
-			} else {
-				absolutePath = (new File("./" + arguments.get("--output").getCompleteArgumentString()))
-						.getCanonicalPath();
-			}
-		}
 
-		if (arguments.get("--population") != null) {
-			if (parentFolder.isEmpty()) {
-				arguments.get("--population").setArgument("parentfolder", absolutePath);
-			} else {
-				arguments.get("--population").setArgument("parentfolder", parentFolder);
+		if (arguments != null) {
+			if (arguments.get("--output") != null) {
+				if (arguments.get("--bestcontrollerweights") != null
+						&& arguments.get("--bestcontrollerweights").getCompleteArgumentString().equals("enable")
+						&& System.getProperty("os.name").toLowerCase().contains("win")) {
+					absolutePath = arguments.get("--output").getCompleteArgumentString().replace("\\", "/");
+				} else {
+					absolutePath = (new File("./" + arguments.get("--output").getCompleteArgumentString()))
+							.getCanonicalPath();
+				}
+			}
+
+			if (arguments.get("--population") != null) {
+				if (parentFolder.isEmpty()) {
+					arguments.get("--population").setArgument("parentfolder", absolutePath);
+				} else {
+					arguments.get("--population").setArgument("parentfolder", parentFolder);
+				}
 			}
 		}
 	}
@@ -202,11 +205,11 @@ public class JBotEvolver extends JBotSim {
 			}
 		}
 	}
-	
+
 	public JBotEvolver getCopy() {
-		JBotEvolver jbot = new JBotEvolver(getArgumentsCopy(), getRandomSeed(),false);
+		JBotEvolver jbot = new JBotEvolver(getArgumentsCopy(), getRandomSeed(), false);
 		jbot.serializableObjects = this.serializableObjects;
 		return jbot;
 	}
-	
+
 }
