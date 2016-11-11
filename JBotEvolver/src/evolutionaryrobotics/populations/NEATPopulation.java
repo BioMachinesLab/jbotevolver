@@ -13,7 +13,7 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 
 public class NEATPopulation extends Population {
-	private static final long serialVersionUID = 6883521910968726763L;
+	private static final long serialVersionUID = 7376995681295593443L;
 	protected NEATPopulation4J pop;
 	protected int size = 200;
 	protected int generationNumber = 0;
