@@ -7,6 +7,7 @@ import java.util.Random;
 import commoninterface.entities.target.Formation.FormationType;
 import environment.target.FormationMultiTargetEnvironment;
 import evolutionaryrobotics.JBotEvolver;
+import evolutionaryrobotics.MetricsData;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import result.Result;
@@ -28,6 +29,10 @@ public class TargetGenerationalTask extends JBotEvolverTask {
 		this.samples = samples;
 		this.chromosome = chromosome;
 		this.random = new Random(seed);
+	}
+
+	public TargetGenerationalTask(JBotEvolver jBotEvolver, int samples, Chromosome chromosome) {
+		this(jBotEvolver, samples, chromosome, jBotEvolver.getRandomSeed());
 	}
 
 	@Override
@@ -171,7 +176,7 @@ public class TargetGenerationalTask extends JBotEvolverTask {
 
 			fitness += eval.getFitness();
 			totalRuns++;
-			
+
 			envArgs.setArgument("moveTarget", 1);
 			envArgs.setArgument("rotateFormation", 1);
 			envArgs.setArgument("fitnesssample", i);
@@ -199,8 +204,13 @@ public class TargetGenerationalTask extends JBotEvolverTask {
 
 	@Override
 	public Result getResult() {
-		SimpleFitnessResult fr = new SimpleFitnessResult(getId(),chromosome.getID(), fitness / totalRuns);
+		SimpleFitnessResult fr = new SimpleFitnessResult(getId(), chromosome.getID(), fitness / totalRuns);
 		return fr;
+	}
+
+	public MetricsData getMetricsData() {
+		// TODO
+		return null;
 	}
 
 	@SuppressWarnings("unused")
