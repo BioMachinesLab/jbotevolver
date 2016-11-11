@@ -41,7 +41,7 @@ public class Evolution extends Thread {
 
 				createConfigFile(outputFolder, controller.getName() + ".conf");
 				runEvolutions();
-				
+
 				Arguments postArguments = controller.getArguments("--postevaluation");
 				if (postArguments != null) {
 					System.out.println();
@@ -92,7 +92,6 @@ public class Evolution extends Thread {
 	}
 
 	protected int runPostEvaluation() throws Exception {
-
 		Thread.sleep(2000); // wait to make sure that all files have been
 							// written to the disk
 
