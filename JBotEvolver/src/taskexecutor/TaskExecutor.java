@@ -1,6 +1,5 @@
 package taskexecutor;
 
-import java.util.HashMap;
 import evolutionaryrobotics.JBotEvolver;
 import result.Result;
 import simulation.util.Arguments;
@@ -20,6 +19,7 @@ public abstract class TaskExecutor extends Thread {
 	
 	public void setDescription(String desc) {}
 
+	@Override
 	public void run() {
 	}
 
