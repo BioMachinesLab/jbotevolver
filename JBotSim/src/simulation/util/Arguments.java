@@ -344,8 +344,9 @@ public class Arguments implements Serializable {
 	 * will be added.
 	 * 
 	 * @param argument
-	 *            the argument for which a new value should be set
-	 * @value the new value for the argument
+	 *            The argument for which a new value should be set
+	 * @param value
+	 *            The new value for the argument
 	 */
 	public void setArgument(String argument, String value) {
 		if (getArgumentIsDefined(argument)) {
@@ -372,8 +373,9 @@ public class Arguments implements Serializable {
 	 * will be added.
 	 * 
 	 * @param argument
-	 *            the argument for which a new value should be set
-	 * @value the new value for the argument
+	 *            The argument for which a new value should be set
+	 * @param value
+	 *            The new value for the argument
 	 */
 	public void setArgument(String argument, int value) {
 		setArgument(argument, "" + value);
@@ -384,8 +386,9 @@ public class Arguments implements Serializable {
 	 * will be added.
 	 * 
 	 * @param argument
-	 *            the argument for which a new value should be set
-	 * @value the new value for the argument
+	 *            The argument for which a new value should be set
+	 * @param value
+	 *            The new value for the argument
 	 */
 	public void setArgument(String argument, double value) {
 		setArgument(argument, "" + value);
@@ -527,7 +530,7 @@ public class Arguments implements Serializable {
 	 * Check if all arguments have been queried. This should be called after
 	 * anyone interested in querying the arguments have had the chance. In case
 	 * not all of the arguments have been queried, the method
-	 * {@link #getUnqueiredArgument} can be used to figure out which arguments
+	 * {@link #getUnqueriedArgument()} can be used to figure out which arguments
 	 * have not been queried.
 	 * 
 	 * @return true if all the arguments have been queried, false otherwise.
@@ -723,13 +726,13 @@ public class Arguments implements Serializable {
 			currentIndex += 2;
 		}
 
-		String commandLine = "";
-
-		for (String s : args) {
-			if (s.startsWith("--"))
-				commandLine += "\n";
-			commandLine += s + " ";
-		}
+		// String commandLine = "";
+		//
+		// for (String s : args) {
+		// if (s.startsWith("--"))
+		// commandLine += "\n";
+		// commandLine += s + " ";
+		// }
 
 		// Arguments commandLineArguments = new
 		// Arguments(commandLine.trim(),true);
