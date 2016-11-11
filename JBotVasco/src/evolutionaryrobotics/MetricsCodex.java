@@ -86,7 +86,6 @@ public class MetricsCodex {
 				return data;
 			}
 		} else {
-
 			return null;
 		}
 	}
