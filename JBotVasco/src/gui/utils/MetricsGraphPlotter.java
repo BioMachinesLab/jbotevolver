@@ -94,6 +94,7 @@ public class MetricsGraphPlotter extends GraphPlotter {
 		String name = file.getParentFile().getParentFile().getName();
 		name += File.separatorChar + file.getParentFile().getName();
 		name += File.separatorChar + file.getName();
+		name += "_" + type.name();
 
 		switch (type) {
 		case TIME_INSIDE_FORMATION:
@@ -110,7 +111,7 @@ public class MetricsGraphPlotter extends GraphPlotter {
 		case TIME_TO_FIRST_OCCUPATION:
 			graph.addDataList(dataList_0);
 
-			graph.setyLabel(name);
+			graph.addLegend(name);
 			break;
 		}
 	}

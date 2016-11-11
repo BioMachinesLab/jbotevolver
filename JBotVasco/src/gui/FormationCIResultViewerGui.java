@@ -93,13 +93,37 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					plotGraph();
+					plotGraph(MetricsType.TIME_INSIDE_FORMATION);
+				}
+			});
+
+			timeUntilFirstOccupationButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					plotGraph(MetricsType.TIME_TO_FIRST_OCCUPATION);
+				}
+			});
+
+			permutationMetricButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					plotGraph(MetricsType.PERMUTATION_METRICS);
+				}
+			});
+
+			reocupationTimeButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					plotGraph(MetricsType.REOCUPATION_TIME);
 				}
 			});
 		}
 	}
 
-	private void plotGraph() {
+	private void plotGraph(MetricsType type) {
 		TreePath[] selectedFiles = fileTree.getSelectedFilesPaths();
 		ArrayList<String> paths = new ArrayList<String>();
 
@@ -138,70 +162,80 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 			mainFolders[i] = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
 		}
 
-		Thread t = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				// Get a list of all the metrics files
-				ArrayList<String> files = new ArrayList<String>();
-				for (String folder : mainFolders) {
-					String[] fs = getMetricsFiles(folder).split("###");
-
-					for (String str : fs) {
-						if (!str.isEmpty()) {
-							files.add(str);
-						}
-					}
-				}
-
-				if (files.isEmpty()) {
-					System.out.println("Empty!");
-				}
-
-				if (files != null && !files.isEmpty()) {
-					new MetricsGraphPlotter(files.toArray(new String[files.size()]), MetricsType.PERMUTATION_METRICS);
-				} else {
-					JOptionPane.showMessageDialog(null, "No files to compare!", "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		});
+		Thread t = new Thread(new GraphTread(mainFolders, type));
 		t.start();
 	}
 
-	/*
-	 * Recursively look for a file in the supplied folder
-	 */
-	private String getMetricsFiles(String folder) {
-		File f = new File(folder + "/_metrics.log");
+	protected class GraphTread implements Runnable {
+		private String[] folders;
+		private MetricsType type;
 
-		try {
-			if (f.exists()) {
-				return f.getAbsolutePath();
-			} else {
-				if (folder == null) {
-					JOptionPane.showMessageDialog(this, "No folders selected!", "Error", JOptionPane.ERROR_MESSAGE);
-					return null;
-				} else {
-					String[] directories = (new File(folder)).list(new FilenameFilter() {
-						@Override
-						public boolean accept(File dir, String name) {
-							return (new File(dir, name)).isDirectory();
-						}
-					});
-					String result = "";
-					if (directories != null) {
-						for (String dir : directories) {
-							String dirResult = getMetricsFiles(folder + "/" + dir);
-							if (!dirResult.isEmpty())
-								result += dirResult + "###";
-						}
+		public GraphTread(String[] folders, MetricsType type) {
+			this.folders = folders;
+			this.type = type;
+		}
+
+		@Override
+		public void run() {
+			// Get a list of all the metrics files
+			ArrayList<String> files = new ArrayList<String>();
+			for (String folder : folders) {
+				String[] fs = getMetricsFiles(folder).split("###");
+
+				for (String str : fs) {
+					if (!str.isEmpty()) {
+						files.add(str);
 					}
-
-					return result;
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
+
+			if (files.isEmpty()) {
+				System.out.println("Empty!");
+			}
+
+			if (files != null && !files.isEmpty()) {
+				new MetricsGraphPlotter(files.toArray(new String[files.size()]), type);
+			} else {
+				JOptionPane.showMessageDialog(null, "No files to compare!", "Error", JOptionPane.ERROR_MESSAGE);
+			}
 		}
-		return "";
+
+		/*
+		 * Recursively look for a file in the supplied folder
+		 */
+		private String getMetricsFiles(String folder) {
+			File f = new File(folder + "/_metrics.log");
+
+			try {
+				if (f.exists()) {
+					return f.getAbsolutePath();
+				} else {
+					if (folder == null) {
+						JOptionPane.showMessageDialog(null, "No folders selected!", "Error", JOptionPane.ERROR_MESSAGE);
+						return null;
+					} else {
+						String[] directories = (new File(folder)).list(new FilenameFilter() {
+							@Override
+							public boolean accept(File dir, String name) {
+								return (new File(dir, name)).isDirectory();
+							}
+						});
+						String result = "";
+						if (directories != null) {
+							for (String dir : directories) {
+								String dirResult = getMetricsFiles(folder + "/" + dir);
+								if (!dirResult.isEmpty())
+									result += dirResult + "###";
+							}
+						}
+
+						return result;
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return "";
+		}
 	}
 }
