@@ -20,6 +20,4 @@ public class SimpleFitnessResult extends Result {
 	public int getChromosomeId() {
 		return chromosomeId;
 	}
-	
-	
 }
