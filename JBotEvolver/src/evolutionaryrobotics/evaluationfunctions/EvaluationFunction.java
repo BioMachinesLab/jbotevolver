@@ -2,11 +2,14 @@ package evolutionaryrobotics.evaluationfunctions;
 
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
+
+import evolutionaryrobotics.MetricsData;
 import simulation.Updatable;
 import simulation.util.Arguments;
 
 public abstract class EvaluationFunction implements Serializable, Updatable {
 	protected double fitness;
+	protected MetricsData metricsData;
 	protected Arguments args;
 
 	public EvaluationFunction(Arguments args) {
@@ -19,6 +22,10 @@ public abstract class EvaluationFunction implements Serializable, Updatable {
 	
 	public Arguments getArgs() {
 		return args;
+	}
+	
+	public MetricsData getMetricsData(){
+		return metricsData;
 	}
 	
 	
