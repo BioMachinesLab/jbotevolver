@@ -19,7 +19,7 @@ public class AutomatorMain extends Main {
 			for (Controller c : controllers) {
 				allEvolved = allEvolved && c.hasBeenEvolved();
 				if (!c.hasBeenEvolved() && c.readyToEvolve() && !c.isEvolving()) {
-					System.out.println("Evolving " + c.getName());
+					System.out.printf("[%s] Evolving %s%n", getClass().getSimpleName(), c.getName());
 					AutomatorEvolution evo = new AutomatorEvolution(this, c, defaultArgs);
 					evo.start();
 				}

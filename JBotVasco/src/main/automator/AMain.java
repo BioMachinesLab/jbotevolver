@@ -12,7 +12,7 @@ import src.Main;
 public class AMain {
 	private static final boolean CONFIRM_OVERRIDE = false;
 	private static final String path = "./experiments_automator/";
-	private static final String[] configFiles = { "rendition_automator.conf" };
+	private static final String[] configFiles = { "targetFollowing_automator_test.conf" };
 	private HashMap<String, Evolver> evolverInstances = new HashMap<String, Evolver>();
 	private long initTime;
 
@@ -49,6 +49,7 @@ public class AMain {
 
 	@SuppressWarnings("unused")
 	public AMain(String[] args) {
+		int evolverCount = 0;
 		for (String config : args) {
 			File file = new File(config.substring(0, config.indexOf(".conf")));
 			if (file.exists() && file.isDirectory() && CONFIRM_OVERRIDE) {
@@ -61,9 +62,12 @@ public class AMain {
 			}
 
 			Evolver evolver = new Evolver(new String[] { config });
-			System.out.println("Starting: " + config);
+			System.out.printf("[%s] Starting evolver #%d with configuration file: %s%n", getClass().getSimpleName(),
+					evolverCount, config);
 			evolver.start();
 			evolverInstances.put(config, evolver);
+
+			evolverCount++;
 		}
 
 		if (!evolverInstances.isEmpty()) {
@@ -79,9 +83,9 @@ public class AMain {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(System.currentTimeMillis() - initTime);
 
-			System.out.println("######## Finished evolution in " + (calendar.get(Calendar.DAY_OF_MONTH) - 1) + " days, "
-					+ (calendar.get(Calendar.HOUR) - 1) + "h " + calendar.get(Calendar.MINUTE) + "m "
-					+ calendar.get(Calendar.SECOND) + "s");
+			System.out.printf("[%s] Finished evolution in %d days, %dh %dm %ds%n", getClass().getSimpleName(),
+					(calendar.get(Calendar.DAY_OF_MONTH) - 1), (calendar.get(Calendar.HOUR) - 1),
+					calendar.get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
 
 			System.exit(0);
 		}
