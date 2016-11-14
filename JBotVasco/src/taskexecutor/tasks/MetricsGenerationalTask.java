@@ -48,8 +48,8 @@ public class MetricsGenerationalTask extends JBotEvolverTask {
 		int[] robotsQuantity;
 
 		// Check if it is supposed to vary the robots number, if
-		// there is the range of quantities to use or if there is a
-		// defined robot quantity
+		// There is the range of quantities to use or if there is a
+		// Defined robot quantity
 		if (args.get("--robots").getArgumentIsDefined("randomizenumber")) {
 
 			String[] rawArray = args.get("--robots").getArgumentAsString("randomizenumber").split(",");
@@ -69,7 +69,7 @@ public class MetricsGenerationalTask extends JBotEvolverTask {
 		}
 
 		// Check if the environment is the correct and if there is a specific
-		// shape selected (we only run this if the selected shape is mix)
+		// Shape selected (we only run this if the selected shape is mix)
 		Arguments envArgs = args.get("--environment");
 		if (envArgs.getArgumentAsString("classname").equals(FormationMultiTargetEnvironment.class.getName())) {
 			launchTasks(args, robotsQuantity);
