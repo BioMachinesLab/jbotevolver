@@ -7,7 +7,6 @@ import java.util.Random;
 import commoninterface.entities.target.Formation.FormationType;
 import environment.target.FormationMultiTargetEnvironment;
 import evolutionaryrobotics.JBotEvolver;
-import evolutionaryrobotics.MetricsData;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import result.Result;
@@ -206,11 +205,6 @@ public class TargetGenerationalTask extends JBotEvolverTask {
 	public Result getResult() {
 		SimpleFitnessResult fr = new SimpleFitnessResult(getId(), chromosome.getID(), fitness / totalRuns);
 		return fr;
-	}
-
-	public MetricsData getMetricsData() {
-		// TODO
-		return null;
 	}
 
 	@SuppressWarnings("unused")
