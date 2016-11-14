@@ -11,6 +11,7 @@ import commoninterface.entities.target.Target;
 import commoninterface.mathutils.Vector2d;
 import commoninterface.utils.CoordinateUtilities;
 import environment.target.TargetEnvironment;
+import evolutionaryrobotics.FormationTaskMetricsData;
 import net.jafama.FastMath;
 import simulation.Simulator;
 import simulation.robot.AquaticDrone;
@@ -25,7 +26,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 	private boolean configured = false;
 	private double radiusOfObjectPositioning = 20;
 	private double safetyFactorValue = 0.5;
-
+	private double bootstrapInitialDistance = 10;
 	private double safetyDistance = 1;
 	private double minDistanceOthers = Double.POSITIVE_INFINITY;
 	private boolean killOnCollision = false;
@@ -45,7 +46,18 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 	private HashMap<AquaticDroneCI, Double> spentEnergy = new HashMap<AquaticDroneCI, Double>();
 	private HashMap<AquaticDroneCI, Double> timeInTarget = new HashMap<AquaticDroneCI, Double>();
 
-	private double initialDistance = 10;
+	// Metrics variables
+	private FormationTaskMetricsData formationTaskMetricsData = (FormationTaskMetricsData) metricsData;
+	private HashMap<AquaticDroneCI, Target> targetOccupiedByRobot = new HashMap<AquaticDroneCI, Target>();
+	private HashMap<AquaticDroneCI, Integer> targetOccupiedByRobotCount = new HashMap<AquaticDroneCI, Integer>();
+
+	private Target targetOccupiedByFaultyRobot = null;
+	private AquaticDroneCI faultyRobot = null;
+	private double faultInjectionTime = -1;
+	private double replaceTime = -1;
+	private boolean inFault = false;
+
+	private boolean firstTotalOccupationAchieved = false;
 
 	public KeepPositionInTargetEvaluationFunction(Arguments args) {
 		super(args);
@@ -69,14 +81,18 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 			configure(simulator);
 		}
 
-		// Update the targets positions
+		/*
+		 * Update the targets positions
+		 */
 		for (Target target : targets) {
 			Vector2d newPosition = CoordinateUtilities.GPSToCartesian(target.getLatLon());
 			targetsPositions.remove(target);
 			targetsPositions.put(target, newPosition);
 		}
 
-		// Calculate in target reward and orientation factors
+		/*
+		 * Count occupied targets and get targets velocity vector angles
+		 */
 		int occupiedTargets = 0;
 		double orientationReward = 0;
 		HashMap<Target, Double> targetVelocityVectorAzimuth = new HashMap<Target, Double>();
@@ -97,11 +113,36 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 
 				targetVelocityVectorAzimuth.put(target, angle);
 			}
+
+			if (collectMetrics) {
+				AquaticDroneCI drone = getClosestRobotToTarget(target);
+
+				if (targetOccupiedByRobot.get(drone) == null) {
+					targetOccupiedByRobot.put(drone, target);
+					targetOccupiedByRobotCount.put(drone, targetOccupiedByRobotCount.get(drone) + 1);
+				} else if (!targetOccupiedByRobot.get(drone).equals(target)) {
+					targetOccupiedByRobot.remove(drone);
+					targetOccupiedByRobot.put(drone, target);
+					targetOccupiedByRobotCount.put(drone, targetOccupiedByRobotCount.get(drone) + 1);
+				}
+
+				// If in fault and the faulty robot was already replaced
+				if (inFault && target.equals(targetOccupiedByFaultyRobot)
+						&& !getClosestRobotToTarget(target).equals(faultyRobot)) {
+					inFault = false;
+					replaceTime = simulator.getTime();
+				}
+			}
 		}
 
 		if (simulator.getTime() > 0) {
 			double temporaryFitness = 0;
 			double distance = 0;
+
+			/*
+			 * Calculate distance bootstrap, orientation reward and energy
+			 * Factor. Also check for robot fault conditions
+			 */
 			for (AquaticDroneCI robot : robots) {
 				Target closest = getClosestTarget(robot, false);
 
@@ -115,20 +156,31 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 					double orientationDifference = robotOrientation - orientation;
 
 					if (robotOrientation < 0)
-						robotOrientation += 360;
+						robotOrientation += 360.0;
 
 					if (orientationDifference < 0)
-						orientationDifference += 360;
+						orientationDifference += 360.0;
 
-					robotOrientation %= 360;
-					orientationDifference %= 360;
+					robotOrientation %= 360.0;
+					orientationDifference %= 360.0;
 
-					if (orientationDifference > 180) {
-						orientationDifference = -((180 - orientationDifference) + 180);
+					if (orientationDifference > 180.0) {
+						orientationDifference = -((180.0 - orientationDifference) + 180.0);
 					}
 
-					orientationReward += 1-(FastMath.abs(orientationDifference) / 180.0);
+					orientationReward += 1 - (FastMath.abs(orientationDifference) / 180.0);
 					timeInTarget.put(robot, timeInTarget.remove(robot) + 1);
+				}
+
+				// If a fault is detected, register fault beginning and actors
+				if (collectMetrics && ((AquaticDrone) robot).hasFault()) {
+					inFault = true;
+					faultyRobot = robot;
+					faultInjectionTime = simulator.getTime();
+
+					if (isInsideTarget(robot)) {
+						targetOccupiedByFaultyRobot = getClosestTarget(robot, true);
+					}
 				}
 
 				double energyFactor = spentEnergy.remove(robot);
@@ -137,11 +189,13 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 			}
 
 			double meanDistance = distance / robots.size();
-			double normalizedMeanDistance = (initialDistance - meanDistance) / initialDistance;
+			double normalizedMeanDistance = (bootstrapInitialDistance - meanDistance) / bootstrapInitialDistance;
 
+			/*
+			 * Calculate fitness components
+			 */
 			// Occupied targets fitness component
-			temporaryFitness += ((double) occupiedTargets / (double) robots.size())
-					/ simulator.getEnvironment().getSteps() * 10;
+			temporaryFitness += ((double) occupiedTargets / robots.size()) / simulator.getEnvironment().getSteps() * 10;
 
 			// Distance bootstrap fitness component
 			if (distanceBootstrapFactorEnable) {
@@ -154,7 +208,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 						/ (simulator.getEnvironment().getSteps()));
 			}
 
-			// Safety distance to relatives fitness component
+			// Safety distance to relatives
 			if (safetyFactorEnable) {
 				for (int i = 0; i < robots.size(); i++) {
 					if (robots.get(i) instanceof AquaticDrone) {
@@ -197,19 +251,88 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 
 			// Sum this run fitness to total fitness
 			fitness += temporaryFitness;
+
+			/*
+			 * Process metrics
+			 */
+			if (collectMetrics) {
+				// Process on last time step
+				if (simulator.getTime() == simulator.getEnvironment().getSteps() - 1) {
+					// Time inside target and different occupied spots metrics
+					// (Joined in the same if condition in benefit of
+					// Performance)
+					double min_time = Double.MAX_VALUE, min_occupation = Double.MAX_VALUE;
+					double avg_time = 0, avg_occupation = 0;
+					double max_time = Double.MIN_VALUE, max_occupation = Double.MAX_VALUE;
+
+					for (AquaticDroneCI drone : robots) {
+						double time = timeInTarget.get(drone);
+						double occupation = targetOccupiedByRobotCount.get(drone);
+
+						avg_time += time;
+						avg_occupation += occupation;
+
+						if (time < min_time) {
+							min_time = time;
+						}
+
+						if (time > max_time) {
+							max_time = time;
+						}
+
+						if (occupation < min_occupation) {
+							min_occupation = occupation;
+						}
+
+						if (occupation > max_occupation) {
+							max_occupation = occupation;
+						}
+					}
+
+					avg_time /= robots.size();
+					avg_occupation /= robots.size();
+
+					formationTaskMetricsData.setTimeInside_min(min_time);
+					formationTaskMetricsData.setTimeInside_avg(avg_time);
+					formationTaskMetricsData.setTimeInside_max(max_time);
+
+					formationTaskMetricsData.setNumberDiffSpotsOccupied_min(min_occupation);
+					formationTaskMetricsData.setNumberDiffSpotsOccupied_avg(avg_occupation);
+					formationTaskMetricsData.setNumberDiffSpotsOccupied_max(max_occupation);
+
+				}
+
+				// Reocupation time
+				if (replaceTime != -1) {
+					double replace = faultInjectionTime - replaceTime;
+					formationTaskMetricsData.setReocupationTime_min(replace);
+					formationTaskMetricsData.setReocupationTime_avg(replace);
+					formationTaskMetricsData.setReocupationTime_max(replace);
+				}
+
+				// First total formation occupation metric
+				if (occupiedTargets == targets.size()) {
+					firstTotalOccupationAchieved = true;
+					formationTaskMetricsData.setTimeFirstTotalOccup(simulator.getTime());
+				}
+			}
 		}
 	}
 
 	private void configure(Simulator simulator) {
 		this.simulator = simulator;
 
+		/*
+		 * Configure distance bootstrap
+		 */
 		if (simulator.getEnvironment() instanceof TargetEnvironment) {
 			radiusOfObjectPositioning = ((TargetEnvironment) simulator.getEnvironment()).getRadiusOfObjPositioning();
 		}
+		bootstrapInitialDistance = radiusOfObjectPositioning;
 
-		initialDistance = radiusOfObjectPositioning;
-
-		// Get all targets instances
+		/*
+		 * Get all targets instances
+		 */
 		for (Entity ent : ((AquaticDroneCI) simulator.getRobots().get(0)).getEntities()) {
 			if (ent instanceof Formation) {
 				Formation formation = (Formation) ent;
@@ -227,7 +350,9 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 			throw new NullPointerException("No targets defined!");
 		}
 
-		// Get all AquaticDroneCI instances and calculate initial distance
+		/*
+		 * Get all AquaticDroneCI instances and calculate initial distance
+		 */
 		for (Robot robot : simulator.getRobots()) {
 			if (robot instanceof AquaticDroneCI) {
 				// initialDistance +=
@@ -235,6 +360,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 				robots.add((AquaticDroneCI) robot);
 				timeInTarget.put((AquaticDroneCI) robot, 0.0);
 				spentEnergy.put((AquaticDroneCI) robot, 0.0);
+				targetOccupiedByRobotCount.put((AquaticDroneCI) robot, 0);
 			}
 		}
 
@@ -307,7 +433,9 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		return insideTarget;
 	}
 
-	// If ignoreOccupied it will not consider the targets that are occupied
+	/*
+	 * If ignoreOccupied it will not consider the targets that are occupied
+	 */
 	private Target getClosestTarget(AquaticDroneCI robot, boolean ignoreOccupied) {
 		Target target = null;
 
@@ -329,7 +457,9 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		return target;
 	}
 
-	// If ignoreOccupied and there is no unoccupied targets, it will return 0
+	/*
+	 * If ignoreOccupied and there is no unoccupied targets, it will return 0
+	 */
 	private double getDistanceToClosestTarget(AquaticDroneCI robot, boolean ignoreOccupied) {
 		Target target = getClosestTarget(robot, ignoreOccupied);
 
