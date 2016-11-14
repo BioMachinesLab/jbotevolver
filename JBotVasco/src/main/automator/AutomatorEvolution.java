@@ -1,19 +1,32 @@
 package main.automator;
 
-import evolutionaryrobotics.NEATPostEvaluation;
 import evolutionaryrobotics.NEATTargetPostEvaluation;
 import src.Controller;
 import src.Evolution;
 import src.Main;
 
 public class AutomatorEvolution extends Evolution {
+	private NEATTargetPostEvaluation p;
+
 	public AutomatorEvolution(Main main, Controller controller, String arguments) {
 		super(main, controller, arguments);
 	}
 
 	@Override
+	protected int runPostEvaluation() throws Exception {
+		int toReturn = super.runPostEvaluation();
+
+		Thread.sleep(2000); // Make sure that all files have been written to the
+							// Disk
+
+		p.runMetricsEval();
+
+		return toReturn;
+	}
+
+	@Override
 	protected int runNeatPostEvaluation(int nRuns, int fitnessSamples, String stringArguments) throws Exception {
-		NEATPostEvaluation p = new NEATTargetPostEvaluation(stringArguments.split(" "));
+		p = new NEATTargetPostEvaluation(stringArguments.split(" "));
 		double[][][] values = p.runPostEval();
 
 		int[] bestGenerationIndex = new int[nRuns];
@@ -69,12 +82,9 @@ public class AutomatorEvolution extends Evolution {
 		}
 
 		result += "Overall: " + overallAverage + " +- " + getOverallStdDeviation(generationAverage, nRuns);
-
-		System.out.println(result);
-
 		createFile(outputFolder, "post.txt", result);
 
+		System.out.printf("[%s] %s%n", getClass().getSimpleName(), result);
 		return best;
-
 	}
 }
