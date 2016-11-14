@@ -7,19 +7,19 @@ import java.util.ArrayList;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import evolutionaryrobotics.MetricsCodex;
-import evolutionaryrobotics.MetricsData;
+import evolutionaryrobotics.FormationTaskMetricsCodex;
+import evolutionaryrobotics.FormationTaskMetricsData;
 import gui.util.Graph;
 import gui.util.GraphPlotter;
 
-public class MetricsGraphPlotter extends GraphPlotter {
+public class FormationsMetricsGraphPlotter extends GraphPlotter {
 	private static final long serialVersionUID = 6178820332224992218L;
 
 	public enum MetricsType {
 		TIME_INSIDE_FORMATION, TIME_TO_FIRST_OCCUPATION, PERMUTATION_METRICS, REOCUPATION_TIME;
 	}
 
-	public MetricsGraphPlotter(String[] files, MetricsType type) {
+	public FormationsMetricsGraphPlotter(String[] files, MetricsType type) {
 		super();
 
 		JPanel graphPanel = new JPanel(new BorderLayout());
@@ -30,7 +30,7 @@ public class MetricsGraphPlotter extends GraphPlotter {
 		int totalGenerations = 0;
 		for (String filePath : files) {
 			File file = new File(filePath);
-			ArrayList<MetricsData> metricsData = MetricsCodex.decodeMetricsDataFile(file);
+			ArrayList<FormationTaskMetricsData> metricsData = FormationTaskMetricsCodex.decodeMetricsDataFile(file);
 			totalGenerations = Math.max(metricsData.size(), totalGenerations);
 
 			loadMetricsDataOnGraph(graph, metricsData, file, type);
@@ -60,7 +60,7 @@ public class MetricsGraphPlotter extends GraphPlotter {
 		setVisible(true);
 	}
 
-	private void loadMetricsDataOnGraph(Graph graph, ArrayList<MetricsData> metricsData, File file, MetricsType type) {
+	private void loadMetricsDataOnGraph(Graph graph, ArrayList<FormationTaskMetricsData> metricsData, File file, MetricsType type) {
 		// Instead of differentiate, just create three arrays and use only the
 		// needed ones
 		Double[] dataList_0 = new Double[metricsData.size()];
@@ -68,7 +68,7 @@ public class MetricsGraphPlotter extends GraphPlotter {
 		Double[] dataList_2 = new Double[metricsData.size()];
 
 		for (int i = 0; i < metricsData.size(); i++) {
-			MetricsData data = metricsData.get(i);
+			FormationTaskMetricsData data = metricsData.get(i);
 			switch (type) {
 			case TIME_INSIDE_FORMATION:
 				dataList_0[i] = data.getTimeInside_min();

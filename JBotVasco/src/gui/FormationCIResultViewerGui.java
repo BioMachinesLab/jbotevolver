@@ -19,8 +19,8 @@ import javax.swing.tree.TreePath;
 
 import evolutionaryrobotics.JBotEvolver;
 import gui.util.SpringUtilities;
-import gui.utils.MetricsGraphPlotter;
-import gui.utils.MetricsGraphPlotter.MetricsType;
+import gui.utils.FormationsMetricsGraphPlotter;
+import gui.utils.FormationsMetricsGraphPlotter.MetricsType;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.util.Arguments;
@@ -194,7 +194,7 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 			}
 
 			if (files != null && !files.isEmpty()) {
-				new MetricsGraphPlotter(files.toArray(new String[files.size()]), type);
+				new FormationsMetricsGraphPlotter(files.toArray(new String[files.size()]), type);
 			} else {
 				JOptionPane.showMessageDialog(null, "No files to compare!", "Error", JOptionPane.ERROR_MESSAGE);
 			}

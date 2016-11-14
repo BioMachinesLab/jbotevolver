@@ -13,7 +13,8 @@ import java.util.Formatter;
 import java.util.Locale;
 import java.util.Random;
 
-public class MetricsCodex {
+@SuppressWarnings("unused")
+public class FormationTaskMetricsCodex {
 	// Metrics
 	public static final String TIME_INSIDE_SPOT_MIN = "timeInside_min";
 	public static final String TIME_INSIDE_SPOT_AVG = "timeInside_avg";
@@ -31,12 +32,12 @@ public class MetricsCodex {
 	private static final String COMMENT_INITIATOR = "#";
 	private static final String HEADER_LINE_INITIATOR = "$";
 
-	public static String encodeMetricsData(MetricsData data) {
+	public static String encodeMetricsData(FormationTaskMetricsData data) {
 		StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb, Locale.US);
 
-		formatter.format("%d\t%8.3f\t%8.3f\t%8.3f\t%d\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f", data.getGeneration(),
-				data.getTimeInside_min(), data.getTimeInside_avg(), data.getTimeInside_max(),
+		formatter.format("%d\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f",
+				data.getGeneration(), data.getTimeInside_min(), data.getTimeInside_avg(), data.getTimeInside_max(),
 				data.getTimeFirstTotalOccup(), data.getNumberDiffSpotsOccupied_min(),
 				data.getNumberDiffSpotsOccupied_avg(), data.getNumberDiffSpotsOccupied_max(),
 				data.getReocupationTime_min(), data.getReocupationTime_avg(), data.getReocupationTime_max());
@@ -60,7 +61,7 @@ public class MetricsCodex {
 		return sb.toString();
 	}
 
-	public static MetricsData decodeMetricsData(String line) {
+	public static FormationTaskMetricsData decodeMetricsData(String line) {
 		if (!line.startsWith(COMMENT_INITIATOR) && !line.startsWith(HEADER_LINE_INITIATOR)) {
 			String[] args = line.split("\t");
 
@@ -72,11 +73,11 @@ public class MetricsCodex {
 							.trim();
 				}
 
-				MetricsData data = new MetricsData(Integer.parseInt(args[0]));
+				FormationTaskMetricsData data = new FormationTaskMetricsData(Integer.parseInt(args[0]));
 				data.setTimeInside_min(Double.parseDouble(args[1]));
 				data.setTimeInside_avg(Double.parseDouble(args[2]));
 				data.setTimeInside_max(Double.parseDouble(args[3]));
-				data.setTimeFirstTotalOccup(Integer.parseInt(args[4]));
+				data.setTimeFirstTotalOccup(Double.parseDouble(args[4]));
 				data.setNumberDiffSpotsOccupied_min(Double.parseDouble(args[5]));
 				data.setNumberDiffSpotsOccupied_avg(Double.parseDouble(args[6]));
 				data.setNumberDiffSpotsOccupied_max(Double.parseDouble(args[7]));
@@ -90,8 +91,8 @@ public class MetricsCodex {
 		}
 	}
 
-	public static ArrayList<MetricsData> decodeMetricsDataFile(File file) {
-		ArrayList<MetricsData> data = new ArrayList<MetricsData>();
+	public static ArrayList<FormationTaskMetricsData> decodeMetricsDataFile(File file) {
+		ArrayList<FormationTaskMetricsData> data = new ArrayList<FormationTaskMetricsData>();
 
 		if (file.exists() && file.isFile()) {
 			FileReader fileReader = null;
@@ -103,7 +104,7 @@ public class MetricsCodex {
 
 				String line = buffReader.readLine();
 				while (line != null) {
-					MetricsData md = decodeMetricsData(line);
+					FormationTaskMetricsData md = decodeMetricsData(line);
 
 					if (md != null) {
 						data.add(md);
@@ -112,13 +113,13 @@ public class MetricsCodex {
 					line = buffReader.readLine();
 				}
 			} catch (IOException e) {
-				System.err.printf("[%s] %s%n", MetricsCodex.class.getSimpleName(), e.getMessage());
+				System.err.printf("[%s] %s%n", FormationTaskMetricsCodex.class.getSimpleName(), e.getMessage());
 			} finally {
 				if (fileReader != null) {
 					try {
 						fileReader.close();
 					} catch (IOException e) {
-						System.err.printf("[%s] %s%n", MetricsCodex.class.getSimpleName(), e.getMessage());
+						System.err.printf("[%s] %s%n", FormationTaskMetricsCodex.class.getSimpleName(), e.getMessage());
 					}
 				}
 
@@ -126,7 +127,7 @@ public class MetricsCodex {
 					try {
 						buffReader.close();
 					} catch (IOException e) {
-						System.err.printf("[%s] %s%n", MetricsCodex.class.getSimpleName(), e.getMessage());
+						System.err.printf("[%s] %s%n", FormationTaskMetricsCodex.class.getSimpleName(), e.getMessage());
 					}
 				}
 			}
@@ -136,9 +137,10 @@ public class MetricsCodex {
 	}
 
 	public static void main(String[] args) {
-		// unitTest();
-		generateRandomMetricsFile(
-				"C:\\Users\\BIOMACHINES\\Desktop\\Eclipse Data\\JBotEvolver\\JBotVasco\\experiments_automator");
+		unitTest();
+		// generateRandomMetricsFile(
+		// "C:\\Users\\BIOMACHINES\\Desktop\\Eclipse
+		// Data\\JBotEvolver\\JBotVasco\\experiments_automator");
 	}
 
 	private static void generateRandomMetricsFile(String path) {
@@ -165,11 +167,11 @@ public class MetricsCodex {
 
 			Random r = new Random();
 			for (int i = 0; i < 100; i++) {
-				MetricsData data = new MetricsData(i);
+				FormationTaskMetricsData data = new FormationTaskMetricsData(i);
 				data.setTimeInside_min(r.nextDouble() * 10);
 				data.setTimeInside_avg(r.nextDouble() * 10);
 				data.setTimeInside_max(r.nextDouble() * 10);
-				data.setTimeFirstTotalOccup(r.nextInt(10));
+				data.setTimeFirstTotalOccup(r.nextDouble() * 10);
 				data.setNumberDiffSpotsOccupied_min(r.nextDouble() * 10);
 				data.setNumberDiffSpotsOccupied_avg(r.nextDouble() * 10);
 				data.setNumberDiffSpotsOccupied_max(r.nextDouble() * 10);
@@ -181,16 +183,16 @@ public class MetricsCodex {
 				outputBuffWriter.newLine();
 			}
 
-			System.out.printf("[%s] Generated!%n", MetricsCodex.class.getSimpleName());
+			System.out.printf("[%s] Generated!%n", FormationTaskMetricsCodex.class.getSimpleName());
 
 		} catch (Exception e) {
-			System.err.printf("[%s] %s%n", MetricsCodex.class.getSimpleName(), e.getMessage());
+			System.err.printf("[%s] %s%n", FormationTaskMetricsCodex.class.getSimpleName(), e.getMessage());
 		} finally {
 			if (outputBuffWriter != null) {
 				try {
 					outputBuffWriter.close();
 				} catch (IOException e) {
-					System.err.printf("[%s] %s%n", MetricsCodex.class.getSimpleName(), e.getMessage());
+					System.err.printf("[%s] %s%n", FormationTaskMetricsCodex.class.getSimpleName(), e.getMessage());
 				}
 			}
 
@@ -198,18 +200,17 @@ public class MetricsCodex {
 				try {
 					fileWriter.close();
 				} catch (IOException e) {
-					System.err.printf("[%s] %s%n", MetricsCodex.class.getSimpleName(), e.getMessage());
+					System.err.printf("[%s] %s%n", FormationTaskMetricsCodex.class.getSimpleName(), e.getMessage());
 				}
 			}
 		}
 	}
 
-	@SuppressWarnings("unused")
 	private static void unitTest() {
 		// Custom made Unit test :P
-		System.out.println(MetricsCodex.getEncodedMetricsFileHeader());
+		System.out.println(FormationTaskMetricsCodex.getEncodedMetricsFileHeader());
 
-		MetricsData data = new MetricsData(100);
+		FormationTaskMetricsData data = new FormationTaskMetricsData(100);
 		data.setTimeInside_min(1);
 		data.setTimeInside_avg(2);
 		data.setTimeInside_max(3);
@@ -221,10 +222,10 @@ public class MetricsCodex {
 		data.setReocupationTime_avg(9);
 		data.setReocupationTime_max(10);
 
-		String encodedLine = MetricsCodex.encodeMetricsData(data);
+		String encodedLine = FormationTaskMetricsCodex.encodeMetricsData(data);
 		System.out.println(encodedLine);
 
-		MetricsData decodedData = MetricsCodex.decodeMetricsData(encodedLine);
+		FormationTaskMetricsData decodedData = FormationTaskMetricsCodex.decodeMetricsData(encodedLine);
 		if (data.equals(decodedData)) {
 			System.out.println("Encoding & decoding working fine!");
 		} else {
