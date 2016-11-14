@@ -138,6 +138,11 @@ public class MetricsGenerationalTask extends JBotEvolverTask {
 			HashMap<String, Arguments> args = jBotEvolver.getArguments();
 			Arguments envArgs = args.get("--environment");
 			Arguments robotArgs = args.get("--robots");
+			Arguments evalArgs = args.get("--evaluation");
+
+			/*
+			 * Only move
+			 */
 			envArgs.setArgument("moveTarget", 1);
 			envArgs.setArgument("rotateFormation", 0);
 			envArgs.setArgument("fitnesssample", i);
@@ -154,13 +159,17 @@ public class MetricsGenerationalTask extends JBotEvolverTask {
 			ArrayList<Robot> robots = jBotEvolver.createRobots(simulator, chromosome);
 			simulator.addRobots(robots);
 
-			EvaluationFunction eval = EvaluationFunction.getEvaluationFunction(args.get("--evaluation"));
+			evalArgs.setArgument("collectMetrics", 1);
+			EvaluationFunction eval = EvaluationFunction.getEvaluationFunction(evalArgs);
 			simulator.addCallback(eval);
 			simulator.simulate();
 
 			metricsData.add(eval.getMetricsData());
 			totalRuns++;
 
+			/*
+			 * Only rotate
+			 */
 			envArgs.setArgument("moveTarget", 0);
 			envArgs.setArgument("rotateFormation", 1);
 			envArgs.setArgument("fitnesssample", i);
@@ -177,13 +186,17 @@ public class MetricsGenerationalTask extends JBotEvolverTask {
 			robots = jBotEvolver.createRobots(simulator, chromosome);
 			simulator.addRobots(robots);
 
-			eval = EvaluationFunction.getEvaluationFunction(args.get("--evaluation"));
+			evalArgs.setArgument("collectMetrics", 1);
+			eval = EvaluationFunction.getEvaluationFunction(evalArgs);
 			simulator.addCallback(eval);
 			simulator.simulate();
 
 			metricsData.add(eval.getMetricsData());
 			totalRuns++;
 
+			/*
+			 * Move and rotate
+			 */
 			envArgs.setArgument("moveTarget", 1);
 			envArgs.setArgument("rotateFormation", 1);
 			envArgs.setArgument("fitnesssample", i);
@@ -200,7 +213,8 @@ public class MetricsGenerationalTask extends JBotEvolverTask {
 			robots = jBotEvolver.createRobots(simulator, chromosome);
 			simulator.addRobots(robots);
 
-			eval = EvaluationFunction.getEvaluationFunction(args.get("--evaluation"));
+			evalArgs.setArgument("collectMetrics", 1);
+			eval = EvaluationFunction.getEvaluationFunction(evalArgs);
 			simulator.addCallback(eval);
 			simulator.simulate();
 
