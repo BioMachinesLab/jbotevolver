@@ -12,6 +12,10 @@ public class FormationTaskMetricsData extends MetricsData {
 		super(generation);
 	}
 
+	public FormationTaskMetricsData() {
+		super(-1);
+	}
+
 	// Setters
 	public void setTimeInside_min(double timeInside_min) {
 		this.timeInside_min = timeInside_min;
@@ -121,7 +125,7 @@ public class FormationTaskMetricsData extends MetricsData {
 
 		double metricsCount = 1;
 		for (MetricsData m : metricsData) {
-			if (m.getGeneration() == getGeneration() && m instanceof FormationTaskMetricsData) {
+			if (m instanceof FormationTaskMetricsData) {
 				FormationTaskMetricsData formData = (FormationTaskMetricsData) m;
 				// Minimums calculations
 				if (formData.getTimeInside_min() < timeInside_min) {
