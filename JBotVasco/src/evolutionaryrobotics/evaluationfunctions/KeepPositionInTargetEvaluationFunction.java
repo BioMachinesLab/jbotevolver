@@ -47,7 +47,6 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 	private HashMap<AquaticDroneCI, Double> timeInTarget = new HashMap<AquaticDroneCI, Double>();
 
 	// Metrics variables
-	private FormationTaskMetricsData formationTaskMetricsData = (FormationTaskMetricsData) metricsData;
 	private HashMap<AquaticDroneCI, Target> targetOccupiedByRobot = new HashMap<AquaticDroneCI, Target>();
 	private HashMap<AquaticDroneCI, Integer> targetOccupiedByRobotCount = new HashMap<AquaticDroneCI, Integer>();
 
@@ -292,28 +291,28 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 					avg_time /= robots.size();
 					avg_occupation /= robots.size();
 
-					formationTaskMetricsData.setTimeInside_min(min_time);
-					formationTaskMetricsData.setTimeInside_avg(avg_time);
-					formationTaskMetricsData.setTimeInside_max(max_time);
+					((FormationTaskMetricsData) metricsData).setTimeInside_min(min_time);
+					((FormationTaskMetricsData) metricsData).setTimeInside_avg(avg_time);
+					((FormationTaskMetricsData) metricsData).setTimeInside_max(max_time);
 
-					formationTaskMetricsData.setNumberDiffSpotsOccupied_min(min_occupation);
-					formationTaskMetricsData.setNumberDiffSpotsOccupied_avg(avg_occupation);
-					formationTaskMetricsData.setNumberDiffSpotsOccupied_max(max_occupation);
+					((FormationTaskMetricsData) metricsData).setNumberDiffSpotsOccupied_min(min_occupation);
+					((FormationTaskMetricsData) metricsData).setNumberDiffSpotsOccupied_avg(avg_occupation);
+					((FormationTaskMetricsData) metricsData).setNumberDiffSpotsOccupied_max(max_occupation);
 
 				}
 
 				// Reocupation time
 				if (replaceTime != -1) {
 					double replace = faultInjectionTime - replaceTime;
-					formationTaskMetricsData.setReocupationTime_min(replace);
-					formationTaskMetricsData.setReocupationTime_avg(replace);
-					formationTaskMetricsData.setReocupationTime_max(replace);
+					((FormationTaskMetricsData) metricsData).setReocupationTime_min(replace);
+					((FormationTaskMetricsData) metricsData).setReocupationTime_avg(replace);
+					((FormationTaskMetricsData) metricsData).setReocupationTime_max(replace);
 				}
 
 				// First total formation occupation metric
 				if (occupiedTargets == targets.size()) {
 					firstTotalOccupationAchieved = true;
-					formationTaskMetricsData.setTimeFirstTotalOccup(simulator.getTime());
+					((FormationTaskMetricsData) metricsData).setTimeFirstTotalOccup(simulator.getTime());
 				}
 			}
 		}
@@ -367,6 +366,10 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		// It is true if we only use AquaticDrones, which may not be the true...
 		if (robots.size() != simulator.getRobots().size()) {
 			throw new IllegalStateException("Different size!");
+		}
+
+		if (collectMetrics) {
+			metricsData = new FormationTaskMetricsData();
 		}
 
 		configured = true;
