@@ -1,6 +1,7 @@
 package main.automator;
 
 import evolutionaryrobotics.NEATTargetPostEvaluation;
+import simulation.util.Arguments;
 import src.Controller;
 import src.Evolution;
 import src.Main;
@@ -19,6 +20,17 @@ public class AutomatorEvolution extends Evolution {
 		Thread.sleep(2000); // Make sure that all files have been written to the
 							// Disk
 
+		if (p == null) {
+			Arguments postArguments = controller.getArguments("--postevaluation");
+			String stringArguments = "dir=" + outputFolder;
+			if (postArguments != null) {
+				for (String arg : postArguments.getArguments())
+					stringArguments += " " + arg + "=" + postArguments.getArgumentAsString(arg);
+			}
+			p = new NEATTargetPostEvaluation(stringArguments.split(" "));
+		}
+		
+		System.out.printf("[%s] Finished post evolution, starting metrics collection%n",getClass().getSimpleName());
 		p.runMetricsEval();
 
 		return toReturn;
