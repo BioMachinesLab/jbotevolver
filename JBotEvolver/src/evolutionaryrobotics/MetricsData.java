@@ -1,8 +1,10 @@
 package evolutionaryrobotics;
 
+import java.io.Serializable;
 import java.util.List;
 
-public abstract class MetricsData {
+public abstract class MetricsData implements Serializable {
+	private static final long serialVersionUID = -207450654387115086L;
 	protected int generation = -1;
 
 	public MetricsData(int generation) {

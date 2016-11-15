@@ -3,6 +3,7 @@ package evolutionaryrobotics;
 import java.util.List;
 
 public class FormationTaskMetricsData extends MetricsData {
+	private static final long serialVersionUID = 6939285682274531099L;
 	private double timeInside_min = 0, timeInside_avg = 0, timeInside_max = 0;
 	private double timeFirstTotalOccup = 0;
 	private double numberDiffSpotsOccupied_min = 0, numberDiffSpotsOccupied_avg = 0, numberDiffSpotsOccupied_max = 0;
