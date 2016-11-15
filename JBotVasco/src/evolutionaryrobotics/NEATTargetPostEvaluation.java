@@ -2,7 +2,6 @@ package evolutionaryrobotics;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
@@ -15,6 +14,7 @@ import taskexecutor.tasks.NEATMultipleSampleTargetPostEvaluationTask;
 
 public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 	private int taskCount = 0;
+	protected boolean showOutput = true;
 
 	public NEATTargetPostEvaluation(String[] args, String[] extraArgs) {
 		super(args, extraArgs);
@@ -165,7 +165,6 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 			// Load task executor from configuration file
 			String[] newArgs = args != null ? new String[args.length + 1] : new String[1];
 			newArgs[0] = new File(folder, "_showbest_current.conf").getAbsolutePath();
-
 			for (int i = 1; i < newArgs.length; i++) {
 				newArgs[i] = args[i - 1];
 			}
@@ -184,7 +183,7 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 			}
 
 			// Get task count
-			taskCount = countTasksToPerform(folder);
+			taskCount = countTasksToPerform(new File(dir));
 			if (taskCount > 0) {
 				taskExecutor.setTotalNumberOfTasks(taskCount);
 
@@ -194,17 +193,74 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 					if (singleEvaluation) {
 						runDirectory = folder;
 					} else {
-						runDirectory = new File(folder, Integer.toString(i));
+						runDirectory = new File(dir, Integer.toString(i));
 					}
 
 					// Perform simulation and metrics collection on the runs in
 					// Which it was not performed
 					File metricsLogFile = new File(runDirectory, "_metrics.log");
 					if (!metricsLogFile.exists()) {
-						System.out.printf("[%s] %s%n", getClass().getSimpleName(), metricsLogFile.getAbsolutePath());
-						launchMetricsCollectionTasks(i, runDirectory, jBotEvolver, newArgs);
-						collectMetricsResults(getGenerationNumberFromFile(new File(runDirectory, "_generationnumber")),
-								runDirectory);
+						System.out.printf("[%s] Working on run #%d%n", getClass().getSimpleName(), i);
+
+						// Get the show_best directory and sort the
+						// Configuration files
+						File showBestDirectory = new File(runDirectory, "show_best");
+						File[] files = showBestDirectory.listFiles();
+						sortByNumber(files);
+						int numberOfGenerations = files.length;
+
+						// Get the metrics for each of the generations
+						for (File file : files) {
+							int generation = Integer.valueOf(file.getName().substring(8, file.getName().indexOf(".")));
+
+							newArgs[0] = file.getAbsolutePath();
+							jBotEvolver = new JBotEvolver(newArgs);
+
+							JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),
+									jBotEvolver.getRandomSeed());
+							Chromosome chromosome = newJBot.getPopulation().getBestChromosome();
+
+							MetricsGenerationalTask t = new MetricsGenerationalTask(newJBot, i, 1, generation,
+									chromosome);
+							taskExecutor.addTask(t);
+
+							if (showOutput) {
+								System.out.print(".");
+							}
+
+							String name = dir.replace('/', '\\') + i + File.separatorChar + (generation + 1);
+							taskExecutor.setDescription(
+									name + " out of " + numberOfGenerations + " (total tasks: " + taskCount + ")");
+						}
+
+						if (showOutput) {
+							System.out.println();
+						}
+
+						// Collect all metrics
+						FormationTaskMetricsData[] data = new FormationTaskMetricsData[numberOfGenerations];
+						for (int gen = 0; gen < numberOfGenerations; gen++) {
+							MetricsResult combinedResult = (MetricsResult) taskExecutor.getResult();
+							data[gen] = (FormationTaskMetricsData) combinedResult.getMetricsData();
+						}
+
+						System.out.printf("[%s] Collected: %d%n", getClass().getSimpleName(), data.length);
+
+						// Generate log lines
+						if (saveOutput) {
+							StringBuffer metricsData = new StringBuffer();
+							metricsData.append(FormationTaskMetricsCodex.getEncodedMetricsFileHeader());
+							metricsData.append('\n');
+
+							for (int j = 0; j < data.length; j++) {
+								metricsData.append(FormationTaskMetricsCodex.encodeMetricsData(data[j]));
+								metricsData.append('\n');
+							}
+
+							FileWriter metricsLogFileWriter = new FileWriter(new File(runDirectory, "_metrics.log"));
+							metricsLogFileWriter.append(metricsData);
+							metricsLogFileWriter.close();
+						}
 					}
 				}
 
@@ -234,69 +290,5 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 		}
 
 		return tasks;
-	}
-
-	private void launchMetricsCollectionTasks(int run, File runDirectory, JBotEvolver jBotEvolver, String[] newArgs)
-			throws Exception {
-		// Get the show_best directory and sort the configuration
-		// Files
-		File showBestDirectory = new File(runDirectory, "show_best");
-		File[] files = showBestDirectory.listFiles();
-		sortByNumber(files);
-		int numberOfGenerations = files.length;
-
-		// Get the metrics for each of the generations
-		for (File file : files) {
-			int generation = Integer.valueOf(file.getName().substring(8, file.getName().indexOf(".")));
-
-			newArgs[0] = file.getAbsolutePath();
-			jBotEvolver = new JBotEvolver(newArgs);
-
-			JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(), jBotEvolver.getRandomSeed());
-			Chromosome chromosome = newJBot.getPopulation().getBestChromosome();
-
-			MetricsGenerationalTask t = new MetricsGenerationalTask(newJBot, run, 0, generation, chromosome);
-			taskExecutor.addTask(t);
-
-			if (showOutput) {
-				System.out.println(".");
-			}
-
-			if (showOutput)
-				System.out.println();
-
-			taskExecutor.setDescription(runDirectory.getAbsolutePath() + File.separatorChar + (generation + 1)
-					+ " out of " + numberOfGenerations + " (total tasks: " + taskCount + ")");
-
-			if (showOutput)
-				System.out.println();
-		}
-	}
-
-	private void collectMetricsResults(int generationsCount, File runDirectory) throws IOException {
-		// Collect all metrics
-		FormationTaskMetricsData[] data = new FormationTaskMetricsData[generationsCount];
-		for (int gen = 0; gen < generationsCount; gen++) {
-			MetricsResult combinedResult = (MetricsResult) taskExecutor.getResult();
-			data[gen] = (FormationTaskMetricsData) combinedResult.getMetricsData();
-		}
-
-		System.out.printf("[%s] Collected: %d%n", getClass().getSimpleName(), data.length);
-
-		// Generate log lines
-		if (saveOutput) {
-			StringBuffer metricsData = new StringBuffer();
-			metricsData.append(FormationTaskMetricsCodex.getEncodedMetricsFileHeader());
-			metricsData.append('\n');
-
-			for (int i = 0; i < data.length; i++) {
-				metricsData.append(FormationTaskMetricsCodex.encodeMetricsData(data[i]));
-				metricsData.append('\n');
-			}
-
-			FileWriter metricsLogFileWriter = new FileWriter(new File(runDirectory, "_metrics.log"));
-			metricsLogFileWriter.append(metricsData);
-			metricsLogFileWriter.close();
-		}
 	}
 }
