@@ -98,8 +98,13 @@ public class JBotEvolver extends JBotSim {
 						&& System.getProperty("os.name").toLowerCase().contains("win")) {
 					absolutePath = arguments.get("--output").getCompleteArgumentString().replace("\\", "/");
 				} else {
-					absolutePath = (new File("./" + arguments.get("--output").getCompleteArgumentString()))
-							.getCanonicalPath();
+					try {
+						absolutePath = (new File("./" + arguments.get("--output").getCompleteArgumentString()))
+								.getCanonicalPath();
+					} catch (IOException e) {
+						absolutePath = (new File(arguments.get("--output").getCompleteArgumentString()))
+								.getCanonicalPath();
+					}
 				}
 			}
 
