@@ -226,10 +226,13 @@ public class MetricsGenerationalTask extends JBotEvolverTask {
 	@Override
 	public Result getResult() {
 		MetricsData combinedMetricsData = metricsData.get(0);
+
 		if (metricsData.size() > 1) {
-			List<MetricsData> subList = metricsData.subList(1, metricsData.size() - 1);
+			List<MetricsData> subList = metricsData.subList(1, metricsData.size());
 			combinedMetricsData.combineMetricsData(subList);
 		}
+
+		combinedMetricsData.setGeneration(generation);
 		MetricsResult fr = new MetricsResult(getId(), run, chromosome.getID(), generation, combinedMetricsData);
 		return fr;
 	}
