@@ -200,7 +200,7 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 					// Which it was not performed
 					File metricsLogFile = new File(runDirectory, "_metrics.log");
 					if (!metricsLogFile.exists()) {
-						System.out.printf("[%s] Working on run #%d%n", getClass().getSimpleName(), i);
+						System.out.printf("[%s] Starting metrics collection on run #%d%n", getClass().getSimpleName(), i);
 
 						// Get the show_best directory and sort the
 						// Configuration files
@@ -244,7 +244,8 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 							data[gen] = (FormationTaskMetricsData) combinedResult.getMetricsData();
 						}
 
-						System.out.printf("[%s] Collected: %d%n", getClass().getSimpleName(), data.length);
+						System.out.printf("[%s] Run #%d - Collected results for %d generations%n",
+								getClass().getSimpleName(), i, data.length);
 
 						// Generate log lines
 						if (saveOutput) {
