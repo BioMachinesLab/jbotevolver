@@ -184,8 +184,14 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 					MetricsData metricsData = evaluationFunction.getMetricsData();
 					for (Method method : methodsTextFields.keySet()) {
 						try {
-							Object o = method.invoke(metricsData);
-							methodsTextFields.get(method).setText(o.toString());
+							Object object = method.invoke(metricsData);
+
+							if (method.getName().contains("getGeneration") && ((int) object) == -1) {
+								methodsTextFields.get(method).setText(
+										Integer.toString(jBotEvolver.getPopulation().getNumberOfCurrentGeneration()));
+							} else {
+								methodsTextFields.get(method).setText(object.toString());
+							}
 						} catch (IllegalAccessException | InvocationTargetException e) {
 							e.printStackTrace();
 						}
@@ -287,7 +293,6 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 				}
 			});
 		}
-
 	}
 
 	private boolean getMetricsGetMethods() {
