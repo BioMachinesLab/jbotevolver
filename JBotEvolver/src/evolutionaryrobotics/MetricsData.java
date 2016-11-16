@@ -11,13 +11,9 @@ public abstract class MetricsData implements Serializable {
 		this.generation = generation;
 	}
 
-	public int getGeneration() {
-		return generation;
-	}
+	public abstract int getGeneration();
 
-	public void setGeneration(int generation) {
-		this.generation = generation;
-	}
+	public abstract void setGeneration(int generation);
 
 	/**
 	 * This method merges the given MetricsData with the current metrics data.

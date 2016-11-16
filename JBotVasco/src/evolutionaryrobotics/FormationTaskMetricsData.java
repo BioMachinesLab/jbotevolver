@@ -18,6 +18,11 @@ public class FormationTaskMetricsData extends MetricsData {
 	}
 
 	// Setters
+	@Override
+	public void setGeneration(int generation) {
+		this.generation = generation;
+	}
+
 	public void setTimeInside_min(double timeInside_min) {
 		this.timeInside_min = timeInside_min;
 	}
@@ -59,6 +64,11 @@ public class FormationTaskMetricsData extends MetricsData {
 	}
 
 	// Getters
+	@Override
+	public int getGeneration() {
+		return generation;
+	}
+
 	public double getTimeInside_min() {
 		return timeInside_min;
 	}
