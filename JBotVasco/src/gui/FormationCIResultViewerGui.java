@@ -3,15 +3,17 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 
@@ -44,10 +46,11 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 	private JButton permutationMetricButton;
 	private JButton reocupationTimeButton;
 
-	private boolean createdMetricsPanel = false;
+	private boolean gotMetricsGetMethods = false;
 	private JPanel mainMetricsPanel;
-	private JPanel metricsPanel;
+	private JPanel metricsPanel = null;
 	private JCheckBox collectMetricsCheckBox;
+	private ArrayList<Method> metricsDataGetMethods;
 	private HashMap<Method, JTextField> methodsTextFields;
 
 	public FormationCIResultViewerGui(JBotSim jBotEvolver, Arguments args) {
@@ -164,98 +167,37 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 
 	@Override
 	protected void updateStatus() {
-		if (!createdMetricsPanel && collectMetricsCheckBox.isSelected()) {
-			HashMap<String, Arguments> args = jBotEvolver.getArguments();
-			if (simulator != null && args != null && evaluationFunction != null) {
-				MetricsData metricsData = evaluationFunction.getMetricsData();
+		if (enableDebugOptions) {
+			if (collectMetricsCheckBox.isSelected() && evaluationFunction.getMetricsData() != null) {
+				if (!gotMetricsGetMethods && simulator != null && jBotEvolver.getArguments() != null
+						&& evaluationFunction != null) {
+					gotMetricsGetMethods = getMetricsGetMethods();
 
-				if (metricsData != null && MetricsData.class.isInstance(metricsData)) {
-					Class<? extends MetricsData> metricsDataClass = metricsData.getClass();
-
-					methodsTextFields = new HashMap<Method, JTextField>();
-					metricsPanel = new JPanel();
-
-					JPanel labelsPanel = new JPanel();
-					JPanel textFieldsPanel = new JPanel();
-					ArrayList<Method> methods = new ArrayList<Method>();
-					for (Method method : metricsDataClass.getDeclaredMethods()) {
-						if (method.getName().contains("get")) {
-							methods.add(method);
-						}
+					if (gotMetricsGetMethods) {
+						buildMethodsPanel(metricsDataGetMethods);
+					}
+				} else {
+					if (metricsPanel == null && !metricsDataGetMethods.isEmpty()) {
+						buildMethodsPanel(metricsDataGetMethods);
 					}
 
-					methods.sort(new Comparator<Method>() {
-
-						@Override
-						public int compare(Method method1, Method method2) {
-							String method1Name = method1.getName();
-							String method2Name = method2.getName();
-
-							return method1Name.compareTo(method2Name);
-						}
-					});
-
-					for (Method method : methods) {
-						String[] split = method.getName().split("\\.");
-						String name = split[split.length - 1].replace("get", "");
-
-						labelsPanel.add(new JLabel(name + ":"));
-
-						JTextField textField = new JTextField("N/A");
-						textField.setHorizontalAlignment(JTextField.CENTER);
-						textField.setEditable(false);
-
-						Dimension preferredSize = textField.getPreferredSize();
-						preferredSize.width += 10;
-						textField.setPreferredSize(preferredSize);
-						textFieldsPanel.add(textField);
-
-						methodsTextFields.put(method, textField);
-					}
-
-					labelsPanel.setLayout(new GridLayout(methods.size(), 1));
-					textFieldsPanel.setLayout(new GridLayout(methods.size(), 1));
-
-					metricsPanel.setLayout(new BorderLayout());
-					metricsPanel.add(labelsPanel, BorderLayout.WEST);
-					metricsPanel.add(textFieldsPanel, BorderLayout.CENTER);
-
-					mainMetricsPanel.add(metricsPanel, BorderLayout.CENTER);
-
-					mainMetricsPanel.validate();
-					mainMetricsPanel.repaint();
-
-					debugOptions.repaint();
-
-					if (rightWrapperPanel instanceof JScrollPane) {
-						JViewport viewport = ((JScrollPane) rightWrapperPanel).getViewport();
-						Component[] components = viewport.getComponents();
-
-						for (Component component : components) {
-							component.validate();
-							component.repaint();
+					MetricsData metricsData = evaluationFunction.getMetricsData();
+					for (Method method : methodsTextFields.keySet()) {
+						try {
+							Object o = method.invoke(metricsData);
+							methodsTextFields.get(method).setText(o.toString());
+						} catch (IllegalAccessException | InvocationTargetException e) {
+							e.printStackTrace();
 						}
 					}
-
-					rightWrapperPanel.repaint();
-					validate();
-
-					createdMetricsPanel = true;
 				}
-			}
-		} else if (collectMetricsCheckBox.isSelected()) {
-			MetricsData metricsData = evaluationFunction.getMetricsData();
-			for (Method method : methodsTextFields.keySet()) {
-				try {
-					Object o = method.invoke(metricsData);
-					methodsTextFields.get(method).setText(o.toString());
-				} catch (IllegalAccessException | InvocationTargetException e) {
-					e.printStackTrace();
-				}
+			} else if (evaluationFunction.isCollectingMetrics() && metricsPanel != null) {
+				clearMetricsPanel();
 			}
 		}
 
 		super.updateStatus();
+
 	}
 
 	@Override
@@ -266,8 +208,15 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 				evaluationFunction.setCollectMetrics(collectMetricsCheckBox.isSelected());
 
 				if (collectMetricsCheckBox.isSelected()) {
-					createdMetricsPanel = false;
+					gotMetricsGetMethods = false;
 				}
+			}
+
+			if (metricsPanel != null) {
+				clearMetricsPanel();
+
+				gotMetricsGetMethods = false;
+				metricsDataGetMethods.clear();
 			}
 		}
 
@@ -310,7 +259,134 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 					plotGraph(MetricsType.REOCUPATION_TIME);
 				}
 			});
+
+			collectMetricsCheckBox.addItemListener(new ItemListener() {
+
+				@Override
+				public void itemStateChanged(ItemEvent e) {
+					if (simulator != null) {
+						if (e.getStateChange() == ItemEvent.SELECTED) {
+							if (!evaluationFunction.isCollectingMetrics()) {
+								int currentTime = simulator.getTime().intValue();
+								int status = simulationState;
+
+								loadCurrentFile();
+								simulateUntil = currentTime;
+								simulationState = status;
+								startPauseButton();
+							}
+
+							if (simulationState == PAUSED || simulationState == ENDED) {
+								updateStatus();
+							}
+						} else if (e.getStateChange() == ItemEvent.DESELECTED
+								&& (simulationState == PAUSED || simulationState == ENDED)) {
+							updateStatus();
+						}
+					}
+				}
+			});
 		}
+
+	}
+
+	private boolean getMetricsGetMethods() {
+		MetricsData metricsData = evaluationFunction.getMetricsData();
+
+		if (metricsData != null && MetricsData.class.isInstance(metricsData)) {
+			Class<? extends MetricsData> metricsDataClass = metricsData.getClass();
+
+			metricsDataGetMethods = new ArrayList<Method>();
+			for (Method method : metricsDataClass.getDeclaredMethods()) {
+				if (method.getName().contains("get")) {
+					metricsDataGetMethods.add(method);
+				}
+			}
+			metricsDataGetMethods.sort(new Comparator<Method>() {
+
+				@Override
+				public int compare(Method method1, Method method2) {
+					String method1Name = method1.getName();
+					String method2Name = method2.getName();
+
+					return method1Name.compareTo(method2Name);
+				}
+			});
+
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private void buildMethodsPanel(Collection<Method> methods) {
+		JPanel labelsPanel = new JPanel();
+		JPanel textFieldsPanel = new JPanel();
+		methodsTextFields = new HashMap<Method, JTextField>();
+		for (Method method : methods) {
+			String[] split = method.getName().split("\\.");
+			String name = split[split.length - 1].replace("get", "");
+
+			labelsPanel.add(new JLabel(name + ":"));
+
+			JTextField textField = new JTextField("N/A", 8);
+			textField.setHorizontalAlignment(JTextField.CENTER);
+			textField.setEditable(false);
+			textFieldsPanel.add(textField);
+
+			methodsTextFields.put(method, textField);
+		}
+
+		labelsPanel.setLayout(new GridLayout(methodsTextFields.keySet().size(), 1));
+		textFieldsPanel.setLayout(new GridLayout(methodsTextFields.keySet().size(), 1));
+
+		metricsPanel = new JPanel();
+		metricsPanel.setLayout(new BorderLayout());
+		metricsPanel.add(labelsPanel, BorderLayout.WEST);
+		metricsPanel.add(textFieldsPanel, BorderLayout.CENTER);
+
+		mainMetricsPanel.add(metricsPanel, BorderLayout.CENTER);
+		mainMetricsPanel.validate();
+		mainMetricsPanel.repaint();
+
+		debugOptions.repaint();
+
+		if (rightWrapperPanel instanceof JScrollPane) {
+			JViewport viewport = ((JScrollPane) rightWrapperPanel).getViewport();
+			Component[] components = viewport.getComponents();
+
+			for (Component component : components) {
+				component.validate();
+				component.repaint();
+			}
+		}
+		rightWrapperPanel.repaint();
+		validate();
+	}
+
+	private void clearMetricsPanel() {
+		metricsPanel.removeAll();
+		metricsPanel = null;
+
+		methodsTextFields.clear();
+
+		mainMetricsPanel.validate();
+		mainMetricsPanel.repaint();
+
+		debugOptions.repaint();
+
+		if (rightWrapperPanel instanceof JScrollPane) {
+			JViewport viewport = ((JScrollPane) rightWrapperPanel).getViewport();
+			Component[] components = viewport.getComponents();
+
+			for (Component component : components) {
+				component.validate();
+				component.repaint();
+			}
+		}
+
+		rightWrapperPanel.repaint();
+		validate();
 	}
 
 	private void plotGraph(MetricsType type) {
