@@ -19,6 +19,14 @@ public abstract class EvaluationFunction implements Serializable, Updatable {
 		collectMetrics = arguments.getArgumentAsIntOrSetDefault("collectMetrics", 0) == 1;
 	}
 
+	public void setCollectMetrics(boolean collectMetrics) {
+		this.collectMetrics = collectMetrics;
+	}
+
+	public boolean isCollectingMetrics() {
+		return collectMetrics;
+	}
+
 	public double getFitness() {
 		return fitness;
 	}
