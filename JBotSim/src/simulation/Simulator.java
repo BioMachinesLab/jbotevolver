@@ -1,7 +1,5 @@
 package simulation;
 
-import gui.Gui;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
