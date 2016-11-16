@@ -45,7 +45,6 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
-import javax.swing.SpringLayout;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -65,7 +64,6 @@ import gui.util.Editor;
 import gui.util.GraphPlotter;
 import gui.util.GraphViz;
 import gui.util.PostEvaluationData;
-import gui.util.SpringUtilities;
 import simulation.JBotSim;
 import simulation.Simulator;
 import simulation.Updatable;
@@ -90,8 +88,9 @@ public class ResultViewerGui extends Gui implements Updatable {
 
 	protected int sleepBetweenControlSteps = 10;
 
-	protected JPanel leftWrapperPanel;
-	protected JPanel rightAndCenterWrapperPanel;
+	protected Container leftWrapperPanel;
+	protected Container rightWrapperPanel;
+	protected Container rightAndCenterWrapperPanel;
 	protected JPanel treeWrapper;
 	protected JPanel debugOptions;
 	protected JPanel extraOptionsPanel;
@@ -163,8 +162,10 @@ public class ResultViewerGui extends Gui implements Updatable {
 		setLayout(new BorderLayout());
 
 		leftWrapperPanel = initLeftWrapperPanel();
+		rightWrapperPanel = initRightWrapperPanel();
+
 		rightAndCenterWrapperPanel = new JPanel(new BorderLayout());
-		rightAndCenterWrapperPanel.add(initRightWrapperPanel(), BorderLayout.EAST);
+		rightAndCenterWrapperPanel.add(rightWrapperPanel, BorderLayout.EAST);
 
 		JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftWrapperPanel,
 				rightAndCenterWrapperPanel);
@@ -187,8 +188,6 @@ public class ResultViewerGui extends Gui implements Updatable {
 		leftWrapperPanel.setMinimumSize(minimumSize);
 		rightAndCenterWrapperPanel.setMinimumSize(minimumSize);
 
-		// add(initRightWrapperPanel(), BorderLayout.EAST);
-		// add(initLeftWrapperPanel(), BorderLayout.WEST);
 		add(splitPane);
 
 		initActions();
@@ -197,7 +196,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 		setVisible(true);
 	}
 
-	protected JPanel initLeftWrapperPanel() {
+	protected Container initLeftWrapperPanel() {
 
 		treeWrapper = new JPanel(new BorderLayout());
 
@@ -245,24 +244,21 @@ public class ResultViewerGui extends Gui implements Updatable {
 	}
 
 	protected Container initRightWrapperPanel() {
-
-		int panelWidth = 300;
-
-		JPanel sideTopPanel = new JPanel();
-		sideTopPanel.setLayout(new BoxLayout(sideTopPanel, BoxLayout.Y_AXIS));
+		JPanel rightWrapperPanel = new JPanel();
+		rightWrapperPanel.setLayout(new BoxLayout(rightWrapperPanel, BoxLayout.Y_AXIS));
 
 		pauseButton = new JButton("Start/Pause");
 		plotButton = new JButton("Plot Neural Activations");
 
 		pauseButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sideTopPanel.add(pauseButton);
+		rightWrapperPanel.add(pauseButton);
 		plotButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sideTopPanel.add(plotButton);
+		rightWrapperPanel.add(plotButton);
 
-		sideTopPanel.add(new JLabel(" "));
+		rightWrapperPanel.add(new JLabel(" "));
 
 		JLabel sleep = new JLabel("Sleep between control steps (ms)");
-		sideTopPanel.add(sleep);
+		rightWrapperPanel.add(sleep);
 		sleep.setAlignmentX(Component.CENTER_ALIGNMENT);
 
 		sleepSlider.setMajorTickSpacing(20);
@@ -272,18 +268,18 @@ public class ResultViewerGui extends Gui implements Updatable {
 		sleepSlider.setValue(10);
 
 		sleepSlider.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sideTopPanel.add(sleepSlider);
+		rightWrapperPanel.add(sleepSlider);
 
-		sideTopPanel.add(new JLabel("Play position (%)"));
+		rightWrapperPanel.add(new JLabel("Play position (%)"));
 		playPosition.setMajorTickSpacing(20);
 		playPosition.setMinorTickSpacing(5);
 		playPosition.setPaintTicks(true);
 		playPosition.setPaintLabels(true);
 		playPosition.setValue(0);
 		playPosition.setAlignmentX(Component.CENTER_ALIGNMENT);
-		sideTopPanel.add(playPosition);
+		rightWrapperPanel.add(playPosition);
 
-		sideTopPanel.add(new JLabel(" "));
+		rightWrapperPanel.add(new JLabel(" "));
 
 		// Status panel
 		JPanel statusPanel = new JPanel(new GridLayout(3, 2));
@@ -301,17 +297,15 @@ public class ResultViewerGui extends Gui implements Updatable {
 		fitnessTextField.setEditable(false);
 		statusPanel.add(fitnessTextField);
 
-		sideTopPanel.add(statusPanel);
-		statusPanel.setPreferredSize(new Dimension(panelWidth, 100));
+		rightWrapperPanel.add(statusPanel);
 
 		JPanel sideWrapperPanel = new JPanel(new BorderLayout());
-		sideWrapperPanel.add(sideTopPanel, BorderLayout.NORTH);
+		sideWrapperPanel.add(rightWrapperPanel, BorderLayout.NORTH);
 		sideWrapperPanel.setBorder(BorderFactory.createTitledBorder("Controls"));
 
 		if (enableDebugOptions) {
 			debugOptions = new JPanel();
-			SpringLayout layout = new SpringLayout();
-			debugOptions.setLayout(layout);
+			debugOptions.setLayout(new BoxLayout(debugOptions, BoxLayout.Y_AXIS));
 
 			extraOptionsPanel = new JPanel(new GridLayout(2, 1));
 			extraOptionsPanel.setLayout(new GridLayout(2, 1));
@@ -355,15 +349,8 @@ public class ResultViewerGui extends Gui implements Updatable {
 			annPanel.add(totalNeuronsTextField);
 			debugOptions.add(annPanel);
 
-			SpringUtilities.makeGrid(debugOptions, 2, 1, // rows, cols
-					0, 0, // initialX, initialY
-					10, 10);
-			sideTopPanel.add(debugOptions, BorderLayout.SOUTH);
-
+			rightWrapperPanel.add(debugOptions, BorderLayout.SOUTH);
 		}
-
-		pauseButton.setPreferredSize(new Dimension(panelWidth, 50));
-		plotButton.setPreferredSize(new Dimension(panelWidth, 50));
 
 		return sideWrapperPanel;
 	}
