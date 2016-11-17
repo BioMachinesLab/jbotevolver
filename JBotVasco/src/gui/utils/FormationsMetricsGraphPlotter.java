@@ -3,6 +3,7 @@ package gui.utils;
 import java.awt.BorderLayout;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -60,9 +61,25 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 		setVisible(true);
 	}
 
-	private void loadMetricsDataOnGraph(Graph graph, ArrayList<FormationTaskMetricsData> metricsData, File file, MetricsType type) {
+	private void loadMetricsDataOnGraph(Graph graph, ArrayList<FormationTaskMetricsData> metricsData, File file,
+			MetricsType type) {
 		// Instead of differentiate, just create three arrays and use only the
 		// needed ones
+		metricsData.sort(new Comparator<FormationTaskMetricsData>() {
+			@Override
+			public int compare(FormationTaskMetricsData o1, FormationTaskMetricsData o2) {
+				if (o1.getGeneration() < o2.getGeneration()) {
+					return -1;
+				} else {
+					if (o1.getGeneration() > o2.getGeneration()) {
+						return 1;
+					} else {
+						return 0;
+					}
+				}
+			}
+		});
+
 		Double[] dataList_0 = new Double[metricsData.size()];
 		Double[] dataList_1 = new Double[metricsData.size()];
 		Double[] dataList_2 = new Double[metricsData.size()];
