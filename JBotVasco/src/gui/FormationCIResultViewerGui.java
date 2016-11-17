@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -34,6 +35,7 @@ import javax.swing.tree.TreePath;
 import environment.target.FormationMultiTargetEnvironment;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.MetricsData;
+import evolutionaryrobotics.evaluationfunctions.KeepPositionInTargetEvaluationFunction;
 import gui.utils.FormationsMetricsGraphPlotter;
 import gui.utils.FormationsMetricsGraphPlotter.MetricsType;
 import simulation.JBotSim;
@@ -181,11 +183,11 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 					gotMetricsGetMethods = getMetricsGetMethods();
 
 					if (gotMetricsGetMethods) {
-						buildMethodsPanel(metricsDataGetMethods);
+						buildMetricsPanel(metricsDataGetMethods);
 					}
 				} else {
 					if (metricsPanel == null && !metricsDataGetMethods.isEmpty()) {
-						buildMethodsPanel(metricsDataGetMethods);
+						buildMetricsPanel(metricsDataGetMethods);
 					}
 
 					synchronized (methodsTextFields) {
@@ -198,7 +200,12 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 									methodsTextFields.get(method).setText(Integer
 											.toString(jBotEvolver.getPopulation().getNumberOfCurrentGeneration()));
 								} else {
-									methodsTextFields.get(method).setText(object.toString());
+									if (object instanceof Double) {
+										methodsTextFields.get(method)
+												.setText(new DecimalFormat("#.######").format(object));
+									} else {
+										methodsTextFields.get(method).setText(object.toString());
+									}
 								}
 							} catch (IllegalAccessException | InvocationTargetException e) {
 								e.printStackTrace();
@@ -350,7 +357,7 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 		}
 	}
 
-	private void buildMethodsPanel(Collection<Method> methods) {
+	private void buildMetricsPanel(Collection<Method> methods) {
 		JPanel labelsPanel = new JPanel();
 		JPanel textFieldsPanel = new JPanel();
 		methodsTextFields = new HashMap<Method, JTextField>();
@@ -393,6 +400,10 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 		}
 		rightWrapperPanel.repaint();
 		validate();
+
+		if (evaluationFunction instanceof KeepPositionInTargetEvaluationFunction) {
+			((KeepPositionInTargetEvaluationFunction) evaluationFunction).setContinuousMetricsUpdate(true);
+		}
 	}
 
 	private void clearMetricsPanel() {
