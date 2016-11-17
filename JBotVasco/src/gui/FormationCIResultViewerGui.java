@@ -31,6 +31,7 @@ import javax.swing.JViewport;
 import javax.swing.KeyStroke;
 import javax.swing.tree.TreePath;
 
+import environment.target.FormationMultiTargetEnvironment;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.MetricsData;
 import gui.utils.FormationsMetricsGraphPlotter;
@@ -45,6 +46,10 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 	private JButton timeUntilFirstOccupationButton;
 	private JButton permutationMetricButton;
 	private JButton reocupationTimeButton;
+
+	private JPanel faultInjectionPanel;
+	private JTextField faultInjectionStepTextField;
+	private boolean updateFaultInjectionPanel = false;
 
 	private boolean gotMetricsGetMethods = false;
 	private JPanel mainMetricsPanel;
@@ -68,6 +73,9 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 		Container panel = super.initRightWrapperPanel();
 
 		if (enableDebugOptions) {
+			faultInjectionPanel = new JPanel(new GridLayout(1, 2));
+			debugOptions.add(faultInjectionPanel);
+
 			// Metrics info
 			mainMetricsPanel = new JPanel(new BorderLayout());
 			mainMetricsPanel.setBorder(BorderFactory.createTitledBorder("Metrics"));
@@ -76,7 +84,6 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 			collectMetricsCheckBox.setHorizontalAlignment(JCheckBox.CENTER);
 
 			mainMetricsPanel.add(collectMetricsCheckBox, BorderLayout.NORTH);
-
 			debugOptions.add(mainMetricsPanel);
 		}
 
@@ -181,24 +188,33 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 						buildMethodsPanel(metricsDataGetMethods);
 					}
 
-					MetricsData metricsData = evaluationFunction.getMetricsData();
-					for (Method method : methodsTextFields.keySet()) {
-						try {
-							Object object = method.invoke(metricsData);
+					synchronized (methodsTextFields) {
+						MetricsData metricsData = evaluationFunction.getMetricsData();
+						for (Method method : methodsTextFields.keySet()) {
+							try {
+								Object object = method.invoke(metricsData);
 
-							if (method.getName().contains("getGeneration") && ((int) object) == -1) {
-								methodsTextFields.get(method).setText(
-										Integer.toString(jBotEvolver.getPopulation().getNumberOfCurrentGeneration()));
-							} else {
-								methodsTextFields.get(method).setText(object.toString());
+								if (method.getName().contains("getGeneration") && ((int) object) == -1) {
+									methodsTextFields.get(method).setText(Integer
+											.toString(jBotEvolver.getPopulation().getNumberOfCurrentGeneration()));
+								} else {
+									methodsTextFields.get(method).setText(object.toString());
+								}
+							} catch (IllegalAccessException | InvocationTargetException e) {
+								e.printStackTrace();
 							}
-						} catch (IllegalAccessException | InvocationTargetException e) {
-							e.printStackTrace();
 						}
 					}
 				}
 			} else if (evaluationFunction.isCollectingMetrics() && metricsPanel != null) {
 				clearMetricsPanel();
+			}
+
+			if (updateFaultInjectionPanel) {
+				FormationMultiTargetEnvironment environment = (FormationMultiTargetEnvironment) simulator
+						.getEnvironment();
+				faultInjectionStepTextField.setText(Integer.toString(environment.getTimestepToInjectFaults()));
+				updateFaultInjectionPanel = false;
 			}
 		}
 
@@ -210,6 +226,15 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 	public Simulator loadSimulator() {
 		Simulator simulator = super.loadSimulator();
 		if (simulator != null) {
+			if (simulator.getEnvironment() instanceof FormationMultiTargetEnvironment
+					&& ((FormationMultiTargetEnvironment) simulator.getEnvironment()).isFaultInjectionActive()) {
+				buildFaultInjectionPanel();
+				updateFaultInjectionPanel = true;
+			} else {
+				clearFaultInjectionPanel();
+				updateFaultInjectionPanel = false;
+			}
+
 			if (evaluationFunction.getMetricsData() == null) {
 				evaluationFunction.setCollectMetrics(collectMetricsCheckBox.isSelected());
 
@@ -227,6 +252,7 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 		}
 
 		return simulator;
+
 	}
 
 	@Override
@@ -392,6 +418,57 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 
 		rightWrapperPanel.repaint();
 		validate();
+	}
+
+	private void buildFaultInjectionPanel() {
+		faultInjectionPanel.removeAll();
+
+		faultInjectionPanel.setBorder(BorderFactory.createTitledBorder("Fault injection"));
+		faultInjectionPanel.add(new JLabel("Injection step:"));
+
+		faultInjectionStepTextField = new JTextField("N/A", 8);
+		faultInjectionStepTextField.setHorizontalAlignment(JTextField.CENTER);
+		faultInjectionStepTextField.setEditable(false);
+		faultInjectionPanel.add(faultInjectionStepTextField);
+
+		faultInjectionPanel.validate();
+		faultInjectionPanel.repaint();
+		debugOptions.repaint();
+
+		if (rightWrapperPanel instanceof JScrollPane) {
+			JViewport viewport = ((JScrollPane) rightWrapperPanel).getViewport();
+			Component[] components = viewport.getComponents();
+
+			for (Component component : components) {
+				component.validate();
+				component.repaint();
+			}
+		}
+
+		rightWrapperPanel.repaint();
+		validate();
+	}
+
+	private void clearFaultInjectionPanel() {
+		if (faultInjectionPanel != null) {
+			faultInjectionPanel.removeAll();
+			faultInjectionPanel.setBorder(null);
+
+			debugOptions.repaint();
+
+			if (rightWrapperPanel instanceof JScrollPane) {
+				JViewport viewport = ((JScrollPane) rightWrapperPanel).getViewport();
+				Component[] components = viewport.getComponents();
+
+				for (Component component : components) {
+					component.validate();
+					component.repaint();
+				}
+			}
+
+			rightWrapperPanel.repaint();
+			validate();
+		}
 	}
 
 	private void plotGraph(MetricsType type) {
