@@ -12,7 +12,7 @@ import src.Main;
 public class AMain {
 	private static final boolean CONFIRM_OVERRIDE = false;
 	private static final String path = "./experiments_automator/";
-	private static final String[] configFiles = { "targetFollowing_automator_test.conf" };
+	private static final String[] configFiles = { "targetFollowing_automator.conf" };
 	private HashMap<String, Evolver> evolverInstances = new HashMap<String, Evolver>();
 	private long initTime;
 
