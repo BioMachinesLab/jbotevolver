@@ -96,19 +96,10 @@ public class Robot extends MovableObject {
 	/**
 	 * Initialize a new robot.
 	 * 
-	 * @param name
-	 *            human readable name (for debugging and logging purposes)
-	 * @param x
-	 *            the x-coordinate of the robot's start location
-	 * @param y
-	 *            the y-coordinate of the robot's start location
-	 * @param orientation
-	 *            the robot's start orientation
-	 * @param mass
-	 *            the mass of the robot
-	 * @param radius
-	 *            the radius of the robot
-	 * @param color
+	 * @param simulator
+	 *            A instance of the simulator
+	 * @param args
+	 *            The arguments to use on robot initialization
 	 */
 	public Robot(Simulator simulator, Arguments args) {
 		super(simulator, args);
@@ -151,7 +142,6 @@ public class Robot extends MovableObject {
 	 * 
 	 * @return the reference to the controller for the robot (or null)
 	 */
-
 	public Controller getController() {
 		return controller;
 	}
@@ -201,7 +191,6 @@ public class Robot extends MovableObject {
 	 * @param sensor
 	 *            the new sensor to associate to the robot
 	 */
-
 	public void addSensor(Sensor sensor) {
 		sensors.add(sensor);
 	}
@@ -311,7 +300,6 @@ public class Robot extends MovableObject {
 	 * @param simulationStep
 	 * @param teleported
 	 */
-
 	public void updateCloseObjects(Double simulationStep, ArrayList<PhysicalObject> teleported) {
 		shape.getCloseRobot().update(simulationStep, teleported);
 	}
@@ -414,7 +402,6 @@ public class Robot extends MovableObject {
 	 * @param color
 	 *            array with length three.
 	 */
-
 	public void setBodyColor(double[] color) {
 		this.bodyColor = color;
 	}
@@ -434,7 +421,7 @@ public class Robot extends MovableObject {
 		return description;
 	}
 
-	public Sensor getSensorByType(Class sensorClass) {
+	public Sensor getSensorByType(Class<? extends Sensor> sensorClass) {
 		for (Sensor s : sensors) {
 			if (s.getClass().equals(sensorClass))
 				return s;
@@ -442,7 +429,7 @@ public class Robot extends MovableObject {
 		return null;
 	}
 
-	public Actuator getActuatorByType(Class actuatorClass) {
+	public Actuator getActuatorByType(Class<? extends Actuator> actuatorClass) {
 		for (Actuator a : actuators) {
 			if (a.getClass().equals(actuatorClass))
 				return a;
@@ -559,5 +546,4 @@ public class Robot extends MovableObject {
 	public boolean ignoreWallCollisions() {
 		return false;
 	}
-
 }
