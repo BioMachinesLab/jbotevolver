@@ -73,7 +73,6 @@ public class MetricsGenerationalTask extends JBotEvolverTask {
 		Arguments envArgs = args.get("--environment");
 		if (envArgs.getArgumentAsString("classname").equals(FormationMultiTargetEnvironment.class.getName())) {
 			launchTasks(args, robotsQuantity);
-			System.out.print("!");
 		} else {
 			System.err.printf("[%s] Invalid environment to use this task type.%n", this.getClass().getName());
 			System.exit(0);
