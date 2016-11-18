@@ -65,10 +65,6 @@ public abstract class Controller extends SimulatorObject {
 		
 		return (Controller)Factory.getInstance(arguments.getArgumentAsString("classname"),simulator,robot,arguments);
 	}
-
-	public void controlStep(double time, double d) {
-		controlStep(time);
-	}
 	
 	public void controlStep(double time) {}
 }
