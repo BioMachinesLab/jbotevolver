@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -548,10 +549,6 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 				}
 			}
 
-			if (files.isEmpty()) {
-				System.out.println("Empty!");
-			}
-
 			if (files != null && !files.isEmpty()) {
 				new FormationsMetricsGraphPlotter(files.toArray(new String[files.size()]), type);
 			} else {
@@ -563,38 +560,41 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 		 * Recursively look for a file in the supplied folder
 		 */
 		private String getMetricsFiles(String folder) {
-			File f = new File(folder + "/_metrics.log");
+			if (folder == null) {
+				JOptionPane.showMessageDialog(null, "No folders selected!", "Error", JOptionPane.ERROR_MESSAGE);
+				return null;
+			}
 
-			try {
-				if (f.exists()) {
-					return f.getAbsolutePath();
+			File folderFile = new File(folder);
+			File[] files = folderFile.listFiles(new FileFilter() {
+
+				@Override
+				public boolean accept(File pathname) {
+					return pathname.getName().contains("_metrics");
+				}
+			});
+
+			String result = "";
+			for (File file : files) {
+				if (file.isFile()) {
+					result += file.getAbsolutePath() + "###";
 				} else {
-					if (folder == null) {
-						JOptionPane.showMessageDialog(null, "No folders selected!", "Error", JOptionPane.ERROR_MESSAGE);
-						return null;
-					} else {
-						String[] directories = (new File(folder)).list(new FilenameFilter() {
-							@Override
-							public boolean accept(File dir, String name) {
-								return (new File(dir, name)).isDirectory();
-							}
-						});
-						String result = "";
-						if (directories != null) {
-							for (String dir : directories) {
-								String dirResult = getMetricsFiles(folder + "/" + dir);
-								if (!dirResult.isEmpty())
-									result += dirResult + "###";
-							}
+					String[] directories = (new File(folder)).list(new FilenameFilter() {
+						@Override
+						public boolean accept(File dir, String name) {
+							return (new File(dir, name)).isDirectory();
 						}
-
-						return result;
+					});
+					if (directories != null) {
+						for (String dir : directories) {
+							String dirResult = getMetricsFiles(folder + File.separatorChar + dir);
+							if (!dirResult.isEmpty())
+								result += dirResult + "###";
+						}
 					}
 				}
-			} catch (Exception e) {
-				e.printStackTrace();
 			}
-			return "";
+			return result;
 		}
 	}
 }
