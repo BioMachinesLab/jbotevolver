@@ -20,17 +20,18 @@ public class AutomatorEvolution extends Evolution {
 		Thread.sleep(2000); // Make sure that all files have been written to the
 							// Disk
 
-		if (p == null) {
-			Arguments postArguments = controller.getArguments("--postevaluation");
-			String stringArguments = "dir=" + outputFolder;
-			if (postArguments != null) {
-				for (String arg : postArguments.getArguments())
+		Arguments postArguments = controller.getArguments("--postevaluation");
+		String stringArguments = "dir=" + outputFolder;
+		if (postArguments != null) {
+			for (String arg : postArguments.getArguments()) {
+				if (!arg.contains("steps")) {
 					stringArguments += " " + arg + "=" + postArguments.getArgumentAsString(arg);
+				}
 			}
-			p = new NEATTargetPostEvaluation(stringArguments.split(" "));
 		}
-		
-		System.out.printf("[%s] Finished post evolution, starting metrics collection%n",getClass().getSimpleName());
+		p = new NEATTargetPostEvaluation(stringArguments.split(" "));
+
+		System.out.printf("[%s] Finished post evolution, starting metrics collection%n", getClass().getSimpleName());
 		p.runMetricsEval();
 
 		return toReturn;
