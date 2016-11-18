@@ -2,6 +2,7 @@ package evolutionaryrobotics;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.HashMap;
 
 import evolutionaryrobotics.neuralnetworks.Chromosome;
 import evolutionaryrobotics.populations.Population;
@@ -217,8 +218,11 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 							newArgs[0] = file.getAbsolutePath();
 							jBotEvolver = new JBotEvolver(newArgs);
 
-							JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),
-									jBotEvolver.getRandomSeed());
+							HashMap<String, Arguments> arguments = jBotEvolver.getArgumentsCopy();
+							arguments.get("--evolution").setArgument("halfhalfFaults", 1);
+							arguments.get("--environment").setArgument("injectFaults", 1);
+
+							JBotEvolver newJBot = new JBotEvolver(arguments, jBotEvolver.getRandomSeed());
 							Chromosome chromosome = newJBot.getPopulation().getBestChromosome();
 
 							MetricsGenerationalTask t = new MetricsGenerationalTask(newJBot, i, 1, generation,
@@ -243,6 +247,7 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 						for (int gen = 0; gen < numberOfGenerations; gen++) {
 							MetricsResult combinedResult = (MetricsResult) taskExecutor.getResult();
 							data[gen] = (FormationTaskMetricsData) combinedResult.getMetricsData();
+							System.out.print("!");
 						}
 
 						System.out.printf("[%s] Run #%d - Collected results for %d generations%n",
