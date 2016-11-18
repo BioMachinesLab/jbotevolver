@@ -135,6 +135,11 @@ public class FormationTaskMetricsData extends MetricsData {
 		double sum_reocupationTime_avg = reocupationTime_avg;
 
 		double metricsCount = 1;
+		double reocupationCount = 0;
+		if (reocupationTime_max > 0) {
+			reocupationCount++;
+		}
+
 		for (MetricsData m : metricsData) {
 			if (m instanceof FormationTaskMetricsData) {
 				FormationTaskMetricsData formData = (FormationTaskMetricsData) m;
@@ -145,8 +150,9 @@ public class FormationTaskMetricsData extends MetricsData {
 				if (formData.getNumberDiffSpotsOccupied_min() < numberDiffSpotsOccupied_min) {
 					numberDiffSpotsOccupied_min = formData.getNumberDiffSpotsOccupied_min();
 				}
-				if (formData.getReocupationTime_min() < reocupationTime_min) {
+				if (formData.getReocupationTime_min() > 0 && formData.getReocupationTime_min() < reocupationTime_min) {
 					reocupationTime_min = formData.getReocupationTime_min();
+					reocupationCount++;
 				}
 
 				// Averages calculations
@@ -162,7 +168,7 @@ public class FormationTaskMetricsData extends MetricsData {
 				if (formData.getNumberDiffSpotsOccupied_max() > numberDiffSpotsOccupied_max) {
 					numberDiffSpotsOccupied_max = formData.getNumberDiffSpotsOccupied_max();
 				}
-				if (formData.getReocupationTime_max() > reocupationTime_max) {
+				if (formData.getReocupationTime_min() > 0 && formData.getReocupationTime_max() > reocupationTime_max) {
 					reocupationTime_max = formData.getReocupationTime_max();
 				}
 
@@ -173,6 +179,6 @@ public class FormationTaskMetricsData extends MetricsData {
 		timeInside_avg = sum_timeInside_avg / metricsCount;
 		timeFirstTotalOccup = sum_timeFirstTotalOccup / metricsCount;
 		numberDiffSpotsOccupied_avg = sum_numberDiffSpotsOccupied_avg / metricsCount;
-		reocupationTime_avg = sum_reocupationTime_avg / metricsCount;
+		reocupationTime_avg = sum_reocupationTime_avg / reocupationCount;
 	}
 }
