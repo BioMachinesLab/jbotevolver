@@ -200,7 +200,8 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 					// Which it was not performed
 					File metricsLogFile = new File(runDirectory, "_metrics.log");
 					if (!metricsLogFile.exists()) {
-						System.out.printf("[%s] Starting metrics collection on run #%d%n", getClass().getSimpleName(), i);
+						System.out.printf("[%s] Starting metrics collection on run #%d%n", getClass().getSimpleName(),
+								i);
 
 						// Get the show_best directory and sort the
 						// Configuration files
