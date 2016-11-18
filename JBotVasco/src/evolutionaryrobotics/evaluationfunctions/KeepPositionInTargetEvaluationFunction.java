@@ -50,7 +50,6 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 	private HashMap<AquaticDroneCI, ArrayList<Target>> visitedTargetsPerRobot = new HashMap<AquaticDroneCI, ArrayList<Target>>();
 	private Target targetOccupiedByFaultyRobot = null;
 	private AquaticDroneCI faultyRobot = null;
-	private double faultInjectionTime = -1;
 	private double replaceTime = -1;
 	private double targetReleaseTime = -1;
 	private boolean inFault = false;
@@ -317,7 +316,6 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		if (((AquaticDrone) robot).hasFault() && !inFault) {
 			inFault = true;
 			faultyRobot = robot;
-			faultInjectionTime = simulator.getTime();
 
 			if (isInsideTarget(robot)) {
 				targetOccupiedByFaultyRobot = getClosestTarget(faultyRobot, false);
@@ -433,6 +431,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		return true;
 	}
 
+	@SuppressWarnings("unused")
 	private AquaticDroneCI getClosestRobotToTarget(Target target) {
 		double minDistance = Double.MAX_VALUE;
 		AquaticDroneCI closestRobot = null;
