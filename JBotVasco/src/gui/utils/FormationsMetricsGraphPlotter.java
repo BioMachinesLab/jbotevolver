@@ -5,7 +5,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import evolutionaryrobotics.FormationTaskMetricsCodex;
@@ -14,7 +16,8 @@ import gui.util.Graph;
 import gui.util.GraphPlotter;
 
 public class FormationsMetricsGraphPlotter extends GraphPlotter {
-	private static final long serialVersionUID = 6178820332224992218L;
+	private static final long serialVersionUID = -3907874113934204291L;
+	private RequestParamsPanel panel = null;
 
 	public enum MetricsType {
 		TIME_INSIDE_FORMATION, TIME_TO_FIRST_OCCUPATION, PERMUTATION_METRICS, REOCUPATION_TIME;
@@ -27,6 +30,11 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 		Graph graph = new Graph();
 		getContentPane().add(graphPanel);
 		graphPanel.add(graph);
+
+		if (type != MetricsType.TIME_TO_FIRST_OCCUPATION) {
+			panel = new RequestParamsPanel();
+			panel.triggerDialog();
+		}
 
 		int totalGenerations = 0;
 		for (String filePath : files) {
@@ -117,19 +125,63 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 		case TIME_INSIDE_FORMATION:
 		case PERMUTATION_METRICS:
 		case REOCUPATION_TIME:
-			graph.addDataList(dataList_0);
-			graph.addDataList(dataList_1);
-			graph.addDataList(dataList_2);
+			if (panel.getDialogResult() == JOptionPane.OK_OPTION) {
+				if (panel.isPlotMinimumSelected()) {
+					graph.addDataList(dataList_0);
+					graph.addLegend(name + "_min");
+				}
 
-			graph.addLegend(name + "_min");
-			graph.addLegend(name + "_avg");
-			graph.addLegend(name + "_max");
+				if (panel.isPlotAverageSelected()) {
+					graph.addDataList(dataList_1);
+					graph.addLegend(name + "_avg");
+				}
+
+				if (panel.isPlotMaximumSelected()) {
+					graph.addDataList(dataList_2);
+					graph.addLegend(name + "_max");
+				}
+			}
 			break;
 		case TIME_TO_FIRST_OCCUPATION:
 			graph.addDataList(dataList_0);
 
 			graph.addLegend(name);
 			break;
+		}
+	}
+
+	private class RequestParamsPanel {
+		private JCheckBox minimumCheckBox = null;
+		private JCheckBox averageCheckBox = null;
+		private JCheckBox maximumCheckBox = null;
+		private int dialogResult = 0;
+
+		public int triggerDialog() {
+			minimumCheckBox = new JCheckBox("Minimum");
+			averageCheckBox = new JCheckBox("Average");
+			averageCheckBox.setSelected(true);
+			maximumCheckBox = new JCheckBox("Maximum");
+
+			String message = "Select fields to plot:";
+			Object[] params = { message, minimumCheckBox, averageCheckBox, maximumCheckBox };
+			dialogResult = JOptionPane.showConfirmDialog(null, params, "Plot parameters", JOptionPane.YES_NO_OPTION);
+			return dialogResult;
+		}
+
+		public boolean isPlotMinimumSelected() {
+			return minimumCheckBox != null && minimumCheckBox.isSelected();
+		}
+
+		public boolean isPlotAverageSelected() {
+			return averageCheckBox != null && averageCheckBox.isSelected();
+		}
+
+		public boolean isPlotMaximumSelected() {
+			return maximumCheckBox != null && maximumCheckBox.isSelected();
+		}
+
+		public int getDialogResult() {
+			return dialogResult;
 		}
 	}
 }
