@@ -2,6 +2,8 @@ package evolutionaryrobotics;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 import evolutionaryrobotics.neuralnetworks.Chromosome;
@@ -221,6 +223,8 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 							HashMap<String, Arguments> arguments = jBotEvolver.getArgumentsCopy();
 							arguments.get("--evolution").setArgument("halfhalfFaults", 1);
 							arguments.get("--environment").setArgument("injectFaults", 1);
+							arguments.get("--controllers").setArgument("classname",
+									"controllers.TargetFollowingHibridController");
 
 							JBotEvolver newJBot = new JBotEvolver(arguments, jBotEvolver.getRandomSeed());
 							Chromosome chromosome = newJBot.getPopulation().getBestChromosome();
@@ -264,7 +268,9 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 								metricsData.append('\n');
 							}
 
-							FileWriter metricsLogFileWriter = new FileWriter(new File(runDirectory, "_metrics.log"));
+							SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+							String name = "_metrics_" + sdf.format(new Date()) + ".log";
+							FileWriter metricsLogFileWriter = new FileWriter(new File(runDirectory, name));
 							metricsLogFileWriter.append(metricsData);
 							metricsLogFileWriter.close();
 						}
