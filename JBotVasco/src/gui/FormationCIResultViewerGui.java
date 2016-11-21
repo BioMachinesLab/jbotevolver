@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -516,21 +519,26 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 		}
 
 		// Join all the selected folders and files paths
-		final String[] mainFolders = new String[paths.size()];
+		final List<String> files = new ArrayList<String>();
 		for (int i = 0; i < paths.size(); i++) {
 			File file = new File(paths.get(i));
-			mainFolders[i] = file.isDirectory() ? file.getAbsolutePath() : file.getParent();
+			files.add(file.getAbsolutePath());
 		}
 
-		Thread t = new Thread(new GraphTread(mainFolders, type));
+		// Workaround to remove duplicates (in case they exist)
+		Set<String> hashSet = new HashSet<String>(files);
+		files.clear();
+		files.addAll(hashSet);
+
+		Thread t = new Thread(new GraphTread(files, type));
 		t.start();
 	}
 
 	protected class GraphTread implements Runnable {
-		private String[] folders;
+		private List<String> folders;
 		private MetricsType type;
 
-		public GraphTread(String[] folders, MetricsType type) {
+		public GraphTread(List<String> folders, MetricsType type) {
 			this.folders = folders;
 			this.type = type;
 		}
@@ -565,36 +573,40 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 				return null;
 			}
 
-			File folderFile = new File(folder);
-			File[] files = folderFile.listFiles(new FileFilter() {
+			if (new File(folder).isFile()) {
+				return new File(folder).getAbsolutePath();
+			} else {
+				File folderFile = new File(folder);
+				File[] files = folderFile.listFiles(new FileFilter() {
 
-				@Override
-				public boolean accept(File pathname) {
-					return pathname.getName().contains("_metrics");
-				}
-			});
+					@Override
+					public boolean accept(File pathname) {
+						return pathname.getName().contains("_metrics");
+					}
+				});
 
-			String result = "";
-			for (File file : files) {
-				if (file.isFile()) {
-					result += file.getAbsolutePath() + "###";
-				} else {
-					String[] directories = (new File(folder)).list(new FilenameFilter() {
-						@Override
-						public boolean accept(File dir, String name) {
-							return (new File(dir, name)).isDirectory();
-						}
-					});
-					if (directories != null) {
-						for (String dir : directories) {
-							String dirResult = getMetricsFiles(folder + File.separatorChar + dir);
-							if (!dirResult.isEmpty())
-								result += dirResult + "###";
+				String result = "";
+				for (File file : files) {
+					if (file.isFile()) {
+						result += file.getAbsolutePath() + "###";
+					} else {
+						String[] directories = (new File(folder)).list(new FilenameFilter() {
+							@Override
+							public boolean accept(File dir, String name) {
+								return (new File(dir, name)).isDirectory();
+							}
+						});
+						if (directories != null) {
+							for (String dir : directories) {
+								String dirResult = getMetricsFiles(folder + File.separatorChar + dir);
+								if (!dirResult.isEmpty())
+									result += dirResult + "###";
+							}
 						}
 					}
 				}
+				return result;
 			}
-			return result;
 		}
 	}
 }

@@ -36,37 +36,39 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 			panel.triggerDialog();
 		}
 
-		int totalGenerations = 0;
-		for (String filePath : files) {
-			File file = new File(filePath);
-			ArrayList<FormationTaskMetricsData> metricsData = FormationTaskMetricsCodex.decodeMetricsDataFile(file);
-			totalGenerations = Math.max(metricsData.size(), totalGenerations);
+		if (panel.getDialogResult() == JOptionPane.OK_OPTION) {
+			int totalGenerations = 0;
+			for (String filePath : files) {
+				File file = new File(filePath);
+				ArrayList<FormationTaskMetricsData> metricsData = FormationTaskMetricsCodex.decodeMetricsDataFile(file);
+				totalGenerations = Math.max(metricsData.size(), totalGenerations);
 
-			loadMetricsDataOnGraph(graph, metricsData, file, type);
+				loadMetricsDataOnGraph(graph, metricsData, file, type);
+			}
+
+			graph.setxLabel("Generations (" + (totalGenerations) + ")");
+			switch (type) {
+			case TIME_INSIDE_FORMATION:
+				graph.setyLabel("Robots time in spot");
+				break;
+			case TIME_TO_FIRST_OCCUPATION:
+				graph.setyLabel("Time to first full occupation");
+				break;
+			case PERMUTATION_METRICS:
+				graph.setyLabel("Different spots occupied per robot");
+				break;
+			case REOCUPATION_TIME:
+				graph.setyLabel("Time until faulty robot spot is occupied");
+				break;
+			}
+
+			graph.setShowLast(totalGenerations);
+
+			setSize(800, 500 + graph.getHeaderSize());
+			setLocationRelativeTo(null);
+			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			setVisible(true);
 		}
-
-		graph.setxLabel("Generations (" + (totalGenerations) + ")");
-		switch (type) {
-		case TIME_INSIDE_FORMATION:
-			graph.setyLabel("Robot time in spot");
-			break;
-		case TIME_TO_FIRST_OCCUPATION:
-			graph.setyLabel("Time to first full occupation");
-			break;
-		case PERMUTATION_METRICS:
-			graph.setyLabel("Different spots occupied per robot");
-			break;
-		case REOCUPATION_TIME:
-			graph.setyLabel("Time until faulty robot spot is occupied");
-			break;
-		}
-
-		graph.setShowLast(totalGenerations);
-
-		setSize(800, 500 + graph.getHeaderSize());
-		setLocationRelativeTo(null);
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setVisible(true);
 	}
 
 	private void loadMetricsDataOnGraph(Graph graph, ArrayList<FormationTaskMetricsData> metricsData, File file,
@@ -163,7 +165,7 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 			maximumCheckBox = new JCheckBox("Maximum");
 
 			String message = "Select fields to plot:";
-			Object[] params = { message, minimumCheckBox, averageCheckBox, maximumCheckBox };
+			Object[] params = { message, maximumCheckBox, averageCheckBox, minimumCheckBox };
 			dialogResult = JOptionPane.showConfirmDialog(null, params, "Plot parameters", JOptionPane.YES_NO_OPTION);
 			return dialogResult;
 		}
