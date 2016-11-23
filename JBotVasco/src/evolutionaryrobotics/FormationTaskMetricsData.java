@@ -8,6 +8,7 @@ public class FormationTaskMetricsData extends MetricsData {
 	private double timeFirstTotalOccup = 0;
 	private double numberDiffSpotsOccupied_min = 0, numberDiffSpotsOccupied_avg = 0, numberDiffSpotsOccupied_max = 0;
 	private double reocupationTime_min = 0, reocupationTime_avg = 0, reocupationTime_max = 0;
+	private boolean isFaultInjectionActive = false;
 
 	public FormationTaskMetricsData(int generation) {
 		super(generation);
@@ -63,6 +64,10 @@ public class FormationTaskMetricsData extends MetricsData {
 		this.reocupationTime_max = reocupationTime_max;
 	}
 
+	public void setFaultInjectionActive(boolean isFaultInjectionActive) {
+		this.isFaultInjectionActive = isFaultInjectionActive;
+	}
+
 	// Getters
 	@Override
 	public int getGeneration() {
@@ -109,6 +114,10 @@ public class FormationTaskMetricsData extends MetricsData {
 		return reocupationTime_max;
 	}
 
+	public boolean isFaultInjectionActive() {
+		return isFaultInjectionActive;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof FormationTaskMetricsData) {
@@ -121,7 +130,8 @@ public class FormationTaskMetricsData extends MetricsData {
 					&& data.getNumberDiffSpotsOccupied_max() == numberDiffSpotsOccupied_max
 					&& data.getReocupationTime_min() == reocupationTime_min
 					&& data.getReocupationTime_avg() == reocupationTime_avg
-					&& data.getReocupationTime_max() == reocupationTime_max;
+					&& data.getReocupationTime_max() == reocupationTime_max
+					&& data.isFaultInjectionActive() == isFaultInjectionActive;
 		} else {
 			return false;
 		}
@@ -129,15 +139,19 @@ public class FormationTaskMetricsData extends MetricsData {
 
 	@Override
 	public void combineMetricsData(List<MetricsData> metricsData) {
+		double metricsCount = 1;
 		double sum_timeInside_avg = timeInside_avg;
 		double sum_timeFirstTotalOccup = timeFirstTotalOccup;
 		double sum_numberDiffSpotsOccupied_avg = numberDiffSpotsOccupied_avg;
-		double sum_reocupationTime_avg = reocupationTime_avg;
 
-		double metricsCount = 1;
 		double reocupationCount = 0;
-		if (reocupationTime_max > 0) {
+		double sum_reocupationTime_avg = reocupationTime_avg;
+		if (isFaultInjectionActive) {
 			reocupationCount++;
+		} else {
+			reocupationTime_min = Double.MAX_VALUE;
+			reocupationTime_avg = 0;
+			reocupationTime_max = Double.MIN_VALUE;
 		}
 
 		for (MetricsData m : metricsData) {
@@ -150,16 +164,11 @@ public class FormationTaskMetricsData extends MetricsData {
 				if (formData.getNumberDiffSpotsOccupied_min() < numberDiffSpotsOccupied_min) {
 					numberDiffSpotsOccupied_min = formData.getNumberDiffSpotsOccupied_min();
 				}
-				if (formData.getReocupationTime_min() > 0 && formData.getReocupationTime_min() < reocupationTime_min) {
-					reocupationTime_min = formData.getReocupationTime_min();
-					reocupationCount++;
-				}
 
 				// Averages calculations
 				sum_timeInside_avg += formData.getTimeInside_avg();
 				sum_timeFirstTotalOccup += formData.timeFirstTotalOccup;
 				sum_numberDiffSpotsOccupied_avg += formData.getNumberDiffSpotsOccupied_avg();
-				sum_reocupationTime_avg += formData.getReocupationTime_avg();
 
 				// Maximums calculations
 				if (formData.getTimeInside_max() > timeInside_max) {
@@ -168,17 +177,34 @@ public class FormationTaskMetricsData extends MetricsData {
 				if (formData.getNumberDiffSpotsOccupied_max() > numberDiffSpotsOccupied_max) {
 					numberDiffSpotsOccupied_max = formData.getNumberDiffSpotsOccupied_max();
 				}
-				if (formData.getReocupationTime_min() > 0 && formData.getReocupationTime_max() > reocupationTime_max) {
-					reocupationTime_max = formData.getReocupationTime_max();
-				}
 
 				metricsCount++;
+
+				if (formData.isFaultInjectionActive) {
+					if (formData.getReocupationTime_min() < reocupationTime_min) {
+						reocupationTime_min = formData.getReocupationTime_min();
+					}
+
+					if (formData.getReocupationTime_max() > reocupationTime_max) {
+						reocupationTime_max = formData.getReocupationTime_max();
+					}
+
+					sum_reocupationTime_avg += formData.getReocupationTime_avg();
+					reocupationCount++;
+				}
 			}
 		}
 
 		timeInside_avg = sum_timeInside_avg / metricsCount;
 		timeFirstTotalOccup = sum_timeFirstTotalOccup / metricsCount;
 		numberDiffSpotsOccupied_avg = sum_numberDiffSpotsOccupied_avg / metricsCount;
-		reocupationTime_avg = sum_reocupationTime_avg / reocupationCount;
+
+		if (reocupationCount > 0) {
+			reocupationTime_avg = sum_reocupationTime_avg / reocupationCount;
+		} else {
+			reocupationTime_min = 0;
+			reocupationTime_avg = 0;
+			reocupationTime_max = 0;
+		}
 	}
 }

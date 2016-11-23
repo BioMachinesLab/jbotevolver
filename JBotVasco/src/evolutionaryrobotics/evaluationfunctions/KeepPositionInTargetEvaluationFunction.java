@@ -48,14 +48,17 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 	// Metrics variables
 	private boolean continuousMetricsUpdate = false;
 	private HashMap<AquaticDroneCI, ArrayList<Target>> visitedTargetsPerRobot = new HashMap<AquaticDroneCI, ArrayList<Target>>();
+	private boolean firstTotalOccupationAchieved = false;
+
 	private Target targetOccupiedByFaultyRobot = null;
 	private AquaticDroneCI faultyRobot = null;
 	private double replaceTime = -1;
 	private double targetReleaseTime = -1;
+
 	private boolean inFault = false;
 	private boolean wasInFault = false;
-	private boolean faultyRobotExitedTarget = false;
-	private boolean firstTotalOccupationAchieved = false;
+	private boolean successfullReocupation = false;
+	private boolean firstTimeEmpty = false;
 
 	public KeepPositionInTargetEvaluationFunction(Arguments args) {
 		super(args);
@@ -108,30 +111,29 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 				targetVelocityVectorAzimuth.put(target, angle);
 			}
 
-			// if fault extinguishes, we stop counting time even if the target
-			// is not occupied.... solve this
-			if (collectMetrics) {
-				// If in fault and the faulty robot was already replaced
-				if (inFault && target.equals(targetOccupiedByFaultyRobot) && !target.isOccupied()) {
-					if (!faultyRobotExitedTarget) {
-						faultyRobotExitedTarget = true;
+			// problema com o step de release e o cálculo do release time. check
+			// this
+			if (collectMetrics && target.equals(targetOccupiedByFaultyRobot)) {
+				if (inFault && !successfullReocupation) {
+					if (!target.isOccupied() && !firstTimeEmpty) {
 						targetReleaseTime = simulator.getTime();
-					} else {
+						firstTimeEmpty = true;
+					} else if (target.isOccupied() && firstTimeEmpty) {
 						replaceTime = simulator.getTime();
+						successfullReocupation = true;
 					}
-				} else if (wasInFault && target.equals(targetOccupiedByFaultyRobot)) {
+				} else if (wasInFault && !successfullReocupation) {
 					if (!target.isOccupied()) {
 						replaceTime = simulator.getTime();
 					} else {
+						successfullReocupation = true;
 						wasInFault = false;
 					}
 				}
 			}
 		}
 
-		if (simulator.getTime() > 0)
-
-		{
+		if (simulator.getTime() > 0) {
 			double temporaryFitness = 0;
 			double distance = 0;
 
@@ -315,13 +317,16 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		// Actors (target, robot, etc)
 		if (((AquaticDrone) robot).hasFault() && !inFault) {
 			inFault = true;
+			wasInFault = false;
 			faultyRobot = robot;
+			((FormationTaskMetricsData) metricsData).setFaultInjectionActive(true);
 
 			if (isInsideTarget(robot)) {
 				targetOccupiedByFaultyRobot = getClosestTarget(faultyRobot, false);
 			}
 		}
 
+		// If fault condition ended
 		boolean state = faultyRobot != null ? ((AquaticDrone) faultyRobot).hasFault() : false;
 		if (!state && inFault) {
 			inFault = false;
@@ -386,7 +391,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		}
 
 		// Re-occupation time
-		if (replaceTime != -1 && (inFault || wasInFault)) {
+		if (replaceTime != -1 && successfullReocupation) {
 			double replace = replaceTime - targetReleaseTime;
 			((FormationTaskMetricsData) metricsData).setReocupationTime_min(replace);
 			((FormationTaskMetricsData) metricsData).setReocupationTime_avg(replace);

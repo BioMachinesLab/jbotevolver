@@ -36,7 +36,7 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 			panel.triggerDialog();
 		}
 
-		if (panel.getDialogResult() == JOptionPane.OK_OPTION) {
+		if (type == MetricsType.TIME_TO_FIRST_OCCUPATION || panel.getDialogResult() == JOptionPane.OK_OPTION) {
 			int totalGenerations = 0;
 			for (String filePath : files) {
 				File file = new File(filePath);
