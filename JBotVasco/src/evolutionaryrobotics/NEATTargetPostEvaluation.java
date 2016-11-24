@@ -223,8 +223,8 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 							HashMap<String, Arguments> arguments = jBotEvolver.getArgumentsCopy();
 							arguments.get("--evolution").setArgument("halfhalfFaults", 1);
 							arguments.get("--environment").setArgument("injectFaults", 1);
-							arguments.get("--controllers").setArgument("classname",
-									"controllers.TargetFollowingHibridController");
+//							arguments.get("--controllers").setArgument("classname",
+//									"controllers.TargetFollowingHibridController");
 
 							JBotEvolver newJBot = new JBotEvolver(arguments, jBotEvolver.getRandomSeed());
 							Chromosome chromosome = newJBot.getPopulation().getBestChromosome();
