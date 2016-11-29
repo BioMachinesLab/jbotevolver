@@ -157,21 +157,21 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 	}
 
 	public void runMetricsEval() {
+		File folder = null;
+		if (singleEvaluation) {
+			folder = new File(dir);
+		} else {
+			folder = new File(dir, Integer.toString(startTrial));
+		}
+
+		// Load task executor from configuration file
+		String[] newArgs = args != null ? new String[args.length + 1] : new String[1];
+		newArgs[0] = new File(folder, "_showbest_current.conf").getAbsolutePath();
+		for (int i = 1; i < newArgs.length; i++) {
+			newArgs[i] = args[i - 1];
+		}
+
 		try {
-			File folder = null;
-			if (singleEvaluation) {
-				folder = new File(dir);
-			} else {
-				folder = new File(dir, Integer.toString(startTrial));
-			}
-
-			// Load task executor from configuration file
-			String[] newArgs = args != null ? new String[args.length + 1] : new String[1];
-			newArgs[0] = new File(folder, "_showbest_current.conf").getAbsolutePath();
-			for (int i = 1; i < newArgs.length; i++) {
-				newArgs[i] = args[i - 1];
-			}
-
 			// Initialize task executor
 			JBotEvolver jBotEvolver = new JBotEvolver(newArgs);
 			if (jBotEvolver.getArguments().get("--executor") != null) {
@@ -191,96 +191,105 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 				taskExecutor.setTotalNumberOfTasks(taskCount);
 
 				for (int i = startTrial; i <= maxTrial; i++) {
-					// Define the run root directory
-					File runDirectory;
-					if (singleEvaluation) {
-						runDirectory = folder;
-					} else {
-						runDirectory = new File(dir, Integer.toString(i));
-					}
+					try {
+						// Define the run root directory
+						File runDirectory;
+						if (singleEvaluation) {
+							runDirectory = folder;
+						} else {
+							runDirectory = new File(dir, Integer.toString(i));
+						}
 
-					// Perform simulation and metrics collection on the runs in
-					// Which it was not performed
-					File metricsLogFile = new File(runDirectory, "_metrics.log");
-					if (!metricsLogFile.exists()) {
-						System.out.printf("[%s] Starting metrics collection on run #%d%n", getClass().getSimpleName(),
-								i);
+						// Perform simulation and metrics collection on the runs
+						// in
+						// Which it was not performed
+						File metricsLogFile = new File(runDirectory, "_metrics.log");
+						if (!metricsLogFile.exists()) {
+							System.out.printf("[%s] Starting metrics collection on run #%d%n",
+									getClass().getSimpleName(), i);
 
-						// Get the show_best directory and sort the
-						// Configuration files
-						File showBestDirectory = new File(runDirectory, "show_best");
-						File[] files = showBestDirectory.listFiles();
-						sortByNumber(files);
-						int numberOfGenerations = files.length;
+							// Get the show_best directory and sort the
+							// Configuration files
+							File showBestDirectory = new File(runDirectory, "show_best");
+							File[] files = showBestDirectory.listFiles();
+							sortByNumber(files);
+							int numberOfGenerations = files.length;
 
-						// Get the metrics for each of the generations
-						for (File file : files) {
-							int generation = Integer.valueOf(file.getName().substring(8, file.getName().indexOf(".")));
+							// Get the metrics for each of the generations
+							for (File file : files) {
+								int generation = Integer
+										.valueOf(file.getName().substring(8, file.getName().indexOf(".")));
 
-							newArgs[0] = file.getAbsolutePath();
-							jBotEvolver = new JBotEvolver(newArgs);
+								newArgs[0] = file.getAbsolutePath();
+								jBotEvolver = new JBotEvolver(newArgs);
 
-							HashMap<String, Arguments> arguments = jBotEvolver.getArgumentsCopy();
-							arguments.get("--evolution").setArgument("halfhalfFaults", 1);
-							arguments.get("--environment").setArgument("injectFaults", 1);
-//							arguments.get("--controllers").setArgument("classname",
-//									"controllers.TargetFollowingHibridController");
+								HashMap<String, Arguments> arguments = jBotEvolver.getArgumentsCopy();
+								arguments.get("--evolution").setArgument("halfhalfFaults", 1);
+								arguments.get("--environment").setArgument("injectFaults", 1);
+								// arguments.get("--controllers").setArgument("classname",
+								// "controllers.TargetFollowingHibridController");
 
-							JBotEvolver newJBot = new JBotEvolver(arguments, jBotEvolver.getRandomSeed());
-							Chromosome chromosome = newJBot.getPopulation().getBestChromosome();
+								JBotEvolver newJBot = new JBotEvolver(arguments, jBotEvolver.getRandomSeed());
+								Chromosome chromosome = newJBot.getPopulation().getBestChromosome();
 
-							MetricsGenerationalTask t = new MetricsGenerationalTask(newJBot, i, 1, generation,
-									chromosome);
-							taskExecutor.addTask(t);
+								MetricsGenerationalTask t = new MetricsGenerationalTask(newJBot, i, 1, generation,
+										chromosome);
+								taskExecutor.addTask(t);
+
+								if (showOutput) {
+									System.out.print(".");
+								}
+
+								String name = dir.replace('/', '\\') + i + File.separatorChar + (generation + 1);
+								taskExecutor.setDescription(
+										name + " out of " + numberOfGenerations + " (total tasks: " + taskCount + ")");
+							}
 
 							if (showOutput) {
-								System.out.print(".");
+								System.out.println();
 							}
 
-							String name = dir.replace('/', '\\') + i + File.separatorChar + (generation + 1);
-							taskExecutor.setDescription(
-									name + " out of " + numberOfGenerations + " (total tasks: " + taskCount + ")");
-						}
+							// Collect all metrics
+							FormationTaskMetricsData[] data = new FormationTaskMetricsData[numberOfGenerations];
+							for (int gen = 0; gen < numberOfGenerations; gen++) {
+								MetricsResult combinedResult = (MetricsResult) taskExecutor.getResult();
+								data[gen] = (FormationTaskMetricsData) combinedResult.getMetricsData();
+								System.out.print("!");
+							}
 
-						if (showOutput) {
-							System.out.println();
-						}
+							System.out.printf("[%s] Run #%d - Collected results for %d generations%n",
+									getClass().getSimpleName(), i, data.length);
 
-						// Collect all metrics
-						FormationTaskMetricsData[] data = new FormationTaskMetricsData[numberOfGenerations];
-						for (int gen = 0; gen < numberOfGenerations; gen++) {
-							MetricsResult combinedResult = (MetricsResult) taskExecutor.getResult();
-							data[gen] = (FormationTaskMetricsData) combinedResult.getMetricsData();
-							System.out.print("!");
-						}
-
-						System.out.printf("[%s] Run #%d - Collected results for %d generations%n",
-								getClass().getSimpleName(), i, data.length);
-
-						// Generate log lines
-						if (saveOutput) {
-							StringBuffer metricsData = new StringBuffer();
-							metricsData.append(FormationTaskMetricsCodex.getEncodedMetricsFileHeader());
-							metricsData.append('\n');
-
-							for (int j = 0; j < data.length; j++) {
-								metricsData.append(FormationTaskMetricsCodex.encodeMetricsData(data[j]));
+							// Generate log lines
+							if (saveOutput) {
+								StringBuffer metricsData = new StringBuffer();
+								metricsData.append(FormationTaskMetricsCodex.getEncodedMetricsFileHeader());
 								metricsData.append('\n');
-							}
 
-							SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
-							String name = "_metrics_" + sdf.format(new Date()) + ".log";
-							FileWriter metricsLogFileWriter = new FileWriter(new File(runDirectory, name));
-							metricsLogFileWriter.append(metricsData);
-							metricsLogFileWriter.close();
+								for (int j = 0; j < data.length; j++) {
+									metricsData.append(FormationTaskMetricsCodex.encodeMetricsData(data[j]));
+									metricsData.append('\n');
+								}
+
+								SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+								String name = "_metrics_" + sdf.format(new Date()) + ".log";
+								FileWriter metricsLogFileWriter = new FileWriter(new File(runDirectory, name));
+								metricsLogFileWriter.append(metricsData);
+								metricsLogFileWriter.close();
+							}
 						}
+					} catch (Exception e) {
+						e.printStackTrace();
 					}
 				}
 
-				taskExecutor.stopTasks();
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (taskExecutor != null) {
+				taskExecutor.stopTasks();
+			}
 		}
 	}
 
