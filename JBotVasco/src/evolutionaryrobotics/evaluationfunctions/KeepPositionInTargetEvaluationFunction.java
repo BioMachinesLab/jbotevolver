@@ -91,7 +91,6 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		}
 
 		occupiedTargetsCount = 0;
-		double orientationReward = 0;
 		HashMap<Target, Double> targetVelocityVectorAzimuth = new HashMap<Target, Double>();
 		for (Target target : targets) {
 			List<AquaticDroneCI> robotsInsideTarget = getRobotsInsideTarget(target);
@@ -133,6 +132,7 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 			}
 		}
 
+		double orientationReward = 0;
 		if (simulator.getTime() > 0) {
 			double temporaryFitness = 0;
 			double distance = 0;
@@ -186,7 +186,10 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 			 * Calculate fitness components
 			 */
 			// Occupied targets fitness component
-			temporaryFitness += ((double) occupiedTargetsCount / robots.size()) / simulator.getEnvironment().getSteps()
+			// temporaryFitness += ((double) occupiedTargetsCount /
+			// robots.size()) / simulator.getEnvironment().getSteps()
+			// * 10;
+			temporaryFitness += ((double) occupiedTargetsCount / targets.size()) / simulator.getEnvironment().getSteps()
 					* 10;
 
 			// Distance bootstrap fitness component
