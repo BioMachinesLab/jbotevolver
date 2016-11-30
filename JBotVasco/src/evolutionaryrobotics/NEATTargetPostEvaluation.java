@@ -17,7 +17,6 @@ import taskexecutor.tasks.NEATMultipleSampleTargetPostEvaluationTask;
 
 public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 	private int taskCount = 0;
-	protected boolean showOutput = true;
 
 	public NEATTargetPostEvaluation(String[] args, String[] extraArgs) {
 		super(args, extraArgs);
@@ -110,19 +109,11 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 								generation, newJBot, chr, sample, sample + sampleIncrement, targetfitness);
 						taskExecutor.addTask(t);
 
-						if (showOutput) {
-							System.out.println(".");
-						}
+						System.out.print(".");
 					}
-
-					if (showOutput)
-						System.out.println();
 
 					taskExecutor.setDescription(dir + i + "/" + (generation + 1) + " out of " + numberOfGenerations
 							+ " (total tasks: " + totalTasks + ")");
-
-					if (showOutput)
-						System.out.println();
 				}
 
 				for (int gen = 0; gen < numberOfGenerations; gen++) {
@@ -134,16 +125,12 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 						String line = sfr.getRun() + " " + sfr.getGeneration() + " " + sfr.getFitnesssample() + " "
 								+ sfr.getSample() + " " + sfr.getFitness() + "\n";
 						data.append(line);
-
-						if (showOutput) {
-							System.out.print(line);
-						}
+						System.out.print("!");
 					}
 				}
 			}
 
-			if (showOutput)
-				System.out.println();
+			System.out.println();
 
 			if (saveOutput) {
 				fw.append(data);
@@ -238,19 +225,14 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 								MetricsGenerationalTask t = new MetricsGenerationalTask(newJBot, i, 1, generation,
 										chromosome);
 								taskExecutor.addTask(t);
-
-								if (showOutput) {
-									System.out.print(".");
-								}
+								System.out.print(".");
 
 								String name = dir.replace('/', '\\') + i + File.separatorChar + (generation + 1);
 								taskExecutor.setDescription(
 										name + " out of " + numberOfGenerations + " (total tasks: " + taskCount + ")");
 							}
 
-							if (showOutput) {
-								System.out.println();
-							}
+							System.out.println();
 
 							// Collect all metrics
 							FormationTaskMetricsData[] data = new FormationTaskMetricsData[numberOfGenerations];
