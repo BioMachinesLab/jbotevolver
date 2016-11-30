@@ -15,7 +15,7 @@ import taskexecutor.tasks.NEATMultipleSamplePostEvaluationTask;
 
 public class NEATPostEvaluation {
 
-	protected int startTrial = 0;
+	protected final int startTrial;
 	protected int maxTrial = 0;
 	protected int samples = 100;
 	protected int sampleIncrement = 100;
@@ -99,11 +99,11 @@ public class NEATPostEvaluation {
 				folder = new File(dir, Integer.toString(startTrial));
 			}
 
-			generationNumber = getGenerationNumberFromFile(new File(folder,"/_generationnumber"));
+			generationNumber = getGenerationNumberFromFile(new File(folder, "/_generationnumber"));
 			result = new double[maxTrial][generationNumber][fitnesssamples];
 
 			String[] newArgs = args != null ? new String[args.length + 1] : new String[1];
-			newArgs[0] = new File(folder,"_showbest_current.conf").getAbsolutePath();
+			newArgs[0] = new File(folder, "_showbest_current.conf").getAbsolutePath();
 
 			for (int i = 1; i < newArgs.length; i++)
 				newArgs[i] = args[i - 1];
@@ -152,7 +152,7 @@ public class NEATPostEvaluation {
 				for (File f : files) {
 					int generation = Integer.valueOf(f.getName().substring(8, f.getName().indexOf(".")));
 
-					newArgs[0] = directory.getAbsolutePath()+ f.getName();
+					newArgs[0] = directory.getAbsolutePath() + f.getName();
 					jBotEvolver = new JBotEvolver(newArgs);
 
 					for (int fitnesssample = 0; fitnesssample < fitnesssamples; fitnesssample++) {
@@ -261,7 +261,6 @@ public class NEATPostEvaluation {
 				return i;
 			}
 		});
-
 	}
 
 	protected int getGenerationNumberFromFile(File file) {
