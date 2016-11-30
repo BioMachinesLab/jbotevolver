@@ -77,10 +77,13 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 				if (singleEvaluation) {
 					directory = new File(dir, "show_best");
 				} else {
-					directory = new File(dir, i + File.separatorChar + "show_best");
+					directory = new File(dir, Integer.toString(i) + File.separatorChar + "show_best");
 				}
 
 				File[] files = directory.listFiles();
+				System.out.printf("[%s] Working in directory %s (%d files)%n", getClass().getSimpleName(),
+						directory.getAbsolutePath(), files.length);
+
 				sortByNumber(files);
 				int numberOfGenerations = files.length;
 
@@ -94,8 +97,8 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 				for (File file : files) {
 					int generation = Integer.valueOf(file.getName().substring(8, file.getName().indexOf(".")));
 
-					newArgs[0] = directory.getAbsolutePath() + file.getName();
-					jBotEvolver = new JBotEvolver(newArgs);
+					newArgs[0] = directory.getAbsolutePath() + File.separatorChar + file.getName();
+					jBotEvolver = new JBotEvolver(newArgs.clone());
 
 					for (int sample = 0; sample < samples; sample += sampleIncrement) {
 						JBotEvolver newJBot = new JBotEvolver(jBotEvolver.getArgumentsCopy(),
