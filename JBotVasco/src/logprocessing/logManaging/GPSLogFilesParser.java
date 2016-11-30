@@ -87,7 +87,7 @@ public class GPSLogFilesParser {
 						String[] split = line.split(",");
 						data.add(parseGPRMCSentence(split));
 					} catch (RuntimeException e) {
-						// System.err.printf("[%s] Error parsing %s message%n",
+						// System.err.printf("[%s] Error parsing %s%n",
 						// getClass().getSimpleName(), line);
 						parsingErrors++;
 					}
@@ -166,6 +166,11 @@ public class GPSLogFilesParser {
 			throw new RuntimeException();
 	}
 
+	/**
+	 * Gets the parsed GPS data
+	 * 
+	 * @return a map with the parsed GPS data where the robot index is the key
+	 */
 	public HashMap<Integer, ArrayList<GPSData>> getGPSData() {
 		return gpsData;
 	}
@@ -173,6 +178,6 @@ public class GPSLogFilesParser {
 	public static void main(String[] args) {
 		System.out.printf("[%S] [INIT]%n", GPSLogFilesParser.class.getSimpleName());
 		new GPSLogFilesParser(INPUT_FOLDER);
-		System.out.printf("[%S] [FINISH]%n", GPSLogFilesParser.class.getSimpleName());
+		System.out.printf("[%S] [FINISHED]%n", GPSLogFilesParser.class.getSimpleName());
 	}
 }

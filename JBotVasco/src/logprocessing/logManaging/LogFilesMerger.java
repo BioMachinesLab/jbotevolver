@@ -91,7 +91,7 @@ public class LogFilesMerger {
 		try {
 			System.out.printf("[%S] [INIT]%n", LogFilesMerger.class.getSimpleName());
 			new LogFilesMerger(INPUT_FOLDER, OUTPUT_FOLDER);
-			System.out.printf("[%S] [FINISH]%n", LogFilesMerger.class.getSimpleName());
+			System.out.printf("[%S] [FINISHED]%n", LogFilesMerger.class.getSimpleName());
 		} catch (IOException e) {
 			System.err.println(e.getMessage());
 		}
