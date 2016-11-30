@@ -29,10 +29,16 @@ public class AutomatorEvolution extends Evolution {
 				}
 			}
 		}
-		p = new NEATTargetPostEvaluation(stringArguments.split(" "));
 
-		System.out.printf("[%s] Finished post evolution, starting metrics collection%n", getClass().getSimpleName());
-		p.runMetricsEval();
+		if (postArguments.getArgumentAsIntOrSetDefault("collectMetrics", 0) == 1) {
+			p = new NEATTargetPostEvaluation(stringArguments.split(" "));
+
+			System.out.printf("[%s] Finished post evolution, starting metrics collection%n",
+					getClass().getSimpleName());
+			p.runMetricsEval();
+		} else {
+			System.out.printf("[%s] Finished post evolution%n", getClass().getSimpleName());
+		}
 
 		return toReturn;
 	}
