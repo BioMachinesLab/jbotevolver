@@ -79,7 +79,7 @@ public class GPSLogFilesParser {
 			inputBuffReader = new BufferedReader(fileReader);
 
 			String line = inputBuffReader.readLine();
-			while (line != null) {
+			while ((line = inputBuffReader.readLine()) != null) {
 				int indexComma = line.indexOf(',');
 
 				if (indexComma >= 0 && line.substring(0, indexComma).equals("$GPRMC")) {
@@ -92,7 +92,6 @@ public class GPSLogFilesParser {
 						parsingErrors++;
 					}
 				}
-				line = inputBuffReader.readLine();
 			}
 		} catch (IOException e) {
 			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
