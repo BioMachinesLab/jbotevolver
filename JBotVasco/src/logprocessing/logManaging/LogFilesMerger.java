@@ -34,18 +34,20 @@ public class LogFilesMerger {
 				if (!outputFolderFile.mkdir()) {
 					throw new IOException("Unable to create output directory");
 				}
-			}
 
-			for (File tempInputFolder : inputFolderFile.listFiles()) {
-				if (tempInputFolder.isDirectory()) {
-					File tempOutputFolder = new File(outputFolderFile, tempInputFolder.getName());
+				for (File tempInputFolder : inputFolderFile.listFiles()) {
+					if (tempInputFolder.isDirectory()) {
+						File tempOutputFolder = new File(outputFolderFile, tempInputFolder.getName());
 
-					if (!tempOutputFolder.exists()) {
-						tempOutputFolder.mkdir();
+						if (!tempOutputFolder.exists()) {
+							tempOutputFolder.mkdir();
+						}
+
+						mergeLogs(tempInputFolder, tempOutputFolder);
 					}
-
-					mergeLogs(tempInputFolder, tempOutputFolder);
 				}
+			} else {
+				System.out.printf("[%s] Output folder already exist%n", getClass().getSimpleName());
 			}
 		} else {
 			System.err.printf("[%s] Input folder does not exist%n", getClass().getSimpleName());

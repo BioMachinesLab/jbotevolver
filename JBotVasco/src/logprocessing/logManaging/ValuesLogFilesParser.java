@@ -30,6 +30,10 @@ public class ValuesLogFilesParser {
 	private HashMap<Integer, ArrayList<DecodedLog>> decodedLogData = new HashMap<Integer, ArrayList<DecodedLog>>();
 
 	public ValuesLogFilesParser(String inputFolderPath) {
+		if (inputFolderPath == null) {
+			inputFolderPath = INPUT_FOLDER;
+		}
+
 		inputFolderFile = new File(inputFolderPath);
 
 		if (inputFolderFile.exists() && inputFolderFile.isDirectory()) {
