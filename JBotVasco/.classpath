@@ -7,13 +7,13 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/CommonInterface"/>
 	<classpathentry exported="true" kind="lib" path="/JBotSim/lib/jafama.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/EvolutionAutomator"/>
-	<classpathentry kind="lib" path="/CommonInterface/lib/joda-time-2.4.jar" sourcepath="/CommonInterface/lib/joda-time-2.4-sources.jar">
+	<classpathentry exported="true" kind="lib" path="/CommonInterface/lib/joda-time-2.4.jar" sourcepath="/CommonInterface/lib/joda-time-2.4-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/CommonInterface/lib/joda-time-2.4-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" kind="src" path="/JBotAquatic"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/BaseClient"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/BaseClient"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Behaviors"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
