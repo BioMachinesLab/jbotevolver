@@ -78,7 +78,7 @@ public class GPSLogFilesParser {
 			fileReader = new FileReader(inputFile);
 			inputBuffReader = new BufferedReader(fileReader);
 
-			String line = inputBuffReader.readLine();
+			String line = "";
 			while ((line = inputBuffReader.readLine()) != null) {
 				int indexComma = line.indexOf(',');
 
@@ -113,7 +113,8 @@ public class GPSLogFilesParser {
 			}
 		}
 
-		System.out.printf("[%s] -----> %d parsing errors%n", getClass().getSimpleName(), parsingErrors);
+		if (parsingErrors > 0)
+			System.out.printf("[%s] -----> %d bad sentences or parsing errors%n", getClass().getSimpleName(), parsingErrors);
 		return data;
 	}
 

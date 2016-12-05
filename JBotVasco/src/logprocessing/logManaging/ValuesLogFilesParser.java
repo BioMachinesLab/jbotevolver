@@ -61,10 +61,10 @@ public class ValuesLogFilesParser {
 			}
 
 			for (File file : files) {
-				System.out.printf("[%s] Processing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
+				System.out.printf("[%s] Pre-processing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
 				preprocessLogFile(file);
 			}
-			System.exit(0);
+
 			for (File file : files) {
 				System.out.printf("[%s] Parsing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
 
@@ -140,7 +140,6 @@ public class ValuesLogFilesParser {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
 			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getLocalizedMessage());
 		} finally {
 			if (fileReader != null) {
@@ -184,7 +183,8 @@ public class ValuesLogFilesParser {
 				}
 			}
 
-			System.out.printf("[%s] -----> %d parsing errors%n", getClass().getSimpleName(), parsingErrors);
+			if (parsingErrors > 0)
+				System.out.printf("[%s] -----> %d pre-processing errors%n", getClass().getSimpleName(), parsingErrors);
 		}
 	}
 
@@ -193,17 +193,18 @@ public class ValuesLogFilesParser {
 
 		FileReader inputReader = null;
 		BufferedReader inputBuffReader = null;
+		int parsingErrors = 0;
 		try {
 			inputReader = new FileReader(inputFile);
 			inputBuffReader = new BufferedReader(inputReader);
 
-			String line = inputBuffReader.readLine();
-			while (line != null) {
+			String line = "";
+			while ((line = inputBuffReader.readLine()) != null) {
 				data.add(LogCodex.decodeLog(line));
-				line = inputBuffReader.readLine();
 			}
 		} catch (IOException e) {
 			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+			parsingErrors++;
 		} finally {
 			if (inputReader != null) {
 				try {
@@ -222,6 +223,8 @@ public class ValuesLogFilesParser {
 			}
 		}
 
+		if (parsingErrors > 0)
+			System.out.printf("[%s] -----> %d parsing errors%n", getClass().getSimpleName(), parsingErrors);
 		return data;
 	}
 
