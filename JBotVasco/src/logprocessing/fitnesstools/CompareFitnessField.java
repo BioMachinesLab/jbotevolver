@@ -1,4 +1,4 @@
-package logprocessing;
+package logprocessing.fitnesstools;
 
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;

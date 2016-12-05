@@ -1,4 +1,4 @@
-package logprocessing;
+package logprocessing.fitnesstools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +16,7 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import gui.renderer.CITwoDRenderer;
 import gui.renderer.Renderer;
 import logprocessing.dataObjects.Experiment;
+import logprocessing.gui.RendererViewer;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.AquaticDrone;
