@@ -17,7 +17,7 @@ import simulation.util.Factory;
  *
  */
 public abstract class Renderer extends Component {
-
+	private static final long serialVersionUID = -2985346787960655999L;
 	protected Simulator simulator;
 	protected String titleText = "";
 
@@ -72,11 +72,11 @@ public abstract class Renderer extends Component {
 	protected void drawTitle(Graphics g) {
 		if (titleText != null && !titleText.isEmpty()) {
 			Font f = g.getFont();
-			
-//			if (System.getProperty("os.name").contains("Windows")) {
-//				Font font = new Font(f.getName(), f.getStyle(), f.getSize() * 2);
-//				g.setFont(font);
-//			}			
+
+			// if (System.getProperty("os.name").contains("Windows")) {
+			// Font font = new Font(f.getName(), f.getStyle(), f.getSize() * 2);
+			// g.setFont(font);
+			// }
 
 			int x = getWidth() / 2 - g.getFontMetrics().stringWidth(titleText) / 2;
 			int y = (int) (g.getFontMetrics().getHeight() * 1.5);

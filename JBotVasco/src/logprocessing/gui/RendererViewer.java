@@ -1,6 +1,7 @@
-package logprocessing;
+package logprocessing.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Toolkit;
@@ -14,8 +15,7 @@ import javax.swing.JPanel;
 import gui.renderer.Renderer;
 
 public class RendererViewer extends JFrame {
-	private static final long serialVersionUID = -4468147780385822977L;
-
+	private static final long serialVersionUID = -5808128136352356396L;
 	protected ArrayList<Renderer> renderers;
 	private JPanel mainPanel;
 	private JPanel controlsPanel;
@@ -23,6 +23,7 @@ public class RendererViewer extends JFrame {
 
 	private JButton replayButton;
 	private JButton playPauseButton;
+	private Container extrasContainer;
 
 	public RendererViewer(String windowName) {
 		super(windowName);
@@ -34,6 +35,9 @@ public class RendererViewer extends JFrame {
 
 		buildControlsPanel();
 		add(controlsPanel, BorderLayout.SOUTH);
+
+		extrasContainer = new Container();
+		add(extrasContainer, BorderLayout.EAST);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -97,5 +101,17 @@ public class RendererViewer extends JFrame {
 
 	public void addReplayButtonListener(ActionListener actionListener) {
 		replayButton.addActionListener(actionListener);
+	}
+
+	public Container getExtrasContainer() {
+		return extrasContainer;
+	}
+
+	public void setExtrasContainer(Container extrasContainer) {
+		this.extrasContainer = extrasContainer;
+
+		if (extrasContainer != null) {
+			updateWindow();
+		}
 	}
 }

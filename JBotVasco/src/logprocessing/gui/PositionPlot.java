@@ -1,4 +1,4 @@
-package logprocessing;
+package logprocessing.gui;
 
 import java.awt.Color;
 import java.awt.Dimension;
