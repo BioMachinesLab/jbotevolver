@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/DroneControlConsole"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JBotAquatic"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JBotEvolver"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/JBotSim"/>
@@ -12,5 +11,6 @@
 			<attribute name="javadoc_location" value="jar:platform:/resource/CommonInterface/lib/joda-time-2.4-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/JMapViewer.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
