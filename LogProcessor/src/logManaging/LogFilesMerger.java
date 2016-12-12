@@ -25,6 +25,10 @@ public class LogFilesMerger {
 	private File inputFolderFile;
 	private File outputFolderFile;
 
+	public LogFilesMerger() throws IOException {
+		this(INPUT_FOLDER, OUTPUT_FOLDER);
+	}
+
 	public LogFilesMerger(String inputFolderPath, String outputFolderPath) throws IOException {
 		inputFolderFile = new File(inputFolderPath);
 

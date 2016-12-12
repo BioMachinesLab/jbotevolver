@@ -31,6 +31,10 @@ public class EntitiesLogFilesParser {
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData = new HashMap<Integer, ArrayList<EntityManipulation>>();
 
+	public EntitiesLogFilesParser() {
+		this(INPUT_FOLDER);
+	}
+
 	public EntitiesLogFilesParser(String inputFolderPath) {
 		if (inputFolderPath == null) {
 			inputFolderPath = INPUT_FOLDER;
@@ -209,7 +213,6 @@ public class EntitiesLogFilesParser {
 							DecodedLog decodedLog = LogCodex.decodeLog(line);
 
 							if (decodedLog.getPayloadType() == LogType.ENTITIES) {
-								System.out.println("Class: " + decodedLog.getPayload().getClass());
 								data.add((EntityManipulation) decodedLog.getPayload()[1]);
 							} else {
 								throw new IllegalArgumentException("Invalied log type for this tool");

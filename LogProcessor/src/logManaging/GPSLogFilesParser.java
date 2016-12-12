@@ -25,6 +25,10 @@ public class GPSLogFilesParser {
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<GPSData>> gpsData = new HashMap<Integer, ArrayList<GPSData>>();
 
+	public GPSLogFilesParser() {
+		this(INPUT_FOLDER);
+	}
+
 	public GPSLogFilesParser(String inputFolderPath) {
 		inputFolderFile = new File(inputFolderPath);
 
