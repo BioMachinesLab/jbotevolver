@@ -10,7 +10,7 @@ import java.awt.event.MouseWheelListener;
 import org.openstreetmap.gui.jmapviewer.JMapController;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
-public class DroneMapController extends JMapController
+public class MapController extends JMapController
 		implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 	private static final int MOUSE_BUTTONS_MASK = MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.BUTTON1_DOWN_MASK
@@ -18,7 +18,7 @@ public class DroneMapController extends JMapController
 
 	private static final int MAC_MOUSE_BUTTON3_MASK = MouseEvent.CTRL_DOWN_MASK | MouseEvent.BUTTON3_DOWN_MASK;
 
-	public DroneMapController(JMapViewer map) {
+	public MapController(JMapViewer map) {
 		super(map);
 	}
 

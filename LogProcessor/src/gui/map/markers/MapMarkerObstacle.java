@@ -1,4 +1,4 @@
-package gui.map;
+package gui.map.markers;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;

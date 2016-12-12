@@ -1,4 +1,4 @@
-package gui.map;
+package gui.map.markers;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -12,14 +12,18 @@ import org.openstreetmap.gui.jmapviewer.Coordinate;
 import org.openstreetmap.gui.jmapviewer.Layer;
 import org.openstreetmap.gui.jmapviewer.MapMarkerDot;
 
-public class MapMarkerBaseStation extends MapMarkerDot {
-	private static final Color color = Color.GREEN;
-	private static final String LABEL = "base";
+public class MapMarkerWaypoint extends MapMarkerDot {
+	private Color color = Color.YELLOW;
 
-	public MapMarkerBaseStation(Layer l, String s, Coordinate c) {
-		super(l, LABEL, c);
+	public MapMarkerWaypoint(Layer l, String s, Coordinate c) {
+		super(l, s, c);
 		Font f = getDefaultFont();
 		setFont(new Font(f.getName(), Font.BOLD, f.getSize() - 2));
+	}
+
+	public MapMarkerWaypoint(Layer l, String s, Coordinate c, Color color) {
+		this(l, s, c);
+		this.color = color;
 	}
 
 	@Override
@@ -49,7 +53,16 @@ public class MapMarkerBaseStation extends MapMarkerDot {
 		if (getName() != null && g != null && position != null) {
 			g.setColor(Color.BLACK);
 			g.setFont(getFont());
-			g.drawString(LABEL, position.x - MapMarkerDot.DOT_RADIUS + 5, position.y + MapMarkerDot.DOT_RADIUS + 2);
+
+			String name = getName();
+			name = name.replace("waypoint", "");
+
+			int add = 4;
+
+			if (name.length() > 1)
+				add = 1;
+
+			g.drawString(name, position.x - MapMarkerDot.DOT_RADIUS + add, position.y + MapMarkerDot.DOT_RADIUS + 2);
 		}
 	}
 }
