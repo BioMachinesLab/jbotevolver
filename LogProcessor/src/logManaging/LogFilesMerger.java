@@ -1,9 +1,12 @@
 package logManaging;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.List;
@@ -29,7 +32,8 @@ public class LogFilesMerger {
 		this(INPUT_FOLDER, OUTPUT_FOLDER);
 	}
 
-	public LogFilesMerger(String inputFolderPath, String outputFolderPath) throws IOException {
+	public LogFilesMerger(String inputFolderPath, String outputFolderPath)
+			throws IOException, FileNotFoundException, FileAlreadyExistsException, FileSystemException {
 		inputFolderFile = new File(inputFolderPath);
 
 		if (inputFolderFile.exists() && inputFolderFile.isDirectory()) {
@@ -51,14 +55,14 @@ public class LogFilesMerger {
 					}
 				}
 			} else {
-				System.out.printf("[%s] Output folder already exist%n", getClass().getSimpleName());
+				throw new FileAlreadyExistsException("Output folder already exist");
 			}
 		} else {
-			System.err.printf("[%s] Input folder does not exist%n", getClass().getSimpleName());
+			throw new FileNotFoundException("Input folder does not exist");
 		}
 	}
 
-	private void mergeLogs(File inputFolder, File outputFolder) throws IOException {
+	private void mergeLogs(File inputFolder, File outputFolder) throws IOException, FileSystemException {
 		System.out.printf("[%s] Merging files in %s%n", getClass().getSimpleName(), inputFolder.getAbsolutePath());
 
 		for (final String prefix : FILES_PREFIXES) {
@@ -79,27 +83,32 @@ public class LogFilesMerger {
 					String outputFileName = matcher.group(0) + ".log";
 					File outputFile = new File(outputFolder, outputFileName);
 
-					if (!outputFile.createNewFile()) {
-						throw new IOException("Error creating output file " + outputFileName);
+					try {
+						outputFile.createNewFile();
+					} catch (IOException e) {
+						throw new FileSystemException("Error creating output file " + outputFileName);
 					}
 
-					for (File file : inputFolder.listFiles(filenameFilter)) {
-						List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
-						Files.write(outputFile.toPath(), lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE,
-								StandardOpenOption.APPEND);
+					if (outputFile.exists()) {
+						try {
+							for (File file : inputFolder.listFiles(filenameFilter)) {
+								List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+								Files.write(outputFile.toPath(), lines, StandardCharsets.UTF_8,
+										StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+							}
+						} catch (IOException e) {
+							throw e;
+						}
 					}
 				}
 			}
 		}
 	}
 
-	public static void main(String[] args) {
-		try {
-			System.out.printf("[%S] [INIT]%n", LogFilesMerger.class.getSimpleName());
-			new LogFilesMerger(INPUT_FOLDER, OUTPUT_FOLDER);
-			System.out.printf("[%S] [FINISHED]%n", LogFilesMerger.class.getSimpleName());
-		} catch (IOException e) {
-			System.err.println(e.getMessage());
-		}
+	public static void main(String[] args)
+			throws FileAlreadyExistsException, FileNotFoundException, FileSystemException, IOException {
+		System.out.printf("[%S] [INIT]%n", LogFilesMerger.class.getSimpleName());
+		new LogFilesMerger(INPUT_FOLDER, OUTPUT_FOLDER);
+		System.out.printf("[%S] [FINISHED]%n", LogFilesMerger.class.getSimpleName());
 	}
 }

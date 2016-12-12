@@ -3,6 +3,7 @@ package logManaging;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -29,11 +30,11 @@ public class ValuesLogFilesParser {
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<DecodedLog>> decodedLogData = new HashMap<Integer, ArrayList<DecodedLog>>();
 
-	public ValuesLogFilesParser() {
+	public ValuesLogFilesParser() throws FileNotFoundException {
 		this(INPUT_FOLDER);
 	}
 
-	public ValuesLogFilesParser(String inputFolderPath) {
+	public ValuesLogFilesParser(String inputFolderPath) throws FileNotFoundException {
 		if (inputFolderPath == null) {
 			inputFolderPath = INPUT_FOLDER;
 		}
@@ -57,9 +58,9 @@ public class ValuesLogFilesParser {
 					if (fileList.length == 1) {
 						files.add(fileList[0]);
 					} else if (fileList.length == 0) {
-						System.err.printf("[%s] Missing log file%n", getClass().getSimpleName());
+						throw new FileNotFoundException("Missing log file");
 					} else {
-						System.err.printf("[%s] Ambiguous log files%n", getClass().getSimpleName());
+						throw new FileNotFoundException("Ambiguous log files");
 					}
 				}
 			}
@@ -78,7 +79,7 @@ public class ValuesLogFilesParser {
 				System.out.printf("[%s] -----> %d log lines parsed%n", getClass().getSimpleName(), data.size());
 			}
 		} else {
-			System.err.printf("[%s] Input folder does not exist%n", getClass().getSimpleName());
+			throw new FileNotFoundException("Input folder does not exist");
 		}
 	}
 
@@ -236,7 +237,7 @@ public class ValuesLogFilesParser {
 		return decodedLogData;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
 		System.out.printf("[%S] [INIT]%n", ValuesLogFilesParser.class.getSimpleName());
 		new ValuesLogFilesParser(INPUT_FOLDER);
 		System.out.printf("[%S] [FINISHED]%n", ValuesLogFilesParser.class.getSimpleName());

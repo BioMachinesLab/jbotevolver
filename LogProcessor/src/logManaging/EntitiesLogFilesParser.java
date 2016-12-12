@@ -3,6 +3,7 @@ package logManaging;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
@@ -31,11 +32,11 @@ public class EntitiesLogFilesParser {
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData = new HashMap<Integer, ArrayList<EntityManipulation>>();
 
-	public EntitiesLogFilesParser() {
+	public EntitiesLogFilesParser() throws IOException, FileNotFoundException {
 		this(INPUT_FOLDER);
 	}
 
-	public EntitiesLogFilesParser(String inputFolderPath) {
+	public EntitiesLogFilesParser(String inputFolderPath) throws IOException, FileNotFoundException {
 		if (inputFolderPath == null) {
 			inputFolderPath = INPUT_FOLDER;
 		}
@@ -80,11 +81,11 @@ public class EntitiesLogFilesParser {
 				System.out.printf("[%s] -----> %d log lines parsed%n", getClass().getSimpleName(), data.size());
 			}
 		} else {
-			System.err.printf("[%s] Input folder does not exist%n", getClass().getSimpleName());
+			throw new FileNotFoundException("Input folder does not exist");
 		}
 	}
 
-	private void preprocessLogFile(File inputFile) {
+	private void preprocessLogFile(File inputFile) throws IOException {
 		FileReader fileReader = null;
 		BufferedReader inputBuffReader = null;
 
@@ -142,8 +143,7 @@ public class EntitiesLogFilesParser {
 				}
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
-			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getLocalizedMessage());
+			throw e;
 		} finally {
 			if (fileReader != null) {
 				try {
@@ -259,7 +259,7 @@ public class EntitiesLogFilesParser {
 		return entitiesManipulationData;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException, FileNotFoundException {
 		System.out.printf("[%S] [INIT]%n", EntitiesLogFilesParser.class.getSimpleName());
 		new EntitiesLogFilesParser(INPUT_FOLDER);
 		System.out.printf("[%S] [FINISHED]%n", EntitiesLogFilesParser.class.getSimpleName());

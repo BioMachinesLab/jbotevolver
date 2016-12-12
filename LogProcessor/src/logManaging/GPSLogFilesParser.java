@@ -2,6 +2,7 @@ package logManaging;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -25,11 +26,11 @@ public class GPSLogFilesParser {
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<GPSData>> gpsData = new HashMap<Integer, ArrayList<GPSData>>();
 
-	public GPSLogFilesParser() {
+	public GPSLogFilesParser() throws FileNotFoundException {
 		this(INPUT_FOLDER);
 	}
 
-	public GPSLogFilesParser(String inputFolderPath) {
+	public GPSLogFilesParser(String inputFolderPath) throws FileNotFoundException {
 		inputFolderFile = new File(inputFolderPath);
 
 		if (inputFolderFile.exists() && inputFolderFile.isDirectory()) {
@@ -61,7 +62,7 @@ public class GPSLogFilesParser {
 				}
 			}
 		} else {
-			System.err.printf("[%s] Input folder does not exist%n", getClass().getSimpleName());
+			throw new FileNotFoundException("Input folder does not exist");
 		}
 	}
 
@@ -180,7 +181,7 @@ public class GPSLogFilesParser {
 		return gpsData;
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
 		System.out.printf("[%S] [INIT]%n", GPSLogFilesParser.class.getSimpleName());
 		new GPSLogFilesParser(INPUT_FOLDER);
 		System.out.printf("[%S] [FINISHED]%n", GPSLogFilesParser.class.getSimpleName());
