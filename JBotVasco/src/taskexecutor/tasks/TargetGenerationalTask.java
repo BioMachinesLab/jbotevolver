@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-import commoninterface.entities.target.Formation.FormationType;
+import commoninterface.entities.formation.Formation.FormationType;
 import environment.target.FormationMultiTargetEnvironment;
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;

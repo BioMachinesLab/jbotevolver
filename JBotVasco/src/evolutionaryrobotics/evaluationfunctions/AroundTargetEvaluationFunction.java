@@ -2,7 +2,7 @@ package evolutionaryrobotics.evaluationfunctions;
 
 import commoninterface.AquaticDroneCI;
 import commoninterface.entities.Entity;
-import commoninterface.entities.target.Target;
+import commoninterface.entities.formation.Target;
 import commoninterface.mathutils.Vector2d;
 import commoninterface.utils.CoordinateUtilities;
 import evaluation.AvoidCollisionsFunction;

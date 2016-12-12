@@ -3,7 +3,7 @@ package commoninterface.sensors;
 import commoninterface.AquaticDroneCI;
 import commoninterface.RobotCI;
 import commoninterface.entities.Entity;
-import commoninterface.entities.target.Target;
+import commoninterface.entities.formation.Target;
 import commoninterface.mathutils.Vector2d;
 import commoninterface.utils.CIArguments;
 import commoninterface.utils.CoordinateUtilities;

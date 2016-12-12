@@ -2,7 +2,7 @@ package gui.map;
 
 import org.openstreetmap.gui.jmapviewer.tilesources.AbstractOsmTileSource;
 
-public class OfflineOsmTileSource extends AbstractOsmTileSource {
+class OfflineOsmTileSource extends AbstractOsmTileSource {
 
 	private final int minZoom;
 	private final int maxZoom;

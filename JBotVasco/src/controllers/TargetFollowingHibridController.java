@@ -3,7 +3,7 @@ package controllers;
 import commoninterface.AquaticDroneCI;
 import commoninterface.RobotCI;
 import commoninterface.entities.Waypoint;
-import commoninterface.entities.target.Target;
+import commoninterface.entities.formation.Target;
 import commoninterface.mathutils.Vector2d;
 import commoninterface.sensors.TargetComboCISensor;
 import commoninterface.utils.CIArguments;

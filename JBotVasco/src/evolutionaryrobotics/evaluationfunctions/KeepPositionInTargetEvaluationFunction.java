@@ -6,8 +6,8 @@ import java.util.List;
 
 import commoninterface.AquaticDroneCI;
 import commoninterface.entities.Entity;
-import commoninterface.entities.target.Formation;
-import commoninterface.entities.target.Target;
+import commoninterface.entities.formation.Formation;
+import commoninterface.entities.formation.Target;
 import commoninterface.mathutils.Vector2d;
 import commoninterface.utils.CoordinateUtilities;
 import environment.target.TargetEnvironment;

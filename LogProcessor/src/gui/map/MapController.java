@@ -10,8 +10,7 @@ import java.awt.event.MouseWheelListener;
 import org.openstreetmap.gui.jmapviewer.JMapController;
 import org.openstreetmap.gui.jmapviewer.JMapViewer;
 
-public class MapController extends JMapController
-		implements MouseListener, MouseMotionListener, MouseWheelListener {
+class MapController extends JMapController implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 	private static final int MOUSE_BUTTONS_MASK = MouseEvent.BUTTON3_DOWN_MASK | MouseEvent.BUTTON1_DOWN_MASK
 			| MouseEvent.BUTTON2_DOWN_MASK;
@@ -75,9 +74,9 @@ public class MapController extends JMapController
 
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		 if (wheelZoomEnabled) {
-		 map.setZoom(map.getZoom() - e.getWheelRotation(), e.getPoint());
-		 }
+		if (wheelZoomEnabled) {
+			map.setZoom(map.getZoom() - e.getWheelRotation(), e.getPoint());
+		}
 	}
 
 	public boolean isMovementEnabled() {

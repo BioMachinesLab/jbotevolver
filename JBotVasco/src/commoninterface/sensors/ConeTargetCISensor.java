@@ -2,7 +2,7 @@ package commoninterface.sensors;
 
 import commoninterface.RobotCI;
 import commoninterface.entities.Entity;
-import commoninterface.entities.target.Target;
+import commoninterface.entities.formation.Target;
 import commoninterface.utils.CIArguments;
 
 public class ConeTargetCISensor extends WaypointConeCISensor {
