@@ -13,7 +13,6 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.JViewport;
-import javax.swing.ViewportLayout;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
@@ -22,10 +21,11 @@ import javax.swing.tree.TreePath;
 import commoninterface.entities.Entity;
 import commoninterface.entities.GeoEntity;
 import commoninterface.entities.GeoFence;
+import commoninterface.entities.RobotLocation;
 import commoninterface.entities.VirtualEntity;
 import commoninterface.entities.Waypoint;
-import commoninterface.entities.target.Formation;
-import commoninterface.entities.target.Target;
+import commoninterface.entities.formation.Formation;
+import commoninterface.entities.formation.Target;
 import commoninterface.utils.jcoord.LatLon;
 import commoninterface.utils.logger.EntityManipulation;
 import commoninterface.utils.logger.EntityManipulation.Operation;
@@ -61,10 +61,13 @@ public class InformationTree extends Container {
 		JViewport viewport = jScroll.getViewport();
 		viewport.setLayout(new ConstrainedViewPortLayout());
 		add(jScroll, BorderLayout.CENTER);
+
+		setMinimumSize(jtree.getMinimumSize());
+		setPreferredSize(jtree.getPreferredScrollableViewportSize());
 	}
 
 	/*
-	 * ´ Robots
+	 * Robots
 	 */
 	public void updateRobot(LogData logData) {
 		if (robotsNodes.get(logData.ip) == null) {
@@ -75,6 +78,29 @@ public class InformationTree extends Container {
 			jtree.expandPath(new TreePath(node.getPath()));
 		} else {
 			robotsNodes.get(logData.ip).updateNode(logData);
+		}
+	}
+
+	public void updateRobot(EntityManipulation entityManipulation) {
+		for (Entity entity : entityManipulation.getEntities()) {
+			updateRobot(entity);
+		}
+	}
+
+	public void updateRobot(Entity entity) {
+		if (entity instanceof RobotLocation) {
+			RobotLocation rl = (RobotLocation) entity;
+			if (robotsNodes.get(rl.getName()) == null) {
+				RobotTreeNode node = new RobotTreeNode(rl);
+				robotsNodes.put(rl.getName(), node);
+
+				jtreeModel.insertNodeInto(node, robotsNode, robotsNode.getChildCount());
+				jtree.expandPath(new TreePath(node.getPath()));
+			} else {
+				robotsNodes.get(rl.getName()).updateNode(rl);
+			}
+		} else {
+			throw new IllegalArgumentException("Illegal entity type (" + entity.getClass() + ")");
 		}
 	}
 
@@ -90,17 +116,17 @@ public class InformationTree extends Container {
 
 	protected class RobotTreeNode extends DefaultMutableTreeNode {
 		private static final long serialVersionUID = 6745991001576897626L;
-		private LogData logData;
+		private Object sourceData;
 
 		private DefaultMutableTreeNode type;
 		private DefaultMutableTreeNode position;
 		private DefaultMutableTreeNode orientation;
-		private DefaultMutableTreeNode speed;
-		private DefaultMutableTreeNode date;
+		private DefaultMutableTreeNode speed = null;
+		private DefaultMutableTreeNode date = null;
 
 		public RobotTreeNode(LogData logData) {
 			super(logData.ip + " (T=" + logData.timestep + ")");
-			this.logData = logData;
+			this.sourceData = logData;
 
 			type = new DefaultMutableTreeNode("Type: " + logData.droneType, false);
 			position = new DefaultMutableTreeNode("Position: " + logData.latLon, false);
@@ -115,21 +141,67 @@ public class InformationTree extends Container {
 			add(date);
 		}
 
+		public RobotTreeNode(RobotLocation rl) {
+			super(rl.getName() + " (T=" + rl.getTimestepReceived() + ")");
+			this.sourceData = rl;
+
+			type = new DefaultMutableTreeNode("Type: " + rl.getDroneType(), false);
+			position = new DefaultMutableTreeNode("Position: " + rl.getLatLon(), false);
+			orientation = new DefaultMutableTreeNode("Orientation: " + rl.getOrientation(), false);
+
+			add(type);
+			add(position);
+			add(orientation);
+		}
+
 		public void updateNode(LogData logData) {
-			this.logData = logData;
+			this.sourceData = logData;
 
 			setUserObject(logData.ip + " (T=" + logData.timestep + ")");
 			type.setUserObject("Type: " + logData.droneType);
 			position.setUserObject("Position: " + logData.latLon);
 			orientation.setUserObject("Orientation: " + logData.GPSorientation);
-			speed.setUserObject("Speed: " + logData.GPSspeed);
-			date.setUserObject("Date: " + logData.GPSdate);
+
+			if (speed != null) {
+				speed.setUserObject("Speed: " + logData.GPSspeed);
+			} else {
+				speed = new DefaultMutableTreeNode("Speed: " + logData.GPSspeed, false);
+				add(speed);
+			}
+
+			if (date != null) {
+				date.setUserObject("Date: " + logData.GPSdate);
+			} else {
+				date = new DefaultMutableTreeNode("Date: " + logData.GPSdate, false);
+				add(date);
+			}
 
 			update();
 		}
 
-		public LogData getLogData() {
-			return logData;
+		public void updateNode(RobotLocation rl) {
+			this.sourceData = rl;
+
+			setUserObject(rl.getName() + " (T=" + rl.getTimestepReceived() + ")");
+			type.setUserObject("Type: " + rl.getDroneType());
+			position.setUserObject("Position: " + rl.getLatLon());
+			orientation.setUserObject("Orientation: " + rl.getOrientation());
+
+			if (speed != null) {
+				this.remove(speed);
+				speed = null;
+			}
+
+			if (date != null) {
+				this.remove(date);
+				date = null;
+			}
+
+			update();
+		}
+
+		public Object getSourceData() {
+			return sourceData;
 		}
 
 		private void update() {
@@ -146,20 +218,8 @@ public class InformationTree extends Container {
 		switch (entityManipulation.getOperation()) {
 		case ADD:
 			for (Entity entity : entities) {
-				EntityTreeNode entityTreeNode = new EntityTreeNode(entity);
-				entitiesNodes.put(entity.getName(), entityTreeNode);
-				jtreeModel.insertNodeInto(entityTreeNode, entitiesNode, entitiesNode.getChildCount());
-				jtreeModel.nodeChanged(entityTreeNode);
-				expandNodesAndChilds(entityTreeNode);
-			}
-			break;
-		case MOVE:
-			for (Entity entity : entities) {
-				EntityTreeNode toMoveEntity = entitiesNodes.get(entity.getName());
-
-				if (toMoveEntity != null) {
-					toMoveEntity.updateNode(entity);
-					jtreeModel.nodeChanged(toMoveEntity);
+				if (entity instanceof RobotLocation) {
+					updateRobot(entity);
 				} else {
 					EntityTreeNode entityTreeNode = new EntityTreeNode(entity);
 					entitiesNodes.put(entity.getName(), entityTreeNode);
@@ -169,14 +229,38 @@ public class InformationTree extends Container {
 				}
 			}
 			break;
+		case MOVE:
+			for (Entity entity : entities) {
+				if (entity instanceof RobotLocation) {
+					updateRobot(entity);
+				} else {
+					EntityTreeNode toMoveEntity = entitiesNodes.get(entity.getName());
+
+					if (toMoveEntity != null) {
+						toMoveEntity.updateNode(entity);
+						jtreeModel.nodeChanged(toMoveEntity);
+					} else {
+						EntityTreeNode entityTreeNode = new EntityTreeNode(entity);
+						entitiesNodes.put(entity.getName(), entityTreeNode);
+						jtreeModel.insertNodeInto(entityTreeNode, entitiesNode, entitiesNode.getChildCount());
+						jtreeModel.nodeChanged(entityTreeNode);
+						expandNodesAndChilds(entityTreeNode);
+					}
+				}
+			}
+			break;
 		case REMOVE:
 			for (Entity entity : entities) {
-				EntityTreeNode toRemoveNode = entitiesNodes.remove(entity.getName());
+				if (entity instanceof RobotLocation) {
+					removeRobot(entity.getName());
+				} else {
+					EntityTreeNode toRemoveNode = entitiesNodes.remove(entity.getName());
 
-				if (toRemoveNode != null) {
-					TreeNode parent = toRemoveNode.getParent();
-					jtreeModel.removeNodeFromParent(toRemoveNode);
-					jtreeModel.nodeChanged(parent);
+					if (toRemoveNode != null) {
+						TreeNode parent = toRemoveNode.getParent();
+						jtreeModel.removeNodeFromParent(toRemoveNode);
+						jtreeModel.nodeChanged(parent);
+					}
 				}
 			}
 			break;
@@ -427,23 +511,5 @@ public class InformationTree extends Container {
 		}
 
 		tree.cleanTree();
-	}
-
-	private class ConstrainedViewPortLayout extends ViewportLayout {
-		private static final long serialVersionUID = -7619031680550892640L;
-
-		@Override
-		public Dimension preferredLayoutSize(Container parent) {
-
-			Dimension preferredViewSize = super.preferredLayoutSize(parent);
-
-			Container viewportContainer = parent.getParent();
-			if (viewportContainer != null) {
-				Dimension parentSize = viewportContainer.getSize();
-				preferredViewSize.height = parentSize.height;
-			}
-
-			return preferredViewSize;
-		}
 	}
 }
