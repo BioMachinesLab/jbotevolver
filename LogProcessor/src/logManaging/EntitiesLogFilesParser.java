@@ -33,11 +33,12 @@ public class EntitiesLogFilesParser {
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData = new HashMap<Integer, ArrayList<EntityManipulation>>();
 
-	public EntitiesLogFilesParser() throws FileNotFoundException, FileSystemException {
-		this(INPUT_FOLDER);
+	public EntitiesLogFilesParser(boolean includePreprocessing) throws FileNotFoundException, FileSystemException {
+		this(INPUT_FOLDER, includePreprocessing);
 	}
 
-	public EntitiesLogFilesParser(String inputFolderPath) throws FileNotFoundException, FileSystemException {
+	public EntitiesLogFilesParser(String inputFolderPath, boolean includePreprocessing)
+			throws FileNotFoundException, FileSystemException {
 		if (inputFolderPath == null) {
 			inputFolderPath = INPUT_FOLDER;
 		}
@@ -68,9 +69,11 @@ public class EntitiesLogFilesParser {
 				}
 			}
 
-			for (File file : files) {
-				System.out.printf("[%s] Pre-processing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
-				preprocessLogFile(file);
+			if (includePreprocessing) {
+				for (File file : files) {
+					System.out.printf("[%s] Pre-processing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
+					preprocessLogFile(file);
+				}
 			}
 
 			for (File file : files) {
@@ -267,7 +270,7 @@ public class EntitiesLogFilesParser {
 
 	public static void main(String[] args) throws FileNotFoundException, FileSystemException {
 		System.out.printf("[%S] [INIT]%n", EntitiesLogFilesParser.class.getSimpleName());
-		new EntitiesLogFilesParser(INPUT_FOLDER);
+		new EntitiesLogFilesParser(INPUT_FOLDER, true);
 		System.out.printf("[%S] [FINISHED]%n", EntitiesLogFilesParser.class.getSimpleName());
 	}
 }

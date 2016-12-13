@@ -30,11 +30,11 @@ public class ValuesLogFilesParser {
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<DecodedLog>> decodedLogData = new HashMap<Integer, ArrayList<DecodedLog>>();
 
-	public ValuesLogFilesParser() throws FileNotFoundException {
-		this(INPUT_FOLDER);
+	public ValuesLogFilesParser(boolean includePreprocessing) throws FileNotFoundException {
+		this(INPUT_FOLDER, includePreprocessing);
 	}
 
-	public ValuesLogFilesParser(String inputFolderPath) throws FileNotFoundException {
+	public ValuesLogFilesParser(String inputFolderPath, boolean includePreprocessing) throws FileNotFoundException {
 		if (inputFolderPath == null) {
 			inputFolderPath = INPUT_FOLDER;
 		}
@@ -65,9 +65,11 @@ public class ValuesLogFilesParser {
 				}
 			}
 
-			for (File file : files) {
-				System.out.printf("[%s] Pre-processing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
-				preprocessLogFile(file);
+			if (includePreprocessing) {
+				for (File file : files) {
+					System.out.printf("[%s] Pre-processing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
+					preprocessLogFile(file);
+				}
 			}
 
 			for (File file : files) {
@@ -241,7 +243,7 @@ public class ValuesLogFilesParser {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		System.out.printf("[%S] [INIT]%n", ValuesLogFilesParser.class.getSimpleName());
-		new ValuesLogFilesParser(INPUT_FOLDER);
+		new ValuesLogFilesParser(INPUT_FOLDER, true);
 		System.out.printf("[%S] [FINISHED]%n", ValuesLogFilesParser.class.getSimpleName());
 	}
 }
