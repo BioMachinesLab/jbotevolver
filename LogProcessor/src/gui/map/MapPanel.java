@@ -56,8 +56,8 @@ public class MapPanel extends JComponent {
 	private String TILES_FOLDER_PATH = "C:\\Users\\BIOMACHINES\\Desktop\\Eclipse Data\\Drones Software\\DroneControlConsole\\tiles";
 	// private static Coordinate LISBON_COORDINATES = new Coordinate(38.7166700,
 	// -9.1333300);
-	private Coordinate LISBON_COORDINATES = new Coordinate(38.76351200742713, -9.09394383430481);
-	private int INITIAL_MAP_ZOOM = 18;
+	private Coordinate LISBON_COORDINATES = new Coordinate(38.763513, -9.093943);
+	private int INITIAL_MAP_ZOOM = 17;
 	private int POSITION_HISTORY = 1;
 
 	private JMapViewerImplementation mapInstance = null;
