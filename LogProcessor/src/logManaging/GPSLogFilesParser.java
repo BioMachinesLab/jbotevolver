@@ -54,8 +54,10 @@ public class GPSLogFilesParser {
 						ArrayList<GPSData> data = parseNMEAData(fileList[0]);
 						gpsData.put(currentRobot, data);
 
-						System.out.printf("[%s] -----> %d GPRMC sentences parsed%n", getClass().getSimpleName(),
-								data.size());
+						if (data.size() > 0) {
+							System.out.printf("[%s] -----> %d GPRMC sentences parsed%n", getClass().getSimpleName(),
+									data.size());
+						}
 					} else {
 						System.err.printf("[%s] Ambiguous or missing GPS log file%n", getClass().getSimpleName());
 					}

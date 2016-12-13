@@ -28,19 +28,19 @@ public class LogFilesMerger {
 	private File inputFolderFile;
 	private File outputFolderFile;
 
-	public LogFilesMerger() throws IOException {
+	public LogFilesMerger() throws FileNotFoundException, FileAlreadyExistsException, FileSystemException {
 		this(INPUT_FOLDER, OUTPUT_FOLDER);
 	}
 
 	public LogFilesMerger(String inputFolderPath, String outputFolderPath)
-			throws IOException, FileNotFoundException, FileAlreadyExistsException, FileSystemException {
+			throws FileNotFoundException, FileAlreadyExistsException, FileSystemException {
 		inputFolderFile = new File(inputFolderPath);
 
 		if (inputFolderFile.exists() && inputFolderFile.isDirectory()) {
 			outputFolderFile = new File(outputFolderPath);
 			if (!outputFolderFile.exists()) {
 				if (!outputFolderFile.mkdir()) {
-					throw new IOException("Unable to create output directory");
+					throw new FileSystemException("Unable to create output directory");
 				}
 
 				for (File tempInputFolder : inputFolderFile.listFiles()) {
@@ -55,14 +55,14 @@ public class LogFilesMerger {
 					}
 				}
 			} else {
-				throw new FileAlreadyExistsException("Output folder already exist");
+				throw new FileAlreadyExistsException("Output folder already exist (probably merging was already performed)");
 			}
 		} else {
 			throw new FileNotFoundException("Input folder does not exist");
 		}
 	}
 
-	private void mergeLogs(File inputFolder, File outputFolder) throws IOException, FileSystemException {
+	private void mergeLogs(File inputFolder, File outputFolder) throws FileSystemException {
 		System.out.printf("[%s] Merging files in %s%n", getClass().getSimpleName(), inputFolder.getAbsolutePath());
 
 		for (final String prefix : FILES_PREFIXES) {
@@ -97,7 +97,7 @@ public class LogFilesMerger {
 										StandardOpenOption.CREATE, StandardOpenOption.APPEND);
 							}
 						} catch (IOException e) {
-							throw e;
+							throw new FileSystemException("Error writing data to file " + e.getMessage());
 						}
 					}
 				}
@@ -106,7 +106,7 @@ public class LogFilesMerger {
 	}
 
 	public static void main(String[] args)
-			throws FileAlreadyExistsException, FileNotFoundException, FileSystemException, IOException {
+			throws FileAlreadyExistsException, FileNotFoundException, FileSystemException {
 		System.out.printf("[%S] [INIT]%n", LogFilesMerger.class.getSimpleName());
 		new LogFilesMerger(INPUT_FOLDER, OUTPUT_FOLDER);
 		System.out.printf("[%S] [FINISHED]%n", LogFilesMerger.class.getSimpleName());

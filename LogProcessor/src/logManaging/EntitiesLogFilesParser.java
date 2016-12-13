@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -32,11 +33,11 @@ public class EntitiesLogFilesParser {
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData = new HashMap<Integer, ArrayList<EntityManipulation>>();
 
-	public EntitiesLogFilesParser() throws IOException, FileNotFoundException {
+	public EntitiesLogFilesParser() throws FileNotFoundException, FileSystemException {
 		this(INPUT_FOLDER);
 	}
 
-	public EntitiesLogFilesParser(String inputFolderPath) throws IOException, FileNotFoundException {
+	public EntitiesLogFilesParser(String inputFolderPath) throws FileNotFoundException, FileSystemException {
 		if (inputFolderPath == null) {
 			inputFolderPath = INPUT_FOLDER;
 		}
@@ -78,14 +79,17 @@ public class EntitiesLogFilesParser {
 				int currentRobot = Integer.parseInt(file.getParentFile().getName());
 				ArrayList<EntityManipulation> data = parseEntitiesData(file);
 				entitiesManipulationData.put(currentRobot, data);
-				System.out.printf("[%s] -----> %d log lines parsed%n", getClass().getSimpleName(), data.size());
+
+				if (data.size() > 0) {
+					System.out.printf("[%s] -----> %d log lines parsed%n", getClass().getSimpleName(), data.size());
+				}
 			}
 		} else {
 			throw new FileNotFoundException("Input folder does not exist");
 		}
 	}
 
-	private void preprocessLogFile(File inputFile) throws IOException {
+	private void preprocessLogFile(File inputFile) throws FileSystemException {
 		FileReader fileReader = null;
 		BufferedReader inputBuffReader = null;
 
@@ -143,7 +147,7 @@ public class EntitiesLogFilesParser {
 				}
 			}
 		} catch (IOException e) {
-			throw e;
+			throw new FileSystemException("Error pre-processing log files " + e.getMessage());
 		} finally {
 			if (fileReader != null) {
 				try {
@@ -246,7 +250,9 @@ public class EntitiesLogFilesParser {
 			}
 		}
 
-		System.out.printf("[%s] -----> %d parsing errors%n", getClass().getSimpleName(), parsingErrors);
+		if (parsingErrors > 0) {
+			System.out.printf("[%s] -----> %d parsing errors%n", getClass().getSimpleName(), parsingErrors);
+		}
 		return data;
 	}
 
@@ -259,7 +265,7 @@ public class EntitiesLogFilesParser {
 		return entitiesManipulationData;
 	}
 
-	public static void main(String[] args) throws IOException, FileNotFoundException {
+	public static void main(String[] args) throws FileNotFoundException, FileSystemException {
 		System.out.printf("[%S] [INIT]%n", EntitiesLogFilesParser.class.getSimpleName());
 		new EntitiesLogFilesParser(INPUT_FOLDER);
 		System.out.printf("[%S] [FINISHED]%n", EntitiesLogFilesParser.class.getSimpleName());

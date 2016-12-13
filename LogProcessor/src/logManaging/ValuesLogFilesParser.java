@@ -76,7 +76,10 @@ public class ValuesLogFilesParser {
 				int currentRobot = Integer.parseInt(file.getParentFile().getName());
 				ArrayList<DecodedLog> data = parseLogFile(file);
 				decodedLogData.put(currentRobot, data);
-				System.out.printf("[%s] -----> %d log lines parsed%n", getClass().getSimpleName(), data.size());
+
+				if (data.size() > 0) {
+					System.out.printf("[%s] -----> %d log lines parsed%n", getClass().getSimpleName(), data.size());
+				}
 			}
 		} else {
 			throw new FileNotFoundException("Input folder does not exist");
@@ -209,7 +212,6 @@ public class ValuesLogFilesParser {
 			}
 		} catch (IOException e) {
 			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
-			parsingErrors++;
 		} finally {
 			if (inputReader != null) {
 				try {
