@@ -42,8 +42,8 @@ import commoninterface.entities.GeoFence;
 import commoninterface.entities.ObstacleLocation;
 import commoninterface.entities.RobotLocation;
 import commoninterface.entities.Waypoint;
-import commoninterface.entities.target.Formation;
-import commoninterface.entities.target.Target;
+import commoninterface.entities.formation.Formation;
+import commoninterface.entities.formation.Target;
 import commoninterface.utils.jcoord.LatLon;
 import gui.SpringUtilities;
 import gui.map.markers.MapMarkerBaseStation;
@@ -52,10 +52,13 @@ import gui.map.markers.MapMarkerObstacle;
 import gui.map.markers.MapMarkerWaypoint;
 
 public class MapPanel extends JComponent {
-	private static final long serialVersionUID = 8239117061075444973L;
-	private static String TILES_FOLDER_PATH = "C:\\Users\\BIOMACHINES\\Desktop\\Eclipse Data\\Drones Software\\DroneControlConsole\\tiles";
-	private static Coordinate LISBON_COORDINATES = new Coordinate(38.7166700, -9.1333300);
-	private static int POSITION_HISTORY = 1;
+	private static final long serialVersionUID = -2400291814224245232L;
+	private String TILES_FOLDER_PATH = "C:\\Users\\BIOMACHINES\\Desktop\\Eclipse Data\\Drones Software\\DroneControlConsole\\tiles";
+	// private static Coordinate LISBON_COORDINATES = new Coordinate(38.7166700,
+	// -9.1333300);
+	private Coordinate LISBON_COORDINATES = new Coordinate(38.76351200742713, -9.09394383430481);
+	private int INITIAL_MAP_ZOOM = 18;
+	private int POSITION_HISTORY = 1;
 
 	private JMapViewerImplementation mapInstance = null;
 
@@ -64,6 +67,7 @@ public class MapPanel extends JComponent {
 	 */
 	// Robots
 	private HashMap<String, LinkedList<MapMarker>> robotPositions = new HashMap<String, LinkedList<MapMarker>>();
+	private HashMap<String, Layer> robotLayers = new HashMap<String, Layer>();
 	private HashMap<String, Long> robotPositionsLastUpdate = new HashMap<String, Long>();
 	private int robotMarkerIndex = 0;
 
@@ -98,8 +102,8 @@ public class MapPanel extends JComponent {
 		/*
 		 * Create map instance
 		 */
-		mapInstance = new JMapViewerImplementation("Zones",true);
-		mapInstance.getViewer().setDisplayPosition(LISBON_COORDINATES, 13);
+		mapInstance = new JMapViewerImplementation("Layers", true);
+		mapInstance.getViewer().setDisplayPosition(LISBON_COORDINATES, INITIAL_MAP_ZOOM);
 		add(mapInstance, BorderLayout.CENTER);
 
 		/*
@@ -192,21 +196,10 @@ public class MapPanel extends JComponent {
 				robotPositionsLastUpdate.put(name, System.currentTimeMillis());
 			}
 
-			Layer layer = null;
-			synchronized (this) {
-				Iterator<MapMarker> i = getMap().getMapMarkerList().iterator();
-
-				while (i.hasNext()) {
-					MapMarker m = i.next();
-					if (m.getLayer() != null && m.getLayer().getName().equals(name)) {
-						layer = m.getLayer();
-						break;
-					}
-				}
-			}
-
+			Layer layer = robotLayers.get(name);
 			if (layer == null) {
 				layer = mapInstance.addLayer(name);
+				robotLayers.put(name, layer);
 			}
 
 			// Create a position history in the list
@@ -332,6 +325,32 @@ public class MapPanel extends JComponent {
 		}
 	}
 
+	public void addTarget(Target t) {
+		String layerName = "targets";
+		Layer l = null;
+
+		for (Layer layer : mapInstance.getLayers()) {
+			if (layer.getName().equals(layerName)) {
+				l = layer;
+			}
+		}
+		if (l == null) {
+			l = mapInstance.addLayer(layerName);
+		}
+
+		String markerName = t.getName().substring(t.getName().length() - 3, t.getName().length());
+		MapMarker m = new MapMarkerWaypoint(l, markerName, latLonToCoord(t.getLatLon()), Color.BLUE);
+
+		l.add(m);
+		targetMarkers.add(m);
+
+		getMap().addMapMarker(m);
+
+		synchronized (this) {
+			targets.add(t);
+		}
+	}
+
 	public void addTarget(Coordinate c, String name, double radius) {
 		String layerName = "targets";
 		Layer l = null;
@@ -366,16 +385,32 @@ public class MapPanel extends JComponent {
 
 		ArrayList<Coordinate> polygonCoordinates = new ArrayList<Coordinate>();
 		this.geoFence = geoFence;
+		String layerName = "geofence";
+		Layer layer = null;
+
+		for (Layer l : mapInstance.getLayers()) {
+			if (l.getName().equals(layerName)) {
+				layer = l;
+				break;
+			}
+		}
+
+		if (layer == null) {
+			layer = mapInstance.addLayer(layerName);
+		}
+
 		for (Waypoint wp : geoFence.getWaypoints()) {
 			Coordinate coordinates = latLonToCoord(wp.getLatLon());
 			polygonCoordinates.add(coordinates);
 
-			MapMarker marker = new MapMarkerDot(coordinates);
+			MapMarker marker = new MapMarkerDot(layer, coordinates);
+			layer.add(marker);
 			geoFenceMarkers.add(marker);
 			getMap().addMapMarker(marker);
 		}
 
-		geoFenceMapPolygon = new MapPolygonImpl(polygonCoordinates);
+		geoFenceMapPolygon = new MapPolygonImpl(layer, polygonCoordinates);
+		layer.add(geoFenceMapPolygon);
 		getMap().addMapPolygon(geoFenceMapPolygon);
 	}
 
@@ -466,6 +501,32 @@ public class MapPanel extends JComponent {
 		}
 	}
 
+	public void addObstacle(ObstacleLocation obstacleLocation) {
+		String layerName = "obstacles";
+
+		Layer l = null;
+
+		for (Layer layer : mapInstance.getLayers())
+			if (layer.getName().equals("obstacles"))
+				l = layer;
+
+		if (l == null) {
+			l = mapInstance.addLayer(layerName);
+		}
+
+		String markerName = "obstacle" + obstacles.size();
+		MapMarker m = new MapMarkerObstacle(l, markerName, latLonToCoord(obstacleLocation.getLatLon()));
+
+		l.add(m);
+		obstacleMarkers.add(m);
+
+		getMap().addMapMarker(m);
+
+		synchronized (this) {
+			obstacles.add(obstacleLocation);
+		}
+	}
+
 	public void setBaseStation(LatLon position) {
 		if (basestationMarker != null) {
 			basestationMarker.setLat(position.getLat());
@@ -522,18 +583,9 @@ public class MapPanel extends JComponent {
 	public void clearRobot(String name) {
 		LinkedList<MapMarker> robotMarkers = robotPositions.get(name);
 		Iterator<MapMarker> i = getMap().getMapMarkerList().iterator();
-		Layer l = null;
-
-		while (i.hasNext()) {
-			MapMarker m = i.next();
-			if (m.getLayer() != null && m.getLayer().getName().equals(name)) {
-				l = m.getLayer();
-				break;
-			}
-		}
+		Layer l = robotLayers.get(name);
 
 		if (robotMarkers != null & l != null && !robotMarkers.isEmpty()) {
-
 			i = robotMarkers.iterator();
 
 			while (i.hasNext()) {
