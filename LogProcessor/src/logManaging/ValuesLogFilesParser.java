@@ -105,7 +105,7 @@ public class ValuesLogFilesParser {
 			fileWriter = new FileWriter(temporaryFile);
 			outputBuffWriter = new BufferedWriter(fileWriter);
 
-			String line = null;
+			String line = "";
 			String messageString = "";
 			boolean inMessage = false;
 
