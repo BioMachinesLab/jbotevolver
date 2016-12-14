@@ -6,6 +6,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -21,7 +23,8 @@ import commoninterface.dataobjects.GPSData;
  */
 public class GPSLogFilesParser {
 	private final static String INPUT_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
-	private final static String FILE_PREFIX = "GPSLog_";
+	private final String FILE_PREFIX = "GPSLog_";
+	private final String PARSED_DATA_FILE_GPS = "mergedLogs_gps.log";
 
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<GPSData>> gpsData = new HashMap<Integer, ArrayList<GPSData>>();
@@ -181,6 +184,19 @@ public class GPSLogFilesParser {
 	 */
 	public HashMap<Integer, ArrayList<GPSData>> getGPSData() {
 		return gpsData;
+	}
+
+	public void saveParsedDataToFile() throws FileAlreadyExistsException, FileSystemException {
+		File file = new File(INPUT_FOLDER, PARSED_DATA_FILE_GPS);
+		if (file.exists()) {
+			throw new FileAlreadyExistsException("File already exist");
+		} else {
+			FileUtils.ExperiencesDataOnFile data_gps = new FileUtils.ExperiencesDataOnFile();
+			data_gps.setGPSData(gpsData);
+			if (!FileUtils.saveDataToFile(data_gps, PARSED_DATA_FILE_GPS, true)) {
+				throw new FileSystemException("Error writing GPS data to file");
+			}
+		}
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {

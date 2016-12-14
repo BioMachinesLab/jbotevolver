@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import commoninterface.utils.logger.LogCodex.LogType;
 public class ValuesLogFilesParser {
 	private final static String INPUT_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
 	private final static String FILE_PREFIX = "values_";
+	private final String PARSED_DATA_FILE_LOG = "mergedLogs_logData.log";
 
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<DecodedLog>> decodedLogData = new HashMap<Integer, ArrayList<DecodedLog>>();
@@ -239,6 +242,19 @@ public class ValuesLogFilesParser {
 
 	public HashMap<Integer, ArrayList<DecodedLog>> getDecodedLogData() {
 		return decodedLogData;
+	}
+
+	public void saveParsedDataToFile() throws FileAlreadyExistsException, FileSystemException {
+		File file = new File(INPUT_FOLDER, PARSED_DATA_FILE_LOG);
+		if (file.exists()) {
+			throw new FileAlreadyExistsException("File already exist");
+		} else {
+			FileUtils.ExperiencesDataOnFile data_gps = new FileUtils.ExperiencesDataOnFile();
+			data_gps.setDecodedLogData(decodedLogData);
+			if (!FileUtils.saveDataToFile(data_gps, PARSED_DATA_FILE_LOG, true)) {
+				throw new FileSystemException("Error writing log data data to file");
+			}
+		}
 	}
 
 	public static void main(String[] args) throws FileNotFoundException {

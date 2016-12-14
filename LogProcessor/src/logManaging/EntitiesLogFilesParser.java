@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -28,7 +29,9 @@ import commoninterface.utils.logger.LogCodex.LogType;
  */
 public class EntitiesLogFilesParser {
 	private final static String INPUT_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
-	private final static String FILE_PREFIX = "entity_";
+	private final String FILE_PREFIX = "entity_";
+	private final String REGEX_LOG_LINE = "^[\\w $.,;:?~!\"^=()\t\\-\\/\\{\\}\\[\\]]+$";
+	private final String PARSED_DATA_FILE_ENTITIES = "mergedLogs_entities.log";
 
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData = new HashMap<Integer, ArrayList<EntityManipulation>>();
@@ -111,7 +114,7 @@ public class EntitiesLogFilesParser {
 
 			String line = "";
 			while (line != null && (line = inputBuffReader.readLine()) != null) {
-				if (!line.isEmpty() && !line.matches("^\\s?$")) {
+				if (!line.isEmpty() && line.matches(REGEX_LOG_LINE)) {
 					if (line.contains(RobotLocation.class.getSimpleName())
 							&& line.contains(LogCodex.ENTITY_OP_SEP + EntityManipulation.Operation.REMOVE)) {
 						String previousLine = line;
@@ -122,20 +125,20 @@ public class EntitiesLogFilesParser {
 								line = line.replace(EntityManipulation.Operation.ADD.name(),
 										EntityManipulation.Operation.MOVE.name());
 							} else {
-								if (!previousLine.isEmpty() && !previousLine.matches("^\\s?$")) {
+								if (!previousLine.isEmpty() && previousLine.matches(REGEX_LOG_LINE)) {
 									outputBuffWriter.write(previousLine);
 									outputBuffWriter.newLine();
 									outputBuffWriter.flush();
 								}
 							}
 
-							if (!line.isEmpty() && !line.matches("^\\s?$")) {
+							if (!line.isEmpty() && line.matches(REGEX_LOG_LINE)) {
 								outputBuffWriter.write(line);
 								outputBuffWriter.newLine();
 								outputBuffWriter.flush();
 							}
 						} else {
-							if (!previousLine.isEmpty() && !previousLine.matches("^\\s?$")) {
+							if (!previousLine.isEmpty() && previousLine.matches(REGEX_LOG_LINE)) {
 								outputBuffWriter.write(previousLine);
 								outputBuffWriter.newLine();
 								outputBuffWriter.flush();
@@ -208,7 +211,7 @@ public class EntitiesLogFilesParser {
 			fileReader = new FileReader(inputFile);
 			inputBuffReader = new BufferedReader(fileReader);
 
-			String line = inputBuffReader.readLine();
+			String line = "";
 			while ((line = inputBuffReader.readLine()) != null) {
 				if (!line.isEmpty() && line.matches("^[A-Za-z0-9= \t_.,;:!{}()-\\]\\[]+")) {
 					String[] infoBlocks = line.split(LogCodex.MAIN_SEPARATOR);
@@ -266,6 +269,19 @@ public class EntitiesLogFilesParser {
 	 */
 	public HashMap<Integer, ArrayList<EntityManipulation>> getEntitiesManipulationData() {
 		return entitiesManipulationData;
+	}
+
+	public void saveParsedDataToFile() throws FileAlreadyExistsException, FileSystemException {
+		File file = new File(INPUT_FOLDER, PARSED_DATA_FILE_ENTITIES);
+		if (file.exists()) {
+			throw new FileAlreadyExistsException("File already exist");
+		} else {
+			FileUtils.ExperiencesDataOnFile data_gps = new FileUtils.ExperiencesDataOnFile();
+			data_gps.setEntitiesManipulationData(entitiesManipulationData);
+			if (!FileUtils.saveDataToFile(data_gps, PARSED_DATA_FILE_ENTITIES, true)) {
+				throw new FileSystemException("Error writing entities data to file");
+			}
+		}
 	}
 
 	public static void main(String[] args) throws FileNotFoundException, FileSystemException {
