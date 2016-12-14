@@ -90,16 +90,18 @@ public class GPSLogFilesParser {
 
 			String line = "";
 			while ((line = inputBuffReader.readLine()) != null) {
-				int indexComma = line.indexOf(',');
+				if (!line.startsWith("#")) {
+					int indexComma = line.indexOf(',');
 
-				if (indexComma >= 0 && line.substring(0, indexComma).equals("$GPRMC")) {
-					try {
-						String[] split = line.split(",");
-						data.add(parseGPRMCSentence(split));
-					} catch (RuntimeException e) {
-						// System.err.printf("[%s] Error parsing %s%n",
-						// getClass().getSimpleName(), line);
-						parsingErrors++;
+					if (indexComma >= 0 && line.substring(0, indexComma).equals("$GPRMC")) {
+						try {
+							String[] split = line.split(",");
+							data.add(parseGPRMCSentence(split));
+						} catch (RuntimeException e) {
+							// System.err.printf("[%s] Error parsing %s%n",
+							// getClass().getSimpleName(), line);
+							parsingErrors++;
+						}
 					}
 				}
 			}

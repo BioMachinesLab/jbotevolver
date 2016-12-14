@@ -29,6 +29,8 @@ public class ValuesLogFilesParser {
 	private final static String INPUT_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
 	private final static String FILE_PREFIX = "values_";
 	private final String PARSED_DATA_FILE_LOG = "mergedLogs_logData.log";
+	private final String REGEX_VALID_LOG_LINE = "^[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+$";
+	private final String REGEX_VALID_MESSAGE_LOG_LINE = "^[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+\"[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+\"[ ]?$";
 
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<DecodedLog>> decodedLogData = new HashMap<Integer, ArrayList<DecodedLog>>();
@@ -113,7 +115,7 @@ public class ValuesLogFilesParser {
 			boolean inMessage = false;
 
 			while ((line = inputBuffReader.readLine()) != null) {
-				if (!line.isEmpty() && line.matches("^[A-Za-z0-9\t =._:;\"\\[\\]!-]+$")) {
+				if (!line.isEmpty() && line.matches(REGEX_VALID_LOG_LINE)) {
 					if (inMessage) {
 						messageString += line.replaceAll("\n", "\t");
 						messageString += " ";
@@ -130,8 +132,7 @@ public class ValuesLogFilesParser {
 						try {
 							LogType logType = LogType.valueOf(infoBlocks[0].substring(3, infoBlocks[0].length()));
 							if (logType == LogType.MESSAGE) {
-								if (line.matches(
-										"^[A-Za-z0-9\t =._:;\\[\\]!-]+\"[A-Za-z0-9\t =._:;\\[\\]!-]+\"[ ]?$")) {
+								if (line.matches(REGEX_VALID_MESSAGE_LOG_LINE)) {
 									inMessage = false;
 									outputBuffWriter.write(messageString);
 									outputBuffWriter.newLine();
@@ -213,7 +214,9 @@ public class ValuesLogFilesParser {
 
 			String line = "";
 			while ((line = inputBuffReader.readLine()) != null) {
-				data.add(LogCodex.decodeLog(line));
+				if (!line.startsWith("#")) {
+					data.add(LogCodex.decodeLog(line));
+				}
 			}
 		} catch (IOException e) {
 			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());

@@ -30,8 +30,8 @@ import commoninterface.utils.logger.LogCodex.LogType;
 public class EntitiesLogFilesParser {
 	private final static String INPUT_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
 	private final String FILE_PREFIX = "entity_";
-	private final String REGEX_LOG_LINE = "^[\\w $.,;:?~!\"^=()\t\\-\\/\\{\\}\\[\\]]+$";
 	private final String PARSED_DATA_FILE_ENTITIES = "mergedLogs_entities.log";
+	private final String REGEX_VALID_LOG_LINE = "^[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+$";
 
 	private File inputFolderFile;
 	private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData = new HashMap<Integer, ArrayList<EntityManipulation>>();
@@ -114,7 +114,7 @@ public class EntitiesLogFilesParser {
 
 			String line = "";
 			while (line != null && (line = inputBuffReader.readLine()) != null) {
-				if (!line.isEmpty() && line.matches(REGEX_LOG_LINE)) {
+				if (!line.isEmpty() && line.matches(REGEX_VALID_LOG_LINE)) {
 					if (line.contains(RobotLocation.class.getSimpleName())
 							&& line.contains(LogCodex.ENTITY_OP_SEP + EntityManipulation.Operation.REMOVE)) {
 						String previousLine = line;
@@ -125,20 +125,20 @@ public class EntitiesLogFilesParser {
 								line = line.replace(EntityManipulation.Operation.ADD.name(),
 										EntityManipulation.Operation.MOVE.name());
 							} else {
-								if (!previousLine.isEmpty() && previousLine.matches(REGEX_LOG_LINE)) {
+								if (!previousLine.isEmpty() && previousLine.matches(REGEX_VALID_LOG_LINE)) {
 									outputBuffWriter.write(previousLine);
 									outputBuffWriter.newLine();
 									outputBuffWriter.flush();
 								}
 							}
 
-							if (!line.isEmpty() && line.matches(REGEX_LOG_LINE)) {
+							if (!line.isEmpty() && line.matches(REGEX_VALID_LOG_LINE)) {
 								outputBuffWriter.write(line);
 								outputBuffWriter.newLine();
 								outputBuffWriter.flush();
 							}
 						} else {
-							if (!previousLine.isEmpty() && previousLine.matches(REGEX_LOG_LINE)) {
+							if (!previousLine.isEmpty() && previousLine.matches(REGEX_VALID_LOG_LINE)) {
 								outputBuffWriter.write(previousLine);
 								outputBuffWriter.newLine();
 								outputBuffWriter.flush();
@@ -213,7 +213,7 @@ public class EntitiesLogFilesParser {
 
 			String line = "";
 			while ((line = inputBuffReader.readLine()) != null) {
-				if (!line.isEmpty() && line.matches("^[A-Za-z0-9= \t_.,;:!{}()-\\]\\[]+")) {
+				if (!line.isEmpty() && line.matches(REGEX_VALID_LOG_LINE) && !line.startsWith("#")) {
 					String[] infoBlocks = line.split(LogCodex.MAIN_SEPARATOR);
 
 					try {
