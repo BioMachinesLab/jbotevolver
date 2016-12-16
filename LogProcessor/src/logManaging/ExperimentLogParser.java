@@ -22,6 +22,7 @@ import commoninterface.utils.logger.LogCodex;
 import commoninterface.utils.logger.LogCodex.LogType;
 
 public class ExperimentLogParser {
+	private final boolean PRINT_INFORMATION_RESUME = true;
 	private final String INPUT_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
 	private final String FILE_PREFIX = "entity_";
 	private final String PARSED_DATA_FILE_EXPERIMENTS = "mergedLogs_experiments.log";
@@ -30,7 +31,7 @@ public class ExperimentLogParser {
 	private File inputFolderFile;
 	private HashMap<Integer, ExperimentData> experimentsData = new HashMap<Integer, ExperimentData>();
 
-	public ExperimentLogParser(String inputFolderPath) throws FileNotFoundException, FileSystemException {
+	public ExperimentLogParser(String inputFolderPath) throws FileNotFoundException {
 		if (inputFolderPath == null) {
 			inputFolderPath = INPUT_FOLDER;
 		}
@@ -67,20 +68,42 @@ public class ExperimentLogParser {
 
 				for (int key : data.keySet()) {
 					if (experimentsData.containsKey(key)) {
-						mergeExperimentsData(experimentsData.get(key), data.get(key));
+						ExperimentData experimentData = mergeExperimentsData(experimentsData.remove(key),
+								data.get(key));
+						experimentsData.put(key, experimentData);
 					} else {
 						experimentsData.put(key, data.get(key));
 					}
 				}
 
 				if (data.size() > 0) {
-					System.out.printf("[%s] -----> %d experiments parsed: ", getClass().getSimpleName(), data.size());
+					System.out.printf("[%s] -----> %02d experiments parsed: ", getClass().getSimpleName(), data.size());
 
 					for (int key : data.keySet()) {
-						System.out.printf("%d ", key);
+						System.out.printf("%02d ", key);
 					}
 					System.out.println();
 				}
+			}
+
+			if (PRINT_INFORMATION_RESUME) {
+				System.out.printf("[%s] ###############################%n", getClass().getSimpleName());
+				System.out.printf("[%s] Parse resume:%n", getClass().getSimpleName());
+				System.out.printf("[%s] >> %d experiments parsed%n", getClass().getSimpleName(),
+						experimentsData.keySet().size());
+
+				for (int key : experimentsData.keySet()) {
+					System.out.printf("[%s] >>>> Experiment: %02d\tTimesteps: %04.0f\tRobot(s) - %d: ",
+							getClass().getSimpleName(), experimentsData.get(key).experimentNumber,
+							experimentsData.get(key).timestepsCount,
+							experimentsData.get(key).stepsData.keySet().size());
+
+					for (int key2 : experimentsData.get(key).stepsData.keySet()) {
+						System.out.printf("%d ", key2);
+					}
+					System.out.println();
+				}
+
 			}
 		} else {
 			throw new FileNotFoundException("Input folder does not exist");
@@ -199,7 +222,6 @@ public class ExperimentLogParser {
 					if (!inExperiment && line.startsWith("###")) {
 						inExperiment = true;
 						stringBuilder = new StringBuilder(line + "\n");
-
 						// Between experiments
 					} else if (inExperiment && line.startsWith("###")) {
 						experiments.add(stringBuilder.toString());
@@ -209,6 +231,8 @@ public class ExperimentLogParser {
 					}
 				}
 			}
+
+			experiments.add(stringBuilder.toString());
 		} catch (IOException e) {
 			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
 		} finally {
