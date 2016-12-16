@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import commoninterface.entities.RobotLocation;
 import commoninterface.utils.logger.DecodedLog;
@@ -34,7 +35,7 @@ public class EntitiesLogFilesParser {
 	private final String REGEX_VALID_LOG_LINE = "^[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+$";
 
 	private File inputFolderFile;
-	private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData = new HashMap<Integer, ArrayList<EntityManipulation>>();
+	private HashMap<Integer, List<EntityManipulation>> entitiesManipulationData = new HashMap<Integer, List<EntityManipulation>>();
 
 	public EntitiesLogFilesParser(boolean includePreprocessing) throws FileNotFoundException, FileSystemException {
 		this(INPUT_FOLDER, includePreprocessing);
@@ -83,7 +84,7 @@ public class EntitiesLogFilesParser {
 				System.out.printf("[%s] Parsing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
 
 				int currentRobot = Integer.parseInt(file.getParentFile().getName());
-				ArrayList<EntityManipulation> data = parseEntitiesData(file);
+				List<EntityManipulation> data = parseEntitiesData(file);
 				entitiesManipulationData.put(currentRobot, data);
 
 				if (data.size() > 0) {
@@ -263,11 +264,11 @@ public class EntitiesLogFilesParser {
 	}
 
 	/**
-	 * Gets the parsed GPS data
+	 * Gets the parsed entities data
 	 * 
-	 * @return a map with the parsed GPS data where the robot index is the key
+	 * @return a map with the parsed entities data with the robot's index as key
 	 */
-	public HashMap<Integer, ArrayList<EntityManipulation>> getEntitiesManipulationData() {
+	public HashMap<Integer, List<EntityManipulation>> getEntitiesManipulationData() {
 		return entitiesManipulationData;
 	}
 

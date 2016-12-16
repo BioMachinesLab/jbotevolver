@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import commoninterface.utils.logger.DecodedLog;
 import commoninterface.utils.logger.LogCodex;
@@ -33,7 +34,7 @@ public class ValuesLogFilesParser {
 	private final String REGEX_VALID_MESSAGE_LOG_LINE = "^[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+\"[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+\"[ ]?$";
 
 	private File inputFolderFile;
-	private HashMap<Integer, ArrayList<DecodedLog>> decodedLogData = new HashMap<Integer, ArrayList<DecodedLog>>();
+	private HashMap<Integer, List<DecodedLog>> decodedLogData = new HashMap<Integer, List<DecodedLog>>();
 
 	public ValuesLogFilesParser(boolean includePreprocessing) throws FileNotFoundException {
 		this(INPUT_FOLDER, includePreprocessing);
@@ -81,7 +82,7 @@ public class ValuesLogFilesParser {
 				System.out.printf("[%s] Parsing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
 
 				int currentRobot = Integer.parseInt(file.getParentFile().getName());
-				ArrayList<DecodedLog> data = parseLogFile(file);
+				List<DecodedLog> data = parseLogFile(file);
 				decodedLogData.put(currentRobot, data);
 
 				if (data.size() > 0) {
@@ -202,8 +203,8 @@ public class ValuesLogFilesParser {
 		}
 	}
 
-	private ArrayList<DecodedLog> parseLogFile(File inputFile) {
-		ArrayList<DecodedLog> data = new ArrayList<DecodedLog>();
+	private List<DecodedLog> parseLogFile(File inputFile) {
+		List<DecodedLog> data = new ArrayList<DecodedLog>();
 
 		FileReader inputReader = null;
 		BufferedReader inputBuffReader = null;
@@ -243,7 +244,7 @@ public class ValuesLogFilesParser {
 		return data;
 	}
 
-	public HashMap<Integer, ArrayList<DecodedLog>> getDecodedLogData() {
+	public HashMap<Integer, List<DecodedLog>> getDecodedLogData() {
 		return decodedLogData;
 	}
 

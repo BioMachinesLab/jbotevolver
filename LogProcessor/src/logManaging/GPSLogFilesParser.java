@@ -10,6 +10,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.joda.time.LocalDateTime;
 
@@ -27,7 +28,7 @@ public class GPSLogFilesParser {
 	private final String PARSED_DATA_FILE_GPS = "mergedLogs_gps.log";
 
 	private File inputFolderFile;
-	private HashMap<Integer, ArrayList<GPSData>> gpsData = new HashMap<Integer, ArrayList<GPSData>>();
+	private HashMap<Integer, List<GPSData>> gpsData = new HashMap<Integer, List<GPSData>>();
 
 	public GPSLogFilesParser() throws FileNotFoundException {
 		this(INPUT_FOLDER);
@@ -54,7 +55,7 @@ public class GPSLogFilesParser {
 								fileList[0].getAbsolutePath());
 
 						int currentRobot = Integer.parseInt(folder.getName());
-						ArrayList<GPSData> data = parseNMEAData(fileList[0]);
+						List<GPSData> data = parseNMEAData(fileList[0]);
 						gpsData.put(currentRobot, data);
 
 						if (data.size() > 0) {
@@ -78,7 +79,7 @@ public class GPSLogFilesParser {
 	 * @param data
 	 *            : NMEA sentence to be processed
 	 */
-	private ArrayList<GPSData> parseNMEAData(File inputFile) {
+	private List<GPSData> parseNMEAData(File inputFile) {
 		ArrayList<GPSData> data = new ArrayList<GPSData>();
 		int parsingErrors = 0;
 
@@ -184,7 +185,7 @@ public class GPSLogFilesParser {
 	 * 
 	 * @return a map with the parsed GPS data where the robot index is the key
 	 */
-	public HashMap<Integer, ArrayList<GPSData>> getGPSData() {
+	public HashMap<Integer, List<GPSData>> getGPSData() {
 		return gpsData;
 	}
 

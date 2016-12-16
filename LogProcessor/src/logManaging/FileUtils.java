@@ -7,8 +7,8 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -116,39 +116,48 @@ public class FileUtils {
 
 	public static class ExperiencesDataOnFile implements Serializable {
 		private static final long serialVersionUID = -895303111895917088L;
-		private HashMap<Integer, ArrayList<GPSData>> gpsData;
-		private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData;
-		private HashMap<Integer, ArrayList<DecodedLog>> decodedLogData;
+		private HashMap<Integer, List<GPSData>> gpsData;
+		private HashMap<Integer, List<EntityManipulation>> entitiesManipulationData;
+		private HashMap<Integer, List<DecodedLog>> decodedLogData;
+		private HashMap<Integer, ExperimentLogParser.ExperimentData> experimentsData;
 
 		public ExperiencesDataOnFile() {
 			this.gpsData = null;
 			this.entitiesManipulationData = null;
 			this.decodedLogData = null;
+			this.experimentsData = null;
 		}
 
-		public void setGPSData(HashMap<Integer, ArrayList<GPSData>> gpsData) {
+		public void setGPSData(HashMap<Integer, List<GPSData>> gpsData) {
 			this.gpsData = gpsData;
 		}
 
-		public HashMap<Integer, ArrayList<GPSData>> getGPSData() {
+		public HashMap<Integer, List<GPSData>> getGPSData() {
 			return gpsData;
 		}
 
-		public void setEntitiesManipulationData(
-				HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData) {
+		public void setEntitiesManipulationData(HashMap<Integer, List<EntityManipulation>> entitiesManipulationData) {
 			this.entitiesManipulationData = entitiesManipulationData;
 		}
 
-		public HashMap<Integer, ArrayList<EntityManipulation>> getEntitiesManipulationData() {
+		public HashMap<Integer, List<EntityManipulation>> getEntitiesManipulationData() {
 			return entitiesManipulationData;
 		}
 
-		public void setDecodedLogData(HashMap<Integer, ArrayList<DecodedLog>> decodedLogData) {
+		public void setDecodedLogData(HashMap<Integer, List<DecodedLog>> decodedLogData) {
 			this.decodedLogData = decodedLogData;
 		}
 
-		public HashMap<Integer, ArrayList<DecodedLog>> getDecodedLogData() {
+		public HashMap<Integer, List<DecodedLog>> getDecodedLogData() {
 			return decodedLogData;
 		};
+
+		public void setExperimentsData(HashMap<Integer, ExperimentLogParser.ExperimentData> experimentsData) {
+			this.experimentsData = experimentsData;
+		}
+
+		public HashMap<Integer, ExperimentLogParser.ExperimentData> getExperimentsData() {
+			return experimentsData;
+		}
 	}
 }
