@@ -1,144 +1,297 @@
 package logManaging;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Serializable;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileSystemException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
-import org.joda.time.DateTime;
-
-import commoninterface.dataobjects.GPSData;
 import commoninterface.utils.logger.DecodedLog;
-import commoninterface.utils.logger.ToLogData;
-import fieldtests.data.DroneLogExporter;
-import fieldtests.data.Experiment;
-import fitnesstools.AssessFitness;
+import commoninterface.utils.logger.EntityManipulation;
+import commoninterface.utils.logger.LogCodex;
+import commoninterface.utils.logger.LogCodex.LogType;
 
 public class ExperimentLogParser {
-	private final static String RAW_LOGS_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\logs";
-	private final static String MERGED_LOGS_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
-	private int[] robots = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+	private final String INPUT_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
+	private final String FILE_PREFIX = "entity_";
+	private final String PARSED_DATA_FILE_EXPERIMENTS = "mergedLogs_experiments.log";
+	private final String REGEX_VALID_LOG_LINE = "^[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+$";
 
-	private ArrayList<Experiment> experiments = new ArrayList<Experiment>();
-	private HashMap<Integer, ArrayList<ToLogData>> completeLogs = new HashMap<Integer, ArrayList<ToLogData>>();
+	private File inputFolderFile;
+	private HashMap<Integer, ExperimentData> experimentsData = new HashMap<Integer, ExperimentData>();
 
-	private int nSamples = 10;
+	public ExperimentLogParser(String inputFolderPath) throws FileNotFoundException, FileSystemException {
+		if (inputFolderPath == null) {
+			inputFolderPath = INPUT_FOLDER;
+		}
 
-	public static void main(String[] args) throws Exception {
-		new ExperimentLogParser();
+		inputFolderFile = new File(inputFolderPath);
+		if (inputFolderFile.exists() && inputFolderFile.isDirectory()) {
+			ArrayList<File> files = new ArrayList<File>();
+
+			for (File folder : inputFolderFile.listFiles()) {
+				if (folder.isDirectory()) {
+					FilenameFilter filenameFilter = new FilenameFilter() {
+
+						@Override
+						public boolean accept(File dir, String name) {
+							return name.startsWith(FILE_PREFIX);
+						}
+					};
+					File[] fileList = folder.listFiles(filenameFilter);
+
+					if (fileList.length == 1) {
+						files.add(fileList[0]);
+					} else if (fileList.length == 0) {
+						System.err.printf("[%s] Missing log file%n", getClass().getSimpleName());
+					} else {
+						System.err.printf("[%s] Ambiguous log files%n", getClass().getSimpleName());
+					}
+				}
+			}
+
+			for (File file : files) {
+				System.out.printf("[%s] Parsing %s%n", getClass().getSimpleName(), file.getAbsolutePath());
+
+				HashMap<Integer, ExperimentData> data = parseExperimentsData(file);
+
+				for (int key : data.keySet()) {
+					if (experimentsData.containsKey(key)) {
+						mergeExperimentsData(experimentsData.get(key), data.get(key));
+					} else {
+						experimentsData.put(key, data.get(key));
+					}
+				}
+
+				if (data.size() > 0) {
+					System.out.printf("[%s] -----> %d experiments parsed: ", getClass().getSimpleName(), data.size());
+
+					for (int key : data.keySet()) {
+						System.out.printf("%d ", key);
+					}
+					System.out.println();
+				}
+			}
+		} else {
+			throw new FileNotFoundException("Input folder does not exist");
+		}
 	}
 
-	public ExperimentLogParser() throws Exception {
-		new LogFilesMerger(RAW_LOGS_FOLDER, MERGED_LOGS_FOLDER);
-		HashMap<Integer, ArrayList<GPSData>> gpsData = new GPSLogFilesParser(MERGED_LOGS_FOLDER).getGPSData();
-		HashMap<Integer, ArrayList<DecodedLog>> decodedLogData = new ValuesLogFilesParser(MERGED_LOGS_FOLDER)
-				.getDecodedLogData();
+	private HashMap<Integer, ExperimentData> parseExperimentsData(File inputFile) {
+		HashMap<Integer, ExperimentData> experimentsData = new HashMap<Integer, ExperimentData>();
 
-		exp = getExperiment(s);
-		new File("experiments/" + FOLDERS_TO_PROCESS[folder]).mkdir();
+		int parsingErrors = 0;
+		int currentRobot = Integer.parseInt(inputFile.getParentFile().getName());
+		String[] data = segmentExperimentsData(inputFile);
 
-		FileOutputStream fout = new FileOutputStream(file);
-		ObjectOutputStream oos = new ObjectOutputStream(fout);
-		oos.writeObject(exp);
-		oos.close();
-		fout.close();
+		if (data.length > 0) {
+			for (String experiment : data) {
 
-		System.out.println("ASSESSING FITNESS");
-		System.out.println();
-		int j = 0;
-		for (Experiment e : experiments) {
-			double fitnessReal = AssessFitness.getRealFitness(e, 1);
-			double fitnessSim = 0;
-			for (int i = 1; i <= nSamples; i++) {
-				double f = AssessFitness.getSimulatedFitness(e, i, false);
-				fitnessSim += f;
-				// System.out.print(f+" ");
+				// https://www.mkyong.com/java/how-to-convert-string-to-inputstream-in-java/
+				InputStream is = new ByteArrayInputStream(experiment.getBytes());
+				BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+				String line = "";
+				int experimentNumber = -1;
+				double timesteps = -1;
+				int ordernumber = 0;
+				List<ExperimentStep> experimentSteps = new ArrayList<ExperimentStep>();
+
+				try {
+					while ((line = br.readLine()) != null) {
+						if (!line.isEmpty() && line.matches(REGEX_VALID_LOG_LINE)) {
+							try {
+								if (line.startsWith("###")) {
+									String n = line.replaceAll("###exp", "");
+									experimentNumber = Integer.parseInt(n);
+								} else {
+									String[] infoBlocks = line.split(LogCodex.MAIN_SEPARATOR);
+									LogType logType = LogType
+											.valueOf(infoBlocks[0].substring(3, infoBlocks[0].length()));
+
+									if (logType == LogType.ENTITIES) {
+										DecodedLog decodedLog = LogCodex.decodeLog(line);
+
+										if (decodedLog.getPayloadType() == LogType.ENTITIES) {
+											EntityManipulation entityManipulation = (EntityManipulation) decodedLog
+													.getPayload()[1];
+
+											ExperimentStep step = new ExperimentStep();
+											step.entityManipulationData = entityManipulation;
+											step.ordernumber = ordernumber++;
+
+											if (entityManipulation.getTimestep() > timesteps) {
+												timesteps = entityManipulation.getTimestep();
+											}
+										} else {
+											throw new IllegalArgumentException("Invalied log type for this tool");
+										}
+									} else {
+										throw new IllegalArgumentException("Invalied log type for this tool");
+									}
+								}
+							} catch (IllegalArgumentException | StringIndexOutOfBoundsException e) {
+								System.out.println("Error line: " + line);
+								parsingErrors++;
+							}
+						}
+					}
+				} catch (IOException e) {
+					System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+				} finally {
+
+					try {
+						is.close();
+					} catch (IOException e) {
+						System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+					}
+
+					try {
+						br.close();
+					} catch (IOException e) {
+						System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+					}
+				}
+
+				HashMap<Integer, List<ExperimentStep>> stepsData = new HashMap<Integer, List<ExperimentStep>>();
+				stepsData.put(currentRobot, experimentSteps);
+
+				ExperimentData experimentData = new ExperimentData();
+				experimentData.experimentNumber = experimentNumber;
+				experimentData.timestepsCount = timesteps;
+				experimentData.stepsData = stepsData;
+				experimentsData.put(experimentNumber, experimentData);
 			}
-			// System.out.println();
-			fitnessSim /= nSamples;
-			System.out.println((j++) + "\t" + fitnessReal + "\t" + fitnessSim + "\t" + e);
-			// System.out.println();
 		}
 
+		if (parsingErrors > 0) {
+			System.out.printf("[%s] -----> %d parsing errors%n", getClass().getSimpleName(), parsingErrors);
+		}
+
+		return experimentsData;
 	}
 
-	public Experiment getsExperiment(String description) throws IOException {
+	private String[] segmentExperimentsData(File inputFile) {
+		ArrayList<String> experiments = new ArrayList<>();
 
-		String[] split = description.split(";");
+		FileReader fileReader = null;
+		BufferedReader inputBuffReader = null;
+		try {
+			fileReader = new FileReader(inputFile);
+			inputBuffReader = new BufferedReader(fileReader);
 
-		String controller = split[0];
-		int controllerNumber = Integer.parseInt(split[1]);
-		int sample = Integer.parseInt(split[2]);
-		int nRobots = Integer.parseInt(split[3]);
-		String experimentName = split[4];
-		int duration = Integer.parseInt(split[5]);
+			String line = "";
+			StringBuilder stringBuilder = new StringBuilder();
+			boolean inExperiment = false;
+			while ((line = inputBuffReader.readLine()) != null) {
+				if (!line.isEmpty() && line.matches(REGEX_VALID_LOG_LINE)) {
+					// In the beginning
+					if (!inExperiment && line.startsWith("###")) {
+						inExperiment = true;
+						stringBuilder = new StringBuilder(line + "\n");
 
-		DateTime startTime = null;
+						// Between experiments
+					} else if (inExperiment && line.startsWith("###")) {
+						experiments.add(stringBuilder.toString());
+						stringBuilder = new StringBuilder(line + "\n");
+					} else if (inExperiment) {
+						stringBuilder.append(line + "\n");
+					}
+				}
+			}
+		} catch (IOException e) {
+			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+		} finally {
+			if (fileReader != null) {
+				try {
+					fileReader.close();
+				} catch (IOException e) {
+					System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+				}
+			}
 
-		ArrayList<Integer> participatingRobots = new ArrayList<Integer>();
-
-		for (int i : robots) {
-			DateTime timeFound = DroneLogExporter.getStartTime(completeLogs.get(i), experimentName);
-			if (timeFound != null) {
-
-				if (startTime != null && startTime.isBefore(timeFound))
-					timeFound = startTime;
-
-				startTime = timeFound;
-				participatingRobots.add(i);
+			if (inputBuffReader != null) {
+				try {
+					inputBuffReader.close();
+				} catch (IOException e) {
+					System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+				}
 			}
 		}
 
-		if (split.length >= 7) {
-			System.out.println("Manually defining the robots: " + split[6]);
-			participatingRobots.clear();
-			String[] splitRobots = split[6].split(",");
-			for (String id : splitRobots)
-				participatingRobots.add(Integer.parseInt(id));
-		}
-
-		if (startTime == null) {
-			System.out.println("Can't find start time for experiment " + description);
-			System.exit(0);
-		}
-
-		DateTime endTime = startTime.plus(duration * 1000);
-
-		if (nRobots != participatingRobots.size()) {
-			System.out.print("Missing logs for some of the robots " + description + " [");
-			for (int i : participatingRobots) {
-				System.out.print(i + ",");
-			}
-			System.out.println("]");
-		}
-
-		ArrayList<ToLogData> allData = new ArrayList<ToLogData>();
-
-		for (int i : participatingRobots) {
-			allData.addAll(DroneLogExporter.getLogs(completeLogs.get(i), startTime, endTime));
-		}
-
-		Collections.sort(allData);
-
-		Experiment experiment = new Experiment();
-
-		if (split.length == 8) {
-			experiment.activeRobot = Integer.parseInt(split[7]);
-		}
-
-		experiment.setRobots(participatingRobots);
-		experiment.setTimeSteps(duration * 10);
-		experiment.setExperimentStart(startTime);
-		experiment.setExperimentEnd(endTime);
-		experiment.setControllerNumber(controllerNumber);
-		experiment.setSample(sample);
-		experiment.setControllerName(controller);
-		experiment.setLogs(allData);
-
-		return experiment;
+		return experiments.toArray(new String[experiments.size()]);
 	}
 
+	private ExperimentData mergeExperimentsData(ExperimentData experimentData1, ExperimentData experimentData2) {
+		if (experimentData1.experimentNumber != experimentData2.experimentNumber) {
+			throw new IllegalArgumentException("The experiments numbers do not match");
+		}
+
+		ExperimentData experimentData = new ExperimentData();
+		experimentData.experimentNumber = experimentData1.experimentNumber;
+		if (experimentData2.timestepsCount >= experimentData1.timestepsCount) {
+			experimentData.timestepsCount = experimentData2.timestepsCount;
+		} else {
+			experimentData.timestepsCount = experimentData1.timestepsCount;
+		}
+
+		for (int key : experimentData1.stepsData.keySet()) {
+			experimentData.stepsData.put(key, experimentData1.stepsData.get(key));
+		}
+
+		// Experiment 1 data takes priority over 2
+		for (int key : experimentData2.stepsData.keySet()) {
+			if (experimentData.stepsData.get(key) == null) {
+				experimentData.stepsData.put(key, experimentData2.stepsData.get(key));
+			}
+		}
+
+		return experimentData;
+	}
+
+	public class ExperimentData implements Serializable {
+		private static final long serialVersionUID = -405600509166311277L;
+		public double timestepsCount;
+		public int experimentNumber;
+		public HashMap<Integer, List<ExperimentStep>> stepsData = new HashMap<Integer, List<ExperimentStep>>();
+	}
+
+	public class ExperimentStep implements Serializable {
+		private static final long serialVersionUID = 4585308655579494159L;
+		public int ordernumber;
+		public EntityManipulation entityManipulationData;
+	}
+
+	public HashMap<Integer, ExperimentData> getExperimentsData() {
+		return experimentsData;
+	}
+
+	public void saveParsedDataToFile() throws FileAlreadyExistsException, FileSystemException {
+		File file = new File(INPUT_FOLDER, PARSED_DATA_FILE_EXPERIMENTS);
+		if (file.exists()) {
+			throw new FileAlreadyExistsException("File already exist");
+		} else {
+			FileUtils.ExperiencesDataOnFile data_experiment = new FileUtils.ExperiencesDataOnFile();
+			data_experiment.setExperimentsData(experimentsData);
+			if (!FileUtils.saveDataToFile(data_experiment, PARSED_DATA_FILE_EXPERIMENTS, true)) {
+				throw new FileSystemException("Error writing entities data to file");
+			}
+		}
+	}
+
+	public static void main(String[] args) throws FileNotFoundException, FileSystemException {
+		System.out.printf("[%S] [INIT]%n", EntitiesLogFilesParser.class.getSimpleName());
+		new ExperimentLogParser(null);
+		System.out.printf("[%S] [FINISHED]%n", EntitiesLogFilesParser.class.getSimpleName());
+	}
 }
