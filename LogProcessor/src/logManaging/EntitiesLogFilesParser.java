@@ -272,14 +272,14 @@ public class EntitiesLogFilesParser {
 		return entitiesManipulationData;
 	}
 
-	public void saveParsedDataToFile() throws FileAlreadyExistsException, FileSystemException {
+	public void saveParsedDataToFile(boolean override) throws FileAlreadyExistsException, FileSystemException {
 		File file = new File(INPUT_FOLDER, PARSED_DATA_FILE_ENTITIES);
-		if (file.exists()) {
+		if (file.exists() && !override) {
 			throw new FileAlreadyExistsException("File already exist");
 		} else {
 			FileUtils.ExperimentsDataOnFile data_gps = new FileUtils.ExperimentsDataOnFile();
 			data_gps.setEntitiesManipulationData(entitiesManipulationData);
-			if (!FileUtils.saveDataToCompressedFile(data_gps, file, true)) {
+			if (!FileUtils.saveDataToCompressedFile(data_gps, file, false)) {
 				throw new FileSystemException("Error writing entities data to file");
 			}
 		}

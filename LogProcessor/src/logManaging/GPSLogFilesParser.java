@@ -189,14 +189,14 @@ public class GPSLogFilesParser {
 		return gpsData;
 	}
 
-	public void saveParsedDataToFile() throws FileAlreadyExistsException, FileSystemException {
+	public void saveParsedDataToFile(boolean override) throws FileAlreadyExistsException, FileSystemException {
 		File file = new File(INPUT_FOLDER, PARSED_DATA_FILE_GPS);
-		if (file.exists()) {
+		if (file.exists() && !override) {
 			throw new FileAlreadyExistsException("File already exist");
 		} else {
 			FileUtils.ExperimentsDataOnFile data_gps = new FileUtils.ExperimentsDataOnFile();
 			data_gps.setGPSData(gpsData);
-			if (!FileUtils.saveDataToCompressedFile(data_gps, file, true)) {
+			if (!FileUtils.saveDataToCompressedFile(data_gps, file, false)) {
 				throw new FileSystemException("Error writing GPS data to file");
 			}
 		}

@@ -300,14 +300,14 @@ public class ExperimentLogParser {
 		return experimentsData;
 	}
 
-	public void saveParsedDataToFile() throws FileAlreadyExistsException, FileSystemException {
+	public void saveParsedDataToFile(boolean override) throws FileAlreadyExistsException, FileSystemException {
 		File file = new File(INPUT_FOLDER, PARSED_DATA_FILE_EXPERIMENTS);
-		if (file.exists()) {
+		if (file.exists() && !override) {
 			throw new FileAlreadyExistsException("File already exist");
 		} else {
 			FileUtils.ExperimentsDataOnFile data_experiment = new FileUtils.ExperimentsDataOnFile();
 			data_experiment.setExperimentsData(experimentsData);
-			if (!FileUtils.saveDataToCompressedFile(data_experiment, file, true)) {
+			if (!FileUtils.saveDataToCompressedFile(data_experiment, file, false)) {
 				throw new FileSystemException("Error writing entities data to file");
 			}
 		}
