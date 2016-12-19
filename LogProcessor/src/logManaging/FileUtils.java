@@ -67,7 +67,10 @@ public class FileUtils {
 	}
 
 	public static boolean saveDataToFile(ExperiencesDataOnFile data, String file, boolean askoverride) {
-		File outputFile = new File(file);
+		return saveDataToFile(data, new File(file), askoverride);
+	}
+
+	public static boolean saveDataToFile(ExperiencesDataOnFile data, File outputFile, boolean askoverride) {
 		if (askoverride && outputFile.exists()) {
 			int result = JOptionPane.showConfirmDialog(null, "Output file already exists. Override?", "Question",
 					JOptionPane.OK_CANCEL_OPTION);
@@ -81,7 +84,8 @@ public class FileUtils {
 		ObjectOutputStream oos = null;
 		boolean toReturn = true;
 
-		System.out.printf("[%s] Saving data to file %s%n", PositionPlot.class.getSimpleName(), file);
+		System.out.printf("[%s] Saving data to file %s%n", PositionPlot.class.getSimpleName(),
+				outputFile.getAbsolutePath());
 		try {
 			fout = new FileOutputStream(outputFile);
 			oos = new ObjectOutputStream(fout);
