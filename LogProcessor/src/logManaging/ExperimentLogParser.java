@@ -13,6 +13,7 @@ import java.io.Serializable;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -187,6 +188,7 @@ public class ExperimentLogParser implements Serializable {
 					}
 				}
 
+				Collections.sort(experimentSteps);
 				HashMap<Integer, List<ExperimentStep>> stepsData = new HashMap<Integer, List<ExperimentStep>>();
 				stepsData.put(currentRobot, experimentSteps);
 
@@ -291,10 +293,15 @@ public class ExperimentLogParser implements Serializable {
 		public HashMap<Integer, List<ExperimentStep>> stepsData = new HashMap<Integer, List<ExperimentStep>>();
 	}
 
-	public class ExperimentStep implements Serializable {
+	public class ExperimentStep implements Serializable, Comparable<ExperimentStep> {
 		private static final long serialVersionUID = 4585308655579494159L;
 		public int ordernumber;
 		public EntityManipulation entityManipulationData;
+
+		@Override
+		public int compareTo(ExperimentStep o) {
+			return ordernumber - o.ordernumber;
+		}
 	}
 
 	public HashMap<Integer, ExperimentData> getExperimentsData() {
