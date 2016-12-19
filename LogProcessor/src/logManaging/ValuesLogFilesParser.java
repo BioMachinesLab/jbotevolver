@@ -27,11 +27,19 @@ import commoninterface.utils.logger.LogCodex.LogType;
  *
  */
 public class ValuesLogFilesParser {
+	/*
+	 * Files need to be previously processed with the following Regex (not in
+	 * program due to a high laziness level ;) ): Match:
+	 * (commoninterface\.controllers\.ControllerCIBehavior)"\n[ ]?(\()[ ]?([\w
+	 * -]*\))[ ]? Replace: $1 $2$3"\n
+	 */
+
 	private final static String INPUT_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
 	private final static String FILE_PREFIX = "values_";
 	private final String PARSED_DATA_FILE_LOG = "mergedLogs_logData.log";
 	private final String REGEX_VALID_LOG_LINE = "^[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+$";
-	private final String REGEX_VALID_MESSAGE_LOG_LINE = "^[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+\"[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+\"[ ]?$";
+	private final String REGEX_VALID_MESSAGE_LOG_LINE = "^[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+"
+			+ "\"[\\w $.,;:?~!#\"^=()\t\\-\\/\\{\\}\\[\\]]+\"" + "[ ]?$";
 
 	private File inputFolderFile;
 	private HashMap<Integer, List<DecodedLog>> decodedLogData = new HashMap<Integer, List<DecodedLog>>();
@@ -136,6 +144,8 @@ public class ValuesLogFilesParser {
 								if (line.matches(REGEX_VALID_MESSAGE_LOG_LINE)) {
 									inMessage = false;
 									outputBuffWriter.write(messageString);
+									outputBuffWriter.newLine();
+									outputBuffWriter.write(line);
 									outputBuffWriter.newLine();
 									outputBuffWriter.flush();
 								} else {
@@ -248,14 +258,14 @@ public class ValuesLogFilesParser {
 		return decodedLogData;
 	}
 
-	public void saveParsedDataToFile() throws FileAlreadyExistsException, FileSystemException {
+	public void saveParsedDataToFile(boolean override) throws FileAlreadyExistsException, FileSystemException {
 		File file = new File(INPUT_FOLDER, PARSED_DATA_FILE_LOG);
-		if (file.exists()) {
+		if (file.exists() && !override) {
 			throw new FileAlreadyExistsException("File already exist");
 		} else {
-			FileUtils.ExperiencesDataOnFile data_gps = new FileUtils.ExperiencesDataOnFile();
+			FileUtils.ExperimentsDataOnFile data_gps = new FileUtils.ExperimentsDataOnFile();
 			data_gps.setDecodedLogData(decodedLogData);
-			if (!FileUtils.saveDataToFile(data_gps, PARSED_DATA_FILE_LOG, true)) {
+			if (!FileUtils.saveDataToCompressedFile(data_gps, file, false)) {
 				throw new FileSystemException("Error writing log data data to file");
 			}
 		}
