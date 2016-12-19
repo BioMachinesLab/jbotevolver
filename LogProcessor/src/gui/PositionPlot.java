@@ -7,13 +7,7 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileSystemException;
 import java.util.ArrayList;
@@ -52,18 +46,24 @@ import commoninterface.utils.logger.EntityManipulation;
 import commoninterface.utils.logger.LogData;
 import gui.map.MapPanel;
 import logManaging.EntitiesLogFilesParser;
+import logManaging.ExperimentLogParser;
+import logManaging.ExperimentLogParser.ExperimentData;
+import logManaging.FileUtils;
+import logManaging.FileUtils.ExperimentsDataOnFile;
 import logManaging.GPSLogFilesParser;
 import logManaging.LogFilesMerger;
 import logManaging.ValuesLogFilesParser;
 
+@SuppressWarnings("unused")
 public class PositionPlot extends JFrame {
-	private final boolean DEBUG = false;
-	private final String RAW_LOGS_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\logs";
+	private final boolean LOAD_DATA = true;
+	private final static String RAW_LOGS_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\logs";
 	private final String MERGED_LOGS_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
 
 	private final String PARSED_DATA_FILE_GPS = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs\\mergedLogs_gps.log";
 	private final String PARSED_DATA_FILE_ENTITIES = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs\\mergedLogs_entities.log";
 	private final String PARSED_DATA_FILE_LOG = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs\\mergedLogs_logData.log";
+	private final String PARSED_DATA_FILE_EXPERIMENTS = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs\\mergedLogs_experiments.log";
 
 	// GUI Components
 	private Container centerPanel;
@@ -77,18 +77,20 @@ public class PositionPlot extends JFrame {
 	private JButton playPauseButton;
 	private JSlider playerSlider;
 	private JTextField logLineTextField;
-	private JComboBox<String> availableRobotLogsCombobox;
+	private JComboBox<String> availableOptionsLogsCombobox;
 	private PlayerThread playerThread;
 
 	// Data parsers and loaders
 	private enum DataSource {
-		GPS, ENTITIES, LOG;
+		GPS, ENTITIES, LOG, EXPERIMENT, NONE;
 	}
 
 	private DataSource dataSource;
-	private HashMap<Integer, ArrayList<GPSData>> gpsData = null;
-	private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData = null;
-	private HashMap<Integer, ArrayList<DecodedLog>> decodedLogData = null;
+
+	private HashMap<Integer, List<GPSData>> gpsData = null;
+	private HashMap<Integer, List<EntityManipulation>> entitiesManipulationData = null;
+	private HashMap<Integer, List<DecodedLog>> decodedLogData = null;
+	private HashMap<Integer, ExperimentData> experimentsData = null;
 
 	public PositionPlot() {
 		this(null);
@@ -103,55 +105,54 @@ public class PositionPlot extends JFrame {
 				toOpenFolder = selectFolderToOpen();
 			}
 
-			if (toOpenFolder == null || !toOpenFolder.exists() || !toOpenFolder.isDirectory()
-					|| !processOriginalLogFiles()) {
+			if (toOpenFolder == null || !toOpenFolder.exists() || !toOpenFolder.isDirectory()) {
 				System.err.printf("[%s] Unable to load data from RAW files!%n", getClass().getSimpleName());
 				System.exit(1);
+			} else {
+				processOriginalLogFiles();
 			}
 		} else {
 			File gpsDataFile = new File(PARSED_DATA_FILE_GPS);
 			File entitiesDataFile = new File(PARSED_DATA_FILE_ENTITIES);
 			File logDataFile = new File(PARSED_DATA_FILE_LOG);
+			File experimentsDataFile = new File(PARSED_DATA_FILE_EXPERIMENTS);
 
-			if (!gpsDataFile.exists() || !entitiesDataFile.exists() || !logDataFile.exists()) {
+			if (!gpsDataFile.exists() || !entitiesDataFile.exists() || !logDataFile.exists() || !logDataFile.exists()) {
 				File toOpenFolder = selectFolderToOpen();
 
-				if (toOpenFolder == null || !toOpenFolder.exists() || !toOpenFolder.isDirectory()
-						|| !processOriginalLogFiles()) {
+				if (toOpenFolder == null || !toOpenFolder.exists() || !toOpenFolder.isDirectory()) {
 					System.err.printf("[%s] Unable to load data from RAW files!%n", getClass().getSimpleName());
 					System.exit(1);
+				} else {
+					processOriginalLogFiles();
 				}
 			}
 		}
 
-		if (!DEBUG) {
+		if (LOAD_DATA) {
 			try {
-				EntitiesLogFilesParser entitiesLogFilesParser = new EntitiesLogFilesParser(MERGED_LOGS_FOLDER, false);
-				entitiesManipulationData = entitiesLogFilesParser.getEntitiesManipulationData();
-				dataSource = DataSource.ENTITIES;
-			} catch (FileNotFoundException | FileSystemException e) {
+				ExperimentsDataOnFile experimentsDataOnFile = FileUtils
+						.loadDataFromCompressedParsedFile(PARSED_DATA_FILE_EXPERIMENTS);
+				experimentsData = experimentsDataOnFile.getExperimentsData();
+
+				for (int k : experimentsData.keySet()) {
+					experimentsData.get(k).sortSteps();
+				}
+
+				// ExperimentLogParser experimentLogParser = new
+				// ExperimentLogParser(MERGED_LOGS_FOLDER);
+				// experimentData = experimentLogParser.getExperimentsData();
+				dataSource = DataSource.EXPERIMENT;
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
+		} else {
+			dataSource = DataSource.NONE;
 		}
 
-		if (DEBUG || entitiesManipulationData != null) {
-			buildGUI();
-			playPauseButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					playerThread.togglePlayStatus();
-				}
-			});
-			replayButton.addActionListener(new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					playerThread.replay();
-				}
-			});
-
+		if (!LOAD_DATA || experimentsData != null) {
 			playerThread = new PlayerThread();
+			buildGUI();
 			setVisible(true);
 		} else {
 			System.err.printf("[%s] Missing data on parsed data file!%n", getClass().getSimpleName());
@@ -233,7 +234,21 @@ public class PositionPlot extends JFrame {
 		// Right part
 		JPanel leftControlsPanel = new JPanel(new BorderLayout());
 		replayButton = new JButton("Replay");
+		replayButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				playerThread.replay();
+			}
+		});
 		playPauseButton = new JButton("Play");
+		playPauseButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				playerThread.togglePlayStatus();
+			}
+		});
 		playPauseButton.setPreferredSize(replayButton.getPreferredSize());
 
 		leftControlsPanel.add(replayButton, BorderLayout.WEST);
@@ -249,10 +264,11 @@ public class PositionPlot extends JFrame {
 		playerSlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				// currentStep = playerSlider.getValue();
-				// playerSlider.setToolTipText("" + playerSlider.getValue());
-				// if (!playerThread.isPlaying())
-				// moveTo(playerSlider.getValue());
+				int currentStep = playerSlider.getValue();
+				playerSlider.setToolTipText(Integer.toString(playerSlider.getValue()));
+				if (playerThread != null && !playerThread.isPlaying()) {
+					// playerThread.moveTo(playerSlider.getValue());
+				}
 			}
 		});
 		centralWrapperPanel.add(playerSlider, BorderLayout.CENTER);
@@ -262,33 +278,62 @@ public class PositionPlot extends JFrame {
 		logLineTextField.setEditable(false);
 		logLineTextField.setHorizontalAlignment(JTextField.CENTER);
 
-		logLinePanel.add(new JLabel("Log line:"));
+		switch (dataSource) {
+		case GPS:
+		case ENTITIES:
+		case LOG:
+			logLinePanel.add(new JLabel("Log line:"));
+			break;
+		case EXPERIMENT:
+			logLinePanel.add(new JLabel("Timestep:"));
+			break;
+		case NONE:
+			logLinePanel.add(new JLabel("N/A:"));
+			break;
+		}
+
 		logLinePanel.add(logLineTextField);
 		SpringUtilities.makeGrid(logLinePanel, 1, 2, 0, 0, 5, 0);
 		centralWrapperPanel.add(logLinePanel, BorderLayout.EAST);
 
 		// Left part with combo box that selects the data to load
 		JPanel leftControlPanel = new JPanel(new SpringLayout());
-		availableRobotLogsCombobox = new JComboBox<String>(getRobotLogsLabels());
-		availableRobotLogsCombobox.setPreferredSize(replayButton.getPreferredSize());
-		availableRobotLogsCombobox.setEditable(false);
-		((JLabel) availableRobotLogsCombobox.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
-		availableRobotLogsCombobox.addActionListener(new ActionListener() {
+		availableOptionsLogsCombobox = new JComboBox<String>(getRobotLogsLabels());
+		availableOptionsLogsCombobox.setPreferredSize(replayButton.getPreferredSize());
+		availableOptionsLogsCombobox.setEditable(false);
+		((JLabel) availableOptionsLogsCombobox.getRenderer()).setHorizontalAlignment(JLabel.CENTER);
+		availableOptionsLogsCombobox.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				playerThread.pause();
 				updateSliderLabels();
+				playerThread.load();
 			}
 		});
-		if (availableRobotLogsCombobox.getItemCount() == 0) {
-			availableRobotLogsCombobox.setEnabled(false);
+		if (availableOptionsLogsCombobox.getItemCount() == 0) {
+			availableOptionsLogsCombobox.setEnabled(false);
 		} else {
-			availableRobotLogsCombobox.setSelectedItem(0);
+			availableOptionsLogsCombobox.setSelectedItem(0);
 			updateSliderLabels();
+			playerThread.load();
 		}
 
-		leftControlPanel.add(new JLabel("Robot:"));
-		leftControlPanel.add(availableRobotLogsCombobox);
+		switch (dataSource) {
+		case GPS:
+		case ENTITIES:
+		case LOG:
+			leftControlPanel.add(new JLabel("Robot:"));
+			break;
+		case EXPERIMENT:
+			leftControlPanel.add(new JLabel("Experiment:"));
+			break;
+		case NONE:
+			leftControlPanel.add(new JLabel("N/A:"));
+			break;
+		}
+
+		leftControlPanel.add(availableOptionsLogsCombobox);
 		SpringUtilities.makeGrid(leftControlPanel, 1, 2, 0, 0, 5, 0);
 
 		// Join everything in the main panel
@@ -354,24 +399,43 @@ public class PositionPlot extends JFrame {
 			} else {
 				return new String[] {};
 			}
+		case EXPERIMENT:
+			if (experimentsData != null) {
+				List<String> labels = new ArrayList<String>();
+
+				for (Integer i : experimentsData.keySet()) {
+					labels.add(Integer.toString(i));
+				}
+
+				return labels.toArray(new String[labels.size()]);
+			} else {
+				return new String[] {};
+			}
+		case NONE:
 		default:
 			return new String[] {};
 		}
 	}
 
 	private void updateSliderLabels() {
-		int robot = Integer.parseInt((String) availableRobotLogsCombobox.getSelectedItem());
+		int index = Integer.parseInt((String) availableOptionsLogsCombobox.getSelectedItem());
 		int maximum = 0;
 
 		switch (dataSource) {
 		case GPS:
-			maximum = gpsData.get(robot).size();
+			maximum = gpsData.get(index).size();
 			break;
 		case ENTITIES:
-			maximum = entitiesManipulationData.get(robot).size();
+			maximum = entitiesManipulationData.get(index).size();
 			break;
 		case LOG:
-			maximum = decodedLogData.get(robot).size();
+			maximum = decodedLogData.get(index).size();
+			break;
+		case EXPERIMENT:
+			maximum = (int) experimentsData.get(index).timestepsCount;
+			break;
+		case NONE:
+			maximum = playerSlider.getMinimum();
 			break;
 		}
 
@@ -386,231 +450,125 @@ public class PositionPlot extends JFrame {
 	/*
 	 * Plot and data management "things"
 	 */
-	private boolean processOriginalLogFiles() {
+	private void processOriginalLogFiles() {
+		// Merge log files
+		boolean continueProcessing = true;
 		try {
 			System.out.printf("[%s] ######################## Merging logs%n", getClass().getSimpleName());
 			new LogFilesMerger(RAW_LOGS_FOLDER, MERGED_LOGS_FOLDER);
 		} catch (FileNotFoundException e) {
 			System.err.printf("[%s] File not found! %s%n", getClass().getSimpleName(), e.getMessage());
-			return false;
+			continueProcessing = false;
 		} catch (FileAlreadyExistsException e) {
 			System.out.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
 		} catch (FileSystemException e) {
 			System.err.printf("[%s] File system error! %s%n", getClass().getSimpleName(), e.getMessage());
+			continueProcessing = false;
 		}
 
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		if (continueProcessing) {
+			// Just for the system outs to be nice :P
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
 
-		try {
-			/*
-			 * Due to problems with GC and since it is rare the need to process
-			 * RAW log files, after each parsing we write the objects to a file
-			 * And release all the used resources
-			 */
+			// GPS logs
 			if (!new File(PARSED_DATA_FILE_GPS).exists()) {
-				System.out.printf("[%s] ######################## Parsing GPS logs%n", getClass().getSimpleName());
-				GPSLogFilesParser gpsLogFilesParser = new GPSLogFilesParser(MERGED_LOGS_FOLDER);
-				ExperiencesDataOnFile data_gps = new ExperiencesDataOnFile();
-				data_gps.setGPSData(gpsLogFilesParser.getGPSData());
-				if (!saveDataToFile(data_gps, PARSED_DATA_FILE_GPS, true)) {
-					System.err.printf("[%s] Error writing GPS data to file%n", getClass().getSimpleName());
-				} else {
-					// Release everything so GC finds space in memory
-					gpsLogFilesParser = null;
-					data_gps = null;
-					System.gc();
+				try {
+					System.out.printf("[%s] ######################## Parsing GPS logs%n", getClass().getSimpleName());
+					GPSLogFilesParser gpsLogFilesParser = new GPSLogFilesParser(MERGED_LOGS_FOLDER);
+					gpsLogFilesParser.saveParsedDataToFile(false);
+				} catch (FileNotFoundException e) {
+					System.err.printf("[%s] File not found! %s%n", getClass().getSimpleName(), e.getMessage());
+				} catch (FileAlreadyExistsException e) {
+					System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+				} catch (FileSystemException e) {
+					System.err.printf("[%s] File system error! %s%n", getClass().getSimpleName(), e.getMessage());
 				}
 			} else {
 				System.out.printf("[%s] ######################## GPS logs already parsed%n",
 						getClass().getSimpleName());
 			}
 
+			// Entities logs
 			if (!new File(PARSED_DATA_FILE_ENTITIES).exists()) {
-				System.out.printf("[%s] ######################## Parsing entities logs%n", getClass().getSimpleName());
-				EntitiesLogFilesParser entitiesLogFilesParser = new EntitiesLogFilesParser(MERGED_LOGS_FOLDER, true);
-				ExperiencesDataOnFile data_entities = new ExperiencesDataOnFile();
-				data_entities.setEntitiesManipulationData(entitiesLogFilesParser.getEntitiesManipulationData());
-				if (!saveDataToFile(data_entities, PARSED_DATA_FILE_ENTITIES, true)) {
-					System.err.printf("[%s] Error writing entities manipulation data to file%n",
+				try {
+					System.out.printf("[%s] ######################## Parsing entities logs%n",
 							getClass().getSimpleName());
-					return false;
-				} else {
-					// Release everything so GC finds space in memory
-					entitiesLogFilesParser = null;
-					data_entities = null;
-					System.gc();
+					EntitiesLogFilesParser entitiesLogFilesParser = new EntitiesLogFilesParser(MERGED_LOGS_FOLDER,
+							true);
+					entitiesLogFilesParser.saveParsedDataToFile(false);
+				} catch (FileNotFoundException e) {
+					System.err.printf("[%s] File not found! %s%n", getClass().getSimpleName(), e.getMessage());
+				} catch (FileAlreadyExistsException e) {
+					System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+				} catch (FileSystemException e) {
+					System.err.printf("[%s] File system error! %s%n", getClass().getSimpleName(), e.getMessage());
 				}
 			} else {
-				System.out.printf("[%s] ######################## Entites logs already parsed%n",
-						getClass().getSimpleName());
+				int result = JOptionPane.showConfirmDialog(null, "Entites logs already parsed. Re-parse?", "Question",
+						JOptionPane.OK_CANCEL_OPTION);
+
+				if (result == JOptionPane.OK_OPTION) {
+					try {
+						System.out.printf(
+								"[%s] ######################## Entites logs already parsed, but re-generating parses without pre-processing%n",
+								getClass().getSimpleName());
+						EntitiesLogFilesParser entitiesLogFilesParser = new EntitiesLogFilesParser(MERGED_LOGS_FOLDER,
+								false);
+						entitiesLogFilesParser.saveParsedDataToFile(true);
+					} catch (FileNotFoundException e) {
+						System.err.printf("[%s] File not found! %s%n", getClass().getSimpleName(), e.getMessage());
+					} catch (FileAlreadyExistsException e) {
+						System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+					} catch (FileSystemException e) {
+						System.err.printf("[%s] File system error! %s%n", getClass().getSimpleName(), e.getMessage());
+					}
+				}
 			}
 
+			// Log lines logs
 			if (!new File(PARSED_DATA_FILE_LOG).exists()) {
-				System.out.printf("[%s] ######################## Parsing values logs%n", getClass().getSimpleName());
-				ValuesLogFilesParser valuesLogFilesParser = new ValuesLogFilesParser(MERGED_LOGS_FOLDER, true);
-				ExperiencesDataOnFile data_logs = new ExperiencesDataOnFile();
-				data_logs.setDecodedLogData(valuesLogFilesParser.getDecodedLogData());
-				if (!saveDataToFile(data_logs, PARSED_DATA_FILE_LOG, true)) {
-					System.err.printf("[%s] Error writing decoded log data to file%n", getClass().getSimpleName());
-					return false;
-				} else {
-					// Release everything so GC finds space in memory
-					valuesLogFilesParser = null;
-					data_logs = null;
-					System.gc();
+				try {
+					System.out.printf("[%s] ######################## Parsing values logs%n",
+							getClass().getSimpleName());
+					ValuesLogFilesParser valuesLogFilesParser = new ValuesLogFilesParser(MERGED_LOGS_FOLDER, true);
+					valuesLogFilesParser.saveParsedDataToFile(false);
+				} catch (FileNotFoundException e) {
+					System.err.printf("[%s] File not found! %s%n", getClass().getSimpleName(), e.getMessage());
+				} catch (FileAlreadyExistsException e) {
+					System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+				} catch (FileSystemException e) {
+					System.err.printf("[%s] File system error! %s%n", getClass().getSimpleName(), e.getMessage());
 				}
 			} else {
 				System.out.printf("[%s] ######################## Values logs already parsed%n",
 						getClass().getSimpleName());
 			}
-		} catch (FileNotFoundException e) {
-			System.err.printf("[%s] File not found! %s%n", getClass().getSimpleName(), e.getMessage());
-			return false;
-		} catch (FileSystemException e) {
-			System.err.printf("[%s] File system error! %s%n", getClass().getSimpleName(), e.getMessage());
-			return false;
-		}
 
-		return true;
-	}
-
-	private static ExperiencesDataOnFile loadDataFromParsedFile(String file) {
-		File inputFile = new File(file);
-		if (inputFile.exists()) {
-			FileInputStream fin = null;
-			ObjectInputStream ois = null;
-
-			System.out.printf("[%s] Loading data from file %s%n", PositionPlot.class.getSimpleName(), file);
-			try {
-				fin = new FileInputStream(inputFile);
-				ois = new ObjectInputStream(fin);
-
-				Object obj = ois.readObject();
-
-				if (obj instanceof ExperiencesDataOnFile) {
-					return (ExperiencesDataOnFile) obj;
-				} else {
-					return null;
-				}
-			} catch (IOException | ClassNotFoundException e) {
-				System.err.printf("[%s] Error reading object from file! %s%n", PositionPlot.class.getSimpleName(),
-						e.getMessage());
-				return null;
-			} finally {
-				if (fin != null) {
-					try {
-						fin.close();
-					} catch (IOException e) {
-						System.err.printf("[%s] Error closing file input stream %s%n",
-								PositionPlot.class.getSimpleName(), e.getMessage());
-					}
-				}
-
-				if (ois != null) {
-					try {
-						ois.close();
-					} catch (IOException e) {
-						System.err.printf("[%s] Error closing object input stream %s%n",
-								PositionPlot.class.getSimpleName(), e.getMessage());
-					}
-				}
-			}
-		} else {
-			JOptionPane.showMessageDialog(null, "Data file does not exist", "Error reading file!",
-					JOptionPane.ERROR_MESSAGE);
-			return null;
-		}
-	}
-
-	private static boolean saveDataToFile(ExperiencesDataOnFile data, String file, boolean askoverride) {
-		File outputFile = new File(file);
-		if (askoverride && outputFile.exists()) {
-			int result = JOptionPane.showConfirmDialog(null, "Output file already exists. Override?", "Question",
-					JOptionPane.OK_CANCEL_OPTION);
-
-			if (result != JOptionPane.OK_OPTION) {
-				return false;
-			}
-		}
-
-		FileOutputStream fout = null;
-		ObjectOutputStream oos = null;
-		boolean toReturn = true;
-
-		System.out.printf("[%s] Saving data to file %s%n", PositionPlot.class.getSimpleName(), file);
-		try {
-			fout = new FileOutputStream(outputFile);
-			oos = new ObjectOutputStream(fout);
-
-			oos.writeObject(data);
-		} catch (IOException e) {
-			System.err.printf("[%s] Error writting object to file! %s%n", PositionPlot.class.getSimpleName(),
-					e.getMessage());
-			toReturn = false;
-		} finally {
-			if (fout != null) {
+			// Experiments logs
+			if (!new File(PARSED_DATA_FILE_EXPERIMENTS).exists()) {
 				try {
-					fout.close();
-				} catch (IOException e) {
-					System.err.printf("[%s] Error closing file output stream %s%n", PositionPlot.class.getSimpleName(),
-							e.getMessage());
+					System.out.printf("[%s] ######################## Parsing experiments logs%n",
+							getClass().getSimpleName());
+					ExperimentLogParser experimentsLogFilesParser = new ExperimentLogParser(MERGED_LOGS_FOLDER);
+					experimentsLogFilesParser.saveParsedDataToFile(false);
+				} catch (FileNotFoundException e) {
+					System.err.printf("[%s] File not found! %s%n", getClass().getSimpleName(), e.getMessage());
+				} catch (FileAlreadyExistsException e) {
+					System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+				} catch (FileSystemException e) {
+					System.err.printf("[%s] File system error! %s%n", getClass().getSimpleName(), e.getMessage());
 				}
-			}
-
-			if (oos != null) {
-				try {
-					oos.close();
-				} catch (IOException e) {
-					System.err.printf("[%s] Error closing object output stream %s%n",
-							PositionPlot.class.getSimpleName(), e.getMessage());
-				}
+			} else {
+				System.out.printf("[%s] ######################## Experiments logs already parsed%n",
+						getClass().getSimpleName());
 			}
 		}
-
-		return toReturn;
 	}
 
-	private class ExperiencesDataOnFile implements Serializable {
-		private static final long serialVersionUID = -8244038888675417327L;
-		private HashMap<Integer, ArrayList<GPSData>> gpsData;
-		private HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData;
-		private HashMap<Integer, ArrayList<DecodedLog>> decodedLogData;
-
-		public ExperiencesDataOnFile() {
-			this.gpsData = null;
-			this.entitiesManipulationData = null;
-			this.decodedLogData = null;
-		}
-
-		public void setGPSData(HashMap<Integer, ArrayList<GPSData>> gpsData) {
-			this.gpsData = gpsData;
-		}
-
-		public HashMap<Integer, ArrayList<GPSData>> getGPSData() {
-			return gpsData;
-		}
-
-		public void setEntitiesManipulationData(
-				HashMap<Integer, ArrayList<EntityManipulation>> entitiesManipulationData) {
-			this.entitiesManipulationData = entitiesManipulationData;
-		}
-
-		public HashMap<Integer, ArrayList<EntityManipulation>> getEntitiesManipulationData() {
-			return entitiesManipulationData;
-		}
-
-		public void setDecodedLogData(HashMap<Integer, ArrayList<DecodedLog>> decodedLogData) {
-			this.decodedLogData = decodedLogData;
-		}
-
-		public HashMap<Integer, ArrayList<DecodedLog>> getDecodedLogData() {
-			return decodedLogData;
-		};
-	}
-
+	@SuppressWarnings("unused")
 	private void updateGeoEntityInstance(EntityManipulation entityManipulation) {
 		informationTree.updateEntity(entityManipulation);
 
@@ -632,28 +590,23 @@ public class PositionPlot extends JFrame {
 
 	public class PlayerThread extends Thread {
 		private boolean play = false;
-		private boolean exit = false;
+		private int playLimit = -1;
 		private int currentStep = -1;
 		private double multiplier = 1.0;
 
 		@Override
 		public void run() {
-			while (!exit) {
+			while (true) {
 				try {
 					synchronized (this) {
-						if (!play)
+						if (!play) {
 							wait();
+						}
 					}
 
 					incrementPlay();
-
-					long time = (long) (compareTimeWithNextStep() * multiplier);
-
-					if (time > 1000)
-						time = 1000;
-
-					Thread.sleep(time);
-				} catch (Exception e) {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
 				}
 			}
 		}
@@ -673,14 +626,35 @@ public class PositionPlot extends JFrame {
 		}
 
 		public synchronized void replay() {
-			// TODO
+			pause();
+			load();
+		}
+
+		public void load() {
+			switch (dataSource) {
+			case GPS:
+
+				break;
+			case ENTITIES:
+
+				break;
+			case LOG:
+
+				break;
+			case EXPERIMENT:
+
+				break;
+			case NONE:
+				break;
+			}
 		}
 
 		public void togglePlayStatus() {
-			if (play)
+			if (play) {
 				pause();
-			else
+			} else {
 				play();
+			}
 		}
 
 		public void playFaster() {
@@ -693,11 +667,6 @@ public class PositionPlot extends JFrame {
 				multiplier *= 2;
 				interrupt();
 			}
-		}
-
-		public void stopThread() {
-			exit = true;
-			interrupt();
 		}
 
 		/*
@@ -750,6 +719,6 @@ public class PositionPlot extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		new PositionPlot();
+		new PositionPlot(RAW_LOGS_FOLDER);
 	}
 }

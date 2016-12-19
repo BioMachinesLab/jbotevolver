@@ -287,10 +287,16 @@ public class ExperimentLogParser implements Serializable {
 	}
 
 	public class ExperimentData implements Serializable {
-		private static final long serialVersionUID = -405600509166311277L;
+		private static final long serialVersionUID = -8020027278239501177L;
 		public double timestepsCount;
 		public int experimentNumber;
 		public HashMap<Integer, List<ExperimentStep>> stepsData = new HashMap<Integer, List<ExperimentStep>>();
+
+		public void sortSteps() {
+			for (int k : stepsData.keySet()) {
+				Collections.sort(stepsData.get(k));
+			}
+		}
 	}
 
 	public class ExperimentStep implements Serializable, Comparable<ExperimentStep> {
