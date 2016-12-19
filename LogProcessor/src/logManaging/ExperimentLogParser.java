@@ -305,9 +305,9 @@ public class ExperimentLogParser {
 		if (file.exists()) {
 			throw new FileAlreadyExistsException("File already exist");
 		} else {
-			FileUtils.ExperiencesDataOnFile data_experiment = new FileUtils.ExperiencesDataOnFile();
+			FileUtils.ExperimentsDataOnFile data_experiment = new FileUtils.ExperimentsDataOnFile();
 			data_experiment.setExperimentsData(experimentsData);
-			if (!FileUtils.saveDataToFile(data_experiment, PARSED_DATA_FILE_EXPERIMENTS, true)) {
+			if (!FileUtils.saveDataToCompressedFile(data_experiment, file, true)) {
 				throw new FileSystemException("Error writing entities data to file");
 			}
 		}

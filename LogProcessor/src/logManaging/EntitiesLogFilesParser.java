@@ -277,9 +277,9 @@ public class EntitiesLogFilesParser {
 		if (file.exists()) {
 			throw new FileAlreadyExistsException("File already exist");
 		} else {
-			FileUtils.ExperiencesDataOnFile data_gps = new FileUtils.ExperiencesDataOnFile();
+			FileUtils.ExperimentsDataOnFile data_gps = new FileUtils.ExperimentsDataOnFile();
 			data_gps.setEntitiesManipulationData(entitiesManipulationData);
-			if (!FileUtils.saveDataToFile(data_gps, PARSED_DATA_FILE_ENTITIES, true)) {
+			if (!FileUtils.saveDataToCompressedFile(data_gps, file, true)) {
 				throw new FileSystemException("Error writing entities data to file");
 			}
 		}

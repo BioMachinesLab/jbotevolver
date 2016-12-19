@@ -194,9 +194,9 @@ public class GPSLogFilesParser {
 		if (file.exists()) {
 			throw new FileAlreadyExistsException("File already exist");
 		} else {
-			FileUtils.ExperiencesDataOnFile data_gps = new FileUtils.ExperiencesDataOnFile();
+			FileUtils.ExperimentsDataOnFile data_gps = new FileUtils.ExperimentsDataOnFile();
 			data_gps.setGPSData(gpsData);
-			if (!FileUtils.saveDataToFile(data_gps, PARSED_DATA_FILE_GPS, true)) {
+			if (!FileUtils.saveDataToCompressedFile(data_gps, file, true)) {
 				throw new FileSystemException("Error writing GPS data to file");
 			}
 		}
