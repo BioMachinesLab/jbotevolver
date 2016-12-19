@@ -18,7 +18,6 @@ import javax.swing.JOptionPane;
 import commoninterface.dataobjects.GPSData;
 import commoninterface.utils.logger.DecodedLog;
 import commoninterface.utils.logger.EntityManipulation;
-import gui.PositionPlot;
 
 public class FileUtils {
 	/*
@@ -30,7 +29,7 @@ public class FileUtils {
 			FileInputStream fin = null;
 			ObjectInputStream ois = null;
 
-			System.out.printf("[%s] Loading data from file %s%n", PositionPlot.class.getSimpleName(), file);
+			System.out.printf("[%s] Loading data from file %s%n", FileUtils.class.getSimpleName(), file);
 			try {
 				fin = new FileInputStream(inputFile);
 				ois = new ObjectInputStream(fin);
@@ -43,7 +42,7 @@ public class FileUtils {
 					return null;
 				}
 			} catch (IOException | ClassNotFoundException e) {
-				System.err.printf("[%s] Error reading object from file! %s%n", PositionPlot.class.getSimpleName(),
+				System.err.printf("[%s] Error reading object from file! %s%n", FileUtils.class.getSimpleName(),
 						e.getMessage());
 				return null;
 			} finally {
@@ -52,7 +51,7 @@ public class FileUtils {
 						fin.close();
 					} catch (IOException e) {
 						System.err.printf("[%s] Error closing file input stream %s%n",
-								PositionPlot.class.getSimpleName(), e.getMessage());
+								FileUtils.class.getSimpleName(), e.getMessage());
 					}
 				}
 
@@ -61,7 +60,7 @@ public class FileUtils {
 						ois.close();
 					} catch (IOException e) {
 						System.err.printf("[%s] Error closing object input stream %s%n",
-								PositionPlot.class.getSimpleName(), e.getMessage());
+								FileUtils.class.getSimpleName(), e.getMessage());
 					}
 				}
 			}
@@ -90,7 +89,7 @@ public class FileUtils {
 		ObjectOutputStream oos = null;
 		boolean toReturn = true;
 
-		System.out.printf("[%s] Saving data to file %s%n", PositionPlot.class.getSimpleName(),
+		System.out.printf("[%s] Saving data to file %s%n", FileUtils.class.getSimpleName(),
 				outputFile.getAbsolutePath());
 		try {
 			fout = new FileOutputStream(outputFile);
@@ -98,7 +97,7 @@ public class FileUtils {
 
 			oos.writeObject(data);
 		} catch (IOException e) {
-			System.err.printf("[%s] Error writting object to file! %s%n", PositionPlot.class.getSimpleName(),
+			System.err.printf("[%s] Error writting object to file! %s%n", FileUtils.class.getSimpleName(),
 					e.getMessage());
 			toReturn = false;
 		} finally {
@@ -106,7 +105,7 @@ public class FileUtils {
 				try {
 					fout.close();
 				} catch (IOException e) {
-					System.err.printf("[%s] Error closing file output stream %s%n", PositionPlot.class.getSimpleName(),
+					System.err.printf("[%s] Error closing file output stream %s%n", FileUtils.class.getSimpleName(),
 							e.getMessage());
 				}
 			}
@@ -116,7 +115,7 @@ public class FileUtils {
 					oos.close();
 				} catch (IOException e) {
 					System.err.printf("[%s] Error closing object output stream %s%n",
-							PositionPlot.class.getSimpleName(), e.getMessage());
+							FileUtils.class.getSimpleName(), e.getMessage());
 				}
 			}
 		}
@@ -133,7 +132,7 @@ public class FileUtils {
 			InflaterInputStream fin = null;
 			ObjectInputStream ois = null;
 
-			System.out.printf("[%s] Loading data from file %s%n", PositionPlot.class.getSimpleName(), file);
+			System.out.printf("[%s] Loading data from file %s%n", FileUtils.class.getSimpleName(), file);
 			try {
 				fin = new InflaterInputStream(new FileInputStream(inputFile));
 				ois = new ObjectInputStream(fin);
@@ -146,7 +145,7 @@ public class FileUtils {
 					return null;
 				}
 			} catch (IOException | ClassNotFoundException e) {
-				System.err.printf("[%s] Error reading object from file! %s%n", PositionPlot.class.getSimpleName(),
+				System.err.printf("[%s] Error reading object from file! %s%n", FileUtils.class.getSimpleName(),
 						e.getMessage());
 				return null;
 			} finally {
@@ -155,7 +154,7 @@ public class FileUtils {
 						fin.close();
 					} catch (IOException e) {
 						System.err.printf("[%s] Error closing file input stream %s%n",
-								PositionPlot.class.getSimpleName(), e.getMessage());
+								FileUtils.class.getSimpleName(), e.getMessage());
 					}
 				}
 
@@ -164,7 +163,7 @@ public class FileUtils {
 						ois.close();
 					} catch (IOException e) {
 						System.err.printf("[%s] Error closing object input stream %s%n",
-								PositionPlot.class.getSimpleName(), e.getMessage());
+								FileUtils.class.getSimpleName(), e.getMessage());
 					}
 				}
 			}
@@ -193,7 +192,7 @@ public class FileUtils {
 		ObjectOutputStream oos = null;
 		boolean toReturn = true;
 
-		System.out.printf("[%s] Saving data to file %s%n", PositionPlot.class.getSimpleName(),
+		System.out.printf("[%s] Saving data to file %s%n", FileUtils.class.getSimpleName(),
 				outputFile.getAbsolutePath());
 		try {
 			fout = new DeflaterOutputStream(new FileOutputStream(outputFile));
@@ -201,7 +200,7 @@ public class FileUtils {
 
 			oos.writeObject(data);
 		} catch (IOException e) {
-			System.err.printf("[%s] Error writting object to file! %s%n", PositionPlot.class.getSimpleName(),
+			System.err.printf("[%s] Error writting object to file! %s%n", FileUtils.class.getSimpleName(),
 					e.getMessage());
 			toReturn = false;
 		} finally {
@@ -209,7 +208,7 @@ public class FileUtils {
 				try {
 					fout.close();
 				} catch (IOException e) {
-					System.err.printf("[%s] Error closing file output stream %s%n", PositionPlot.class.getSimpleName(),
+					System.err.printf("[%s] Error closing file output stream %s%n", FileUtils.class.getSimpleName(),
 							e.getMessage());
 				}
 			}
@@ -219,7 +218,7 @@ public class FileUtils {
 					oos.close();
 				} catch (IOException e) {
 					System.err.printf("[%s] Error closing object output stream %s%n",
-							PositionPlot.class.getSimpleName(), e.getMessage());
+							FileUtils.class.getSimpleName(), e.getMessage());
 				}
 			}
 		}

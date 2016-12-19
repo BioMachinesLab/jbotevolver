@@ -21,7 +21,8 @@ import commoninterface.utils.logger.EntityManipulation;
 import commoninterface.utils.logger.LogCodex;
 import commoninterface.utils.logger.LogCodex.LogType;
 
-public class ExperimentLogParser {
+public class ExperimentLogParser implements Serializable {
+	private static final long serialVersionUID = 695124312870952574L;
 	private final boolean PRINT_INFORMATION_RESUME = true;
 	private final String INPUT_FOLDER = "C:\\Users\\BIOMACHINES\\Desktop\\mergedLogs";
 	private final String FILE_PREFIX = "entity_";
