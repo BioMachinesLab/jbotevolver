@@ -1,13 +1,19 @@
 package gui.util;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,12 +21,14 @@ import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Vector;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -37,8 +45,9 @@ import simulation.Updatable;
 import simulation.robot.Robot;
 
 public class GraphPlotter extends JFrame implements Updatable {
-
-	protected static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -3465748965026180370L;
+	protected final String PLOTS_FOLDER_PATH = ".\\plots";
+	protected final String SAVE_TO_IMAGE_EXTENSION = "png";
 
 	protected LinkedList<JCheckBox> robotCheckboxes = new LinkedList<JCheckBox>();
 	protected LinkedList<JCheckBox> inputCheckboxes = new LinkedList<JCheckBox>();
@@ -172,11 +181,11 @@ public class GraphPlotter extends JFrame implements Updatable {
 	 * @param files
 	 *            list of file names of the fitness.log files to plot
 	 */
-	public GraphPlotter(String[] files) {
-		JPanel graphPanel = new JPanel(new BorderLayout());
-		getContentPane().add(graphPanel);
-		Graph graph = new Graph();
-		graphPanel.add(graph);
+	public GraphPlotter(final String[] files) {
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		getContentPane().add(mainPanel, BorderLayout.CENTER);
+		final Graph graph = new Graph();
+		mainPanel.add(graph);
 
 		int totalGenerations = 0;
 
@@ -231,6 +240,20 @@ public class GraphPlotter extends JFrame implements Updatable {
 		graph.setxLabel("Generations (" + (totalGenerations) + ")");
 		graph.setyLabel("Fitness");
 		graph.setShowLast(totalGenerations);
+
+		JButton saveToFileButton = new JButton("Save graph to file");
+		saveToFileButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (saveGraphToFile(graph, files)) {
+					JOptionPane.showMessageDialog(null, "Saved image!", "Sucess", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(null, "Error saving image!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		mainPanel.add(saveToFileButton, BorderLayout.SOUTH);
 
 		setSize(800, 500 + graph.getHeaderSize());
 		setLocationRelativeTo(null);
@@ -648,5 +671,47 @@ public class GraphPlotter extends JFrame implements Updatable {
 				window.setVisible(true);
 			}
 		}
+	}
+
+	protected boolean saveGraphToFile(Graph graph, String[] files) {
+		try {
+			if (files != null && files.length > 0) {
+				Rectangle originalBounds = getBounds();
+				Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+				setBounds(0, 0, screen.width, screen.height);
+				validate();
+				repaint();
+				graph.enableMouseLines(false);
+
+				BufferedImage img = new BufferedImage(graph.getWidth(), graph.getHeight(), BufferedImage.TYPE_INT_RGB);
+				Graphics2D g2d = img.createGraphics();
+				graph.printAll(g2d);
+				g2d.dispose();
+
+				graph.enableMouseLines(true);
+				setBounds(originalBounds);
+
+				File f = new File(files[0]);
+				String name = "";
+
+				if (files.length == 1) {
+					name = f.getParentFile().getParentFile().getName() + "_" + f.getParentFile().getName() + "_fitness."
+							+ SAVE_TO_IMAGE_EXTENSION;
+				} else {
+					name = f.getParentFile().getParentFile().getName() + "_fitness." + SAVE_TO_IMAGE_EXTENSION;
+				}
+
+				if (!new File(PLOTS_FOLDER_PATH).exists()) {
+					new File(PLOTS_FOLDER_PATH).mkdir();
+				}
+
+				ImageIO.write(img, SAVE_TO_IMAGE_EXTENSION, new File(PLOTS_FOLDER_PATH, name));
+			}
+		} catch (IOException e) {
+			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+			return false;
+		}
+
+		return true;
 	}
 }

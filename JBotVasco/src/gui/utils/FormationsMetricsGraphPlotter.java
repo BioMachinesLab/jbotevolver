@@ -1,10 +1,20 @@
 package gui.utils;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+import javax.imageio.ImageIO;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -16,38 +26,44 @@ import gui.util.Graph;
 import gui.util.GraphPlotter;
 
 public class FormationsMetricsGraphPlotter extends GraphPlotter {
-	private static final long serialVersionUID = -3907874113934204291L;
+	private static final long serialVersionUID = -7417290618569517026L;
 	private RequestParamsPanel panel = null;
+	private Graph graph;
+	private String[] files;
+	private MetricsType metricsType;
 
 	public enum MetricsType {
 		TIME_INSIDE_FORMATION, TIME_TO_FIRST_OCCUPATION, PERMUTATION_METRICS, REOCUPATION_TIME;
 	}
 
-	public FormationsMetricsGraphPlotter(String[] files, MetricsType type) {
+	public FormationsMetricsGraphPlotter(String[] files, MetricsType metricsType) {
 		super();
+		this.files = files;
+		this.metricsType = metricsType;
 
-		JPanel graphPanel = new JPanel(new BorderLayout());
-		Graph graph = new Graph();
-		getContentPane().add(graphPanel);
-		graphPanel.add(graph);
+		JPanel mainPanel = new JPanel(new BorderLayout());
+		getContentPane().add(mainPanel);
 
-		if (type != MetricsType.TIME_TO_FIRST_OCCUPATION) {
+		graph = new Graph();
+		mainPanel.add(graph, BorderLayout.CENTER);
+
+		if (metricsType != MetricsType.TIME_TO_FIRST_OCCUPATION) {
 			panel = new RequestParamsPanel();
 			panel.triggerDialog();
 		}
 
-		if (type == MetricsType.TIME_TO_FIRST_OCCUPATION || panel.getDialogResult() == JOptionPane.OK_OPTION) {
+		if (metricsType == MetricsType.TIME_TO_FIRST_OCCUPATION || panel.getDialogResult() == JOptionPane.OK_OPTION) {
 			int totalGenerations = 0;
 			for (String filePath : files) {
 				File file = new File(filePath);
 				ArrayList<FormationTaskMetricsData> metricsData = FormationTaskMetricsCodex.decodeMetricsDataFile(file);
 				totalGenerations = Math.max(metricsData.size(), totalGenerations);
 
-				loadMetricsDataOnGraph(graph, metricsData, file, type);
+				loadMetricsDataOnGraph(graph, metricsData, file, metricsType);
 			}
 
 			graph.setxLabel("Generations (" + (totalGenerations) + ")");
-			switch (type) {
+			switch (metricsType) {
 			case TIME_INSIDE_FORMATION:
 				graph.setyLabel("Robots time in spot");
 				break;
@@ -69,6 +85,20 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			setVisible(true);
 		}
+
+		JButton saveToFileButton = new JButton("Save graph to file");
+		saveToFileButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (saveImage()) {
+					JOptionPane.showMessageDialog(null, "Saved image!", "Sucess", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(null, "Error saving image!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		mainPanel.add(saveToFileButton, BorderLayout.SOUTH);
 	}
 
 	private void loadMetricsDataOnGraph(Graph graph, ArrayList<FormationTaskMetricsData> metricsData, File file,
@@ -185,5 +215,53 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 		public int getDialogResult() {
 			return dialogResult;
 		}
+	}
+
+	private boolean saveImage() {
+		return saveGraphToFile(graph, files);
+	}
+
+	@Override
+	protected boolean saveGraphToFile(Graph graph, String[] files) {
+		try {
+			if (files != null && files.length > 0) {
+				Rectangle originalBounds = getBounds();
+				Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
+				setBounds(0, 0, screen.width, screen.height);
+				validate();
+				repaint();
+				graph.enableMouseLines(false);
+
+				BufferedImage img = new BufferedImage(graph.getWidth(), graph.getHeight(), BufferedImage.TYPE_INT_RGB);
+				Graphics2D g2d = img.createGraphics();
+				graph.printAll(g2d);
+				g2d.dispose();
+
+				graph.enableMouseLines(true);
+				setBounds(originalBounds);
+
+				File f = new File(files[0]);
+				String name = "";
+
+				if (files.length == 1) {
+					name = f.getParentFile().getParentFile().getName() + "_" + f.getParentFile().getName() + "_"
+							+ metricsType.toString() + "." + SAVE_TO_IMAGE_EXTENSION;
+				} else {
+					name = f.getParentFile().getParentFile().getName() + "_" + metricsType.toString() + "."
+							+ SAVE_TO_IMAGE_EXTENSION;
+				}
+
+				if (!new File(PLOTS_FOLDER_PATH).exists()) {
+					new File(PLOTS_FOLDER_PATH).mkdir();
+				}
+
+				ImageIO.write(img, SAVE_TO_IMAGE_EXTENSION, new File(PLOTS_FOLDER_PATH, name));
+			}
+		} catch (IOException e) {
+			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+			return false;
+		}
+
+		return true;
 	}
 }

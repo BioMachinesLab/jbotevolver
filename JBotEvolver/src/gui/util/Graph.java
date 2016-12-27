@@ -23,7 +23,7 @@ import javax.swing.JPanel;
 import mathutils.Vector2d;
 
 public class Graph extends JPanel {
-	private static final long serialVersionUID = -1702844395291637231L;
+	private static final long serialVersionUID = 3226419525651844693L;
 	public static final int LEGEND_SIZE = 20;
 	public static final int ORIGINAL_PAD_TOP = 20;
 
@@ -55,6 +55,7 @@ public class Graph extends JPanel {
 	private Vector<String> legends = new Vector<String>();
 
 	private Vector2d mousePosition = new Vector2d();
+	private boolean mouseLineEnable = true;
 
 	public Graph() {
 		addMouseMotionListener(new MouseMotionListener() {
@@ -143,22 +144,25 @@ public class Graph extends JPanel {
 	}
 
 	private void drawMouseLine(Graphics2D g2) {
-		int lh = getHeight() - pad;
-		int lw = getWidth() - pad;
+		if (mouseLineEnable) {
+			int lh = getHeight() - pad;
+			int lw = getWidth() - pad;
 
-		if (mousePosition.getX() >= pad && mousePosition.getX() <= (getWidth() - pad) && mousePosition.getY() >= padTop
-				&& mousePosition.getY() <= (getHeight() - pad)) {
-			g2.setColor(Color.BLACK);
-			Stroke originalStroke = g2.getStroke();
+			if (mousePosition.getX() >= pad && mousePosition.getX() <= (getWidth() - pad)
+					&& mousePosition.getY() >= padTop && mousePosition.getY() <= (getHeight() - pad)) {
+				g2.setColor(Color.BLACK);
+				Stroke originalStroke = g2.getStroke();
 
-			Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 5 }, 0);
-			g2.setStroke(dashed);
-			setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+				Stroke dashed = new BasicStroke(1, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[] { 5 },
+						0);
+				g2.setStroke(dashed);
+				setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
 
-			g2.draw(new Line2D.Double(mousePosition.getX(), padTop, mousePosition.getX(), lh));
-			g2.draw(new Line2D.Double(pad, mousePosition.getY(), lw, mousePosition.getY()));
+				g2.draw(new Line2D.Double(mousePosition.getX(), padTop, mousePosition.getX(), lh));
+				g2.draw(new Line2D.Double(pad, mousePosition.getY(), lw, mousePosition.getY()));
 
-			g2.setStroke(originalStroke);
+				g2.setStroke(originalStroke);
+			}
 		}
 	}
 
@@ -302,21 +306,22 @@ public class Graph extends JPanel {
 		float sx = (w - sw) / 2 + 10;
 		g2.drawString(s, sx, sy);
 
-		if (mousePosition.getX() >= pad && mousePosition.getX() <= (getWidth() - pad) && mousePosition.getY() >= padTop
-				&& mousePosition.getY() <= (getHeight() - pad)) {
-			double lw = getWidth() - pad * 2;
-			double mouseXShift = mousePosition.getX() - pad;
-			double mX = (mouseXShift * showLast) / lw;
+		if (mouseLineEnable) {
+			if (mousePosition.getX() >= pad && mousePosition.getX() <= (getWidth() - pad)
+					&& mousePosition.getY() >= padTop && mousePosition.getY() <= (getHeight() - pad)) {
+				double lw = getWidth() - pad * 2;
+				double mouseXShift = mousePosition.getX() - pad;
+				double mX = (mouseXShift * showLast) / lw;
 
-			double lh = (getHeight() - pad) - padTop;
-			double mouseYShift = lh - (mousePosition.getY() - padTop);
-			double mY = mouseYShift * (max - min) / lh + min;
+				double lh = (getHeight() - pad) - padTop;
+				double mouseYShift = lh - (mousePosition.getY() - padTop);
+				double mY = mouseYShift * (max - min) / lh + min;
 
-			String mousePoint = "X: " + df.format(mX) + ", Y: " + df.format(mY);
-			float halfDistance = ((getWidth() - pad) - sx) / 2;
-			g2.drawString(mousePoint, sx + halfDistance, sy);
+				String mousePoint = "X: " + df.format(mX) + ", Y: " + df.format(mY);
+				float halfDistance = ((getWidth() - pad) - sx) / 2;
+				g2.drawString(mousePoint, sx + halfDistance, sy);
+			}
 		}
-
 	}
 
 	private void drawData(Graphics2D g2) {
@@ -372,5 +377,10 @@ public class Graph extends JPanel {
 
 	public void setyLabel(String name) {
 		yLabel = name;
+	}
+
+	public void enableMouseLines(boolean enable) {
+		mouseLineEnable = enable;
+		this.repaint();
 	}
 }
