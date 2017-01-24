@@ -99,12 +99,11 @@ public class Graph extends JPanel {
 		padTop += LEGEND_SIZE;
 	}
 
+	public Vector<String> getLegends() {
+		return legends;
+	}
+
 	public void addDataList(Double[] dataList) {
-
-		// for (int i = 0; i < dataList.length; i++)
-		// if(dataList[i] != null)
-		// dataList[i]-=10;
-
 		Vector<Double> aux = new Vector<Double>();
 
 		for (int i = 0; i < dataList.length; i++) {
@@ -117,6 +116,10 @@ public class Graph extends JPanel {
 		}
 
 		listOfData.add(aux);
+	}
+
+	public Vector<Vector<Double>> getDataLists() {
+		return listOfData;
 	}
 
 	public int getShowLast() {

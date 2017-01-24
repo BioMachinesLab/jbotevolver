@@ -17,19 +17,24 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.Vector;
 
 import javax.imageio.ImageIO;
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -46,8 +51,10 @@ import simulation.robot.Robot;
 
 public class GraphPlotter extends JFrame implements Updatable {
 	private static final long serialVersionUID = -3465748965026180370L;
-	protected final String PLOTS_FOLDER_PATH = ".\\plots";
+	protected final String PLOTS_IMAGES_FOLDER_PATH = ".\\plots";
 	protected final String SAVE_TO_IMAGE_EXTENSION = "png";
+	protected final String PLOTS_DATA_FOLDER_PATH = ".\\data";
+	protected final String SAVE_TO_DATA_EXTENSION = "csv";
 
 	protected LinkedList<JCheckBox> robotCheckboxes = new LinkedList<JCheckBox>();
 	protected LinkedList<JCheckBox> inputCheckboxes = new LinkedList<JCheckBox>();
@@ -148,19 +155,18 @@ public class GraphPlotter extends JFrame implements Updatable {
 			plotButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent arg0) {
-					plotGraph(false);
+					plotGraph();
 				}
 			});
 
-			saveToFileButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent arg0) {
-					plotGraph(true);
-				}
-			});
+			// saveToFileButton.addActionListener(new ActionListener() {
+			// @Override
+			// public void actionPerformed(ActionEvent arg0) {
+			// saveGraphDataToFile();
+			// }
+			// });
 
 			mainPanel.add(buttonsPanel);
-
 			mainPanel.add(new JScrollPane(console));
 
 			add(mainPanel);
@@ -241,19 +247,36 @@ public class GraphPlotter extends JFrame implements Updatable {
 		graph.setyLabel("Fitness");
 		graph.setShowLast(totalGenerations);
 
-		JButton saveToFileButton = new JButton("Save graph to file");
-		saveToFileButton.addActionListener(new ActionListener() {
+		JPanel buttonsPanel = new JPanel(new GridLayout(1, 2));
+		JButton saveToImageButton = new JButton("Save graph as image");
+		saveToImageButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				if (saveGraphToFile(graph, files)) {
+				if (saveGraphAsImage(graph, files)) {
 					JOptionPane.showMessageDialog(null, "Saved image!", "Sucess", JOptionPane.INFORMATION_MESSAGE);
 				} else {
 					JOptionPane.showMessageDialog(null, "Error saving image!", "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
-		mainPanel.add(saveToFileButton, BorderLayout.SOUTH);
+		buttonsPanel.add(saveToImageButton);
+
+		JButton saveToFileButton = new JButton("Save graph data");
+		saveToFileButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (saveGraphDataToFile(graph, files)) {
+					JOptionPane.showMessageDialog(null, "Saved data!", "Sucess", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(null, "Error saving data!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		buttonsPanel.add(saveToFileButton);
+
+		mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
 
 		setSize(800, 500 + graph.getHeaderSize());
 		setLocationRelativeTo(null);
@@ -292,7 +315,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 			c.setSelected(value);
 	}
 
-	protected void plotGraph(boolean saveToFile) {
+	protected void plotGraph() {
 
 		valuesList = new ArrayList<double[][]>();
 		titlesList = new ArrayList<String>();
@@ -363,7 +386,7 @@ public class GraphPlotter extends JFrame implements Updatable {
 				}
 			}
 
-			Thread worker = new Thread(new GraphSimulationRunner(simulator, saveToFile));
+			Thread worker = new Thread(new GraphSimulationRunner(simulator));
 			worker.start();
 
 		} catch (Exception e) {
@@ -593,11 +616,9 @@ public class GraphPlotter extends JFrame implements Updatable {
 
 	public class GraphSimulationRunner implements Runnable {
 		protected Simulator sim;
-		protected boolean saveToFile;
 
-		public GraphSimulationRunner(Simulator sim, boolean saveToFile) {
+		public GraphSimulationRunner(Simulator sim) {
 			this.sim = sim;
-			this.saveToFile = saveToFile;
 		}
 
 		@Override
@@ -614,66 +635,41 @@ public class GraphPlotter extends JFrame implements Updatable {
 				valuesList.set(i, newValues);
 			}
 
-			if (saveToFile) {
-				System.out.println("Saving to file data.csv");
-				try {
-					String[] array = new String[valuesList.get(0).length];
+			JFrame window = new JFrame();
+			JPanel graphPanel = new JPanel(new BorderLayout());
+			window.getContentPane().add(graphPanel);
+			Graph graph = new Graph();
+			graphPanel.add(graph);
 
-					for (int i = 0; i < valuesList.size(); i++) {
-						double[][] current = valuesList.get(i);
-						for (int j = 0; j < array.length; j++) {
-							if (array[j] == null)
-								array[j] = "" + j;
-							array[j] += " " + current[j][1];
-						}
-					}
-
-					File f = new File("data.csv");
-					PrintWriter pw = new PrintWriter(new FileOutputStream(f));
-					for (String s : array)
-						pw.write(s + "\n");
-					pw.close();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			} else {
-
-				JFrame window = new JFrame();
-				JPanel graphPanel = new JPanel(new BorderLayout());
-				window.getContentPane().add(graphPanel);
-				Graph graph = new Graph();
-				graphPanel.add(graph);
-
-				int dataSize = 0;
-				for (int i = 0; i < valuesList.size(); i++) {
-					double[][] aux = valuesList.get(i);
-					Double[] data = new Double[aux.length];
-					for (int x = 0; x < aux.length; x++) {
-						data[x] = (aux[x][1]);
-					}
-
-					if (data.length > dataSize)
-						dataSize = data.length;
-
-					graph.addDataList(data);
+			int dataSize = 0;
+			for (int i = 0; i < valuesList.size(); i++) {
+				double[][] aux = valuesList.get(i);
+				Double[] data = new Double[aux.length];
+				for (int x = 0; x < aux.length; x++) {
+					data[x] = (aux[x][1]);
 				}
 
-				for (String s : titlesList)
-					graph.addLegend(s);
+				if (data.length > dataSize)
+					dataSize = data.length;
 
-				graph.setxLabel("Timesteps (" + dataSize + ")");
-				graph.setyLabel("Activations");
-				graph.setShowLast(dataSize);
-
-				window.setSize(800, 500 + graph.getHeaderSize());
-				window.setLocationRelativeTo(null);
-				window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				window.setVisible(true);
+				graph.addDataList(data);
 			}
+
+			for (String s : titlesList)
+				graph.addLegend(s);
+
+			graph.setxLabel("Timesteps (" + dataSize + ")");
+			graph.setyLabel("Activations");
+			graph.setShowLast(dataSize);
+
+			window.setSize(800, 500 + graph.getHeaderSize());
+			window.setLocationRelativeTo(null);
+			window.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			window.setVisible(true);
 		}
 	}
 
-	protected boolean saveGraphToFile(Graph graph, String[] files) {
+	protected boolean saveGraphAsImage(Graph graph, String[] files) {
 		try {
 			if (files != null && files.length > 0) {
 				Rectangle originalBounds = getBounds();
@@ -693,7 +689,6 @@ public class GraphPlotter extends JFrame implements Updatable {
 
 				File f = new File(files[0]);
 				String name = "";
-
 				if (files.length == 1) {
 					name = f.getParentFile().getParentFile().getName() + "_" + f.getParentFile().getName() + "_fitness."
 							+ SAVE_TO_IMAGE_EXTENSION;
@@ -701,11 +696,11 @@ public class GraphPlotter extends JFrame implements Updatable {
 					name = f.getParentFile().getParentFile().getName() + "_fitness." + SAVE_TO_IMAGE_EXTENSION;
 				}
 
-				if (!new File(PLOTS_FOLDER_PATH).exists()) {
-					new File(PLOTS_FOLDER_PATH).mkdir();
+				if (!new File(PLOTS_IMAGES_FOLDER_PATH).exists()) {
+					new File(PLOTS_IMAGES_FOLDER_PATH).mkdir();
 				}
 
-				ImageIO.write(img, SAVE_TO_IMAGE_EXTENSION, new File(PLOTS_FOLDER_PATH, name));
+				ImageIO.write(img, SAVE_TO_IMAGE_EXTENSION, new File(PLOTS_IMAGES_FOLDER_PATH, name));
 			}
 		} catch (IOException e) {
 			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
@@ -713,5 +708,206 @@ public class GraphPlotter extends JFrame implements Updatable {
 		}
 
 		return true;
+	}
+
+	protected boolean saveGraphDataToFile(Graph graph, String[] files) {
+		return saveGraphDataToFile(graph, files, "fitness", false);
+	}
+
+	protected boolean saveGraphDataToFile(Graph graph, String[] files, String fileName, boolean metricsFile) {
+		try {
+			/*
+			 * Get the name to use on file to create
+			 */
+			File f = new File(files[0]);
+			String name = "";
+			if (files.length == 1) {
+				name = f.getParentFile().getParentFile().getName() + "_" + f.getParentFile().getName() + "_" + fileName
+						+ "." + SAVE_TO_DATA_EXTENSION;
+			} else {
+				name = f.getParentFile().getParentFile().getName() + "_" + fileName + "." + SAVE_TO_DATA_EXTENSION;
+			}
+
+			if (!new File(PLOTS_DATA_FOLDER_PATH).exists()) {
+				new File(PLOTS_DATA_FOLDER_PATH).mkdir();
+			}
+
+			/*
+			 * Get the max vector size in the list
+			 */
+			Vector<Vector<Double>> dataLists = graph.getDataLists();
+			int maxVectorSize = Integer.MIN_VALUE;
+
+			for (int i = 0; i < dataLists.size(); i++) {
+				if (dataLists.get(i).size() > maxVectorSize) {
+					maxVectorSize = dataLists.get(i).size();
+				}
+			}
+
+			/*
+			 * Create a bi-dimensional array with all values to be write to file
+			 */
+			double[][] data = new double[maxVectorSize][dataLists.size() + 1];
+
+			// Add the generation number
+			for (int line = 0; line < maxVectorSize; line++) {
+				data[line] = new double[dataLists.size() + 1];
+				data[line][0] = line;
+			}
+
+			// Collect all data in the array
+			for (int column = 0; column < dataLists.size(); column++) {
+				Vector<Double> vector = dataLists.get(column);
+
+				for (int line = 0; line < vector.size(); line++) {
+					data[line][column + 1] = vector.get(line);
+				}
+			}
+
+			/*
+			 * Write everything to a file
+			 */
+			RequestDataParamsPane panel = new RequestDataParamsPane();
+			if (panel.triggerDialog() == JOptionPane.OK_OPTION) {
+				PrintWriter pw = new PrintWriter(new FileOutputStream(new File(PLOTS_DATA_FOLDER_PATH, name)));
+
+				if (panel.addColumnsIdentifiers()) {
+					if (panel.addGenerationNumber()) {
+						pw.print("generation" + panel.getArgumentsSeparator());
+					}
+					Vector<String> legends = graph.getLegends();
+					for (int i = 0; i < legends.size(); i++) {
+						String[] substrings = legends.get(i).split("\\\\");
+						String legend = substrings[substrings.length - 1];
+
+						if (metricsFile) {
+							String[] splittedNames = legend.split("\\.log");
+							if (splittedNames.length > 1) {
+								legend = splittedNames[1];
+							}
+						}
+						
+						if (legend.startsWith("_")) {
+							legend = legend.substring(1, legend.length());
+						}
+
+						pw.print(legend);
+
+						if (i < legends.size() - 1) {
+							pw.print(panel.getArgumentsSeparator());
+						}
+					}
+					pw.println();
+				}
+
+				for (int line = 0; line < data.length; line++) {
+					for (int column = 0; column < data[line].length; column++) {
+						if (column == 0) {
+							if (panel.addGenerationNumber()) {
+								pw.print((int) data[line][column]);
+
+								if (column < data[line].length - 1) {
+									pw.print(panel.getArgumentsSeparator());
+								}
+							}
+						} else {
+							pw.print(String.format("%.8f", data[line][column]));
+							
+							if (column < data[line].length - 1) {
+								pw.print(panel.getArgumentsSeparator());
+							}
+						}
+					}
+
+					if (line < data.length - 1) {
+						pw.println();
+					}
+				}
+
+				pw.close();
+			} else {
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
+	}
+
+	protected class RequestDataParamsPane {
+		private JCheckBox addColumnsIdentifiers = null;
+		private JCheckBox addGenerationNumber = null;
+		private JRadioButton argumentsSeparator_tab = null;
+		private JRadioButton argumentsSeparator_comma = null;
+		private JRadioButton argumentsSeparator_semicolon = null;
+		private ButtonGroup argumentsSeparatorGroup = null;
+
+		private int dialogResult = 0;
+
+		public int triggerDialog() {
+			addColumnsIdentifiers = new JCheckBox("Columns identifiers");
+			addGenerationNumber = new JCheckBox("Generation number");
+			addColumnsIdentifiers.setSelected(false);
+			addGenerationNumber.setSelected(false);
+
+			argumentsSeparator_tab = new JRadioButton("Tab (\\t)");
+			argumentsSeparator_comma = new JRadioButton("Comma (,)");
+			argumentsSeparator_semicolon = new JRadioButton("Semicolon (;)");
+
+			argumentsSeparatorGroup = new ButtonGroup();
+			argumentsSeparatorGroup.add(argumentsSeparator_tab);
+			argumentsSeparatorGroup.add(argumentsSeparator_comma);
+			argumentsSeparatorGroup.add(argumentsSeparator_semicolon);
+
+			argumentsSeparator_tab.setSelected(true);
+
+			JPanel radioButtonsPanel = new JPanel(new GridLayout(4, 1));
+			radioButtonsPanel.add(new JLabel("Select data separator"));
+			radioButtonsPanel.add(argumentsSeparator_tab);
+			radioButtonsPanel.add(argumentsSeparator_comma);
+			radioButtonsPanel.add(argumentsSeparator_semicolon);
+
+			String message = "Select options:";
+			Object[] params = { message, addColumnsIdentifiers, addGenerationNumber, radioButtonsPanel };
+			dialogResult = JOptionPane.showConfirmDialog(null, params, "Plot parameters", JOptionPane.YES_NO_OPTION);
+			return dialogResult;
+		}
+
+		public boolean addColumnsIdentifiers() {
+			return addColumnsIdentifiers != null && addColumnsIdentifiers.isSelected();
+		}
+
+		public boolean addGenerationNumber() {
+			return addGenerationNumber != null && addGenerationNumber.isSelected();
+		}
+
+		public char getArgumentsSeparator() {
+			for (Enumeration<AbstractButton> buttons = argumentsSeparatorGroup.getElements(); buttons
+					.hasMoreElements();) {
+				AbstractButton button = buttons.nextElement();
+
+				if (button.isSelected()) {
+					String text = button.getText();
+					if (text.equals(argumentsSeparator_tab.getText())) {
+						return '\t';
+					} else if (text.equals(argumentsSeparator_comma.getText())) {
+						return ',';
+					} else if (text.equals(argumentsSeparator_semicolon.getText())) {
+						return ';';
+					} else {
+						return '\0';
+					}
+				}
+			}
+
+			// return null object
+			return '\0';
+		}
+
+		public int getDialogResult() {
+			return dialogResult;
+		}
 	}
 }
