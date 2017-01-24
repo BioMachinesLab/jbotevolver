@@ -119,7 +119,7 @@ public class JBotSim implements Serializable {
 		parentFolder = (new File(file)).getParent();
 	}
 
-	protected void loadFile(String fileName) throws Exception {
+	public void loadFile(String fileName) throws Exception {
 		loadArguments(Arguments.readOptionsFromFile(fileName));
 		runInit();
 	}
