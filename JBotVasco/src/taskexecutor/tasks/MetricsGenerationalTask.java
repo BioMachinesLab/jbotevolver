@@ -85,7 +85,7 @@ public class MetricsGenerationalTask extends JBotEvolverTask {
 		if (envArgs.getArgumentAsString("formationShape").equals(FormationType.mix.toString())) {
 			// Run for each formation, excluding the mix one
 			for (FormationType formation : FormationType.values()) {
-				if (formation != FormationType.mix) {
+				if (formation != FormationType.mix && formation != FormationType.random) {
 					if (envArgs.getArgumentAsIntOrSetDefault("injectFaults", 0) == 1) {
 						if (halfhalfFaults) {
 							for (Integer qnt : robotsQuantity) {

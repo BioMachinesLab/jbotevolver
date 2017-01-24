@@ -404,7 +404,9 @@ public class KeepPositionInTargetEvaluationFunction extends EvaluationFunction {
 		// First total formation occupation metric
 		if (occupiedTargetsCount == targets.size() && !firstTotalOccupationAchieved) {
 			firstTotalOccupationAchieved = true;
-			((FormationTaskMetricsData) metricsData).setTimeFirstTotalOccup(simulator.getTime());
+			((FormationTaskMetricsData) metricsData).setTimeFirstTotalOccup_min(simulator.getTime());
+			((FormationTaskMetricsData) metricsData).setTimeFirstTotalOccup_avg(simulator.getTime());
+			((FormationTaskMetricsData) metricsData).setTimeFirstTotalOccup_max(simulator.getTime());
 		}
 	}
 

@@ -3,6 +3,7 @@ package gui.utils;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -27,7 +28,7 @@ import gui.util.GraphPlotter;
 
 public class FormationsMetricsGraphPlotter extends GraphPlotter {
 	private static final long serialVersionUID = -7417290618569517026L;
-	private RequestParamsPanel panel = null;
+	private RequestMetricsParamsPane panel = null;
 	private Graph graph;
 	private String[] files;
 	private MetricsType metricsType;
@@ -47,12 +48,9 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 		graph = new Graph();
 		mainPanel.add(graph, BorderLayout.CENTER);
 
-		if (metricsType != MetricsType.TIME_TO_FIRST_OCCUPATION) {
-			panel = new RequestParamsPanel();
-			panel.triggerDialog();
-		}
+		panel = new RequestMetricsParamsPane();
 
-		if (metricsType == MetricsType.TIME_TO_FIRST_OCCUPATION || panel.getDialogResult() == JOptionPane.OK_OPTION) {
+		if (panel.triggerDialog() == JOptionPane.OK_OPTION) {
 			int totalGenerations = 0;
 			for (String filePath : files) {
 				File file = new File(filePath);
@@ -80,14 +78,15 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 
 			graph.setShowLast(totalGenerations);
 
-			setSize(800, 500 + graph.getHeaderSize());
+			setSize(800, 600 + graph.getHeaderSize());
 			setLocationRelativeTo(null);
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			setVisible(true);
 		}
 
-		JButton saveToFileButton = new JButton("Save graph to file");
-		saveToFileButton.addActionListener(new ActionListener() {
+		JPanel buttonsPanel = new JPanel(new GridLayout(1, 2));
+		JButton saveToImageButton = new JButton("Save graph as image");
+		saveToImageButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
@@ -98,13 +97,29 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 				}
 			}
 		});
-		mainPanel.add(saveToFileButton, BorderLayout.SOUTH);
+		buttonsPanel.add(saveToImageButton);
+
+		JButton saveToFileButton = new JButton("Save graph data");
+		saveToFileButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				if (saveData()) {
+					JOptionPane.showMessageDialog(null, "Saved data!", "Sucess", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(null, "Error saving data!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		buttonsPanel.add(saveToFileButton);
+
+		mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
 	}
 
 	private void loadMetricsDataOnGraph(Graph graph, ArrayList<FormationTaskMetricsData> metricsData, File file,
 			MetricsType type) {
 		// Instead of differentiate, just create three arrays and use only the
-		// needed ones
+		// Needed ones
 		metricsData.sort(new Comparator<FormationTaskMetricsData>() {
 			@Override
 			public int compare(FormationTaskMetricsData o1, FormationTaskMetricsData o2) {
@@ -133,7 +148,9 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 				dataList_2[i] = data.getTimeInside_max();
 				break;
 			case TIME_TO_FIRST_OCCUPATION:
-				dataList_0[i] = (double) data.getTimeFirstTotalOccup();
+				dataList_0[i] = data.getTimeFirstTotalOccup_min();
+				dataList_1[i] = data.getTimeFirstTotalOccup_avg();
+				dataList_2[i] = data.getTimeFirstTotalOccup_max();
 				break;
 			case PERMUTATION_METRICS:
 				dataList_0[i] = data.getNumberDiffSpotsOccupied_min();
@@ -153,36 +170,25 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 		name += File.separatorChar + file.getName();
 		name += "_" + type.name();
 
-		switch (type) {
-		case TIME_INSIDE_FORMATION:
-		case PERMUTATION_METRICS:
-		case REOCUPATION_TIME:
-			if (panel.getDialogResult() == JOptionPane.OK_OPTION) {
-				if (panel.isPlotMinimumSelected()) {
-					graph.addDataList(dataList_0);
-					graph.addLegend(name + "_min");
-				}
-
-				if (panel.isPlotAverageSelected()) {
-					graph.addDataList(dataList_1);
-					graph.addLegend(name + "_avg");
-				}
-
-				if (panel.isPlotMaximumSelected()) {
-					graph.addDataList(dataList_2);
-					graph.addLegend(name + "_max");
-				}
+		if (panel.getDialogResult() == JOptionPane.OK_OPTION) {
+			if (panel.isPlotMinimumSelected()) {
+				graph.addDataList(dataList_0);
+				graph.addLegend(name + "_min");
 			}
-			break;
-		case TIME_TO_FIRST_OCCUPATION:
-			graph.addDataList(dataList_0);
 
-			graph.addLegend(name);
-			break;
+			if (panel.isPlotAverageSelected()) {
+				graph.addDataList(dataList_1);
+				graph.addLegend(name + "_avg");
+			}
+
+			if (panel.isPlotMaximumSelected()) {
+				graph.addDataList(dataList_2);
+				graph.addLegend(name + "_max");
+			}
 		}
 	}
 
-	private class RequestParamsPanel {
+	private class RequestMetricsParamsPane {
 		private JCheckBox minimumCheckBox = null;
 		private JCheckBox averageCheckBox = null;
 		private JCheckBox maximumCheckBox = null;
@@ -218,11 +224,15 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 	}
 
 	private boolean saveImage() {
-		return saveGraphToFile(graph, files);
+		return saveGraphAsImage(graph, files);
+	}
+
+	private boolean saveData() {
+		return saveGraphDataToFile(graph, files, metricsType.toString(), true);
 	}
 
 	@Override
-	protected boolean saveGraphToFile(Graph graph, String[] files) {
+	protected boolean saveGraphAsImage(Graph graph, String[] files) {
 		try {
 			if (files != null && files.length > 0) {
 				Rectangle originalBounds = getBounds();
@@ -245,17 +255,17 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 
 				if (files.length == 1) {
 					name = f.getParentFile().getParentFile().getName() + "_" + f.getParentFile().getName() + "_"
-							+ metricsType.toString() + "." + SAVE_TO_IMAGE_EXTENSION;
+							+ metricsType.toString() + "." + SAVE_TO_DATA_EXTENSION;
 				} else {
 					name = f.getParentFile().getParentFile().getName() + "_" + metricsType.toString() + "."
-							+ SAVE_TO_IMAGE_EXTENSION;
+							+ SAVE_TO_DATA_EXTENSION;
 				}
 
-				if (!new File(PLOTS_FOLDER_PATH).exists()) {
-					new File(PLOTS_FOLDER_PATH).mkdir();
+				if (!new File(PLOTS_IMAGES_FOLDER_PATH).exists()) {
+					new File(PLOTS_IMAGES_FOLDER_PATH).mkdir();
 				}
 
-				ImageIO.write(img, SAVE_TO_IMAGE_EXTENSION, new File(PLOTS_FOLDER_PATH, name));
+				ImageIO.write(img, SAVE_TO_DATA_EXTENSION, new File(PLOTS_IMAGES_FOLDER_PATH, name));
 			}
 		} catch (IOException e) {
 			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());

@@ -19,7 +19,9 @@ public class FormationTaskMetricsCodex {
 	public static final String TIME_INSIDE_SPOT_MIN = "timeInside_min";
 	public static final String TIME_INSIDE_SPOT_AVG = "timeInside_avg";
 	public static final String TIME_INSIDE_SPOT_MAX = "timeInside_max";
-	public static final String TIME_FIRST_TOTAL_OCCUP = "timeFirstTotalOccup";
+	public static final String TIME_FIRST_TOTAL_OCCUP_MIN = "timeFirstTotalOccup_min";
+	public static final String TIME_FIRST_TOTAL_OCCUP_AVG = "timeFirstTotalOccup_avg";
+	public static final String TIME_FIRST_TOTAL_OCCUP_MAX = "timeFirstTotalOccup_max";
 	public static final String NUM_DIFF_SPOTS_OCCUP_MIN = "numberDiffSpotsOccupied_min";
 	public static final String NUM_DIFF_SPOTS_OCCUP_AVG = "numberDiffSpotsOccupied_avg";
 	public static final String NUM_DIFF_SPOTS_OCCUP_MAX = "numberDiffSpotsOccupied_max";
@@ -36,11 +38,12 @@ public class FormationTaskMetricsCodex {
 		StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb, Locale.US);
 
-		formatter.format("%d\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f",
+		formatter.format("%d\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f\t%8.3f",
 				data.getGeneration(), data.getTimeInside_min(), data.getTimeInside_avg(), data.getTimeInside_max(),
-				data.getTimeFirstTotalOccup(), data.getNumberDiffSpotsOccupied_min(),
-				data.getNumberDiffSpotsOccupied_avg(), data.getNumberDiffSpotsOccupied_max(),
-				data.getReocupationTime_min(), data.getReocupationTime_avg(), data.getReocupationTime_max());
+				data.getTimeFirstTotalOccup_min(), data.getTimeFirstTotalOccup_avg(), data.getTimeFirstTotalOccup_max(),
+				data.getNumberDiffSpotsOccupied_min(), data.getNumberDiffSpotsOccupied_avg(),
+				data.getNumberDiffSpotsOccupied_max(), data.getReocupationTime_min(), data.getReocupationTime_avg(),
+				data.getReocupationTime_max());
 
 		formatter.close();
 		return sb.toString();
@@ -52,8 +55,9 @@ public class FormationTaskMetricsCodex {
 
 		formatter.format("%s\tMetrics written on %s%n", COMMENT_INITIATOR,
 				new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
-		formatter.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", HEADER_LINE_INITIATOR, GENERATION_NUMBER,
-				TIME_INSIDE_SPOT_MIN, TIME_INSIDE_SPOT_AVG, TIME_INSIDE_SPOT_MAX, TIME_FIRST_TOTAL_OCCUP,
+		formatter.format("%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s", HEADER_LINE_INITIATOR,
+				GENERATION_NUMBER, TIME_INSIDE_SPOT_MIN, TIME_INSIDE_SPOT_AVG, TIME_INSIDE_SPOT_MAX,
+				TIME_FIRST_TOTAL_OCCUP_MIN, TIME_FIRST_TOTAL_OCCUP_AVG, TIME_FIRST_TOTAL_OCCUP_MAX,
 				NUM_DIFF_SPOTS_OCCUP_MIN, NUM_DIFF_SPOTS_OCCUP_AVG, NUM_DIFF_SPOTS_OCCUP_MAX, TIME_REOCUPATION_MIN,
 				TIME_REOCUPATION_AVG, TIME_REOCUPATION_MAX);
 
@@ -65,7 +69,7 @@ public class FormationTaskMetricsCodex {
 		if (!line.startsWith(COMMENT_INITIATOR) && !line.startsWith(HEADER_LINE_INITIATOR)) {
 			String[] args = line.split("\t");
 
-			if (args.length < 11) {
+			if (args.length < 13) {
 				return null;
 			} else {
 				for (String str : args) {
@@ -77,13 +81,15 @@ public class FormationTaskMetricsCodex {
 				data.setTimeInside_min(Double.parseDouble(args[1]));
 				data.setTimeInside_avg(Double.parseDouble(args[2]));
 				data.setTimeInside_max(Double.parseDouble(args[3]));
-				data.setTimeFirstTotalOccup(Double.parseDouble(args[4]));
-				data.setNumberDiffSpotsOccupied_min(Double.parseDouble(args[5]));
-				data.setNumberDiffSpotsOccupied_avg(Double.parseDouble(args[6]));
-				data.setNumberDiffSpotsOccupied_max(Double.parseDouble(args[7]));
-				data.setReocupationTime_min(Double.parseDouble(args[8]));
-				data.setReocupationTime_avg(Double.parseDouble(args[9]));
-				data.setReocupationTime_max(Double.parseDouble(args[10]));
+				data.setTimeFirstTotalOccup_min(Double.parseDouble(args[4]));
+				data.setTimeFirstTotalOccup_avg(Double.parseDouble(args[5]));
+				data.setTimeFirstTotalOccup_max(Double.parseDouble(args[6]));
+				data.setNumberDiffSpotsOccupied_min(Double.parseDouble(args[7]));
+				data.setNumberDiffSpotsOccupied_avg(Double.parseDouble(args[8]));
+				data.setNumberDiffSpotsOccupied_max(Double.parseDouble(args[9]));
+				data.setReocupationTime_min(Double.parseDouble(args[10]));
+				data.setReocupationTime_avg(Double.parseDouble(args[11]));
+				data.setReocupationTime_max(Double.parseDouble(args[12]));
 				return data;
 			}
 		} else {
@@ -171,7 +177,9 @@ public class FormationTaskMetricsCodex {
 				data.setTimeInside_min(r.nextDouble() * 10);
 				data.setTimeInside_avg(r.nextDouble() * 10);
 				data.setTimeInside_max(r.nextDouble() * 10);
-				data.setTimeFirstTotalOccup(r.nextDouble() * 10);
+				data.setTimeFirstTotalOccup_min(r.nextDouble() * 10);
+				data.setTimeFirstTotalOccup_avg(r.nextDouble() * 10);
+				data.setTimeFirstTotalOccup_max(r.nextDouble() * 10);
 				data.setNumberDiffSpotsOccupied_min(r.nextDouble() * 10);
 				data.setNumberDiffSpotsOccupied_avg(r.nextDouble() * 10);
 				data.setNumberDiffSpotsOccupied_max(r.nextDouble() * 10);
@@ -214,13 +222,15 @@ public class FormationTaskMetricsCodex {
 		data.setTimeInside_min(1);
 		data.setTimeInside_avg(2);
 		data.setTimeInside_max(3);
-		data.setTimeFirstTotalOccup(4);
-		data.setNumberDiffSpotsOccupied_min(5);
-		data.setNumberDiffSpotsOccupied_avg(6);
-		data.setNumberDiffSpotsOccupied_max(7);
-		data.setReocupationTime_min(8);
-		data.setReocupationTime_avg(9);
-		data.setReocupationTime_max(10);
+		data.setTimeFirstTotalOccup_min(4);
+		data.setTimeFirstTotalOccup_avg(5);
+		data.setTimeFirstTotalOccup_max(6);
+		data.setNumberDiffSpotsOccupied_min(7);
+		data.setNumberDiffSpotsOccupied_avg(8);
+		data.setNumberDiffSpotsOccupied_max(9);
+		data.setReocupationTime_min(10);
+		data.setReocupationTime_avg(11);
+		data.setReocupationTime_max(12);
 
 		String encodedLine = FormationTaskMetricsCodex.encodeMetricsData(data);
 		System.out.println(encodedLine);

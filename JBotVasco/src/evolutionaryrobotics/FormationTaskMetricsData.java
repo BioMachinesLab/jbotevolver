@@ -5,7 +5,7 @@ import java.util.List;
 public class FormationTaskMetricsData extends MetricsData {
 	private static final long serialVersionUID = 6939285682274531099L;
 	private double timeInside_min = 0, timeInside_avg = 0, timeInside_max = 0;
-	private double timeFirstTotalOccup = 0;
+	private double timeFirstTotalOccup_min = 0, timeFirstTotalOccup_avg = 0, timeFirstTotalOccup_max = 0;
 	private double numberDiffSpotsOccupied_min = 0, numberDiffSpotsOccupied_avg = 0, numberDiffSpotsOccupied_max = 0;
 	private double reocupationTime_min = 0, reocupationTime_avg = 0, reocupationTime_max = 0;
 	private boolean isFaultInjectionActive = false;
@@ -36,8 +36,16 @@ public class FormationTaskMetricsData extends MetricsData {
 		this.timeInside_max = timeInside_max;
 	}
 
-	public void setTimeFirstTotalOccup(double timeFirstTotalOccup) {
-		this.timeFirstTotalOccup = timeFirstTotalOccup;
+	public void setTimeFirstTotalOccup_min(double timeFirstTotalOccup_min) {
+		this.timeFirstTotalOccup_min = timeFirstTotalOccup_min;
+	}
+
+	public void setTimeFirstTotalOccup_avg(double timeFirstTotalOccup_avg) {
+		this.timeFirstTotalOccup_avg = timeFirstTotalOccup_avg;
+	}
+
+	public void setTimeFirstTotalOccup_max(double timeFirstTotalOccup_max) {
+		this.timeFirstTotalOccup_max = timeFirstTotalOccup_max;
 	}
 
 	public void setNumberDiffSpotsOccupied_min(double numberDiffSpotsOccupied_min) {
@@ -86,8 +94,16 @@ public class FormationTaskMetricsData extends MetricsData {
 		return timeInside_max;
 	}
 
-	public double getTimeFirstTotalOccup() {
-		return timeFirstTotalOccup;
+	public double getTimeFirstTotalOccup_min() {
+		return timeFirstTotalOccup_min;
+	}
+
+	public double getTimeFirstTotalOccup_avg() {
+		return timeFirstTotalOccup_avg;
+	}
+
+	public double getTimeFirstTotalOccup_max() {
+		return timeFirstTotalOccup_max;
 	}
 
 	public double getNumberDiffSpotsOccupied_min() {
@@ -124,7 +140,9 @@ public class FormationTaskMetricsData extends MetricsData {
 			FormationTaskMetricsData data = (FormationTaskMetricsData) obj;
 			return data.getGeneration() == getGeneration() && data.getTimeInside_min() == timeInside_min
 					&& data.getTimeInside_avg() == timeInside_avg && data.getTimeInside_max() == timeInside_max
-					&& data.getTimeFirstTotalOccup() == timeFirstTotalOccup
+					&& data.getTimeFirstTotalOccup_min() == timeFirstTotalOccup_min
+					&& data.getTimeFirstTotalOccup_avg() == timeFirstTotalOccup_avg
+					&& data.getTimeFirstTotalOccup_max() == timeFirstTotalOccup_max
 					&& data.getNumberDiffSpotsOccupied_min() == numberDiffSpotsOccupied_min
 					&& data.getNumberDiffSpotsOccupied_avg() == numberDiffSpotsOccupied_avg
 					&& data.getNumberDiffSpotsOccupied_max() == numberDiffSpotsOccupied_max
@@ -141,7 +159,7 @@ public class FormationTaskMetricsData extends MetricsData {
 	public void combineMetricsData(List<MetricsData> metricsData) {
 		double metricsCount = 1;
 		double sum_timeInside_avg = timeInside_avg;
-		double sum_timeFirstTotalOccup = timeFirstTotalOccup;
+		double sum_timeFirstTotalOccup_avg = timeFirstTotalOccup_avg;
 		double sum_numberDiffSpotsOccupied_avg = numberDiffSpotsOccupied_avg;
 
 		double reocupationCount = 0;
@@ -161,19 +179,29 @@ public class FormationTaskMetricsData extends MetricsData {
 				if (formData.getTimeInside_min() < timeInside_min) {
 					timeInside_min = formData.getTimeInside_min();
 				}
+
+				if (formData.getTimeFirstTotalOccup_min() < timeFirstTotalOccup_min) {
+					timeFirstTotalOccup_min = formData.getTimeFirstTotalOccup_min();
+				}
+
 				if (formData.getNumberDiffSpotsOccupied_min() < numberDiffSpotsOccupied_min) {
 					numberDiffSpotsOccupied_min = formData.getNumberDiffSpotsOccupied_min();
 				}
 
 				// Averages calculations
 				sum_timeInside_avg += formData.getTimeInside_avg();
-				sum_timeFirstTotalOccup += formData.timeFirstTotalOccup;
+				sum_timeFirstTotalOccup_avg += formData.getTimeFirstTotalOccup_avg();
 				sum_numberDiffSpotsOccupied_avg += formData.getNumberDiffSpotsOccupied_avg();
 
 				// Maximums calculations
 				if (formData.getTimeInside_max() > timeInside_max) {
 					timeInside_max = formData.getTimeInside_max();
 				}
+
+				if (formData.getTimeFirstTotalOccup_max() > timeFirstTotalOccup_max) {
+					timeFirstTotalOccup_max = formData.getTimeFirstTotalOccup_max();
+				}
+
 				if (formData.getNumberDiffSpotsOccupied_max() > numberDiffSpotsOccupied_max) {
 					numberDiffSpotsOccupied_max = formData.getNumberDiffSpotsOccupied_max();
 				}
@@ -196,7 +224,7 @@ public class FormationTaskMetricsData extends MetricsData {
 		}
 
 		timeInside_avg = sum_timeInside_avg / metricsCount;
-		timeFirstTotalOccup = sum_timeFirstTotalOccup / metricsCount;
+		timeFirstTotalOccup_avg = sum_timeFirstTotalOccup_avg / metricsCount;
 		numberDiffSpotsOccupied_avg = sum_numberDiffSpotsOccupied_avg / metricsCount;
 
 		if (reocupationCount > 0) {
