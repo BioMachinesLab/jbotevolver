@@ -65,8 +65,12 @@ public abstract class Renderer extends Component {
 		return (Renderer) Factory.getInstance(arguments.getArgumentAsString("classname"), arguments);
 	}
 
-	public void setText(String titleText) {
+	public void setTitleText(String titleText) {
 		this.titleText = titleText;
+	}
+
+	public String getTitleText() {
+		return titleText;
 	}
 
 	protected void drawTitle(Graphics g) {

@@ -1082,7 +1082,7 @@ public class ResultViewerGui extends Gui implements Updatable {
 					playPosition.setValue(0);
 
 				if (showCurrentFileLabel) {
-					renderer.setText("File: " + filename);
+					renderer.setTitleText("File: " + filename);
 				}
 
 				launchSimulation();

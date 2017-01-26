@@ -46,10 +46,8 @@ public class TwoDRenderer extends Renderer
 
 	protected boolean bigRobots = false;
 
-	private boolean debug = false;
-
 	protected double drawFrames = 1;
-	protected boolean darIds;
+	protected boolean showRobotsIds;
 
 	private int px;
 	private int py;
@@ -61,7 +59,7 @@ public class TwoDRenderer extends Renderer
 		createImage();
 		bigRobots = args.getArgumentAsIntOrSetDefault("bigrobots", 0) == 1;
 		drawFrames = args.getArgumentAsIntOrSetDefault("drawframes", 1);
-		darIds = args.getArgumentAsIntOrSetDefault("drawids", 1) == 1;
+		showRobotsIds = args.getArgumentAsIntOrSetDefault("drawids", 1) == 1;
 	}
 
 	public double getScale() {
@@ -84,7 +82,7 @@ public class TwoDRenderer extends Renderer
 			graphics.fillRect(0, 0, getWidth(), getHeight());
 			return;
 		}
-		
+
 		if (simulator.getTime() % drawFrames != 0) {
 			// repaint();
 			return;
@@ -143,10 +141,19 @@ public class TwoDRenderer extends Renderer
 				case ROBOT:
 					drawEntities(graphics, (Robot) m);
 					drawRobot(graphics, (Robot) m);
-					if (numberOfRobots > 1 && darIds)
-						drawRobotId(graphics, (Robot) m);
 				default:
 					break;
+				}
+			}
+
+			if (numberOfRobots > 1 && showRobotsIds) {
+				for (PhysicalObject m : simulator.getEnvironment().getAllObjects()) {
+					switch (m.getType()) {
+					case ROBOT:
+						drawRobotId(graphics, (Robot) m);
+					default:
+						break;
+					}
 				}
 			}
 		}
@@ -200,10 +207,10 @@ public class TwoDRenderer extends Renderer
 		int y = transformY(robot.getPosition().y - robot.getDiameter() - (bigRobots ? 1 : 0));
 
 		g.setColor(Color.WHITE);
-		g.fillRect(x, y - 10, 8, 10);
+		g.fillRect(x + 4, y - 10, 8, 10);
 
 		g.setColor(Color.BLACK);
-		g.drawString(String.valueOf(robot.getId()), x, y);
+		g.drawString(String.valueOf(robot.getId()), x + 4, y);
 	}
 
 	@Override
@@ -286,7 +293,7 @@ public class TwoDRenderer extends Renderer
 	}
 
 	public void drawWall(Wall w) {
-		
+
 		graphics.setColor(w.color);
 
 		Edge[] edges = w.getEdges();
@@ -321,7 +328,7 @@ public class TwoDRenderer extends Renderer
 		// int y = (int) transformY(m.getTopLeftY());
 		//
 		// graphics.fillRect(x, y, wallWidth, wallHeight);
-		
+
 		graphics.setColor(Color.BLACK);
 
 	}

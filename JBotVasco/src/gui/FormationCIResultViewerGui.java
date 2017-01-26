@@ -3,14 +3,17 @@ package gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Graphics2D;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
@@ -22,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -48,6 +52,9 @@ import simulation.util.Arguments;
 
 public class FormationCIResultViewerGui extends CIResultViewerGui {
 	private static final long serialVersionUID = -272519649519979276L;
+	protected final String PLOTS_IMAGES_FOLDER_PATH = ".\\plots";
+	protected final String SAVE_TO_IMAGE_EXTENSION = "png";
+
 	private JButton timeInsideRobotMetricsButton;
 	private JButton timeUntilFirstOccupationButton;
 	private JButton permutationMetricButton;
@@ -82,11 +89,30 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 			faultInjectionPanel = new JPanel(new GridLayout(1, 2));
 			debugOptions.add(faultInjectionPanel);
 
+			Component[] components = extraOptionsPanel.getComponents();
+			JPanel originalComponentsPanel = new JPanel(new GridLayout(4, 1));
+			for (Component component : components) {
+				originalComponentsPanel.add(component);
+			}
+
+			extraOptionsPanel.setLayout(new BorderLayout());
+			extraOptionsPanel.add(originalComponentsPanel, BorderLayout.CENTER);
+
+			JButton exportRenderToImageButton = new JButton("Export renderer to image");
+			exportRenderToImageButton.addActionListener(new ActionListener() {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					exportRendererToImage();
+				}
+			});
+			extraOptionsPanel.add(exportRenderToImageButton, BorderLayout.SOUTH);
+
 			// Metrics info
 			mainMetricsPanel = new JPanel(new BorderLayout());
 			mainMetricsPanel.setBorder(BorderFactory.createTitledBorder("Metrics"));
 			collectMetricsCheckBox = new JCheckBox("Collect metrics");
-			collectMetricsCheckBox.setSelected(true);
+			collectMetricsCheckBox.setSelected(false);
 			collectMetricsCheckBox.setHorizontalAlignment(JCheckBox.CENTER);
 
 			mainMetricsPanel.add(collectMetricsCheckBox, BorderLayout.NORTH);
@@ -532,6 +558,105 @@ public class FormationCIResultViewerGui extends CIResultViewerGui {
 
 		Thread t = new Thread(new GraphTread(files, type));
 		t.start();
+	}
+
+	private void exportRendererToImage() {
+		if (renderer != null && simulator != null) {
+			boolean wasRunning = false;
+			if (simulationState == RUN) {
+				startPauseButton();
+				wasRunning = true;
+			}
+
+			String originalTitle = renderer.getTitleText();
+			renderer.setTitleText("");
+			renderer.drawFrame();
+
+			try {
+				BufferedImage img = new BufferedImage(renderer.getWidth(), renderer.getHeight(),
+						BufferedImage.TYPE_INT_RGB);
+				Graphics2D g2d = img.createGraphics();
+				renderer.printAll(g2d);
+				g2d.dispose();
+
+				String name = originalTitle;
+				if (name.isEmpty()) {
+					name = "noname";
+				} else {
+					name = name.substring(6, name.length());
+
+					String[] splittedString = name.split("\\\\");
+					if (splittedString.length > 3) {
+						name = splittedString[splittedString.length - 3] + "_"
+								+ splittedString[splittedString.length - 2]
+								+ splittedString[splittedString.length - 1].replaceAll("\\.conf", "");
+					} else {
+						name = splittedString[splittedString.length - 1].replaceAll("\\.conf", "").replaceAll("_", "");
+					}
+				}
+
+				if (!new File(PLOTS_IMAGES_FOLDER_PATH).exists()) {
+					new File(PLOTS_IMAGES_FOLDER_PATH).mkdir();
+				}
+
+				boolean save = true;
+				if (new File(PLOTS_IMAGES_FOLDER_PATH, name + "." + SAVE_TO_IMAGE_EXTENSION).exists()) {
+					final String nameCopy = name;
+					File[] files = new File(PLOTS_IMAGES_FOLDER_PATH).listFiles(new FileFilter() {
+
+						@Override
+						public boolean accept(File arg0) {
+							String name = arg0.getName();
+							return name.contains(nameCopy);
+						}
+					});
+
+					if (files != null && files.length > 0) {
+						String lastFileName = files[files.length - 1].getName();
+						lastFileName = lastFileName.replaceAll("\\." + SAVE_TO_IMAGE_EXTENSION, "");
+
+						String[] splittedName = lastFileName.split("_");
+
+						if (splittedName.length > 1) {
+							try {
+								int number = Integer.parseInt(splittedName[splittedName.length - 1]) + 1;
+								name += "_" + number;
+							} catch (NumberFormatException e) {
+								name += "_1";
+							}
+						} else {
+							name += "_1";
+						}
+
+						name += "." + SAVE_TO_IMAGE_EXTENSION;
+					} else {
+						System.err.printf("[%s] Error getting existing files names%n", getClass().getSimpleName());
+						save = false;
+					}
+				} else {
+					name += "." + SAVE_TO_IMAGE_EXTENSION;
+				}
+
+				if (save) {
+					ImageIO.write(img, SAVE_TO_IMAGE_EXTENSION, new File(PLOTS_IMAGES_FOLDER_PATH, name));
+					JOptionPane.showMessageDialog(null, "Saved image!", "Sucess", JOptionPane.INFORMATION_MESSAGE);
+				} else {
+					JOptionPane.showMessageDialog(null, "Error saving image!", "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			} catch (IOException e) {
+				System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
+				JOptionPane.showMessageDialog(null, "Error saving image!", "Error", JOptionPane.ERROR_MESSAGE);
+			}
+
+			renderer.setTitleText(originalTitle);
+			renderer.drawFrame();
+
+			if (wasRunning) {
+				startPauseButton();
+			}
+		} else {
+			JOptionPane.showMessageDialog(null, "No simulation running!", "Error", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 
 	protected class GraphTread implements Runnable {

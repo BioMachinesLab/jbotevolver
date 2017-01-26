@@ -255,17 +255,17 @@ public class FormationsMetricsGraphPlotter extends GraphPlotter {
 
 				if (files.length == 1) {
 					name = f.getParentFile().getParentFile().getName() + "_" + f.getParentFile().getName() + "_"
-							+ metricsType.toString() + "." + SAVE_TO_DATA_EXTENSION;
+							+ metricsType.toString() + "." + SAVE_TO_IMAGE_EXTENSION;
 				} else {
 					name = f.getParentFile().getParentFile().getName() + "_" + metricsType.toString() + "."
-							+ SAVE_TO_DATA_EXTENSION;
+							+ SAVE_TO_IMAGE_EXTENSION;
 				}
 
 				if (!new File(PLOTS_IMAGES_FOLDER_PATH).exists()) {
 					new File(PLOTS_IMAGES_FOLDER_PATH).mkdir();
 				}
 
-				ImageIO.write(img, SAVE_TO_DATA_EXTENSION, new File(PLOTS_IMAGES_FOLDER_PATH, name));
+				ImageIO.write(img, SAVE_TO_IMAGE_EXTENSION, new File(PLOTS_IMAGES_FOLDER_PATH, name));
 			}
 		} catch (IOException e) {
 			System.err.printf("[%s] %s%n", getClass().getSimpleName(), e.getMessage());
