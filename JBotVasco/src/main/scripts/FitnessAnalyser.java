@@ -1,4 +1,4 @@
-package main;
+package main.scripts;
 
 import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;

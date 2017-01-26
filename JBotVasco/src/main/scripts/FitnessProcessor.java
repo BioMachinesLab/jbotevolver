@@ -1,4 +1,4 @@
-package main;
+package main.scripts;
 
 import java.awt.GridLayout;
 import java.io.File;
@@ -22,10 +22,10 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import simulation.Simulator;
 
 public class FitnessProcessor {
-	private static final String path = "C:\\Users\\BIOMACHINES\\Desktop\\Eclipse Data\\JBotEvolver\\JBotVasco\\experiments_automator\\targetFollowing_automator\\targetFollowing_basicSetup_normal_correctedErrors";
+	private final String path = "C:\\Users\\BIOMACHINES\\Desktop\\Eclipse Data\\JBotEvolver\\JBotVasco\\experiments_automator\\targetFollowing_automator\\targetFollowing_basicSetup_normal_correctedErrors";
 	private int runs = 10;
-	private static String showBestFolder = "show_best";
-	private static String showBestFileName = "showbest%d.conf";
+	private final String showBestFolder = "show_best";
+	private final String showBestFileName = "showbest%d.conf";
 	private final String PLOTS_DATA_FOLDER_PATH = ".\\data";
 	private final String SAVE_TO_DATA_EXTENSION = "csv";
 
