@@ -16,6 +16,7 @@ import taskexecutor.tasks.MetricsGenerationalTask;
 import taskexecutor.tasks.NEATMultipleSampleTargetPostEvaluationTask;
 
 public class NEATTargetPostEvaluation extends NEATPostEvaluation {
+	private final boolean INJECT_FAULTS_IN_METRICS = false;
 	private int taskCount = 0;
 
 	public NEATTargetPostEvaluation(String[] args, String[] extraArgs) {
@@ -214,8 +215,11 @@ public class NEATTargetPostEvaluation extends NEATPostEvaluation {
 								jBotEvolver = new JBotEvolver(newArgs);
 
 								HashMap<String, Arguments> arguments = jBotEvolver.getArgumentsCopy();
-								arguments.get("--evolution").setArgument("halfhalfFaults", 1);
-								arguments.get("--environment").setArgument("injectFaults", 1);
+
+								if (INJECT_FAULTS_IN_METRICS) {
+									arguments.get("--evolution").setArgument("halfhalfFaults", 1);
+									arguments.get("--environment").setArgument("injectFaults", 1);
+								}
 								// arguments.get("--controllers").setArgument("classname",
 								// "controllers.TargetFollowingHibridController");
 
