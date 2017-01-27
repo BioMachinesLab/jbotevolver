@@ -231,7 +231,7 @@ public class MetricsProcessor {
 			if (path.contains("hybrid")) {
 				controllerType = "Hybrid";
 			} else if (path.contains("normal")) {
-				controllerType = "Simple";
+				controllerType = "Monolithic";
 			}
 
 			for (int i = 0; i < lines.length; i++) {
@@ -272,7 +272,7 @@ public class MetricsProcessor {
 			if (path.contains("hybrid")) {
 				controllerType = "Hybrid";
 			} else if (path.contains("normal")) {
-				controllerType = "Simple";
+				controllerType = "Monolithic";
 			}
 
 			// Starts in 1 to ignore the headers
