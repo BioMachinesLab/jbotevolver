@@ -72,8 +72,8 @@ public class FireEnv extends JS_Environment {
 		double fireX_Position=wallX_Selected-rangeBetweenWalls+(wallX_Selected-(wallX_Selected-rangeBetweenWalls))/2;
 		double fireY_Position=wallY_Selected-rangeBetweenWalls+(wallY_Selected-(wallY_Selected-rangeBetweenWalls))/2;
 		
-		//env.addPrey(new IntensityPrey(simulator, "Prey " + 0, new Vector2d( fireX_Position, fireY_Position), 0, PREY_MASS, 0.25, 1));
-		env.addPrey(new IntensityPrey(simulator, "Prey " + 0, new Vector2d( 0, -2.5), 0, PREY_MASS, 0.25, PREY_INTENSITY));
+		env.addPrey(new IntensityPrey(simulator, "Prey " + 0, new Vector2d( fireX_Position, fireY_Position), 0, PREY_MASS, 0.25, 1));
+		//env.addPrey(new IntensityPrey(simulator, "Prey " + 0, new Vector2d( 0, -2.5), 0, PREY_MASS, 0.25, PREY_INTENSITY));
 		
 		for(Robot r : env.getRobots()) {
 			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);

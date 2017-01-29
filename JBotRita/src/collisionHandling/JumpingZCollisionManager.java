@@ -6,6 +6,7 @@ import java.util.LinkedList;
 
 import javax.naming.InitialContext;
 
+import physicalobjects.WallWithZ;
 import mathutils.Vector2d;
 import robots.JumpingRobot;
 import robots.JumpingSumo;
@@ -82,9 +83,6 @@ public class JumpingZCollisionManager extends SimpleCollisionManager {
 		}
 		// robot - wall
 		for (Robot robot : environment.getRobots()) {
-			if(robot.ignoreWallCollisions()){
-				continue;
-			}
 			ClosePhysicalObjects closeWalls = robot.shape.getCloseWalls();
 			CloseObjectIterator iterator = closeWalls.iterator();
 			while (iterator.hasNext()) {
@@ -94,28 +92,33 @@ public class JumpingZCollisionManager extends SimpleCollisionManager {
 				
 				int status = checkIfCollided(closeWall, robot);
 				if (status != -1) {
-					if(robot instanceof JumpingSumo){
-						
-					JumpingSumo myRobot= ((JumpingSumo) robot);
+					if(robot instanceof JumpingRobot ){
+					JumpingRobot myRobot= ((JumpingRobot) robot);
 					if (myRobot.ignoreWallCollisions()) {
+						if(closeWall instanceof WallWithZ){
+							if(((WallWithZ)closeWall).getHeightZ()>myRobot.getHeight()){
+								myRobot.stopJumping();
+								handle_RobotWithWall_Collisiion(robot, closeWall,
+										status);
+							}
+								
+						}
+					}else{
+
 						myRobot.stopJumping();
+						handle_RobotWithWall_Collisiion(robot, closeWall,
+								status);
 					}
-					myRobot.ignoreStatusOfDrivingAfterJumping();
+					}else{
+
+						handle_RobotWithWall_Collisiion(robot, closeWall,
+								status);
 					}
-					Vector2d newPosition = handleCollision(robot, closeWall,
-							status);
-					robot.moveTo(newPosition);
-					robot.setInvolvedInCollison(true);
-					robot.setInvolvedInCollisonWall(true);
 					
-					robot.getCollidingObjects().add(closeWall);
 					
-					if(robot.specialWallCollisions()) {
-						DifferentialDriveRobot rr = (DifferentialDriveRobot)robot;
-						rr.setWheelSpeed(rr.getLeftWheelSpeed()*0.5,rr.getRightWheelSpeed()*0.5);
-//						robot.setOrientation(this.simulator.getRandom().nextDouble()*Math.PI*2);
-					}
 				}
+				
+
 			}
 			
 			
@@ -249,8 +252,26 @@ public class JumpingZCollisionManager extends SimpleCollisionManager {
 			}
 		}
 	}
+	
+	private void handle_RobotWithWall_Collisiion(Robot robot, Wall closeWall, int status){
+		Vector2d newPosition = handleCollision(robot, closeWall,
+				status);
+		robot.moveTo(newPosition);
+		robot.setInvolvedInCollison(true);
+		robot.setInvolvedInCollisonWall(true);
+		
+		robot.getCollidingObjects().add(closeWall);
+		
+		if(robot.specialWallCollisions()) {
+			DifferentialDriveRobot rr = (DifferentialDriveRobot)robot;
+			rr.setWheelSpeed(rr.getLeftWheelSpeed()*0.5,rr.getRightWheelSpeed()*0.5);
+			
+	}
+	}
 
 }
 
-		
+	
+
+
 

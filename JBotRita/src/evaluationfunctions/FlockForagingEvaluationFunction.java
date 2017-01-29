@@ -6,12 +6,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import collisionHandling.JumpingZCollisionManager;
 import mathutils.Vector2d;
 import robots.JumpingSumo;
 import sensors.IntensityPreyCarriedSensor;
 import simulation.Simulator;
 import simulation.environment.Environment;
 import simulation.physicalobjects.Prey;
+import simulation.physicalobjects.collisionhandling.SimpleCollisionManager;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import enviromentsSwarms.EmptyEnviromentsWithFixPositions;
@@ -22,22 +24,17 @@ import environments_JumpingSumoIntensityPreys2.copy.JS_EasiestEnv_JustPreys2;
 public class FlockForagingEvaluationFunction extends JumpingSumoEvaluationFunction {
 
 	private double current = 0.0;
-	private double clusters = 0.0;
-	private HashMap<Robot, Vector2d> robotsPosition = new HashMap<Robot, Vector2d>();
-	private double sumOfDistances = 0.0;
 	private ArrayList<Robot> robots = new ArrayList<Robot>();
-	private double rewardForOrientation=0.0;
-	private double rewardForCohesion=0.0;
 	private Simulator simulator;
-	private double distance=0.0;
-	private ArrayList<Boolean> environmentPositions=new ArrayList<Boolean>();
-	
+	private IntensityForagingRobotsEnviroments environment=null;
 
 	public FlockForagingEvaluationFunction(Arguments args) {
 		super(args);
+		
 	}
 
 	public double getFitness() {
+		
 		return fitness;
 	}
 
@@ -45,19 +42,21 @@ public class FlockForagingEvaluationFunction extends JumpingSumoEvaluationFuncti
 	// @Override
 	public void update(Simulator simulator) {
 		
-		IntensityForagingRobotsEnviroments environment = (IntensityForagingRobotsEnviroments) simulator
+		 environment = (IntensityForagingRobotsEnviroments) simulator
 				.getEnvironment();
 		robots = environment.getRobots();
-		double numberOfRobots = robots.size();
+		
 		for(Robot r: robots){
-			if (r.isInvolvedInCollisonWall()) {
+			if (r.isInvolvedInCollison()) {
 				current++;
 			}
 		}
 		//System.out.println("fitness"+fitness);
-		fitness = environment.getNumberOfFoodSuccessfullyForaged()/numberOfRobots;
-		if(fitness==1)
-			fitness+= (1 - simulator.getTime() / environment.getSteps());
+		
+			fitness = environment.getNumberOfFoodSuccessfullyForaged()/robots.size()+current*-0.001/robots.size();
+			if(fitness==1)
+				fitness+= (1 - simulator.getTime() / environment.getSteps());
+			
 			//System.out.println(fitness);
 	}
 
