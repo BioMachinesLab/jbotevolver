@@ -23,7 +23,7 @@ import environments_JumpingSumoIntensityPreys2.copy.JS_EasiestEnv_JustPreys2;
 
 public class FlockForagingEvaluationFunction extends JumpingSumoEvaluationFunction {
 
-	private double current = 0.0;
+	private double numberCollisions = 0.0;
 	private ArrayList<Robot> robots = new ArrayList<Robot>();
 	private Simulator simulator;
 	private IntensityForagingRobotsEnviroments environment=null;
@@ -48,18 +48,28 @@ public class FlockForagingEvaluationFunction extends JumpingSumoEvaluationFuncti
 		
 		for(Robot r: robots){
 			if (r.isInvolvedInCollison()) {
-				current++;
+				numberCollisions++;
 			}
 		}
 		//System.out.println("fitness"+fitness);
-		
-			fitness = environment.getNumberOfFoodSuccessfullyForaged()/robots.size()+current*-0.001/robots.size();
+			int max_PossibleNumberOfCollisions=environment.getSteps()*robots.size();
+			double penalty_for_collision= -numberCollisions/max_PossibleNumberOfCollisions;
+			fitness = environment.getNumberOfFoodSuccessfullyForaged()/robots.size();
 			if(fitness==1)
 				fitness+= (1 - simulator.getTime() / environment.getSteps());
+			fitness+=penalty_for_collision;
 			
-			//System.out.println(fitness);
+		
 	}
 
+	/*
+	 * fitness = environment.getNumberOfFoodSuccessfullyForaged()/robots.size();
+			if(fitness==1)
+				fitness+= (1 - simulator.getTime() / environment.getSteps()) +penalty_for_collision*0.2;
+			else{
+				fitness+= penalty_for_collision*0.1;
+			}
+	 */
 	
 
 }

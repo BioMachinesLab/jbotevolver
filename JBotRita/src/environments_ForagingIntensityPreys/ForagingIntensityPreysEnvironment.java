@@ -67,8 +67,7 @@ public class ForagingIntensityPreysEnvironment extends Environment {
 		}
 				
 		this.random = simulator.getRandom();
-		fitnesssample = arguments.getArgumentAsInt("fitnesssample");
-		fitnesssample = fitnesssample % 4;
+		
 	}
 
 	@Override

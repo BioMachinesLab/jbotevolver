@@ -59,7 +59,7 @@ public class RotationRobotsGlobalSensor extends Sensor {
 		}
 		rangeBackToDefault();
 		if (numberOfRobots_withinRange > 0.0)
-			return sumRelativeOrientation / numberOfRobots_withinRange;
+			return sumRelativeOrientation / numberOfRobots_withinRange; 
 		else
 			return 0.0;
 	}

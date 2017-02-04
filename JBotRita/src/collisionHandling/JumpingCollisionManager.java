@@ -83,6 +83,8 @@ public class JumpingCollisionManager extends SimpleCollisionManager {
 		// robot - wall
 		for (Robot robot : environment.getRobots()) {
 			if(robot.ignoreWallCollisions()){
+				
+				
 				continue;
 			}
 			ClosePhysicalObjects closeWalls = robot.shape.getCloseWalls();
