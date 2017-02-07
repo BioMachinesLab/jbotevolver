@@ -21,7 +21,10 @@ import evolutionaryrobotics.JBotEvolver;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 import simulation.Simulator;
 
-public class FitnessProcessor {
+/*
+ * Creates a merged log of the evolution fitness
+ */
+public class EvolutionFitnessProcessor {
 	private final String path = "C:\\Users\\BIOMACHINES\\Desktop\\Eclipse Data\\JBotEvolver\\JBotVasco\\experiments_automator\\targetFollowing_automator\\targetFollowing_basicSetup_normal_correctedErrors";
 	private int runs = 10;
 	private final String showBestFolder = "show_best";
@@ -32,10 +35,10 @@ public class FitnessProcessor {
 	private int generationNumber = 0;
 
 	public static void main(String[] args) {
-		new FitnessProcessor();
+		new EvolutionFitnessProcessor();
 	}
 
-	public FitnessProcessor() {
+	public EvolutionFitnessProcessor() {
 		HashMap<String, double[]> fitnessData = new HashMap<String, double[]>();
 		for (int i = 1; i <= runs; i++) {
 			File folder = new File(path, Integer.toString(i));
