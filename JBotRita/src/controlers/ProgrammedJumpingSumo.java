@@ -73,7 +73,7 @@ public class ProgrammedJumpingSumo extends Controller {
 			IntensityPrey prey = (IntensityPrey) simulator.getEnvironment()
 					.getPrey().get(0);
 			pickUpPrey.apply(r,time);
-			pickUpPrey.dropPrey();
+			pickUpPrey.notPick();
 			if (prey.getIntensity() < 0) {
 				simulator.stopSimulation();
 			}

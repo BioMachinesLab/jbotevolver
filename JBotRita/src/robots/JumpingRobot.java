@@ -33,14 +33,14 @@ public class JumpingRobot extends DifferentialDriveRobot {
 	@ArgumentsAnnotation(name="timeScale", defaultValue = "0.18")
 	protected double timeScale;
 	
-	@ArgumentsAnnotation(name="wantedTimeDelta", defaultValue = "0.05")
+	@ArgumentsAnnotation(name="wantedTimeDelta", defaultValue = "0.1")
 	protected double wantedTimeDelta;
 	
 	
 	public JumpingRobot(Simulator simulator, Arguments args) {
 		super(simulator, args);
 		random = simulator.getRandom();
-		wantedTimeDelta=args.getArgumentAsDoubleOrSetDefault("delay_to_start_Jumping", 0.05);
+		wantedTimeDelta=args.getArgumentAsDoubleOrSetDefault("wantedTimeDelta", 0.1);
 		this.delay_to_start_Jumping = args.getArgumentAsDoubleOrSetDefault("delay_to_start_Jumping", 10.0)*(0.1/wantedTimeDelta);
 		this.timeScale = args.getArgumentAsDoubleOrSetDefault("timeScale", 0.18)*(0.1/wantedTimeDelta);
 
@@ -56,7 +56,7 @@ public class JumpingRobot extends DifferentialDriveRobot {
 
 	@Override
 	public void updateActuators(Double time, double timeDelta) {
-		timeDelta=wantedTimeDelta;
+		//timeDelta=wantedTimeDelta;
 		if (isToJump) {
 			inicialTime = time;
 			isToJump = false;
@@ -82,7 +82,7 @@ public class JumpingRobot extends DifferentialDriveRobot {
 	}
 
 	protected void robotJumping(Double time, double timeDelta){
-		timeDelta=wantedTimeDelta;
+		//timeDelta=wantedTimeDelta;
 		double t = ((time - time_startedJump) * (timeDelta))
 				/ timeScale;		
 		double Vo = power * FastMath.cosQuick(Math.toRadians(angle));
@@ -104,13 +104,13 @@ public class JumpingRobot extends DifferentialDriveRobot {
 		if (z < 0) {
 			timeLanding=time;
 			landing();
-		//	System.out.println("how much time since the beggining inicialPosition"+ inicialPosition +"posFinal"+ position +" distance" + inicialPosition.distanceTo(position) + "time since startedJumping"+(time-time_startedJump));
+			//System.out.println("how much time since the beggining inicialPosition"+ inicialPosition +"posFinal"+ position +" distance" + inicialPosition.distanceTo(position) + "time since startedJumping"+(time-time_startedJump));
 
 		}
 	}
 	
 	protected void robotDriving(Double time, double timeDelta){
-		timeDelta=wantedTimeDelta;
+		//timeDelta=wantedTimeDelta;
 		inicialPosition = new Vector2d(position.getX(), position.getY());
 		position.set(position.getX() + timeDelta* (leftWheelSpeed + rightWheelSpeed) / 2.0* FastMath.cosQuick(orientation), position.getY()+ timeDelta * (leftWheelSpeed + rightWheelSpeed)/ 2.0 * FastMath.sinQuick(orientation));
 		orientation += timeDelta * 0.5 / (distanceBetweenWheels / 2.0)* (rightWheelSpeed - leftWheelSpeed);

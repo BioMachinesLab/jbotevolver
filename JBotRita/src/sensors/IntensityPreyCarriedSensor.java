@@ -1,6 +1,7 @@
 package sensors;
 
 import actuator.IntensityPreyPickerActuator;
+import actuator.LimitIntensityPreyPickerActuator;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.actuators.PreyPickerActuator;

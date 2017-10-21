@@ -23,7 +23,9 @@ public class Simulator implements Serializable {
 	private static final long serialVersionUID = -2453767907508994194L;
 	public static int maxNumberRobots = 100000;
 	protected Double time = Double.valueOf(0);
-	protected double timeDelta = 0.1;
+	
+	protected double timeDelta = 0.025; //0.1 timeDelta=0.025;
+	
 	protected Environment environment;
 	protected Random random;
 	protected long randomSeed;
@@ -157,8 +159,13 @@ public class Simulator implements Serializable {
 			// Update the readings for all the sensors:
 			// long d = System.currentTimeMillis();
 			updateAllRobotSensors(time);
+			
 			// Call the controllers:
 			updateAllControllers(time);
+			
+			
+			
+			
 			// Compute the actions of the robot's actuators on the environment
 			// and on itself
 			updateAllRobotActuators(time);

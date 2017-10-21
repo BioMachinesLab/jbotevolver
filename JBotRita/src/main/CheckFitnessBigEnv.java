@@ -73,4 +73,14 @@ public class CheckFitnessBigEnv {
 		}
 		return result;
 	}
+	
+	/*public static void main (String[] args ){
+		double angle1=(0);
+		double angle2=(Math.PI/2);
+		double cos=Math.cos(angle1)+Math.cos(angle2); //2
+		double sen=Math.sin(angle1)+Math.sin(angle2); //2
+		double nei1= Math.pow(cos,2)+ Math.pow(sen,2);
+		//double nei2= Math.pow(Math.cos(angle2),2)+Math.pow(Math.sin(angle2),2);
+		System.out.println( Math.sqrt(nei1)/2);
+	}*/
 }

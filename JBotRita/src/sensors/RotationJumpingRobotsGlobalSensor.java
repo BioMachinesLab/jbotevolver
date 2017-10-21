@@ -9,7 +9,7 @@ import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
-public class RotationJumpingRobotsGlobalSensor extends Sensor {
+public class RotationJumpingRobotsGlobalSensor extends Sensor {  //the same as the RotationRobotsGlobalSensor, but just takes into account the robots that are charging
 	private Simulator simulator;
 	private Robot robot;
 	protected boolean rangedIncreased = false;
@@ -75,6 +75,9 @@ public class RotationJumpingRobotsGlobalSensor extends Sensor {
 		return difference;
 	}
 
+	
+	
+	
 	@Override
 	public String toString() {
 		return "RotationRobotsGlobalSensor [" + getSensorReading(0) + "]";

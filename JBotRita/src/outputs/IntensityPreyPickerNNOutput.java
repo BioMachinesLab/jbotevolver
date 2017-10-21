@@ -21,10 +21,11 @@ public class IntensityPreyPickerNNOutput  extends NNOutput {
 
 	@Override
 	public void setValue(int index, double value) {
-		if (value < 0.5) 
-			
-			preyPicker.dropPrey();
-		
+		if (value > 0.5) 
+			preyPicker.pick();
+		else{
+			preyPicker.notPick();
+		}
 	}
 
 	@Override

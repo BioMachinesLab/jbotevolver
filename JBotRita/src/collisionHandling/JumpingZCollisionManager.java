@@ -24,8 +24,8 @@ import simulation.robot.DifferentialDriveRobot;
 import simulation.robot.Robot;
 
 public class JumpingZCollisionManager extends SimpleCollisionManager {
-	private Vector2d oldPos=null;
-	private Vector2d robotPos=null;
+	private Vector2d oldPos = null;
+	private Vector2d robotPos = null;
 	private boolean robotHasOldPos = false;
 
 	public JumpingZCollisionManager(Simulator simulator) {
@@ -88,43 +88,46 @@ public class JumpingZCollisionManager extends SimpleCollisionManager {
 			while (iterator.hasNext()) {
 
 				Wall closeWall = (Wall) (iterator.next().getObject());
-			
-				
+
 				int status = checkIfCollided(closeWall, robot);
 				if (status != -1) {
-					if(robot instanceof JumpingRobot ){
-					JumpingRobot myRobot= ((JumpingRobot) robot);
-					if (myRobot.ignoreWallCollisions()) {
-						if(closeWall instanceof WallWithZ){
-							if(((WallWithZ)closeWall).getHeightZ()>myRobot.getHeight()){
-								myRobot.stopJumping();
-								handle_RobotWithWall_Collisiion(robot, closeWall,
-										status);
+					if (robot instanceof JumpingRobot) {
+						JumpingRobot myRobot = ((JumpingRobot) robot);
+						if (myRobot.ignoreWallCollisions()) {
+							//System.out.println("entrei na colisão com parede em ignore");
+							if (closeWall instanceof WallWithZ) {
+								//System.out.println("instanciaWallWithZ");
+								//System.out.println("height"+myRobot.getHeight());
+
+								if (((WallWithZ) closeWall).getHeightZ() > myRobot
+										.getHeight()) {
+									//System.out.println("a parede é maior");
+									myRobot.stopJumping();
+									handle_RobotWithWall_Collisiion(robot,
+											closeWall, status);
+								}else{
+									//System.out.println("saltei");
+								}
+
 							}
-								
+						} else {
+							//System.out.println("anão cheguei a ser ignore, para sequer ver a colisão");
+
+							myRobot.stopJumping();
+							handle_RobotWithWall_Collisiion(robot, closeWall,
+									status);
 						}
-					}else{
-
-						myRobot.stopJumping();
-						handle_RobotWithWall_Collisiion(robot, closeWall,
-								status);
-					}
-					}else{
+					} else {
+						//System.out.println("não sou robot saltitante");
 
 						handle_RobotWithWall_Collisiion(robot, closeWall,
 								status);
 					}
-					
-					
+
 				}
-				
 
 			}
-			
-			
-			
-			
-		
+
 		}
 		// prey - wall
 		for (Prey prey : environment.getPrey()) {
@@ -252,26 +255,22 @@ public class JumpingZCollisionManager extends SimpleCollisionManager {
 			}
 		}
 	}
-	
-	private void handle_RobotWithWall_Collisiion(Robot robot, Wall closeWall, int status){
-		Vector2d newPosition = handleCollision(robot, closeWall,
-				status);
+
+	private void handle_RobotWithWall_Collisiion(Robot robot, Wall closeWall,
+			int status) {
+		Vector2d newPosition = handleCollision(robot, closeWall, status);
 		robot.moveTo(newPosition);
 		robot.setInvolvedInCollison(true);
 		robot.setInvolvedInCollisonWall(true);
-		
+
 		robot.getCollidingObjects().add(closeWall);
-		
-		if(robot.specialWallCollisions()) {
-			DifferentialDriveRobot rr = (DifferentialDriveRobot)robot;
-			rr.setWheelSpeed(rr.getLeftWheelSpeed()*0.5,rr.getRightWheelSpeed()*0.5);
-			
-	}
+
+		if (robot.specialWallCollisions()) {
+			DifferentialDriveRobot rr = (DifferentialDriveRobot) robot;
+			rr.setWheelSpeed(rr.getLeftWheelSpeed() * 0.5,
+					rr.getRightWheelSpeed() * 0.5);
+
+		}
 	}
 
 }
-
-	
-
-
-

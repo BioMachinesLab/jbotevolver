@@ -21,6 +21,10 @@ public class IntensityForagingRobotsEnviroments extends
 
 	@ArgumentsAnnotation(name = "preyIntensity", defaultValue = "30.0")
 	protected double intensity;
+	
+	@ArgumentsAnnotation(name = "putWalls", values={"0","1"})
+	protected boolean putWalls;
+	
 
 	protected double limitWidhtWalls = width;
 	protected double limitHeightWalls = height;
@@ -34,7 +38,9 @@ public class IntensityForagingRobotsEnviroments extends
 		generation = arguments.getArgumentAsInt("generations");
 		intensity = arguments.getArgumentIsDefined("preyIntensity") ? arguments
 				.getArgumentAsInt("preyIntensity") : 30.0;
-		collisionManager = new JumpingZCollisionManager(simulator);
+				
+		putWalls   = arguments.getArgumentIsDefined("putWalls") ? (arguments.getArgumentAsInt("putWalls")==1)	: false;
+
 	}
 
 	@Override
@@ -54,7 +60,8 @@ public class IntensityForagingRobotsEnviroments extends
 		for (Robot r : robots) {
 			r.setOrientation(simulator.getRandom().nextDouble() * Math.PI * 2);
 		}
-		addWalls();
+		if(putWalls)
+			addWalls();
 	}
 
 	protected void addWalls() {
@@ -95,5 +102,8 @@ public class IntensityForagingRobotsEnviroments extends
 				* (width - wallsSafeMargin * 2)
 				+ (-(width / 2 - wallsSafeMargin)));
 	}
-
+	
+	
+	
+	
 }

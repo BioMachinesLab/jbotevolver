@@ -223,7 +223,6 @@ public abstract class ConeTypeSensor extends Sensor {
 					readings[j] = readings[j] != 0 ? 1.0 : 0.0;
 				}
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace(); 
 		}

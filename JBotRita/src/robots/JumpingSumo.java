@@ -29,6 +29,7 @@ public class JumpingSumo extends JumpingRobot {
 		wheelDiameter      = 0.10;
 	}
 	
+	
 	public void jump() {
 		if (!statusOfJumping) {	
 			this.angle = (AVARAGE_ANGLETOJUMP + STDEV_ANGLETOJUMP* random.nextGaussian()); //85 ± 4cm (distance) /~90(high)			
@@ -78,7 +79,8 @@ public class JumpingSumo extends JumpingRobot {
 					position.getY());
 		distanceToDrive = (AVARAGE_OF_DRIVINGAFTERJUMP + STDEV_OF_DRIVINGAFTERJUMP* random.nextGaussian());				
 		time_startedDriving=timeLanding;
-		//System.out.println("how much time since the beggining inicialPosition"+ inicialPosition +"posFinal"+ position +" distance" + inicialPosition.distanceTo(position) + "time since startedJumping"+(time-time_startedJump));
+		//System.out.println("distances covaraged_whilejUmping"+distanceCovaraged);
+		//System.out.println("how much time since the beggining inicialPosition"+ inicialPosition +"posFinal"+ position +" distance" + inicialPosition.distanceTo(position) + "time since startedJumping"+(timeLanding-time_startedJump));
 
 	}
 	
@@ -92,10 +94,11 @@ public class JumpingSumo extends JumpingRobot {
 		
 		} else {
 			Vector2d finalPosition=new Vector2d(position.getX(), position.getY());
-			distanceCovaraged+=inicialPosition.distanceTo(finalPosition); //Sysout +-1.01m					
+			distanceCovaraged+=inicialPosition.distanceTo(finalPosition); //Sysout +-1.01m			  (+-20)		
 			statusOfDrivingAfterJumping = false;
 			statusOfJumping = false;
 			hasNotStartedJumping=true;
+			//System.out.println("distances covaraged_lansing"+distanceCovaraged);
 			//System.out.println("End-how much time "+(time-inicialTime)+  "time JummpingAndDriving "+(time-time_startedJump) +" timeOfDrivingAfterJump " + (time-time_startedDriving) );
 		}
 	}

@@ -21,8 +21,12 @@ public class Jump_IntensityPreyPickerNNOutput extends NNOutput{
 
 	@Override
 	public void setValue(int index, double value) {
-		if (value < 0.5) 
-			preyPicker.dropPrey();
+		if (value > 0.5) 
+			preyPicker.pick();
+		else{
+			preyPicker.notPick();
+		}
+		
 	}
 
 	@Override
@@ -30,3 +34,31 @@ public class Jump_IntensityPreyPickerNNOutput extends NNOutput{
 		
 	}
 }
+
+
+/*
+public class Jump_IntensityPreyPickerNNOutput extends NNOutput{
+private Jump_IntensityPreyPickerActuator preyPicker;
+
+public Jump_IntensityPreyPickerNNOutput(Actuator preyPicker, Arguments args) {
+	super(preyPicker,args);
+	this.preyPicker = (Jump_IntensityPreyPickerActuator)preyPicker;
+}
+
+@Override
+public int getNumberOfOutputValues() {
+	return 1;
+}
+
+@Override
+public void setValue(int index, double value) {
+	if (value < 0.5) 
+		preyPicker.dropPrey();
+}
+
+@Override
+public void apply() {	
+	
+}
+}
+*/

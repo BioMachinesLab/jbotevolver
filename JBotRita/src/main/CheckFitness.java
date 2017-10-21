@@ -11,17 +11,18 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 public class CheckFitness {
 	
 	//static int samples = 500;
-	static int samples = 10;
+	static int samples = 15;
 	//static int samples = 1200;
-	//static String prefix = "rita/SabsConferenceSensors8and4/";	
-	static String prefix = "experiments/SabsConference10Range30cm/";	
+	//static String prefix = "rita/SabsConferenceSensors8and4/";
+	static String prefix ="untitledFolder/FlockNavigationOtherEnv2/";
+	//static String prefix = "experiments/SabsConference10Range30cm/";	
 	//static String prefix = "experiments/LatexDepoisResultados/";
 	
 	public static void main(String[] args) throws Exception{
 		
 		String f = "";
 		
-		String[] setups = new String[]{f+"driving_Setup/11/",f+"jumping_Setup/8/",f+ "jumpingAndDriving_Setup/10/" };
+		String[] setups = new String[]{f+"driving_Setup20/3",f+"driving_Setup6/2/",f+ "driving_Setup12/2/" };
 		//String[] setups = new String[]{f+"driving_Setup/11/"};
 //		String[] setups = new String[]{f+"all_repertoire"+m,f+"multiple_intersection_repertoire"+m};
 		
@@ -57,7 +58,7 @@ public class CheckFitness {
 		
 		for(int i = 0 ; i < samples ; i++) {
 		
-			jbot.loadFile(filename, "--environment +fitnesssample="+i+"\n--random-seed "+i+"\n--evaluation +classname=FunctionEvalutionTime");
+			jbot.loadFile(filename, "--environment +fitnesssample="+i+"\n--random-seed "+i+"\n--evaluation +classname=FlockAlignementMetric");
 			//jbot.loadFile(filename, "--environment +fitnesssample="+i+"\nrandom-seed "+i);
 			//System.out.println("--environment +fitnesssample="+i+"\nrandom-seed "+i + "\n--environment +classname=JS_LoopAfter5Envs");
 			//jbot.loadFile(filename, "--random-seed "+i + "\n--environment +classname=JS_LoopAfter5Envs,fitnesssample="+i+"\n--evaluation +classname=FunctionEvalutionTime");
@@ -69,14 +70,14 @@ public class CheckFitness {
 			jbot.setupBestIndividual(sim);
 			
 			
-			EvaluationFunction eval =null;
+			//EvaluationFunction eval =null;
 					
-			//EvaluationFunction eval =jbot.getEvaluationFunction() ; Antes era assim, ms com o update do JBotSim já não dá. Perguntar ao Miguel
+			EvaluationFunction[] eval =jbot.getEvaluationFunction() ; //Antes era assim, ms com o update do JBotSim já não dá. Perguntar ao Miguel
 
-			sim.addCallback(eval);
+			sim.addCallback(eval[0]);
 			sim.simulate();
 			
-			double res = eval.getFitness();
+			double res = eval[0].getFitness();
 			
 			String line= split[split.length-3]+"\t"+split[split.length-2]+"\t"+split[split.length-1]+"\t"+i+"\t"+res+"\n";
 			result+=line;

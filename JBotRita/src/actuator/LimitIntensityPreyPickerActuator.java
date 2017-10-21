@@ -30,14 +30,33 @@ public class LimitIntensityPreyPickerActuator extends
 		this.limitOfTaking = args.getArgumentAsDoubleOrSetDefault(
 				"limitOfTaking", 1);
 	}
+	
+	@Override
+	public void apply(Robot robot,double timeDelta) {
+			if(isToPick){
+				if(taking<=limitOfTaking){
+					findBestPrey(robot);
+					if (bestPrey != null) {
+	
+						if (robot instanceof JumpingRobot) {
+							if (!((JumpingRobot) robot).ignoreWallCollisions()) {
+								pickUpPrey(robot, bestPrey);
+							}
+						} else {
+							pickUpPrey(robot, bestPrey);
+						}
+					}
+				}
+			}
+	}
 
 	@Override
 	public void pickUpPrey(Robot robot, IntensityPrey prey) {
-		hasPrey = true;
-		if(taking<=limitOfTaking){
+			isPicking=true;
 			prey.setIntensity(prey.getIntensity() - taking);
 			limitOfTaking=limitOfTaking-taking;
-		}
 	}
+	
+	
 
 }

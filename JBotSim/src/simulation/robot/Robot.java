@@ -74,7 +74,7 @@ public class Robot extends MovableObject {
 
 	@ArgumentsAnnotation(name = "variablenumber", values = { "0", "1" })
 	private static int variableNumber;
-
+	
 	@ArgumentsAnnotation(name = "numberofrobots", defaultValue = "1")
 	private Color ledColor;
 	private LedState ledState;
@@ -88,9 +88,16 @@ public class Robot extends MovableObject {
 
 	@ArgumentsAnnotation(name = "specialwallcollisions", values = { "0", "1" })
 	protected boolean specialWallCollisions = false;
+	
 	@ArgumentsAnnotation(name = "ignorerobottorobotcollisions", values = { "0", "1" })
 	protected boolean ignoreRobotToRobotCollisions = false;
-
+	
+	@ArgumentsAnnotation(name = "swarm_isListOfRobotsNeed", values = { "0", "1" })
+	protected String swarm_isListOfRobotsNeed;
+	
+	@ArgumentsAnnotation(name = "swarm_listOfRobots", defaultValue = "(2,4,6,12,20)")
+	protected String swarm_listOfRobots;
+	
 	protected LinkedList<PhysicalObject> collidingObjects = new LinkedList<PhysicalObject>();
 
 	/**
@@ -110,7 +117,7 @@ public class Robot extends MovableObject {
 	 *            the radius of the robot
 	 * @param color
 	 */
-	public Robot(Simulator simulator, Arguments args) {
+	public Robot(Simulator simulator, Arguments args) {	
 		super(simulator, args);
 		relativeX = args.getArgumentAsDoubleOrSetDefault("relativex", 0);
 		relativeY = args.getArgumentAsDoubleOrSetDefault("relativey", 0);
@@ -457,7 +464,19 @@ public class Robot extends MovableObject {
 	public static ArrayList<Robot> getRobots(Simulator simulator, Arguments arguments) {
 		int numberOfRobots = arguments.getArgumentAsIntOrSetDefault("numberofrobots", 1);
 		variableNumber = arguments.getArgumentAsIntOrSetDefault("variablenumber", 0);
+				
+		if (arguments.getArgumentAsIntOrSetDefault("swarm_isListOfRobotsNeed", 0)==1) {
+			String[] rawArray = arguments.getArgumentAsString("swarm_listOfRobots").split(",");
+			if (rawArray.length > 1){
+				Arguments argsOfEnv=simulator.getArguments().get("--environment");
+				int fitnesssample=argsOfEnv.getArgumentAsInt("fitnesssample");
+				fitnesssample = fitnesssample % rawArray.length;
+				numberOfRobots = Integer.parseInt(rawArray[fitnesssample]);
 
+			}
+				
+		}
+		
 		if (variableNumber == 1) {
 			numberOfRobots = simulator.getRandom().nextInt(numberOfRobots) + 1;
 		}

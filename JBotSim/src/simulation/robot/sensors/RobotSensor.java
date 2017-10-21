@@ -11,7 +11,6 @@ public class RobotSensor extends LightTypeSensor {
 	public RobotSensor(Simulator simulator, int id, Robot robot,Arguments args) {
 		super(simulator, id, robot, args);
 		setAllowedObjectsChecker(new AllowAllRobotsChecker(robot.getId()));
-		
 	}
 	
 }
