@@ -8,7 +8,7 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
-public class FlockingReynaldsWithHalfComponentCohension extends FlockingReynaldsWithMovement {
+public class FlockingReynaldsWithHalfComponentCohension extends FlockingReynalds {
 	
 	public FlockingReynaldsWithHalfComponentCohension(Arguments args) {
 		super(args);

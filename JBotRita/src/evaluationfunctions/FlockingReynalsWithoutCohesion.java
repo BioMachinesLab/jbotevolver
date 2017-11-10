@@ -3,7 +3,7 @@ package evaluationfunctions;
 import simulation.util.Arguments;
 
 
-public class FlockingReynalsWithoutCohesion extends FlockingReynaldsWithMovement {
+public class FlockingReynalsWithoutCohesion extends FlockingReynalds {
 	
 	public FlockingReynalsWithoutCohesion(Arguments args) {
 		super(args);
