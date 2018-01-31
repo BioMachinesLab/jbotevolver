@@ -27,10 +27,9 @@ public class RotationNNOutput extends NNOutput {
 
 	@Override
 	public void apply() {
-		rotation.setSpeed(speed);
+		
+		rotation.setLeftWheelSpeed(speed);
+		rotation.setRightWheelSpeed(speed);
 		
 	}
-	
-	
-	
 }

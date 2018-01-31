@@ -54,28 +54,31 @@ public class IntensityPreyPickerActuator extends Actuator {
 		isToPick=pick;
 	}
 	
-	/**
-	 * Only eat prey if is to do so (if is to pick) and if the robot is not jumping 
-	 * (when the robot is jumping, it is ignored the wall collisions; 
-	 * thus only pick it when it is not to ignore them)
-	 */
 	
 	@Override
 	public void apply(Robot robot,double timeDelta) {
 			if(isToPick){
-					findBestPrey(robot);
-					if (bestPrey != null) {
-	
-						if (robot instanceof JumpingRobot) {
-							if (!((JumpingRobot) robot).ignoreWallCollisions()) {
-								pickUpPrey(robot, bestPrey);
-							}
-						} else {
-							pickUpPrey(robot, bestPrey);
-						}
-					}
-				
+				checkIfPickingIsAllowed(robot);
 			}
+	}
+	
+	/**
+	 * Only eat prey if the robot is close to a prey and the robot is not jumping 
+	 * (when the robot is jumping, it is ignored the wall collisions; 
+	 * thus only pick it when it is not to ignore them)
+	 */
+	protected void checkIfPickingIsAllowed(Robot robot){
+		findBestPrey(robot);
+		if (bestPrey != null) {
+
+			if (robot instanceof JumpingRobot) {
+				if (!((JumpingRobot) robot).ignoreWallCollisions()) {
+					pickUpPrey(robot, bestPrey);
+				}
+			} else {
+				pickUpPrey(robot, bestPrey);
+			}
+		}
 	}
 	
 	
@@ -104,7 +107,7 @@ public class IntensityPreyPickerActuator extends Actuator {
 	}
 	
 	/**
-	 * If the robot wants to eat prey, remove the corresponding amount eaten form the prey
+	 * If the robot wants to eat prey, remove the corresponding amount eaten from the prey
 	 */
 	
 	public void pickUpPrey(Robot robot, IntensityPrey prey) {

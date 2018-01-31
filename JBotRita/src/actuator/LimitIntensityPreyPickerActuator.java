@@ -1,19 +1,9 @@
 package actuator;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 
-import mathutils.Vector2d;
 import physicalobjects.IntensityPrey;
-import robots.JumpingRobot;
-import robots.JumpingSumo;
 import simulation.Simulator;
-import simulation.physicalobjects.ClosePhysicalObjects;
-import simulation.physicalobjects.Wall;
-import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.robot.Robot;
-import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
@@ -35,17 +25,7 @@ public class LimitIntensityPreyPickerActuator extends
 	public void apply(Robot robot,double timeDelta) {
 			if(isToPick){
 				if(taking<=limitOfTaking){
-					findBestPrey(robot);
-					if (bestPrey != null) {
-	
-						if (robot instanceof JumpingRobot) {
-							if (!((JumpingRobot) robot).ignoreWallCollisions()) {
-								pickUpPrey(robot, bestPrey);
-							}
-						} else {
-							pickUpPrey(robot, bestPrey);
-						}
-					}
+					checkIfPickingIsAllowed(robot);
 				}
 			}
 	}
@@ -58,5 +38,4 @@ public class LimitIntensityPreyPickerActuator extends
 	}
 	
 	
-
 }
