@@ -18,7 +18,7 @@ import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
 public class LimitIntensityPreyPickerActuator extends
-		Jump_IntensityPreyPickerActuator {
+		IntensityPreyPickerActuator {
 	
 	@ArgumentsAnnotation(name = "limitOfTaking", defaultValue = "1")
 	protected double limitOfTaking;
