@@ -1,12 +1,12 @@
+
 package outputs;
 
-import actuator.IntensityPreyPickerActuator;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.PreyPickerActuator;
 import simulation.util.Arguments;
+import actuator.IntensityPreyPickerActuator;
 
-public class IntensityPreyPickerNNOutput  extends NNOutput {
+public class IntensityPreyPickerNNOutput extends NNOutput{
 	private IntensityPreyPickerActuator preyPicker;
 	
 	public IntensityPreyPickerNNOutput(Actuator preyPicker, Arguments args) {
@@ -22,10 +22,11 @@ public class IntensityPreyPickerNNOutput  extends NNOutput {
 	@Override
 	public void setValue(int index, double value) {
 		if (value > 0.5) 
-			preyPicker.pick();
+			preyPicker.pick(true);
 		else{
-			preyPicker.notPick();
+			preyPicker.pick(false);
 		}
+		
 	}
 
 	@Override

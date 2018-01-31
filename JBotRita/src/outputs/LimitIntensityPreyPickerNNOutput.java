@@ -4,7 +4,6 @@ import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 import simulation.robot.actuators.Actuator;
 import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
-import actuator.IntensityPreyPickerActuator;
 import actuator.LimitIntensityPreyPickerActuator;
 
 public class LimitIntensityPreyPickerNNOutput extends NNOutput{
@@ -23,9 +22,9 @@ public class LimitIntensityPreyPickerNNOutput extends NNOutput{
 	@Override
 	public void setValue(int index, double value) {
 		if (value > 0.5) 
-			preyPicker.pick();
+			preyPicker.pick(true);
 		else{
-			preyPicker.notPick();
+			preyPicker.pick(false);
 		}
 	}
 
