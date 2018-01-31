@@ -7,7 +7,8 @@ import simulation.util.Arguments;
 import actuator.IntensityPreyPickerActuator;
 
 public class IntensityPreyPickerNNOutput extends NNOutput{
-	private IntensityPreyPickerActuator preyPicker;
+	protected IntensityPreyPickerActuator preyPicker;
+	protected boolean pickBoolean;
 	
 	public IntensityPreyPickerNNOutput(Actuator preyPicker, Arguments args) {
 		super(preyPicker,args);
@@ -22,15 +23,15 @@ public class IntensityPreyPickerNNOutput extends NNOutput{
 	@Override
 	public void setValue(int index, double value) {
 		if (value > 0.5) 
-			preyPicker.pick(true);
+			pickBoolean=true;
 		else{
-			preyPicker.pick(false);
+			pickBoolean=false;
 		}
 		
 	}
 
 	@Override
 	public void apply() {	
-		
+		preyPicker.pick(pickBoolean);
 	}
 }

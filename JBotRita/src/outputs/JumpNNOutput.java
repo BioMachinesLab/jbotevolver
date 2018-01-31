@@ -3,13 +3,10 @@ package outputs;
 import actuator.JumpActuator;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 import simulation.robot.actuators.Actuator;
-import simulation.robot.actuators.PreyPickerActuator;
-import simulation.robot.actuators.TwoWheelActuator;
 import simulation.util.Arguments;
 
 public class JumpNNOutput extends NNOutput {
-	private JumpActuator actuactor;
-	
+	protected JumpActuator actuactor;
 	
 	public JumpNNOutput(Actuator actuactor, Arguments args){
 		super(actuactor, args);
