@@ -11,6 +11,12 @@ import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
+/**
+ * Remove/take/eat a bit from a prey (according to a specified intensity)
+ * @author Rita Ramos
+ */
+
+
 public class IntensityPreyPickerActuator extends Actuator {
 	
 	protected boolean isToPick=false;
@@ -44,6 +50,13 @@ public class IntensityPreyPickerActuator extends Actuator {
 		isToPick=false;
 	}
 	
+	
+	/**
+	 * Only eat prey if is to do so (if is to pick) and if the robot is not jumping 
+	 * (when the robot is jumping, it is ignored the wall collisions; 
+	 * thus only pick it when it is not to ignore them)
+	 */
+	
 	@Override
 	public void apply(Robot robot,double timeDelta) {
 			if(isToPick){
@@ -61,6 +74,11 @@ public class IntensityPreyPickerActuator extends Actuator {
 				
 			}
 	}
+	
+	
+	/**
+	 * find closest prey
+	 */
 	
 	protected void findBestPrey(Robot robot){
 		double bestLength = pickDistance;
@@ -81,13 +99,20 @@ public class IntensityPreyPickerActuator extends Actuator {
 			}
 		}
 	}
-
+	
+	/**
+	 * If the robot wants to eat prey, remove the corresponding amount eaten form the prey
+	 */
+	
 	public void pickUpPrey(Robot robot, IntensityPrey prey) {
 		isPicking=true;
 		prey.setIntensity(prey.getIntensity() - taking);
 	}
 
 	
+	/**
+	 * to inform the discrete sensor of IntensityPreyCarried: if the prey was eaten or not
+	 */
 	public boolean isCarryingPrey() {
 		boolean isCarryingPrey=isPicking;
 		isPicking=false;
