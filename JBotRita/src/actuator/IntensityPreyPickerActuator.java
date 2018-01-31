@@ -16,7 +16,6 @@ import simulation.util.ArgumentsAnnotation;
  * @author Rita Ramos
  */
 
-
 public class IntensityPreyPickerActuator extends Actuator {
 	
 	protected boolean isToPick=false;
@@ -34,6 +33,11 @@ public class IntensityPreyPickerActuator extends Actuator {
 	protected IntensityPrey bestPrey = null;
 
 	
+	/**
+	* Define the maximum distance to eat the prey
+	* Define the amount taken when eating the prey
+	*/
+	
 	public IntensityPreyPickerActuator(Simulator simulator, int id, Arguments args) {
 		super(simulator, id, args);
 		this.pickDistance = args.getArgumentAsDoubleOrSetDefault(
@@ -41,15 +45,14 @@ public class IntensityPreyPickerActuator extends Actuator {
 		this.taking = args.getArgumentAsDoubleOrSetDefault("taking", 1);
 		
 	}
+	
+	/**
+	* IntensityPreyPickerNNOutput will inform if is to pick the prey or not
+	*/
 
-	public void pick(){
-		isToPick=true;
+	public void pick(boolean pick){
+		isToPick=pick;
 	}
-	
-	public void notPick(){
-		isToPick=false;
-	}
-	
 	
 	/**
 	 * Only eat prey if is to do so (if is to pick) and if the robot is not jumping 
