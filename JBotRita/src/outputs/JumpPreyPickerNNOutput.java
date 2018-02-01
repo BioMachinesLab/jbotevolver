@@ -1,17 +1,17 @@
 package outputs;
 
-import actuator.Jump_PreyPickerActuator;
+import actuator.JumpPreyPickerActuator;
 import simulation.robot.actuators.Actuator;
 import simulation.util.Arguments;
 import evolutionaryrobotics.neuralnetworks.outputs.NNOutput;
 
 
-public class Jump_PreyPickerNNOutput extends NNOutput {
-	private Jump_PreyPickerActuator preyPicker;
+public class JumpPreyPickerNNOutput extends NNOutput {
+	private JumpPreyPickerActuator preyPicker;
 	
-	public Jump_PreyPickerNNOutput(Actuator preyPicker, Arguments args) {
+	public JumpPreyPickerNNOutput(Actuator preyPicker, Arguments args) {
 		super(preyPicker,args);
-		this.preyPicker = (Jump_PreyPickerActuator) preyPicker;
+		this.preyPicker = (JumpPreyPickerActuator) preyPicker;
 	}
 
 	@Override
