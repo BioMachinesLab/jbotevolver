@@ -4,7 +4,7 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
-import actuator.Jump_PreyPickerActuator;
+import actuator.JumpPreyPickerActuator;
 
 
 /**
@@ -14,16 +14,16 @@ import actuator.Jump_PreyPickerActuator;
  */
 
 
-public class Jump_PreyCarriedSensor extends PreyCarriedSensor{
+public class JumpPreyCarriedSensor extends PreyCarriedSensor{
 	
-	public Jump_PreyCarriedSensor(Simulator simulator,int id, Robot robot, Arguments args) {
+	public JumpPreyCarriedSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 	}
 	
 	@Override
 	public boolean preyCarried() {
 		if(actuator == null)
-			actuator = (Jump_PreyPickerActuator) robot.getActuatorByType(Jump_PreyPickerActuator.class);
+			actuator = (JumpPreyPickerActuator) robot.getActuatorByType(JumpPreyPickerActuator.class);
 		return actuator.isCarryingPrey();
 	}
 	

@@ -8,7 +8,12 @@ import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
-public class JumpingRobotsGlobalSensor extends Sensor {
+/**
+ * Sensor that indicates if the neighbours robot are currently jumping
+ * (average of the neighbours robots jumping)
+ * @author Rita Ramos
+ */
+public class RobotsJumpingAvarageSensor extends Sensor {
 	private Simulator simulator;
 	private JumpingRobot robot;
 	protected boolean rangedIncreased = false;
@@ -20,7 +25,7 @@ public class JumpingRobotsGlobalSensor extends Sensor {
 	protected double increaseRange = 1.0;
 	
 	
-	public JumpingRobotsGlobalSensor(Simulator simulator, int id, Robot robot,
+	public RobotsJumpingAvarageSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;
@@ -30,6 +35,11 @@ public class JumpingRobotsGlobalSensor extends Sensor {
 		increaseRange = (args.getArgumentIsDefined("increaseRange")) ? args
 				.getArgumentAsDouble("increaseRange") : 1.0;
 	}
+	
+
+	/**
+	 * Counts the number of neighbours robot currently jumping and then averages the result
+	 */
 
 	@Override
 	public double getSensorReading(int sensorNumber) {

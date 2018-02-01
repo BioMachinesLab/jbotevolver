@@ -14,9 +14,14 @@ import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;
 
-public class JumpRobotsSensor extends ConeTypeSensor  {
+/**
+ * Sensor that indicates if the neighbours robot are currently jumping
+ * (see if the robot perceived in the cone sensor is jumping or not)
+ * @author Rita Ramos
+ */
+public class RobotsJumpingConeSensor extends ConeTypeSensor  {
 	
-	public JumpRobotsSensor(Simulator simulator,int id, Robot robot, Arguments args) {
+	public RobotsJumpingConeSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator,id,robot,args);
 		setAllowedObjectsChecker(new AllowAllRobotsChecker(robot.getId()));
 	}
@@ -39,7 +44,6 @@ public class JumpRobotsSensor extends ConeTypeSensor  {
 				}
 			}
 		}
-		
  		return 0;
 	}
 

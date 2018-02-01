@@ -16,7 +16,7 @@ import simulation.util.ArgumentsAnnotation;
  * @author Rita Ramos
  */
 
-public class JumpingChargingGlobalSensor extends Sensor {
+public class RobotsChargingAverageSensor extends Sensor {
 	private Simulator simulator;
 	private JumpingRobot robot;
 	protected boolean rangedIncreased = false;
@@ -28,7 +28,7 @@ public class JumpingChargingGlobalSensor extends Sensor {
 	protected double increaseRange = 1.0;
 	
 	
-	public JumpingChargingGlobalSensor(Simulator simulator, int id, Robot robot,
+	public RobotsChargingAverageSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;

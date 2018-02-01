@@ -1,11 +1,7 @@
 package sensors;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 
-import physicalobjects.IntensityPrey;
+import java.util.HashMap;
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.ClosePhysicalObjects;
@@ -15,16 +11,12 @@ import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
 import simulation.robot.Robot;
-import simulation.robot.actuators.PreyPickerActuator;
-import simulation.robot.actuators.RobotColorActuator;
 import simulation.robot.sensors.PreySensor;
 import simulation.util.Arguments;
 
 public class PreyTakingAccountWallsSensor extends PreySensor{
-	//private RobotColorActuator robotColor;
 	private Robot robot;
 	private boolean sensorNotAvailable;
-	private boolean disabled=false;
 	private Simulator simulator;
 	private HashMap <Integer, Boolean> sensorsDisabled= new HashMap <Integer, Boolean>() ;
 	private int i=0;
@@ -149,12 +141,10 @@ public class PreyTakingAccountWallsSensor extends PreySensor{
 				if (i>= 1) {
 					if (sensorNotAvailable == false){
 						sensorsDisabled.put(sensorNumber, false);
-						//pickUpPrey(robot, bestPrey);
 						return (getRange() - sensorInfo.getDistance()) / getRange();
 					}
 					else{
 						sensorsDisabled.put(sensorNumber, true);
-						disabled=true;
 						sensorNotAvailable = false;
 						return 0;
 					}
