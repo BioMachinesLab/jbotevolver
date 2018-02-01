@@ -1,26 +1,12 @@
 package evaluationfunctions;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
-import collisionHandling.JumpingZCollisionManager;
 import mathutils.Vector2d;
-import robots.JumpingSumo;
-import sensors.IntensityPreyCarriedSensor;
 import simulation.Simulator;
-import simulation.environment.Environment;
-import simulation.physicalobjects.Prey;
-import simulation.physicalobjects.collisionhandling.SimpleCollisionManager;
+
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import enviromentsSwarms.EmptyEnviromentsWithFixPositions;
-import enviromentsSwarms.FireEnv;
 import enviromentsSwarms.IntensityFlockingNavigationRobotsEnviroments;
-import enviromentsSwarms.IntensityForagingRobotsEnviroments;
-import environments_JumpingSumoIntensityPreys2.copy.JS_EasiestEnv_JustPreys2;
 
 public class FlockForagingWithBootstraping extends
 		ForagingWithJumpingSumo {

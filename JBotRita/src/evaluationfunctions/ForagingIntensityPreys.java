@@ -10,7 +10,7 @@ import simulation.Simulator;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import environments_ForagingIntensityPreys.ForagingIntensityPreysEnvironment;
+import environment.ForagingIntensityPreysEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class ForagingIntensityPreys extends EvaluationFunction{

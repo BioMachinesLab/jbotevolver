@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import mathutils.Vector2d;
-import sensors.Jump_PreyCarriedSensor;
+import sensors.JumpPreyCarriedSensor;
 import simulation.Simulator;
 import simulation.physicalobjects.Prey;
 import simulation.robot.DifferentialDriveRobot;
@@ -41,7 +41,7 @@ public class CloseToPreyEvaluationFunction extends EvaluationFunction{
 				if(((DifferentialDriveRobot) r).getRightWheelSpeed()<0 || ((DifferentialDriveRobot) r).getLeftWheelSpeed()<0){
 					current+=-0.05;	
 				}
-				if (((Jump_PreyCarriedSensor)r.getSensorByType(Jump_PreyCarriedSensor.class)).preyCarried()==false) {
+				if (((JumpPreyCarriedSensor)r.getSensorByType(JumpPreyCarriedSensor.class)).preyCarried()==false) {
 				Prey closest_Prey=preys.get(0);
 				Vector2d robot_position=r.getPosition();
 					for(int i=0; i<preys.size(); i++){

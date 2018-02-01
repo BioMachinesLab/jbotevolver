@@ -2,11 +2,9 @@ package evaluationfunctions;
 
 import java.util.ArrayList;
 
-import simulation.environment.Environment;
 import simulation.robot.Robot;
 import simulation.Simulator;
 import simulation.util.Arguments;
-import environments_ForagingIntensityPreys.ForagingIntensityPreysEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 
