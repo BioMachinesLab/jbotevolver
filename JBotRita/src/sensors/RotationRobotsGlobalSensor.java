@@ -1,12 +1,15 @@
 package sensors;
 
 import mathutils.Vector2d;
+
 import robots.JumpingRobot;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
+
+
 
 public class RotationRobotsGlobalSensor extends Sensor {
 	private Simulator simulator;
@@ -53,7 +56,6 @@ public class RotationRobotsGlobalSensor extends Sensor {
 
 					sumRelativeOrientation += 0.5 * (differenceOfOrientation) / 180 + 0.5;
 					numberOfRobots_withinRange += 1.0;
-
 				}
 			}
 		}

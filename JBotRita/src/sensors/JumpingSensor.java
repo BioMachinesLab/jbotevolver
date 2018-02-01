@@ -6,6 +6,12 @@ import simulation.robot.Robot;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 
+
+/**
+ * Proprioceptive sensor that indicates if the robot is currently jumping or not.
+ * @author Rita Ramos
+ */
+
 public class JumpingSensor extends Sensor {
 	
 	JumpingRobot jumpingRobot;
