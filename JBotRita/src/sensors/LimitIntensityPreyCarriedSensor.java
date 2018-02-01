@@ -2,37 +2,30 @@ package sensors;
 
 import simulation.Simulator;
 import simulation.robot.Robot;
-import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 import actuator.LimitIntensityPreyPickerActuator;
 
-public class LimitIntensityPreyCarriedSensor extends Sensor {
-	private LimitIntensityPreyPickerActuator actuator;
-	private boolean hasPicked;
+/**
+ * Sensor that indicates if the robot is currently picking a prey or not.
+ * @author Rita Ramos
+ */
 
-	
+public class LimitIntensityPreyCarriedSensor extends IntensityPreyCarriedSensor {
 	public LimitIntensityPreyCarriedSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
-		
 	}
 	
-	public boolean preyCarried() {
+	@Override	
+	protected boolean preyCarried() {
 		if(actuator == null)
-				actuator = (LimitIntensityPreyPickerActuator) robot.getActuatorByType(LimitIntensityPreyPickerActuator.class);
-		if(actuator.isCarryingPrey()){
-				hasPicked=true;
-		}
-		return hasPicked;
+			actuator = (LimitIntensityPreyPickerActuator) robot.getActuatorByType(LimitIntensityPreyPickerActuator.class);
+		return actuator.isCarryingPrey();
 	}
 	
-	@Override
-	public double getSensorReading(int sensorNumber) {
-		return preyCarried() ? 1 : 0;
-	}
 
 	@Override
 	public String toString() {
-		return "FireCarriedSensor ["+preyCarried()+"]";
+		return "LimitIntensityPreyCarriedSensor ["+preyCarried()+"]";
 	}
 	
 	

@@ -6,15 +6,21 @@ import simulation.robot.Robot;
 import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 
+
+/**
+ * Sensor that indicates if the robot is currently picking a prey or not.
+ * @author Rita Ramos
+ */
+
 public class IntensityPreyCarriedSensor extends Sensor{
 	
-	private IntensityPreyPickerActuator actuator;
+	protected IntensityPreyPickerActuator actuator;
 
 	public IntensityPreyCarriedSensor(Simulator simulator,int id, Robot robot, Arguments args) {
 		super(simulator, id, robot, args);
 	}
 	
-	public boolean preyCarried() {
+	protected boolean preyCarried() {
 		if(actuator == null)
 			actuator = (IntensityPreyPickerActuator) robot.getActuatorByType(IntensityPreyPickerActuator.class);
 		return actuator.isCarryingPrey();
