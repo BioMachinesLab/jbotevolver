@@ -9,9 +9,13 @@ import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
+/**
+ * Alignment sensor to see the relative orientation regarding others robots
+ * (average of the neighbours robots orientation)
+ * @author Rita Ramos
+ */
 
-
-public class RotationRobotsGlobalSensor extends Sensor {
+public class OrientationRobotsAverageSensor extends Sensor {
 	private Simulator simulator;
 	private Robot robot;
 	protected boolean rangedIncreased = false;
@@ -23,7 +27,7 @@ public class RotationRobotsGlobalSensor extends Sensor {
 	@ArgumentsAnnotation(name = "increaseRange", help = "Increase range of the sensor while jumping.", defaultValue = "1.0")
 	protected double increaseRange = 1.0;
 
-	public RotationRobotsGlobalSensor(Simulator simulator, int id, Robot robot,
+	public OrientationRobotsAverageSensor(Simulator simulator, int id, Robot robot,
 			Arguments args) {
 		super(simulator, id, robot, args);
 		this.simulator = simulator;
