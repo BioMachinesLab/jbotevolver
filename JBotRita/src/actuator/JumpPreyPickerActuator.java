@@ -12,9 +12,9 @@ import simulation.util.Arguments;
  * @author Rita Ramos
  */
 
-public class Jump_PreyPickerActuator extends PreyPickerActuator {
+public class JumpPreyPickerActuator extends PreyPickerActuator {
 
-	public Jump_PreyPickerActuator(Simulator simulator, int id, Arguments arguments) {
+	public JumpPreyPickerActuator(Simulator simulator, int id, Arguments arguments) {
 		super(simulator, id, arguments);
 	}
 
