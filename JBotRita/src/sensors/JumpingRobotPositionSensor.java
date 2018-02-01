@@ -1,14 +1,12 @@
 package sensors;
 
 import java.util.Arrays;
-import java.util.HashMap;
 
 import robots.JumpingRobot;
 import simulation.Simulator;
 import simulation.physicalobjects.GeometricInfo;
 import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.checkers.AllowAllRobotsChecker;
-import simulation.physicalobjects.checkers.AllowLightChecker;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.util.Arguments;

@@ -9,6 +9,13 @@ import simulation.robot.sensors.Sensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
+
+/**
+ * Sensor that indicates if the neighbours robot are currently charging
+ * (average of the neighbours robots charging)
+ * @author Rita Ramos
+ */
+
 public class JumpingChargingGlobalSensor extends Sensor {
 	private Simulator simulator;
 	private JumpingRobot robot;
@@ -31,7 +38,11 @@ public class JumpingChargingGlobalSensor extends Sensor {
 		increaseRange = (args.getArgumentIsDefined("increaseRange")) ? args
 				.getArgumentAsDouble("increaseRange") : 1.0;
 	}
-
+	
+	
+	/**
+	 * Counts the number of neighbours robot currently charging and then averages the result
+	 */
 	@Override
 	public double getSensorReading(int sensorNumber) {
 		Vector2d robotPosition = robot.getPosition();
@@ -61,8 +72,9 @@ public class JumpingChargingGlobalSensor extends Sensor {
 
 	@Override
 	public String toString() {
-		return "JumpingRobotsGlobalSensor [" + getSensorReading(0) + "]";
+		return "JumpingChargingGlobalSensor [" + getSensorReading(0) + "]";
 	}
+	
 
 	private void rangeBackToDefault() {
 		if (rangedIncreased == true) {

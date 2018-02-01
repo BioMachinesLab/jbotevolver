@@ -7,6 +7,7 @@ import actuator.LimitIntensityPreyPickerActuator;
 
 /**
  * Sensor that indicates if the robot is currently picking a prey or not.
+ * (if the robot is currently using the LimitIntensityPreyCarriedSensor)
  * @author Rita Ramos
  */
 
@@ -16,7 +17,7 @@ public class LimitIntensityPreyCarriedSensor extends IntensityPreyCarriedSensor 
 	}
 	
 	@Override	
-	protected boolean preyCarried() {
+	public boolean preyCarried() {
 		if(actuator == null)
 			actuator = (LimitIntensityPreyPickerActuator) robot.getActuatorByType(LimitIntensityPreyPickerActuator.class);
 		return actuator.isCarryingPrey();
