@@ -12,14 +12,26 @@ import environment.ForagingIntensityPreysEnvironment;
 public class IntensityForagingRobotsEnviroments extends
 		ForagingIntensityPreysEnvironment {
 
-	@ArgumentsAnnotation(name = "preyIntensity", defaultValue = "30.0")
+	@ArgumentsAnnotation(name = "preyIntensity", defaultValue = "nºof robots")
 	protected double intensity;
+
 	
 	public IntensityForagingRobotsEnviroments(Simulator simulator,
 			Arguments arguments) {
 		super(simulator, arguments);
 		intensity = arguments.getArgumentIsDefined("preyIntensity") ? arguments
-				.getArgumentAsDouble("preyIntensity") : 30.0;
+				.getArgumentAsDouble("preyIntensity") : robots.size();
+	}
+	
+	@Override
+	public void setup(Simulator simulator) {
+		super.setup(simulator);
+	}
+	
+	@Override
+	protected void addPrey(int i){
+		this.addPrey(new IntensityPrey(simulator, "Prey " + i,
+				randomPosition(), 0, PREY_MASS, 0.1, intensity));
 	}
 
 
@@ -31,12 +43,11 @@ public class IntensityForagingRobotsEnviroments extends
 			numberOfFoodSuccessfullyForaged = (int) (intensity - prey
 					.getIntensity());
 
-			if (numberOfFoodSuccessfullyForaged == robots.size()) {
+			if (numberOfFoodSuccessfullyForaged >= intensity) {
 				prey.setColor(Color.WHITE);
 				simulator.stopSimulation();
 			}
-			
-			if (prey.getIntensity() > 0)
+			else
 				prey.setColor(Color.BLACK);
 		}
 

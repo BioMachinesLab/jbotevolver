@@ -1,9 +1,5 @@
 package enviromentsSwarms;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import physicalobjects.WallWithZ;
 import simulation.Simulator;
 import simulation.environment.Environment;
