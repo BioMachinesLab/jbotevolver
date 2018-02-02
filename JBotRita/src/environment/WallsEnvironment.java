@@ -4,15 +4,9 @@ import java.util.Random;
 
 import mathutils.Vector2d;
 import simulation.Simulator;
-import simulation.environment.Environment;
-import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
-import simulation.physicalobjects.Nest;
-import simulation.physicalobjects.PhysicalObjectDistance;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
-import simulation.robot.actuators.PreyPickerActuator;
-import simulation.robot.sensors.PreyCarriedSensor;
 import simulation.util.Arguments;
 import simulation.util.ArgumentsAnnotation;
 
