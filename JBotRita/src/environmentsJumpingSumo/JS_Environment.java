@@ -1,4 +1,4 @@
-package environmentsJumpingSumo.copy;
+package environmentsJumpingSumo;
 
 import java.awt.Color;
 import java.util.Random;

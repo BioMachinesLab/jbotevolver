@@ -1,6 +1,7 @@
-package environmentsJumpingSumo.copy;
+package environmentsJumpingSumo;
 
 import java.awt.Color;
+
 
 import mathutils.Vector2d;
 import physicalobjects.IntensityPrey;
@@ -9,7 +10,7 @@ import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class JS_LoopEnvRatio extends JS_Environment {
+public class JS_LoopNew2 extends JS_Environment {
 	
 	private int fitnesssample = 0;
 	private Arguments args;
@@ -17,13 +18,13 @@ public class JS_LoopEnvRatio extends JS_Environment {
 	private JS_EnvRatio0_5 ratio1_5;
 	private JS_EnvRatio1 ratio2;
 	private JS_EnvRatio2 ratio2_5;
-	private JS_EnvRatio2 ratio3;
+	private JS_EnvRatio4 ratio16;
 	private JS_EnvWithoutRatio withoutRatio;
 
-	public JS_LoopEnvRatio(Simulator simulator, Arguments arguments) {
+	public JS_LoopNew2(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 		fitnesssample = arguments.getArgumentAsInt("fitnesssample");
-		fitnesssample = fitnesssample % 6;
+		fitnesssample = fitnesssample % 5;
 		args = arguments;
 	}
 
@@ -33,22 +34,20 @@ public class JS_LoopEnvRatio extends JS_Environment {
 		if (fitnesssample == 0) {
 			ratio1 = new JS_EasiestEnv_JustPreys2(simulator, args);
 			ratio1.setup(this, simulator);
-		} else if (fitnesssample == 1) {
+		}  else if (fitnesssample == 1) {
 			ratio1_5 = new JS_EnvRatio0_5(simulator, args);
 			ratio1_5.setup(this, simulator,1.25);
-		} else if (fitnesssample == 2) {
+		}
+		else if (fitnesssample == 2) {
 			ratio2 = new JS_EnvRatio1(simulator, args);
 			ratio2.setup(this, simulator);
-		} else if (fitnesssample == 3) {
+		} else if (fitnesssample == 3){
 			ratio2_5 = new JS_EnvRatio2(simulator, args);
-			ratio2_5.setup(this, simulator  );
-		} else if(fitnesssample==4){
-			ratio3 = new JS_EnvRatio2(simulator, args);
-			ratio3.setup(this, simulator );
-		} else {
-			withoutRatio = new JS_EnvWithoutRatio(simulator, args);
-			withoutRatio.setup(this, simulator);
-		}
+			ratio2_5.setup(this, simulator);
+		}else {
+			ratio16 = new JS_EnvRatio4(simulator, args);
+			ratio16.setup(this, simulator);
+		} 
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package environmentsJumpingSumo.copy;
+package environmentsJumpingSumo;
 
 import java.awt.Color;
 
@@ -12,7 +12,7 @@ import simulation.physicalobjects.Wall;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 
-public class RandomEnvRatio2New extends JS_Environment {
+public class RandomEnvRatio2 extends JS_Environment {
 
 	private static final double MAX_WIDTH_LIMIT_FOR_WALL = 5;//4
 	private static final double MIN_WIDTH_LIMIT_FOR_WALL = 3.875; //3.1
@@ -21,7 +21,7 @@ public class RandomEnvRatio2New extends JS_Environment {
 	private Environment env;
 	private double ratio;
 
-	public RandomEnvRatio2New(Simulator simulator, Arguments arguments) {
+	public RandomEnvRatio2(Simulator simulator, Arguments arguments) {
 		super(simulator, arguments);
 	}
 
@@ -46,13 +46,14 @@ public class RandomEnvRatio2New extends JS_Environment {
 		env.addStaticObject(new Wall(simulator, -WIDTH_HEIGHT_WALLSURRONDED/2, 0, 0.125, WIDTH_HEIGHT_WALLSURRONDED)); // VerticalWest
 		
 		
-		double a = 2;
+		double a = 1.5;
 
 		double b=a*(ratio*ratio-1)/(2*ratio);
 		
 		double new_a=1;
 		
 	
+		
 		double new_b =new_a*(ratio*ratio-1)/(2*ratio);
 				
 		
@@ -67,6 +68,33 @@ public class RandomEnvRatio2New extends JS_Environment {
 		for(Robot r : env.getRobots()) {
 			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
 		}
+		
+		
+		
+		
+//		double b = random.nextDouble()
+//				* (MAX_WIDTH_LIMIT_FOR_WALL - MIN_WIDTH_LIMIT_FOR_WALL)
+//				+ MIN_WIDTH_LIMIT_FOR_WALL;
+//
+//		
+//		double a= 2*ratio*b/(ratio*ratio-1);
+//		
+//		double new_b=b-2.215; //1.7
+//		
+//		double new_a = 2*ratio*new_b/(ratio*ratio-1);
+//				
+//		
+//		env.addStaticObject(new Wall(simulator, -(MAX_WIDTH_LIMIT_FOR_WALL-(new_b+MAX_WIDTH_LIMIT_FOR_WALL-0.4)/2),
+//				a-new_a, new_b+MAX_WIDTH_LIMIT_FOR_WALL -0.4, 0.08)); // centerWall
+//		
+//		env.addStaticObject(new Wall(simulator, MAX_WIDTH_LIMIT_FOR_WALL-(new_b+MAX_WIDTH_LIMIT_FOR_WALL-0.4)/2,
+//				-(a-new_a), new_b+MAX_WIDTH_LIMIT_FOR_WALL -0.4, 0.08)); // centerWall
+//
+//
+//		addPreyAndRobotPosition(0, a, 0);
+//		for(Robot r : env.getRobots()) {
+//			r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
+//		}
 	}
 
 	public void addPreyAndRobotPosition(double x, double y,
