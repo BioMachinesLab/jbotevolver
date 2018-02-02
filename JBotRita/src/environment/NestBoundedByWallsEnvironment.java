@@ -1,8 +1,6 @@
 package environment;
 
-import java.awt.Color;
 import java.util.Random;
-
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.environment.Environment;
