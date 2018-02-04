@@ -1,4 +1,4 @@
-package evaluationMetrics;
+package evaluationfunctions.flocking.metrics;
 
 import simulation.Simulator;
 import simulation.util.Arguments;
