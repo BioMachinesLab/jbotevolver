@@ -43,7 +43,7 @@ public class FlockingReynalds extends EvaluationFunction {
 			
 			movement(robot);					
 			separation(robot);
-			computeAligntment(robot);
+			alignment(robot);
 			cohesion( i,robots ,robot,  widthOfEnvironemnt);
 		}
 		computeSwarmFitnessOfEachRule(robots);
@@ -67,7 +67,7 @@ public class FlockingReynalds extends EvaluationFunction {
 		}
 	}
 	
-	protected void computeAligntment(Robot robot){
+	protected void alignment(Robot robot){
 		double angleOfRobot=robot.getOrientation();  
 		cos+=Math.cos(angleOfRobot);  
 		sen+=Math.sin(angleOfRobot);
