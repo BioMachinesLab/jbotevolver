@@ -10,6 +10,19 @@ import simulation.util.Arguments;
 import environmentsJumpingSumo.JS_Environment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
+/**
+ * Reward for a robot getting closer to the prey as fast as possible:
+ * (If the robot did not reach the target destination:
+ * 		- the fitness function has a value in [0, 1] depending on how close the robot got to the destination. 
+ * If the robot is successful:
+ * 		- its fitness will be in the interval [1,2], depending on how long the robot took to reach the target destination. 
+ * 
+ *This fitness function was used in the Paper Evolving Controllers for Robots with Multimodal locomotion)
+ * @author Rita Ramos
+ */
+
+
+
 public class ForagingWithJumpingSumo extends EvaluationFunction {
 	private int numberOfFoodForaged = 0;
 	private double initialDistance;

@@ -8,6 +8,17 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
+
+/**Reynolds' flocking fitness function, giving a reward for separation, cohesion and alignment (plus movement)
+ * This fitness function can be easily extend to adapt those 3 rules, being in this case:
+ * 	alignment: [0,1] having a value of 1 when the swarm is all aligned, and 0 when is not aligned
+ *  separation: penalty for collisions
+ *  cohesion: [0,1] having a value of 1 when the swarm is closer as possible to one another (as agregation)
+ *  movement: reward for getting closer to the prey, although the robots cannot see the prey 
+ *  		(so the idea is just to give a reward for moving)
+ * @author Rita Ramos
+ */
+
 public class ReynoldsFlocking extends EvaluationFunction {
 	
 	protected double currentFitnessForAlignment, currentFitnessForCohesion, bootstrapingComponentCloserToPrey;

@@ -13,6 +13,15 @@ import simulation.util.Arguments;
 import environment.ForagingIntensityPreysEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
+/**
+ * Reward for eating the prey(s)
+ * (give a reward for the number of bites have been eaten so far;
+ * also in order to boostrap the evolution: it is also given a reward for the robots getting closer to the closest prey)
+ * @author Rita Ramos
+ */
+
+
+
 public class ForagingIntensityPreys extends EvaluationFunction{
 	private Vector2d   nestPosition = new Vector2d(0, 0);
 	private int numberOfFoodForaged = 0;
