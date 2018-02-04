@@ -7,42 +7,20 @@ import simulation.util.Arguments;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 
-public class Agregation extends EvaluationFunction {
+public class Agregation extends Dispersion {
 	
-	private int numberCollisions;
-
+	
 	public Agregation(Arguments args) {
 		super(args);
 	}
-
-	@Override
-	public void update(Simulator simulator) {
-		ArrayList<Robot> robots = simulator.getRobots();
+	
+	protected double getPercentageOfDistance(int i,int j, ArrayList<Robot> robots, double widthOfEnvironemnt ){
+		double percentageOfDistance=1-( robots.get(i).getPosition().distanceTo(robots.get(j).getPosition()))/ widthOfEnvironemnt;
 		
-		double currentFitness = 0;
-		
-		double widthOfEnvironemnt=simulator.getEnvironment().getWidth();
-
-		int numberOfRobotsForAvarage=0;
-		for(int i = 0 ; i <  robots.size() ; i++) {
-			
-			if(robots.get(i).isInvolvedInCollison()){
-				numberCollisions++;
-			}
-				
-			
-			for(int j = i+1 ; j < robots.size() ; j++) {				
-				double percentageOfDistance=1-( robots.get(i).getPosition().distanceTo(robots.get(j).getPosition()))/ widthOfEnvironemnt;
-				
-				if(percentageOfDistance < 0){
-					percentageOfDistance=0;
-				}
-				currentFitness+=percentageOfDistance ;
-				numberOfRobotsForAvarage++;
-			}
-		
+		if(percentageOfDistance < 0){
+			percentageOfDistance=0;
 		}
-		fitness= currentFitness/numberOfRobotsForAvarage -numberCollisions/simulator.getTime();
+		return percentageOfDistance;
 	}
 }
 	
