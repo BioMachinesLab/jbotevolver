@@ -1,4 +1,4 @@
-package evaluationfunctions;
+package evaluationMetrics;
 
 import simulation.Simulator;
 import simulation.util.Arguments;

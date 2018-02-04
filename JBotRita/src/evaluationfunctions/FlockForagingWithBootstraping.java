@@ -1,12 +1,12 @@
 package evaluationfunctions;
 
 import java.util.ArrayList;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
-
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import enviromentsSwarms.IntensityFlockingNavigationRobotsEnviroments;
+import environment.IntensityFlockingNavigationRobotsEnviroments;
 
 public class FlockForagingWithBootstraping extends
 		ForagingWithJumpingSumo {

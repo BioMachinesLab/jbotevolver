@@ -24,10 +24,7 @@ public class ReturningToNest extends EvaluationFunction {
 		double current=0.0;
 		if(simulator.getTime()>0){
 			for(Robot r : simulator.getEnvironment().getRobots()){
-					current+=1-r.getPosition().distanceTo(nestPosition)/inicialDistanceToNest_perRobot.get(r);
-					if(((JumpingRobot) r).getRightWheelSpeed()<0 || ((JumpingRobot) r).getLeftWheelSpeed()<0){ //penalty for moving backwards
-						current+=-0.05;	
-					}	
+					current+=1-r.getPosition().distanceTo(nestPosition)/inicialDistanceToNest_perRobot.get(r);	
 			}
 			fitness=current;
 		}
@@ -35,7 +32,6 @@ public class ReturningToNest extends EvaluationFunction {
 			for(Robot r : simulator.getEnvironment().getRobots()){
 				inicialDistanceToNest_perRobot.put(r, r.getPosition().distanceTo(nestPosition));
 			}
-			
 		}		
 	}
 }

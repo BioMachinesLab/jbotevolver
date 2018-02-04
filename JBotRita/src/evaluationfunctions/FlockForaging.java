@@ -1,10 +1,11 @@
 package evaluationfunctions;
 
 import java.util.ArrayList;
+
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import enviromentsSwarms.IntensityForagingRobotsEnviroments;
+import environment.IntensityForagingRobotsEnviroments;
 
 public class FlockForaging extends ForagingWithJumpingSumo {
 

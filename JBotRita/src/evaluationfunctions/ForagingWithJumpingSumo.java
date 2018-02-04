@@ -1,13 +1,13 @@
 package evaluationfunctions;
 
 import java.util.ArrayList;
+
 import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-
-import environments_JumpingSumoIntensityPreys2.copy.JS_Environment;
+import environmentsJumpingSumo.JS_Environment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class ForagingWithJumpingSumo extends EvaluationFunction {

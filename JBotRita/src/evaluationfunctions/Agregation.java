@@ -1,7 +1,6 @@
 package evaluationfunctions;
 
 import java.util.ArrayList;
-
 import simulation.robot.Robot;
 import simulation.Simulator;
 import simulation.util.Arguments;
