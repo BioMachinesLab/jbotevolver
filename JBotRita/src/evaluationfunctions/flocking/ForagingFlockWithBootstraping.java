@@ -1,4 +1,4 @@
-package evaluationfunctions;
+package evaluationfunctions.flocking;
 
 import java.util.ArrayList;
 
@@ -7,8 +7,9 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import environment.IntensityFlockingNavigationRobotsEnviroments;
+import evaluationfunctions.ForagingWithJumpingSumo;
 
-public class FlockForagingWithBootstraping extends
+public class ForagingFlockWithBootstraping extends
 		ForagingWithJumpingSumo {
 
 	private double numberCollisions = 0.0;
@@ -18,7 +19,7 @@ public class FlockForagingWithBootstraping extends
 	private Vector2d nest = new Vector2d(0, 0);
 	private double bootstrapingComponentCloserToPrey = 0.0;
 
-	public FlockForagingWithBootstraping(Arguments args) {
+	public ForagingFlockWithBootstraping(Arguments args) {
 		super(args);
 
 	}

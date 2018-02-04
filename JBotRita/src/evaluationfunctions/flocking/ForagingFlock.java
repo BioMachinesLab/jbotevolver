@@ -1,4 +1,4 @@
-package evaluationfunctions;
+package evaluationfunctions.flocking;
 
 import java.util.ArrayList;
 
@@ -6,15 +6,16 @@ import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
 import environment.IntensityForagingRobotsEnviroments;
+import evaluationfunctions.ForagingWithJumpingSumo;
 
-public class FlockForaging extends ForagingWithJumpingSumo {
+public class ForagingFlock extends ForagingWithJumpingSumo {
 
 	private double numberCollisions = 0.0;
 	private ArrayList<Robot> robots = new ArrayList<Robot>();
 	private Simulator simulator;
 	private IntensityForagingRobotsEnviroments environment=null;
 
-	public FlockForaging(Arguments args) {
+	public ForagingFlock(Arguments args) {
 		super(args);
 	}
 

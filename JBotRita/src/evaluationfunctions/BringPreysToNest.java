@@ -13,13 +13,20 @@ import simulation.util.Arguments;
 import environment.WallsEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
-public class CloseToPreyEvaluationFunction extends EvaluationFunction{
+/**
+ * Reward for robots bringing preys to the nest
+ * (for each robot, a reward is given if is getting closer to the closest prey; 
+ * also a reward is given for preys getting closer to the nest ; ie. for robots taking preys to the nest)
+ * @author Rita Ramos
+ */
+
+public class BringPreysToNest extends EvaluationFunction{
 	private Vector2d   nestPosition = new Vector2d(0, 0);
 	private int numberOfFoodForaged = 0;
 	private HashMap<Prey, Vector2d> preyInicialPosition = new HashMap<Prey, Vector2d>();
     private double current=0.0;
     
-	public CloseToPreyEvaluationFunction(Arguments args) {
+	public BringPreysToNest(Arguments args) {
 		super(args);	
 	}
 
@@ -33,14 +40,18 @@ public class CloseToPreyEvaluationFunction extends EvaluationFunction{
 				preyInicialPosition.put(prey, prey.getPosition());
 			}
 			
-			for(Prey p : environment.getPrey()) {  //Award for the prey is getting closer!
+			for(Prey p : environment.getPrey()) {  //Award for bringing the prey closer to the nest!
 				current+=(1-(p.getPosition().distanceTo(nestPosition)/preyInicialPosition.get(p).distanceTo(nestPosition)))/(environment.getSteps()*1000);	
 			}
 			
 			for(Robot r : environment.getRobots()){
-				if(((DifferentialDriveRobot) r).getRightWheelSpeed()<0 || ((DifferentialDriveRobot) r).getLeftWheelSpeed()<0){
+				
+				//penalty for moving backwards
+				if(((DifferentialDriveRobot) r).getRightWheelSpeed()<0 || ((DifferentialDriveRobot) r).getLeftWheelSpeed()<0){ 
 					current+=-0.05;	
 				}
+				
+				//award for robot getting closer to the closest prey
 				if (((JumpPreyCarriedSensor)r.getSensorByType(JumpPreyCarriedSensor.class)).preyCarried()==false) {
 				Prey closest_Prey=preys.get(0);
 				Vector2d robot_position=r.getPosition();
@@ -49,7 +60,6 @@ public class CloseToPreyEvaluationFunction extends EvaluationFunction{
 						if(robot_position.distanceTo(closest_Prey.getPosition())>robot_position.distanceTo(current_prey.getPosition()))
 							closest_Prey=current_prey;
 					}
-					//award for robot getting closer to the closest prey
 					current+=(1-(robot_position.distanceTo(closest_Prey.getPosition())/preyInicialPosition.get(closest_Prey).distanceTo(nestPosition)))/(environment.getSteps()*10000);
 				}
 			}

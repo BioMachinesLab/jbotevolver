@@ -7,6 +7,13 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
+/**
+ * Reward for moving away from other robots
+ * (for each robot, reward if it is moving away from other robot, 
+ * taking account the current distance to the robot and the max distance it can move away -width of environment)
+ * @author Rita Ramos
+ */
+
 public class Dispersion extends EvaluationFunction {
 	
 	private int numberCollisions;

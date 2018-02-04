@@ -8,6 +8,11 @@ import robots.JumpingRobot;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+/**
+ * Reward for getting closer to the nest
+ * (save robot initial distance to nest and then reward as the robot distance to the nest decreases)
+ * @author Rita Ramos
+ */
 
 public class ReturningToNest extends EvaluationFunction {
 	private Vector2d nestPosition = new Vector2d(0, 0);

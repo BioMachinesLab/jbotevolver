@@ -8,7 +8,7 @@ import simulation.robot.Robot;
 import simulation.util.Arguments;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
-public class FlockingReynalds extends EvaluationFunction {
+public class ReynoldsFlocking extends EvaluationFunction {
 	
 	protected double currentFitnessForAlignment, currentFitnessForCohesion, bootstrapingComponentCloserToPrey;
 	
@@ -23,7 +23,7 @@ public class FlockingReynalds extends EvaluationFunction {
 	
 	protected Simulator simulator;
 
-	public FlockingReynalds(Arguments args) {
+	public ReynoldsFlocking(Arguments args) {
 		super(args);
 	}
 	
