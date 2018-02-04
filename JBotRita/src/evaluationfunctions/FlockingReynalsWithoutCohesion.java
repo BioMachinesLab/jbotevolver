@@ -13,5 +13,7 @@ public class FlockingReynalsWithoutCohesion extends FlockingReynalds {
 		return currentFitnessForAlignment/simulator.getTime() + -numberCollisions/simulator.getTime()+bootstrapingComponentCloserToPrey ;
 	}
 	
+	
+	
 
 }

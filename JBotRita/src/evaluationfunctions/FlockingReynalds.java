@@ -10,11 +10,18 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class FlockingReynalds extends EvaluationFunction {
 	
+	protected double currentFitnessForAlignment, currentFitnessForCohesion, bootstrapingComponentCloserToPrey;
+	
 	protected int numberCollisions;
-	protected double currentFitnessForAlignment;
-	protected double currentFitnessForCohesion;
+
+	protected double cos,sen;
+	
+	protected double cohension = 0;
+	protected int numberOfRobotsForAvarage=0;
+	
+	protected double sum_RobotsGettingCloserToThePrey;
+	
 	protected Simulator simulator;
-	protected double bootstrapingComponentCloserToPrey;
 
 	public FlockingReynalds(Arguments args) {
 		super(args);
@@ -24,57 +31,76 @@ public class FlockingReynalds extends EvaluationFunction {
 		return currentFitnessForAlignment/simulator.getTime() + currentFitnessForCohesion/simulator.getTime()-numberCollisions/simulator.getTime()+bootstrapingComponentCloserToPrey ;
 	}
 	
-
 	@Override
 	public void update(Simulator simulator) {
+		init();
 		ArrayList<Robot> robots = simulator.getRobots();
 		this.simulator=simulator;
-		Vector2d nest = new Vector2d(0, 0);
-
-		
-		double cohension = 0;
 		double widthOfEnvironemnt=simulator.getEnvironment().getWidth();
-		int numberOfRobotsForAvarage=0;
-		double cos=0;
-		double sen=0;
-		double sum_RobotsGettingCloserToThePrey=0.0;
-		Vector2d preyPosition = simulator.getEnvironment().getPrey().get(0).getPosition();
 		
 		for(int i = 0 ; i <  robots.size() ; i++) {
-			
 			Robot robot=robots.get(i);
 			
-			if(robot.isInvolvedInCollison()){    //Collision
-				numberCollisions++;
-			}
-			
-			double initialDistanceToPrey = preyPosition.distanceTo(nest);  //movement
-			sum_RobotsGettingCloserToThePrey += (1 - (robot.getDistanceBetween(preyPosition) / initialDistanceToPrey));
-		
-		
-			double angleOfRobot=robot.getOrientation();  //Alignment
-			cos+=Math.cos(angleOfRobot);  
-			sen+=Math.sin(angleOfRobot);
-			
-			
-			for(int j = i+1 ; j < robots.size() ; j++) {  //Cohension
-				
-				double percentageOfDistance=1-( robot.getPosition().distanceTo(robots.get(j).getPosition()))/ widthOfEnvironemnt;
-				
-				if(percentageOfDistance < 0){
-					percentageOfDistance=0;
-				}
-				cohension+=percentageOfDistance ;
-				numberOfRobotsForAvarage++;
-			}
-		
+			movement(robot);					
+			separation(robot);
+			computeAligntment(robot);
+			cohesion( i,robots ,robot,  widthOfEnvironemnt);
 		}
+		computeSwarmFitnessOfEachRule(robots);
+	}
+	
+	
+	
+	
+	
+	protected void init(){
+		cos=0;
+		sen=0;
+		cohension = 0;
+		numberOfRobotsForAvarage=0;
+		sum_RobotsGettingCloserToThePrey=0.0;
+	}
+	
+	protected void separation(Robot robot){ 
+		if(robot.isInvolvedInCollison()){    
+			numberCollisions++;
+		}
+	}
+	
+	protected void computeAligntment(Robot robot){
+		double angleOfRobot=robot.getOrientation();  
+		cos+=Math.cos(angleOfRobot);  
+		sen+=Math.sin(angleOfRobot);
+	}
+	
+	protected void cohesion(int i, ArrayList<Robot> robots , Robot robot, double widthOfEnvironemnt){
+		for(int j = i+1 ; j < robots.size() ; j++) {  
+			double percentageOfDistance=1-( robot.getPosition().distanceTo(robots.get(j).getPosition()))/ widthOfEnvironemnt;
+			if(percentageOfDistance < 0){
+				percentageOfDistance=0;
+			}
+			cohension+=percentageOfDistance ;
+			numberOfRobotsForAvarage++;
+		}
+	}
+	
+	protected void movement(Robot robot){
+		Vector2d preyPosition = simulator.getEnvironment().getPrey().get(0).getPosition();
+		Vector2d nest = new Vector2d(0, 0);
+		
+		double initialDistanceToPrey = preyPosition.distanceTo(nest);  //movement
+		sum_RobotsGettingCloserToThePrey += (1 - (robot.getDistanceBetween(preyPosition) / initialDistanceToPrey));
+	}
+	
+	
+	protected void computeSwarmFitnessOfEachRule(ArrayList<Robot> robots ){
 		currentFitnessForAlignment+=Math.sqrt(cos*cos+ sen*sen)/robots.size();
 		currentFitnessForCohesion+=cohension/numberOfRobotsForAvarage;
 		double avarage_RobotsGettingCloserToThePrey = sum_RobotsGettingCloserToThePrey/robots.size();
 		
 		if (avarage_RobotsGettingCloserToThePrey > bootstrapingComponentCloserToPrey)
 			bootstrapingComponentCloserToPrey = avarage_RobotsGettingCloserToThePrey;
-		
 	}
+	
+	
 }
