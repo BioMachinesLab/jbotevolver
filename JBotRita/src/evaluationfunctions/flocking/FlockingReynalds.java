@@ -1,4 +1,4 @@
-package evaluationfunctions;
+package evaluationfunctions.flocking;
 
 import java.util.ArrayList;
 
