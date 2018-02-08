@@ -53,6 +53,8 @@ public class ForagingFlockWithBootstraping extends ForagingFlock {
 	protected double boostrapingComponent(){
 		return bootstrapingComponentCloserToPrey; 
 	}
+	
+	
 
 
 }

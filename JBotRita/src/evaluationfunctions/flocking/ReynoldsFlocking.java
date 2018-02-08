@@ -6,6 +6,7 @@ import mathutils.Vector2d;
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 
@@ -21,7 +22,7 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 public class ReynoldsFlocking extends EvaluationFunction {
 	
-	protected double currentFitnessForAlignment, currentFitnessForCohesion, bootstrapingComponentCloserToPrey;
+	protected double fitnessForAlignment, fitnessForCohesion, fitnessForMovement;
 	
 	protected int numberCollisions;
 
@@ -30,16 +31,21 @@ public class ReynoldsFlocking extends EvaluationFunction {
 	protected double cohension = 0;
 	protected int numberOfRobotsForAvarage=0;
 	
-	protected double sum_RobotsGettingCloserToThePrey;
+	@ArgumentsAnnotation(name="cohensionDistance", defaultValue="1.0")	
+	protected double cohensionDistance;
+	
+	protected double movementContribution;
 	
 	protected Simulator simulator;
 
 	public ReynoldsFlocking(Arguments args) {
 		super(args);
+		cohensionDistance = args.getArgumentIsDefined("cohensionDistance") ? args
+				.getArgumentAsInt("cohensionDistance") : 1.0;
 	}
 	
 	public double getFitness() {
-		return currentFitnessForAlignment/simulator.getTime() + currentFitnessForCohesion/simulator.getTime()-numberCollisions/simulator.getTime()+bootstrapingComponentCloserToPrey ;
+		return fitnessForAlignment/simulator.getTime() + fitnessForCohesion/simulator.getTime()-numberCollisions/simulator.getTime()+fitnessForMovement ;
 	}
 	
 	@Override
@@ -47,7 +53,6 @@ public class ReynoldsFlocking extends EvaluationFunction {
 		init();
 		ArrayList<Robot> robots = simulator.getRobots();
 		this.simulator=simulator;
-		double widthOfEnvironemnt=simulator.getEnvironment().getWidth();
 		
 		for(int i = 0 ; i <  robots.size() ; i++) {
 			Robot robot=robots.get(i);
@@ -55,7 +60,7 @@ public class ReynoldsFlocking extends EvaluationFunction {
 			movement(robot);					
 			separation(robot);
 			alignment(robot);
-			cohesion( i,robots ,robot,  widthOfEnvironemnt);
+			cohesion( i,robots ,robot);
 		}
 		computeSwarmFitnessOfEachRule(robots);
 	}
@@ -69,7 +74,7 @@ public class ReynoldsFlocking extends EvaluationFunction {
 		sen=0;
 		cohension = 0;
 		numberOfRobotsForAvarage=0;
-		sum_RobotsGettingCloserToThePrey=0.0;
+		movementContribution=0.0;
 	}
 	
 	protected void separation(Robot robot){ 
@@ -84,33 +89,28 @@ public class ReynoldsFlocking extends EvaluationFunction {
 		sen+=Math.sin(angleOfRobot);
 	}
 	
-	protected void cohesion(int i, ArrayList<Robot> robots , Robot robot, double widthOfEnvironemnt){
+	protected void cohesion(int i, ArrayList<Robot> robots , Robot robot){
 		for(int j = i+1 ; j < robots.size() ; j++) {  
-			double percentageOfDistance=1-( robot.getPosition().distanceTo(robots.get(j).getPosition()))/ widthOfEnvironemnt;
-			if(percentageOfDistance < 0){
-				percentageOfDistance=0;
+			if(robot.getPosition().distanceTo(robots.get(j).getPosition())<=cohensionDistance){
+				cohension+=1;
 			}
-			cohension+=percentageOfDistance ;
 			numberOfRobotsForAvarage++;
 		}
 	}
 	
-	protected void movement(Robot robot){
-		Vector2d preyPosition = simulator.getEnvironment().getPrey().get(0).getPosition();
-		Vector2d nest = new Vector2d(0, 0);
-		
-		double initialDistanceToPrey = preyPosition.distanceTo(nest);  //movement
-		sum_RobotsGettingCloserToThePrey += (1 - (robot.getDistanceBetween(preyPosition) / initialDistanceToPrey));
+	protected void movement(Robot robot){ //robot getting farther away from the center (0,0)
+		double percentageOfDistanceToCenter=robot.getPosition().distanceTo(new Vector2d(0,0))/simulator.getEnvironment().getWidth();;
+		movementContribution+= percentageOfDistanceToCenter>1? 1:percentageOfDistanceToCenter;
 	}
 	
 	
 	protected void computeSwarmFitnessOfEachRule(ArrayList<Robot> robots ){
-		currentFitnessForAlignment+=Math.sqrt(cos*cos+ sen*sen)/robots.size();
-		currentFitnessForCohesion+=cohension/numberOfRobotsForAvarage;
-		double avarage_RobotsGettingCloserToThePrey = sum_RobotsGettingCloserToThePrey/robots.size();
+		fitnessForAlignment+=Math.sqrt(cos*cos+ sen*sen)/robots.size();
+		fitnessForCohesion+=cohension/numberOfRobotsForAvarage;
+		double avarage_MovementContribution = movementContribution/robots.size();
 		
-		if (avarage_RobotsGettingCloserToThePrey > bootstrapingComponentCloserToPrey)
-			bootstrapingComponentCloserToPrey = avarage_RobotsGettingCloserToThePrey;
+		if (avarage_MovementContribution > fitnessForMovement)
+			fitnessForMovement = avarage_MovementContribution;
 	}
 	
 	
