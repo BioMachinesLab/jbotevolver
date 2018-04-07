@@ -1,9 +1,11 @@
 package evaluationfunctions.flocking.metrics;
 
 import java.util.ArrayList;
+
 import simulation.Simulator;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
+import simulation.util.ArgumentsAnnotation;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 
@@ -17,6 +19,7 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 public class Alignment extends EvaluationFunction {
 
 	protected Simulator simulator;
+	
 	public Alignment(Arguments args) {
 		super(args);	
 	}
@@ -25,6 +28,7 @@ public class Alignment extends EvaluationFunction {
 	public double getFitness() {
 		return fitness/simulator.getTime();
 	}
+	
 	
 
 	@Override
@@ -40,8 +44,12 @@ public class Alignment extends EvaluationFunction {
 			cos+=Math.cos(angleOfRobot);  
 			sen+=Math.sin(angleOfRobot);
 		}
-		fitness+=Math.sqrt(cos*cos+ sen*sen)/robots.size();
+		
+		currentFitness=Math.sqrt(cos*cos+ sen*sen)/robots.size();
+		fitness+= currentFitness;
+
 	}
+	
 	
 
 }

@@ -18,8 +18,8 @@ public class NumberOfGroups extends EvaluationFunction {
 	@ArgumentsAnnotation(name = "cohensionDistance", defaultValue = "0.25")
 	protected double cohensionDistance;
 
-	HashMap<Integer, Set<Integer>> equivalenceClasses;
-
+	protected HashMap<Integer, Set<Integer>> equivalenceClasses;
+	
 	public NumberOfGroups(Arguments args) {
 		super(args);
 		cohensionDistance = args.getArgumentIsDefined("cohensionDistance") ? args
@@ -30,67 +30,72 @@ public class NumberOfGroups extends EvaluationFunction {
 	public double getFitness() {
 		return fitness / simulator.getTime();
 	}
+	
 
 	@Override
 	public void update(Simulator simulator) {
-		this.simulator = simulator;
+		init();
+		this.simulator=simulator;
+
 		ArrayList<Robot> robots = simulator.getEnvironment().getRobots();
-
-		equivalenceClasses = new HashMap<Integer, Set<Integer>>();
-
 		int robotsSize = robots.size();
 
 		for (int i = 0; i < robotsSize; i++) {
 			int robot = robots.get(i).getId();
-			for (int j = i + 1; j < robotsSize; j++) {
-				if (robots.get(i).getPosition().distanceTo(robots.get(j).getPosition()) <= cohensionDistance) {
-					int neighbour = robots.get(j).getId();
-					
-					if (equivalenceClasses.containsKey(robot)) {
-						updateGroups(robot, neighbour);
-					} else if (equivalenceClasses.containsKey(neighbour)) {
-						updateGroups(neighbour, robot);
-					} else {
-						addGroup(robot, neighbour);
-					}
-				}
-			}
+			
+			computeGroupsPairs(robot,  robots ,  i,  robotsSize);
+			
 			if (equivalenceClasses.containsKey(robot)) {
 				if (equivalenceClasses.get(robot).size() == robotsSize)
 					break;
-			} else {
+			} else { //if robot had not a pair, put in a group by itself
 				Set<Integer> newEquivalenceClass = new HashSet<Integer>();
 				newEquivalenceClass.add(robot);
 				equivalenceClasses.put(robot, newEquivalenceClass);
 			}
 		}
+		getCurrentFitness(robots);
+	}
+	
+	public void computeGroupsPairs( int robot, ArrayList<Robot> robots , int i, int robotsSize){
+		for (int j = i + 1; j < robotsSize; j++) {
+			if (robots.get(i).getPosition().distanceTo(robots.get(j).getPosition()) <= cohensionDistance) {
+				int neighbour = robots.get(j).getId();
 
-		LinkedList<Set<Integer>> groups = new LinkedList<Set<Integer>>();
+				if (equivalenceClasses.containsKey(robot)) {
+					updateGroups(robot, neighbour);
+				} else if (equivalenceClasses.containsKey(neighbour)) {
 
-		for (Set<Integer> group : equivalenceClasses.values()) {
-			if (!groups.contains(group)) {
-				groups.add(group);
+					updateGroups(neighbour, robot);
+				} else {
+
+					addGroup(robot, neighbour);
+				}
+
+				
 			}
 		}
-
-		double reward = 1 - (groups.size() / (double) robotsSize);
-		// Since this never gives 1,given that nº of groups has a min value of 1, 
-		// we have to normalize between [0,1]
-		fitness += normalize(reward, (1 - 1 / (double) robotsSize), 0, 0, 1);
 	}
-
-	protected double normalize(double value, double maxValue, double minValue, double newMinValue, double newMaxValue) {
-		return (value - minValue) * (newMaxValue - newMinValue)/ (double) (maxValue - minValue) + newMinValue;
-	}
-
+		
 	protected void updateGroups(int robot, int neighbour) {
 		if (equivalenceClasses.containsKey(neighbour)) {
-			equivalenceClasses.get(robot).addAll(equivalenceClasses.get(neighbour));
-			equivalenceClasses.get(neighbour).addAll(equivalenceClasses.get(robot));
+
+			//equivalenceClasses.get(robot).addAll(equivalenceClasses.get(neighbour));
+			//equivalenceClasses.get(neighbour).addAll(equivalenceClasses.get(robot));
+			if(!equivalenceClasses.get(robot).equals(equivalenceClasses.get(neighbour))){
+				
+				equivalenceClasses.get(neighbour).addAll(equivalenceClasses.get(robot));
+				for( int my_neighbour: equivalenceClasses.get(robot)){
+					equivalenceClasses.put(my_neighbour, equivalenceClasses.get(neighbour));
+				}
+			}
+			
 		} else {
+
 			equivalenceClasses.get(robot).add(neighbour);
 			equivalenceClasses.put(neighbour, equivalenceClasses.get(robot));
 		}
+
 	}
 
 	protected void addGroup(int robot, int neighbour) {
@@ -100,7 +105,42 @@ public class NumberOfGroups extends EvaluationFunction {
 		equivalenceClasses.put(robot, newEquivalenceClass);
 		equivalenceClasses.put(neighbour, newEquivalenceClass);
 	}
-
-
+			
+	public double getCurrentFitness(ArrayList<Robot> robots) {
+		LinkedList<Set<Integer>> groups = new LinkedList<Set<Integer>>();
+		
+		for (Set<Integer> group : equivalenceClasses.values()) {
+			if (!groups.contains(group)) {
+				groups.add(group);
+			}
+		}
+		int robotsSize=robots.size();
+		double reward = 1 - (groups.size() / (double) robotsSize); // Since this never gives 1,given that nº of groups has a min value of 1, 
+		currentFitness=normalize(reward, (1 - 1 / (double) robotsSize), 0, 0, 1); // we have to normalize between [0,1]
+		fitness += currentFitness;
+		return fitness ;
+	}
+	
+	protected double normalize(double value, double maxValue, double minValue, double newMinValue, double newMaxValue) {
+		return (value - minValue) * (newMaxValue - newMinValue)/ (double) (maxValue - minValue) + newMinValue;
+	}
+	
+	//---------------------- for being called in Reynolds Component----------//
+	
+	public boolean isAlreadyACohesiveGroup(int robot, int robotsSize){
+		return equivalenceClasses.containsKey(robot) && equivalenceClasses.get(robot).size() == robotsSize;
+	}
+		
+	public void checkRobotIsAlreadyInAGroup(int robot){
+		if (!equivalenceClasses.containsKey(robot)) {
+			Set<Integer> newEquivalenceClass = new HashSet<Integer>();
+			newEquivalenceClass.add(robot);
+			equivalenceClasses.put(robot, newEquivalenceClass);
+		}
+	}
+	
+	public void init(){
+		equivalenceClasses = new HashMap<Integer, Set<Integer>>();
+	}
 
 }

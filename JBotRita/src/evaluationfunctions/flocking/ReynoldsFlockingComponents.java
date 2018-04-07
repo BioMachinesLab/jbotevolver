@@ -1,8 +1,11 @@
 package evaluationfunctions.flocking;
 
-import java.util.ArrayList;
+
 import java.util.LinkedList;
 
+import evaluationfunctions.flocking.metrics.NG_OneDividedByGroups;
+import evaluationfunctions.flocking.metrics.NG_PercentageOfFragmentation;
+import evaluationfunctions.flocking.metrics.NumberOfGroups;
 import mathutils.Vector2d;
 import simulation.environment.Environment;
 import simulation.robot.Robot;
@@ -15,7 +18,7 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 	@ArgumentsAnnotation(name = "movement", values = { "distanceToCenter", "distanceToPrey", "areaCovarage", "Nothing" })
 	protected String movementComponent;
 
-	@ArgumentsAnnotation(name = "cohesion", values = {"degreeOfBelongingToSwarm", "degreeOfDistanceToSwarm", "Nothing" })
+	@ArgumentsAnnotation(name = "cohesion", values = {"degreeOfBelongingToSwarm", "degreeOfDistanceToSwarm", "numberOfGroups","NG_OneDividedByGroups","NG_PercentageOfFragmentation", "Nothing" })
 	protected String cohesionComponent;
 	
 	@ArgumentsAnnotation(name = "separation", values={"Yes","Nothing"})
@@ -24,19 +27,38 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 	@ArgumentsAnnotation(name = "alignment", values={"Yes","Nothing"})
 	protected String alignmentComponent;
 	
+	private Arguments args;
+	
+	private NumberOfGroups numberOfGroups;  //extends os outros... enfim...
 	
 	public ReynoldsFlockingComponents(Arguments args) {
 		super(args);
+		this.args=args;
 		movementComponent = args.getArgumentIsDefined("movement") ? (args
 				.getArgumentAsString("movement")) : "distanceToCenter";
 		cohesionComponent = args.getArgumentIsDefined("cohesion") ? (args
 				.getArgumentAsString("cohesion")) : "degreeOfBelongingToSwarm";
 		separationComponent   = args.getArgumentIsDefined("separation") ? (args.getArgumentAsString("separation")) 	: "Yes";
 		alignmentComponent   = args.getArgumentIsDefined("alignment") ?(args.getArgumentAsString("alignment")) 	: "Yes";
-
+		
+		if(cohesionComponent.equals("numberOfGroups")){
+			numberOfGroups=new NumberOfGroups(args);
+		}else if(cohesionComponent.equals("NG_OneDividedByGroups")){
+			numberOfGroups=new NG_OneDividedByGroups(args);
+		}else if(cohesionComponent.equals("NG_PercentageOfFragmentation")){
+			numberOfGroups=new NG_PercentageOfFragmentation(args);
+		}
 	}
 	
+	@Override
+	protected void init(){
+		super.init();
+		if(numberOfGroups instanceof NumberOfGroups){
+			numberOfGroups.init();
+		}
+	}
 	
+	@Override
 	protected void separation(Robot robot){ 
 		if(separationComponent.equals("Yes")){
 			super.separation(robot);
@@ -45,6 +67,7 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 		}
 	}
 	
+	@Override
 	protected void alignment(Robot robot){
 		if(alignmentComponent.equals("Yes")){
 			super.alignment(robot);
@@ -54,22 +77,36 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 	}
 	
 	@Override
-	protected void cohesion(int i, ArrayList<Robot> robots , Robot robot){
+	protected void cohesion(int i, Robot r){
 		if(cohesionComponent.equals("degreeOfBelongingToSwarm")){
-			super.cohesion(i, robots, robot);
+			super.cohesion(i, r);
 			
 		}else if(cohesionComponent.equals("degreeOfDistanceToSwarm")){
 			
 			for(int j = i+1 ; j < robots.size() ; j++) {  
-				double percentageOfDistance=1-( robot.getPosition().distanceTo(robots.get(j).getPosition()))/ cohensionDistance;
+				double percentageOfDistance=1-( r.getPosition().distanceTo(robots.get(j).getPosition()))
+						/ cohensionDistance;
 				if(percentageOfDistance < 0){
 					percentageOfDistance=0;
 				}
 				cohension+=percentageOfDistance ;
 				numberOfRobotsForAvarage++;
 			}
+		}else if(numberOfGroups instanceof NumberOfGroups ){
+			if(!numberOfGroups.isAlreadyACohesiveGroup(r.getId(), robots.size())){
+				numberOfGroups.computeGroupsPairs(r.getId(),  robots ,  i,  robots.size());
+				numberOfGroups.checkRobotIsAlreadyInAGroup(r.getId());
+			}	
 		}else{ //cohension="nothing"
 			//don't consider this component
+		}
+	}
+	
+	@Override
+	protected void computeFitnessForCohesion(){
+		if(numberOfGroups instanceof NumberOfGroups ){
+
+			fitnessForCohesion=numberOfGroups.getCurrentFitness(robots);
 		}
 	}
 
@@ -86,8 +123,7 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 			double initialDistanceToPrey = preyPosition.distanceTo(nest);
 			movementContribution += (1 - (robot.getDistanceBetween(preyPosition) / initialDistanceToPrey));
 			
-		}else if(movementComponent.equals( "areaCovarage")){
-			
+		}else if(movementComponent.equals("areaCovarage")){
 			int xPos=(int) (robot.getPosition().x);
 			int yPos=(int) (robot.getPosition().y);
 			if(robot.getPosition().x<0)
@@ -109,6 +145,7 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 			}
 			
 			Environment env=simulator.getEnvironment();
+			
 			fitnessForMovement=positionsOccupied.size()/(double)(env.getHeight()*env.getWidth());
 			
 		}else{ //nothing
@@ -128,5 +165,9 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 		}
 		return pos;
 	}
+	
+	
+	
+	
 
 }

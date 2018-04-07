@@ -31,17 +31,19 @@ public class ReynoldsFlocking extends EvaluationFunction {
 	protected double cohension = 0;
 	protected int numberOfRobotsForAvarage=0;
 	
-	@ArgumentsAnnotation(name="cohensionDistance", defaultValue="1.0")	
+	@ArgumentsAnnotation(name="cohensionDistance", defaultValue="0.25")	
 	protected double cohensionDistance;
 	
 	protected double movementContribution;
 	
 	protected Simulator simulator;
+	
+	protected ArrayList<Robot> robots;
 
 	public ReynoldsFlocking(Arguments args) {
 		super(args);
 		cohensionDistance = args.getArgumentIsDefined("cohensionDistance") ? args
-				.getArgumentAsInt("cohensionDistance") : 1.0;
+				.getArgumentAsDouble("cohensionDistance") : 0.25;
 	}
 	
 	public double getFitness() {
@@ -50,31 +52,27 @@ public class ReynoldsFlocking extends EvaluationFunction {
 	
 	@Override
 	public void update(Simulator simulator) {
-		init();
-		ArrayList<Robot> robots = simulator.getRobots();
 		this.simulator=simulator;
-		
+		init();
 		for(int i = 0 ; i <  robots.size() ; i++) {
 			Robot robot=robots.get(i);
 			
 			movement(robot);					
 			separation(robot);
 			alignment(robot);
-			cohesion( i,robots ,robot);
+			cohesion( i,robot);
 		}
-		computeSwarmFitnessOfEachRule(robots);
+		computeSwarmFitnessOfEachRule();
 	}
 	
-	
-	
-	
-	
+
 	protected void init(){
 		cos=0;
 		sen=0;
 		cohension = 0;
 		numberOfRobotsForAvarage=0;
 		movementContribution=0.0;
+		robots = simulator.getRobots();
 	}
 	
 	protected void separation(Robot robot){ 
@@ -89,7 +87,7 @@ public class ReynoldsFlocking extends EvaluationFunction {
 		sen+=Math.sin(angleOfRobot);
 	}
 	
-	protected void cohesion(int i, ArrayList<Robot> robots , Robot robot){
+	protected void cohesion(int i, Robot robot){
 		for(int j = i+1 ; j < robots.size() ; j++) {  
 			if(robot.getPosition().distanceTo(robots.get(j).getPosition())<=cohensionDistance){
 				cohension+=1;
@@ -99,18 +97,29 @@ public class ReynoldsFlocking extends EvaluationFunction {
 	}
 	
 	protected void movement(Robot robot){ //robot getting farther away from the center (0,0)
-		double percentageOfDistanceToCenter=robot.getPosition().distanceTo(new Vector2d(0,0))/simulator.getEnvironment().getWidth();;
+		double percentageOfDistanceToCenter=robot.getPosition().distanceTo(new Vector2d(0,0))/simulator.getEnvironment().getWidth();
 		movementContribution+= percentageOfDistanceToCenter>1? 1:percentageOfDistanceToCenter;
 	}
 	
 	
-	protected void computeSwarmFitnessOfEachRule(ArrayList<Robot> robots ){
-		fitnessForAlignment+=Math.sqrt(cos*cos+ sen*sen)/robots.size();
-		fitnessForCohesion+=cohension/numberOfRobotsForAvarage;
-		double avarage_MovementContribution = movementContribution/robots.size();
-		
+	protected void computeSwarmFitnessOfEachRule(){
+		computeFitnessForAlignment();
+		computeFitnessForCohesion();
+		computeFitnessForMovement();
+	}
+	
+	protected void computeFitnessForAlignment(){
+		fitnessForAlignment+=Math.sqrt(cos*cos+ sen*sen)/ robots.size();
+	}
+	
+	protected void computeFitnessForCohesion(){
+		fitnessForCohesion+=cohension/ numberOfRobotsForAvarage;
+	}
+	
+	protected void computeFitnessForMovement(){
+		double avarage_MovementContribution = movementContribution/ robots.size();
 		if (avarage_MovementContribution > fitnessForMovement)
-			fitnessForMovement = avarage_MovementContribution;
+			fitnessForMovement = avarage_MovementContribution;	
 	}
 	
 	
