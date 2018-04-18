@@ -7,6 +7,7 @@ import simulation.util.Arguments;
 
 public abstract class EvaluationFunction implements Serializable, Updatable {
 	protected double fitness;
+	protected double currentFitness;
 	protected Arguments args;
 
 	public EvaluationFunction(Arguments args) {
@@ -15,6 +16,10 @@ public abstract class EvaluationFunction implements Serializable, Updatable {
 
 	public double getFitness() {
 		return fitness;
+	}
+	
+	public double getCurrentFitness() {
+		return currentFitness;
 	}
 	
 	public Arguments getArgs() {

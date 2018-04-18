@@ -25,6 +25,8 @@ public class IntensityForagingRobotsEnviroments extends
 		}else{
 			setIntensityWithRobotsSize=true;
 		}
+		
+		//Robot a=new Robot();
 	}
 	
 	@Override
