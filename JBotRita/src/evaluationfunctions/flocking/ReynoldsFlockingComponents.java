@@ -18,7 +18,7 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 	@ArgumentsAnnotation(name = "movement", values = { "distanceToCenter", "distanceToPrey", "areaCovarage", "Nothing" })
 	protected String movementComponent;
 
-	@ArgumentsAnnotation(name = "cohesion", values = {"degreeOfBelongingToSwarm", "degreeOfDistanceToSwarm", "numberOfGroups","NG_OneDividedByGroups","NG_PercentageOfFragmentation", "Nothing" })
+	@ArgumentsAnnotation(name = "cohesion", values = {"degreeOfBelongingToSwarm", "degreeOfDistanceToSwarm", "numberOfGroups","NG_OneDividedByGroups","NG_PercentageOfFragmentation", "centerOfMassRange","Nothing" })
 	protected String cohesionComponent;
 	
 	@ArgumentsAnnotation(name = "separation", values={"Yes","Nothing"})
@@ -92,6 +92,28 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 				cohension+=percentageOfDistance ;
 				numberOfRobotsForAvarage++;
 			}
+		}else if(cohesionComponent.equals("centerOfMassRange")){
+			Vector2d robotPosition=r.getPosition();
+			double centerOfMassX=0;
+			double centerOfMassY=0;
+			double numberOfNeighboursInRange=0;
+			for(int j = 0 ; j < robots.size() ; j++) {  
+				Vector2d neighbourPosition=robots.get(j).getPosition();
+				if(robotPosition.distanceTo(neighbourPosition)<=cohensionDistance){
+					if ( i!= j) {
+						centerOfMassX+=neighbourPosition.x;
+						centerOfMassY+=neighbourPosition.y;
+						numberOfNeighboursInRange++;
+					}
+				}
+			}
+			Vector2d centerOfMass=new Vector2d(centerOfMassX/numberOfNeighboursInRange, centerOfMassY/numberOfNeighboursInRange);
+			double distanceToCenterMass=robotPosition.distanceTo(centerOfMass);
+			if(numberOfNeighboursInRange>=1){
+				cohension+=1-distanceToCenterMass/cohensionDistance;
+			}
+			numberOfRobotsForAvarage++;
+			
 		}else if(numberOfGroups instanceof NumberOfGroups ){
 			if(!numberOfGroups.isAlreadyACohesiveGroup(r.getId(), robots.size())){
 				numberOfGroups.computeGroupsPairs(r.getId(),  robots ,  i,  robots.size());
@@ -104,8 +126,8 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 	
 	@Override
 	protected void computeFitnessForCohesion(){
+		super.computeFitnessForCohesion();
 		if(numberOfGroups instanceof NumberOfGroups ){
-
 			fitnessForCohesion=numberOfGroups.getCurrentFitness(robots);
 		}
 	}
