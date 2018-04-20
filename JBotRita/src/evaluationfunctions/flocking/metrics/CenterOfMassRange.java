@@ -34,7 +34,6 @@ public class CenterOfMassRange extends EvaluationFunction  {
 				.getEnvironment().getRobots();
 
 		for(int i = 0 ; i <  robots.size() ; i++) {
-			System.out.println("robot id="+ robots.get(i).getId());
 
 			Vector2d robotPosition=robots.get(i).getPosition();
 			double centerOfMassX=0;
@@ -42,19 +41,11 @@ public class CenterOfMassRange extends EvaluationFunction  {
 			double numberOfNeighboursInRange=0;
 			for(int j = 0 ; j < robots.size() ; j++) {  
 				Vector2d neighbourPosition=robots.get(j).getPosition();
-				System.out.println("neughbout id="+ robots.get(i).getId());
 
 				if(robotPosition.distanceTo(neighbourPosition)<=cohensionDistance){
 					if ( i!= j) {
-						System.out.println("eles vêm-se");
-						System.out.println("distancia entre eles"+ robotPosition.distanceTo(neighbourPosition));
 						centerOfMassX+=neighbourPosition.x;
 						centerOfMassY+=neighbourPosition.y;
-						System.out.println("centerX"+ neighbourPosition.x);
-						System.out.println("centerY"+ neighbourPosition.y);
-						System.out.println("Sum of"+centerOfMassX);
-
-
 						numberOfNeighboursInRange++;
 					}
 				}
