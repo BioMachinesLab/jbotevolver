@@ -12,12 +12,13 @@ import mathutils.Vector2d;
 import robots.JumpingRobot;
 import robots.JumpingSumo;
 import sensors.PreyTakingAccountWallsSensor;
-import sensors.JumpRobotsSensor;
+import sensors.RobotsJumpingConeSensor;
 import simulation.environment.Environment;
 import simulation.physicalobjects.ClosePhysicalObjects;
 import simulation.physicalobjects.Prey;
 import simulation.physicalobjects.Wall;
 import simulation.physicalobjects.ClosePhysicalObjects.CloseObjectIterator;
+import simulation.physicalobjects.Wall.Edge;
 import simulation.robot.Robot;
 import simulation.robot.sensors.ConeTypeSensor;
 import simulation.robot.sensors.LightTypeSensor;
@@ -150,6 +151,7 @@ public class RitaTwoDRenderer extends TwoDRenderer {
 		graphics.fillPolygon(xp, yp, 3);
 
 		graphics.setColor(Color.BLACK);
+	
 
 	}
 
@@ -166,10 +168,13 @@ public class RitaTwoDRenderer extends TwoDRenderer {
 		}
 		graphics.fillOval(x, y, circleDiameter, circleDiameter);
 		graphics.setColor(Color.BLACK);
+		
+		
 	}
 
 	@Override
 	protected void drawCones(Graphics graphics, Robot robot){
+		
 		if(robot.getId()==0){
 		if(robotId != -1 && robot.getId() != robotId)
 			return;
@@ -566,5 +571,9 @@ public class RitaTwoDRenderer extends TwoDRenderer {
 	// r.getPosition().y);
 	//
 	// }
+	
+	
+	
+	
 
 }
