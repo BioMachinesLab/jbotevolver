@@ -36,13 +36,12 @@ public class CenterOfMassRange extends EvaluationFunction  {
 		for(int i = 0 ; i <  robots.size() ; i++) {
 
 			Vector2d robotPosition=robots.get(i).getPosition();
-			double centerOfMassX=0;
-			double centerOfMassY=0;
-			double numberOfNeighboursInRange=0;
+			double centerOfMassX=0, centerOfMassY=0, numberOfNeighboursInRange=0;
 			for(int j = 0 ; j < robots.size() ; j++) {  
 				Vector2d neighbourPosition=robots.get(j).getPosition();
 
 				if(robotPosition.distanceTo(neighbourPosition)<=cohensionDistance){
+					
 					if ( i!= j) {
 						centerOfMassX+=neighbourPosition.x;
 						centerOfMassY+=neighbourPosition.y;
@@ -56,7 +55,7 @@ public class CenterOfMassRange extends EvaluationFunction  {
 				rewardOfSwarm+=1-distanceToCenterMass/cohensionDistance;
 			}
 		}
-		currentFitness=rewardOfSwarm/(double) robots.size();
+		currentFitness=rewardOfSwarm/ robots.size();
 		fitness+= currentFitness;
 	}
 	

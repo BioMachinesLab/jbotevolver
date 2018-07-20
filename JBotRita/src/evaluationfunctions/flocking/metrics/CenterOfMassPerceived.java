@@ -35,6 +35,7 @@ public class CenterOfMassPerceived extends EvaluationFunction  {
 				.getEnvironment().getRobots();
 
 		for(int i = 0 ; i <  robots.size() ; i++) {
+			
 			Vector2d robotPosition=robots.get(i).getPosition();
 			PhysicalObject [] neighboursPerceived=(((RobotSensorWithSources)robots.get(i).getSensorByType(RobotSensorWithSources.class)).getSourcesPerceived());;
 
@@ -57,7 +58,7 @@ public class CenterOfMassPerceived extends EvaluationFunction  {
 				rewardOfSwarm+=1-distanceToCenterMass/cohensionDistance;
 			}
 		}
-		currentFitness=rewardOfSwarm/(double) robots.size();
+		currentFitness=rewardOfSwarm/ robots.size();
 		fitness+= currentFitness;
 	}
 	

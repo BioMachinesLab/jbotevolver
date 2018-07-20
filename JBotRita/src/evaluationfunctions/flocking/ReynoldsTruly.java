@@ -20,7 +20,6 @@ public class ReynoldsTruly extends EvaluationFunction {
 	protected double cos,sen;
 	
 	protected double currentCohesion = 0;
-	protected int numberOfRobotsForAvarage=0;
 	
 	@ArgumentsAnnotation(name="cohensionDistance", defaultValue="0.25")	
 	protected double cohensionDistance;
@@ -61,12 +60,6 @@ public class ReynoldsTruly extends EvaluationFunction {
 		}
 		
 		computeSwarmFitnessOfEachRule();
-		fitnessForAlignment+=Math.sqrt(cos*cos+ sen*sen)/ robots.size();
-		fitnessForCohesion+=currentCohesion/ numberOfRobotsForAvarage;
-		double avarage_MovementContribution = currentMovement/ robots.size();
-		if (avarage_MovementContribution > fitnessForMovement)
-			fitnessForMovement = avarage_MovementContribution;	
-
 	}
 	
 
@@ -74,7 +67,6 @@ public class ReynoldsTruly extends EvaluationFunction {
 		cos=0;
 		sen=0;
 		currentCohesion = 0;
-		numberOfRobotsForAvarage=0;
 		currentMovement=0.0;
 		robots = simulator.getRobots();
 	}

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import evaluationfunctions.flocking.metrics.NG_OneDividedByGroups;
 import evaluationfunctions.flocking.metrics.NG_PercentageOfFragmentation;
+import evaluationfunctions.flocking.metrics.NG_SquareOneDividedByGroups;
 import evaluationfunctions.flocking.metrics.NumberOfGroups;
 import mathutils.Vector2d;
 import sensors.RobotSensorWithSources;
@@ -20,7 +21,7 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 	@ArgumentsAnnotation(name = "movement", values = { "distanceToCenter", "distanceToPrey", "areaCovarage", "Nothing" })
 	protected String movementComponent;
 
-	@ArgumentsAnnotation(name = "cohesion", values = {"degreeOfBelongingToSwarm", "degreeOfDistanceToSwarm", "numberOfGroups","NG_OneDividedByGroups","NG_PercentageOfFragmentation", "centerOfMassPerceived","centerOfMassRange","Nothing" })
+	@ArgumentsAnnotation(name = "cohesion", values = {"degreeOfBelongingToSwarm", "degreeOfDistanceToSwarm", "numberOfGroups","NG_OneDividedByGroups","NG_SquareOneDividedByGroups","NG_PercentageOfFragmentation", "centerOfMassPerceived","centerOfMassRange","Nothing" })
 	protected String cohesionComponent;
 	
 	@ArgumentsAnnotation(name = "separation", values={"Yes","Nothing"})
@@ -47,6 +48,8 @@ public class ReynoldsFlockingComponents extends ReynoldsFlocking {
 		
 		if(cohesionComponent.equals("numberOfGroups")){
 			numberOfGroups=new NumberOfGroups(args);
+		}else if(cohesionComponent.equals("NG_SquareOneDividedByGroups")){
+			numberOfGroups=new NG_SquareOneDividedByGroups(args);
 		}else if(cohesionComponent.equals("NG_OneDividedByGroups")){
 			numberOfGroups=new NG_OneDividedByGroups(args);
 		}else if(cohesionComponent.equals("NG_PercentageOfFragmentation")){

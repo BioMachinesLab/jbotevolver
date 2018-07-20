@@ -37,9 +37,9 @@ public class ReynoldsLocally extends EvaluationFunction {
 	}
 	
 	public double getFitness() {
-		//System.out.println("alignment"+ (fitnessForAlignment/simulator.getTime()) );
-		//System.out.println("cohesion"+ (fitnessForCohesion/simulator.getTime()) );
-		//System.out.println("movemnt"+ (fitnessForMovement/simulator.getTime()) );
+		System.out.println("alignment"+ (fitnessForAlignment/simulator.getTime()) );
+		System.out.println("cohesion"+ (fitnessForCohesion/simulator.getTime()) );
+		System.out.println("movemnt"+ (fitnessForMovement/simulator.getTime()) );
 
 		return fitnessForAlignment/simulator.getTime() + fitnessForCohesion/simulator.getTime()-numberCollisions/simulator.getTime()+fitnessForMovement ;
 	}
