@@ -10,7 +10,6 @@ import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
  * Reward for getting closer from other robots
  * (for each robot, reward if it is getting closer from other robot, 
  * taking account the current distance to the robot and the max distance it can move away -width of environment)
- * 
  * @author Rita Ramos
  */
 

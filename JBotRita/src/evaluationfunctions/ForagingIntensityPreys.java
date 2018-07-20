@@ -10,7 +10,7 @@ import simulation.Simulator;
 import simulation.physicalobjects.Prey;
 import simulation.robot.Robot;
 import simulation.util.Arguments;
-import environment.ForagingIntensityPreysEnvironment;
+import environment.RoundForageIntensityEnvironment;
 import evolutionaryrobotics.evaluationfunctions.EvaluationFunction;
 
 /**
@@ -35,7 +35,7 @@ public class ForagingIntensityPreys extends EvaluationFunction{
 
 	@Override
 	public void update(Simulator simulator) {	
-		ForagingIntensityPreysEnvironment environment= ((ForagingIntensityPreysEnvironment)(simulator.getEnvironment()));
+		RoundForageIntensityEnvironment environment= ((RoundForageIntensityEnvironment)(simulator.getEnvironment()));
 		ArrayList<Prey> preys= environment.getPrey();
 		if(simulator.getTime()>0){
 			if(environment.isToChange_PreyInitialDistance()){
