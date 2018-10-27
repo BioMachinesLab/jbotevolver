@@ -56,9 +56,11 @@ public class OrientationRobotsAverageSensor extends Sensor {
 				if (robot.getId() != robotNeighbour.getId()) {
 					double differenceOfOrientation = calculateDifferenceBetweenAngles(
 							Math.toDegrees(robotNeighbour.getOrientation()),
-							Math.toDegrees(robot.getOrientation()));
-
-					sumRelativeOrientation += 0.5 * (differenceOfOrientation) / 180 + 0.5;
+							Math.toDegrees(robot.getOrientation())); // [-180,180]
+					sumRelativeOrientation += 0.5 * (differenceOfOrientation) / 180 + 0.5; // [0,1] 
+					// if diff -179 -> 0;
+					// if diff 180 -> 1;
+					// if diff 0 -> 0.5 (max score)
 					numberOfRobots_withinRange += 1.0;
 				}
 			}

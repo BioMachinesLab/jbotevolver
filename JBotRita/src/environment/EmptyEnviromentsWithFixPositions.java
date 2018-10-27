@@ -1,5 +1,7 @@
 package environment;
 
+import mathutils.Vector2d;
+import net.jafama.FastMath;
 import physicalobjects.WallWithZ;
 import simulation.Simulator;
 import simulation.environment.Environment;
@@ -10,7 +12,7 @@ import simulation.util.ArgumentsAnnotation;
 public class EmptyEnviromentsWithFixPositions extends Environment{
 
 	@ArgumentsAnnotation(name="distance", defaultValue="0.20")	
-	private double distance;
+	protected double distance;
 	
 	@ArgumentsAnnotation(name = "putWalls", values={"0","1"})
 	protected boolean putWalls;
@@ -32,11 +34,29 @@ public class EmptyEnviromentsWithFixPositions extends Environment{
 	@Override
 	public void setup(Simulator simulator) {
 		super.setup(simulator);
+	
+		//distance= FastMath.sqrtQuick(5*robots.size()/Math.PI);
+		
+		
+
 			for(Robot r : robots) {
+				//robot.size= (distance*2^2)*5
+				//distance=raiz quadrada(robot.size/5)/2
+				distance = FastMath.sqrtQuick(robots.size()/5);
 				double x = simulator.getRandom().nextDouble()*distance*2-distance;
 				double y = simulator.getRandom().nextDouble()*distance*2-distance;
+				
 				r.setPosition(x, y);
 				r.setOrientation(simulator.getRandom().nextDouble()*Math.PI*2);
+				
+				/*
+				double radius = simulator.getRandom().nextDouble() * (5*0.20)*(robots.size()/(double)5);  
+				double angle = simulator.getRandom().nextDouble() * 2 * Math.PI;
+				r.setPosition( new Vector2d(radius * Math.cos(angle), radius
+						* Math.sin(angle)));
+						*/
+				
+				
 			}
 		if(putWalls)
 			addWalls();
