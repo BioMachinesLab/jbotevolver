@@ -84,7 +84,7 @@ public class PreyPickerActuator extends Actuator {
 
 					// Stop robot
 					if (isStopRobot()) {
-						System.out.println("stop");
+						//System.out.println("stop");
 						if(robot instanceof DifferentialDriveRobot) {
 							DifferentialDriveRobot ddr = (DifferentialDriveRobot)robot;
 							ddr.setWheelSpeed(0,0);
