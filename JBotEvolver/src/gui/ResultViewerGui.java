@@ -624,10 +624,10 @@ public class ResultViewerGui extends Gui implements Updatable {
 				}
 			});
 			/*
-			 * neuralNetworkViewerCheckbox.addChangeListener(new
-			 * ChangeListener() { public void stateChanged(ChangeEvent arg0) {
-			 * JCheckBox check = (JCheckBox)arg0.getSource();
-			 * networkViewer.setVisible(check.isSelected()); } });
+			 * neuralNetworkViewerCheckbox.addChangeListener(new ChangeListener() { public
+			 * void stateChanged(ChangeEvent arg0) { JCheckBox check =
+			 * (JCheckBox)arg0.getSource(); networkViewer.setVisible(check.isSelected()); }
+			 * });
 			 */
 		}
 	}
@@ -1401,20 +1401,22 @@ public class ResultViewerGui extends Gui implements Updatable {
 				.addKeyEventDispatcher(new EnvironmentKeyDispatcher(simulator));
 
 		Controller controller = simulator.getEnvironment().getRobots().get(0).getController();
-		if (controller instanceof NeuralNetworkController) {
-			NeuralNetwork network = ((NeuralNetworkController) controller).getNeuralNetwork();
-			inputNeuronsTextField.setText(Integer.toString(network.getNumberOfInputNeurons()));
-			outputNeuronsTextField.setText(Integer.toString(network.getNumberOfOutputNeurons()));
+		if (enableDebugOptions) {
+			if (controller instanceof NeuralNetworkController) {
+				NeuralNetwork network = ((NeuralNetworkController) controller).getNeuralNetwork();
+				inputNeuronsTextField.setText(Integer.toString(network.getNumberOfInputNeurons()));
+				outputNeuronsTextField.setText(Integer.toString(network.getNumberOfOutputNeurons()));
 
-			if (network instanceof CTRNNMultilayer) {
-				CTRNNMultilayer net = (CTRNNMultilayer) network;
-				totalNeuronsTextField.setText(Integer.toString(net.getNumberOfHiddenNodes()));
-			} else {
-				totalNeuronsTextField.setText(
-						Integer.toString(network.getNumberOfInputNeurons() + network.getNumberOfOutputNeurons()));
+				if (network instanceof CTRNNMultilayer) {
+					CTRNNMultilayer net = (CTRNNMultilayer) network;
+					totalNeuronsTextField.setText(Integer.toString(net.getNumberOfHiddenNodes()));
+				} else {
+					totalNeuronsTextField.setText(
+							Integer.toString(network.getNumberOfInputNeurons() + network.getNumberOfOutputNeurons()));
+				}
+				if (network.getWeights() != null)
+					synapsesTextField.setText(Integer.toString(network.getWeights().length));
 			}
-			if(network.getWeights() != null)
-				synapsesTextField.setText(Integer.toString(network.getWeights().length));
 		}
 
 		return simulator;
